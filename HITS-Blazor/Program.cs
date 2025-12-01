@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
-using Services;
 
 namespace HITSBlazor
 {
@@ -13,8 +12,6 @@ namespace HITSBlazor
             builder.RootComponents.Add<HeadOutlet>("head::after");
 
             builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
-
-            builder.Services.AddScoped<IdeaService>();
 
             await builder.Build().RunAsync();
         }
