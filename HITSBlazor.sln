@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36408.4
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HITSBlazor", "HITS-Blazor\HITSBlazor.csproj", "{8D36EBFD-D815-4EC9-89D2-7FDB50097127}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{8D36EBFD-D815-4EC9-89D2-7FDB50097127}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8D36EBFD-D815-4EC9-89D2-7FDB50097127}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8D36EBFD-D815-4EC9-89D2-7FDB50097127}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8D36EBFD-D815-4EC9-89D2-7FDB50097127}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {846C2A38-36FF-45E4-B565-3D41C2E33ADE}
+	EndGlobalSection
+EndGlobal
