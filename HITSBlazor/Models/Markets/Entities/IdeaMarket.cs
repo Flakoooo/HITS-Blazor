@@ -1,5 +1,7 @@
 ﻿using HITSBlazor.Models.Common.Entities;
 using HITSBlazor.Models.Markets.Enums;
+using HITSBlazor.Models.Teams.Entities;
+using HITSBlazor.Models.Users.Entities;
 
 namespace HITSBlazor.Models.Markets.Entities
 {

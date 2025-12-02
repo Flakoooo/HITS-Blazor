@@ -1,4 +1,6 @@
 ﻿using HITSBlazor.Models.Projects.Enums;
+using HITSBlazor.Models.Teams.Entities;
+using HITSBlazor.Models.Users.Entities;
 
 namespace HITSBlazor.Models.Projects.Entities
 {

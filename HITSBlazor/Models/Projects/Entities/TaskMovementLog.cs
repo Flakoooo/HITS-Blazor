@@ -1,4 +1,4 @@
-﻿using HITSBlazor.Models.Entities;
+﻿using HITSBlazor.Models.Users.Entities;
 
 namespace HITSBlazor.Models.Projects.Entities
 {

@@ -1,4 +1,5 @@
 ﻿using HITSBlazor.Models.Common.Entities;
+using HITSBlazor.Models.Ideas.Entities;
 using HITSBlazor.Models.Teams.Entities;
 
 namespace HITSBlazor.Models.Users.Entities

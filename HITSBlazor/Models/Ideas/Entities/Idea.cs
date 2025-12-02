@@ -1,5 +1,6 @@
 ﻿using HITSBlazor.Models.Common.Entities;
 using HITSBlazor.Models.Ideas.Enums;
+using HITSBlazor.Models.Users.Entities;
 
 namespace HITSBlazor.Models.Ideas.Entities
 {

@@ -1,5 +1,4 @@
-﻿using HITSBlazor.Models.Interfaces;
-using HITSBlazor.Models.Projects.Enums;
+﻿using HITSBlazor.Models.Projects.Enums;
 
 namespace HITSBlazor.Models.Projects.Entities
 {
@@ -11,6 +10,6 @@ namespace HITSBlazor.Models.Projects.Entities
         public string LastName { get; set; } = string.Empty;
         public ProjectMemberRole ProjectRole { get; set; }
         public int Mark { get; set; }
-        public List<ITask>? Tasks { get; set; }
+        public List<Task>? Tasks { get; set; }
     }
 }
