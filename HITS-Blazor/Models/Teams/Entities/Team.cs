@@ -1,0 +1,27 @@
+﻿using HITSBlazor.Models.Common.Entities;
+
+namespace HITSBlazor.Models.Teams.Entities
+{
+    public class Team
+    {
+        public string Id { get; set; } = string.Empty;
+        public string CreatedAt { get; set; } = string.Empty;
+
+        public string Name { get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty;
+        public bool Closed { get; set; }
+        public bool IsRefused { get; set; }
+        public int MembersCount { get; set; }
+        public TeamMember Owner { get; set; } = new();
+        public TeamMember? Leader { get; set; }
+
+        public List<TeamMember> Members { get; set; } = new();
+        public List<Skill> Skills { get; set; } = new();
+        public List<Skill> WantedSkills { get; set; } = new();
+        public TeamTags Tags { get; set; } = new();
+        public bool? StatusQuest { get; set; }
+
+        public bool HasActiveProject { get; set; }
+        public bool IsAcceptedToIdea { get; set; }
+    }
+}

@@ -1,0 +1,19 @@
+﻿@namespace HITSBlazor.Components.Icon
+
+<i id="@Id" class="@GetIconClass()" @onclick="OnClick"></i>
+
+@code {
+    [Parameter] public string? Id { get; set; }
+    [Parameter] public string? ClassName { get; set; }
+    [Parameter] public EventCallback OnClick { get; set; }
+
+    private string GetIconClass()
+    {
+        var classes = new List<string> { "icon" };
+        
+        if (!string.IsNullOrEmpty(ClassName))
+            classes.Add(ClassName);
+            
+        return string.Join(" ", classes);
+    }
+}

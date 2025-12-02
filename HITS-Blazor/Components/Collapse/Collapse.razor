@@ -1,0 +1,23 @@
+﻿@namespace HITSBlazor.Components.Collapse
+
+<div id="@Id" class="@GetCollapseClass()">
+    <div class="list-group">
+        @ChildContent
+    </div>
+</div>
+
+@code {
+    [Parameter] public string Id { get; set; } = string.Empty;
+    [Parameter] public string? ClassName { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+
+    private string GetCollapseClass()
+    {
+        var classes = new List<string> { "collapse" };
+
+        if (!string.IsNullOrEmpty(ClassName))
+            classes.Add(ClassName);
+
+        return string.Join(" ", classes);
+    }
+}

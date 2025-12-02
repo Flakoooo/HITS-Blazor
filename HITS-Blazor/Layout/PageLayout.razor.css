@@ -1,0 +1,34 @@
+﻿.page-layout {
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-start;
+}
+
+.page-layout__leftsidebar {
+    height: 100vh;
+    width: 85px;
+    position: fixed;
+}
+
+.page-layout__header {
+    position: sticky;
+    top: 0;
+    right: 0;
+    left: 0;
+    z-index: 6;
+    height: min-content;
+}
+
+.page-layout__content--with-header {
+    height: auto;
+}
+
+.page-layout__content--no-header {
+    height: 100vh;
+}
+
+.page-layout__content-wrapper {
+    height: 100vh;
+    display: grid;
+    grid-template-rows: min-content auto;
+}
