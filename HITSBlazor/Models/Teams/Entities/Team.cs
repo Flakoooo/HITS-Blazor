@@ -15,9 +15,9 @@ namespace HITSBlazor.Models.Teams.Entities
         public TeamMember Owner { get; set; } = new();
         public TeamMember? Leader { get; set; }
 
-        public List<TeamMember> Members { get; set; } = new();
-        public List<Skill> Skills { get; set; } = new();
-        public List<Skill> WantedSkills { get; set; } = new();
+        public List<TeamMember> Members { get; set; } = [];
+        public List<Skill> Skills { get; set; } = [];
+        public List<Skill> WantedSkills { get; set; } = [];
         public TeamTags Tags { get; set; } = new();
         public bool? StatusQuest { get; set; }
 

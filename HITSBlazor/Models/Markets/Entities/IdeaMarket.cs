@@ -20,7 +20,7 @@ namespace HITSBlazor.Models.Markets.Entities
         public string Customer { get; set; } = string.Empty;
         public int Position { get; set; }
         public Team? Team { get; set; }
-        public List<Skill> Stack { get; set; } = new();
+        public List<Skill> Stack { get; set; } = [];
         public IdeaMarketStatusType Status { get; set; }
         public int Requests { get; set; }
         public int AcceptedRequests { get; set; }

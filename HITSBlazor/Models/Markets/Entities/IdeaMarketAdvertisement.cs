@@ -9,6 +9,6 @@ namespace HITSBlazor.Models.Markets.Entities
         public string CreatedAt { get; set; } = string.Empty;
         public string Text { get; set; } = string.Empty;
         public User Sender { get; set; } = new();
-        public List<string> CheckedBy { get; set; } = new();
+        public List<string> CheckedBy { get; set; } = [];
     }
 }

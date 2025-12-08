@@ -3,6 +3,6 @@
     public class UsersSkills
     {
         public string IdUsers { get; set; } = string.Empty;
-        public List<Skill> Skills { get; set; } = new();
+        public List<Skill> Skills { get; set; } = [];
     }
 }

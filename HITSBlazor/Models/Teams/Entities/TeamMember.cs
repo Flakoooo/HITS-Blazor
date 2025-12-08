@@ -10,6 +10,6 @@ namespace HITSBlazor.Models.Teams.Entities
         public string Email { get; set; } = string.Empty;
         public string FirstName { get; set; } = string.Empty;
         public string LastName { get; set; } = string.Empty;
-        public List<Skill> Skills { get; set; } = new();
+        public List<Skill> Skills { get; set; } = [];
     }
 }
