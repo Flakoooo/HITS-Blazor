@@ -13,7 +13,7 @@
         public int? TechnicalRealizability { get; set; }
         public int? Suitability { get; set; }
         public int? Budget { get; set; }
-        public int? RatingValue { get; set; }
+        public double? RatingValue { get; set; }
         public bool IsConfirmed { get; set; }
     }
 }

@@ -20,7 +20,7 @@ namespace HITSBlazor.Models.Projects.Entities
         public string StartDate { get; set; } = string.Empty;
         public string? FinishDate { get; set; }
 
-        public List<Tag> Tags { get; set; } = new();
-        public TaskStatus Status { get; set; }
+        public List<Tag> Tags { get; set; } = [];
+        public Enums.TaskStatus Status { get; set; }
     }
 }

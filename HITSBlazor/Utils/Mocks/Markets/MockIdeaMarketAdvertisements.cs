@@ -1,5 +1,4 @@
 ﻿using HITSBlazor.Models.Markets.Entities;
-using HITSBlazor.Models.Users.Entities;
 using HITSBlazor.Utils.Mocks.Users;
 
 namespace HITSBlazor.Utils.Mocks.Markets
@@ -12,16 +11,16 @@ namespace HITSBlazor.Utils.Mocks.Markets
 
         public static List<IdeaMarketAdvertisement> GetMockIdeaMarketAdvertisements()
         {
-            User manager = MockUsers.GetUserById(MockUsers.ManagerId);
-            User kirill = MockUsers.GetUserById(MockUsers.KirillId);
-
+            var manager = MockUsers.GetUserById(MockUsers.ManagerId);
+            var kirill = MockUsers.GetUserById(MockUsers.KirillId);
+            
             return
             [
                 new IdeaMarketAdvertisement
                 {
                     Id = BackendOnlyAdId,
                     IdeaMarketId = MockIdeaMarkets.HelperId, 
-                    CreatedAt = "2023-03-11T11:02:17Z",
+                    CreatedAt = new DateTime(2023, 3, 11, 11, 2, 17, DateTimeKind.Utc).ToString(Settings.DateFormat),
                     Text = "Для выполнения данной идеи требуются только бекендеры!",
                     Sender = manager,
                     CheckedBy = [manager.Email]
@@ -30,7 +29,7 @@ namespace HITSBlazor.Utils.Mocks.Markets
                 {
                     Id = ClosingSoonAdId,
                     IdeaMarketId = MockIdeaMarkets.HelperId,
-                    CreatedAt = "2023-03-12T11:02:17Z",
+                    CreatedAt = new DateTime(2023, 3, 12, 11, 2, 17, DateTimeKind.Utc).ToString(Settings.DateFormat),
                     Text = "Скоро набор закроется, быстрее подавайте заявки!",
                     Sender = manager,
                     CheckedBy = [manager.Email]
@@ -39,7 +38,7 @@ namespace HITSBlazor.Utils.Mocks.Markets
                 {
                     Id = NeedFrontendBackendAdId,
                     IdeaMarketId = MockIdeaMarkets.PWTechnologyId,
-                    CreatedAt = "2023-03-18T11:02:17Z",
+                    CreatedAt = new DateTime(2023, 3, 18, 11, 2, 17, DateTimeKind.Utc).ToString(Settings.DateFormat),
                     Text = "Требуются фронтендеры, бекендеры и желающие научиться новым компетенциям.",
                     Sender = kirill,
                     CheckedBy = [kirill.Email]

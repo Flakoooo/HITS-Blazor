@@ -1,6 +1,7 @@
 ﻿using HITSBlazor.Models.Markets.Entities;
 using HITSBlazor.Models.Markets.Enums;
 using HITSBlazor.Utils.Mocks.Common;
+using HITSBlazor.Utils.Mocks.Ideas;
 using HITSBlazor.Utils.Mocks.Users;
 
 namespace HITSBlazor.Utils.Mocks.Markets
@@ -13,152 +14,161 @@ namespace HITSBlazor.Utils.Mocks.Markets
         public static string CalculatorId { get; } = Guid.NewGuid().ToString();
         public static string TestId { get; } = Guid.NewGuid().ToString();
 
-        public static List<IdeaMarket> GetMockIdeaMarkets() => [
-            new IdeaMarket
-            {
-                Id = HelperId,
-                IdeaId = "dfaedabe-2b3b-44e7-851e-35c9c6409869",
-                Initiator = MockUsers.GetUserById(MockUsers.KirillId),
-                Team = null,
-                MarketId = MockMarkets.Autumn2023Id,
-                Name = "Цифровой помощник сотрудника приемной комиссии университета",
-                Problem = "null",
-                Description = "null",
-                Solution = "Разработать web приложение для прогнозирования предпочтительного направления обучения поступающих , прогноза успеваемости и успешности с применением технологий машинного обучения и искусственного интеллекта",
-                Result = "null",
-                MaxTeamSize = 7,
-                Customer = "null",
-                Position = 7,
-                Stack =
-                [
-                    MockSkills.GetSkillById(MockSkills.PythonId),
-                    MockSkills.GetSkillById(MockSkills.KerasId),
-                    MockSkills.GetSkillById(MockSkills.ScikitLearnId),
-                    MockSkills.GetSkillById(MockSkills.PostgreSQLId),
-                    MockSkills.GetSkillById(MockSkills.DockerId)
-                ],
-                Status = IdeaMarketStatusType.RECRUITMENT_IS_OPEN,
-                Requests = 0,
-                AcceptedRequests = 0,
-                IsFavorite = false
-            },
-            new IdeaMarket
-            {
-                Id = PWTechnologyId,
-                IdeaId = "279b3fbf-de63-426f-bf9f-0c01ea19706b",
-                Initiator = MockUsers.GetUserById(MockUsers.AntonId),
-                Team = null,
-                MarketId = MockMarkets.Autumn2023Id,
-                Name = "PW Technology: Интерактивное виртуальное образование с 3D тренажерами",
-                Problem = "null",
-                Description = "null",
-                Solution = "Разработка проекта по обучению людей взаимодействию с оборудованием в игровой форме, где каждый пользователь сможет примерить на себя роль нефтяника, электрика, строителя и других профессий, требующих специальных навыков и знаний.",
-                Result = "null",
-                MaxTeamSize = 7,
-                Customer = "null",
-                Position = 8,
-                Stack =
-                [
-                    MockSkills.GetSkillById(MockSkills.UnrealEngineId),
-                    MockSkills.GetSkillById(MockSkills.GitId),
-                    MockSkills.GetSkillById(MockSkills.CppId)
-                ],
-                Status = IdeaMarketStatusType.RECRUITMENT_IS_OPEN,
-                Requests = 0,
-                AcceptedRequests = 0,
-                IsFavorite = false
-            },
-            new IdeaMarket
-            {
-                Id = EMetricsViewerId,
-                IdeaId = "c2d8b869-2731-4c37-b0de-17c1950a770f",
-                Initiator = MockUsers.GetUserById(MockUsers.LubovId),
-                Team = null,
-                MarketId = MockMarkets.Autumn2023Id,
-                Name = "EMetrics.Viewer",
-                Problem = "null",
-                Description = "null",
-                Solution = "WEB-приложение (конкретная реализация выбирается разработчиками в рамках стэка React|Vue, NodeJS|Python)\nИспользование существующих у заказчика оперативных и аналитических БД в том числе тестовых.\nИспользование VPN (предоставляется заказчиком) для подключения к ресурсам заказчика с машин разработчиков.",
-                Result = "null",
-                MaxTeamSize = 5,
-                Customer = "null",
-                Position = 9,
-                Stack =
-                [
-                    MockSkills.GetSkillById(MockSkills.PythonId),
-                    MockSkills.GetSkillById(MockSkills.DockerId),
-                    MockSkills.GetSkillById(MockSkills.GoId),
-                    MockSkills.GetSkillById(MockSkills.CSharpId),
-                    MockSkills.GetSkillById(MockSkills.VueId),
-                    MockSkills.GetSkillById(MockSkills.GitId),
-                    MockSkills.GetSkillById(MockSkills.RedisId),
-                    MockSkills.GetSkillById(MockSkills.PostgreSQLId)
-                ],
-                Status = IdeaMarketStatusType.RECRUITMENT_IS_OPEN,
-                Requests = 0,
-                AcceptedRequests = 0,
-                IsFavorite = false
-            },
-            new IdeaMarket
-            {
-                Id = CalculatorId,
-                IdeaId = "a51c17fd-c089-448c-be7b-714bceee8109",
-                Initiator = MockUsers.GetUserById(MockUsers.DmitryId),
-                Team = null,
-                MarketId = MockMarkets.Autumn2023Id,
-                Name = "Расчет строительных материалов.",
-                Problem = "null",
-                Description = "null",
-                Solution = "Система, которая позволяет указать размерные характеристики объекта строительства и\\или работ, выбрать требуемый материал и получить расчет количества этих материалов.\nПродумать систему придется в рамках реализации проекта.",
-                Result = "null",
-                MaxTeamSize = 7,
-                Customer = "null",
-                Position = 10,
-                Stack =
-                [
-                    MockSkills.GetSkillById(MockSkills.PythonId),
-                    MockSkills.GetSkillById(MockSkills.DockerId),
-                    MockSkills.GetSkillById(MockSkills.GoId),
-                    MockSkills.GetSkillById(MockSkills.CSharpId),
-                    MockSkills.GetSkillById(MockSkills.VueId),
-                    MockSkills.GetSkillById(MockSkills.GitId),
-                    MockSkills.GetSkillById(MockSkills.RedisId),
-                    MockSkills.GetSkillById(MockSkills.PostgreSQLId)
-                ],
-                Status = IdeaMarketStatusType.RECRUITMENT_IS_OPEN,
-                Requests = 0,
-                AcceptedRequests = 0,
-                IsFavorite = false
-            },
-            new IdeaMarket
-            {
-                Id = TestId,
-                IdeaId = "a51c17fd-c089-448c-be7b-714bceee8109",
-                Initiator = MockUsers.GetUserById(MockUsers.KirillId),
-                Team = null,
-                MarketId = MockMarkets.Autumn2023Id,
-                Name = "Идея для проверки",
-                Problem = "null",
-                Description = "Разработать web приложение для прогнозирования предпочтительного направления обучения поступающих , прогноза успеваемости и успешности с применением технологий машинного обучения и искусственного интеллекта",
-                Solution = "Разработать web приложение для прогнозирования предпочтительного направления обучения поступающих , прогноза успеваемости и успешности с применением технологий машинного обучения и искусственного интеллекта",
-                Result = "null",
-                MaxTeamSize = 7,
-                Customer = "ВШЦТ",
-                Position = 7,
-                Stack =
-                [
-                    MockSkills.GetSkillById(MockSkills.PythonId),
-                    MockSkills.GetSkillById(MockSkills.KerasId),
-                    MockSkills.GetSkillById(MockSkills.ScikitLearnId),
-                    MockSkills.GetSkillById(MockSkills.PostgreSQLId),
-                    MockSkills.GetSkillById(MockSkills.DockerId)
-                ],
-                Status = IdeaMarketStatusType.RECRUITMENT_IS_OPEN,
-                Requests = 0,
-                AcceptedRequests = 0,
-                IsFavorite = false
-            }
-        ];
+        public static List<IdeaMarket> GetMockIdeaMarkets()
+        {
+            var helper = MockIdeas.GetIdeaById(MockIdeas.HelperId);
+            var pwTechnology = MockIdeas.GetIdeaById(MockIdeas.PWTechnologyId);
+            var eMetricsViewer = MockIdeas.GetIdeaById(MockIdeas.EMetricsViewerId);
+            var calculator = MockIdeas.GetIdeaById(MockIdeas.CalculatorId);
+            var test = MockIdeas.GetIdeaById(MockIdeas.TestId);
+
+            return [
+                new IdeaMarket
+                {
+                    Id = HelperId,
+                    IdeaId = helper!.Id,
+                    Initiator = MockUsers.GetUserById(MockUsers.KirillId),
+                    Team = null,
+                    MarketId = MockMarkets.Autumn2023Id,
+                    Name = helper.Name,
+                    Problem = helper.Problem,
+                    Description = helper.Description,
+                    Solution = helper.Solution,
+                    Result = helper.Result,
+                    MaxTeamSize = helper.MaxTeamSize,
+                    Customer = helper.Customer,
+                    Position = 7,
+                    Stack =
+                    [
+                        MockSkills.GetSkillById(MockSkills.PythonId),
+                        MockSkills.GetSkillById(MockSkills.KerasId),
+                        MockSkills.GetSkillById(MockSkills.ScikitLearnId),
+                        MockSkills.GetSkillById(MockSkills.PostgreSQLId),
+                        MockSkills.GetSkillById(MockSkills.DockerId)
+                    ],
+                    Status = IdeaMarketStatusType.RECRUITMENT_IS_OPEN,
+                    Requests = 0,
+                    AcceptedRequests = 0,
+                    IsFavorite = false
+                },
+                new IdeaMarket
+                {
+                    Id = PWTechnologyId,
+                    IdeaId = pwTechnology!.Id,
+                    Initiator = MockUsers.GetUserById(MockUsers.AntonId),
+                    Team = null,
+                    MarketId = MockMarkets.Autumn2023Id,
+                    Name = pwTechnology.Name,
+                    Problem = pwTechnology.Problem,
+                    Description = pwTechnology.Description,
+                    Solution = pwTechnology.Solution,
+                    Result = pwTechnology.Result,
+                    MaxTeamSize = pwTechnology.MaxTeamSize,
+                    Customer = pwTechnology.Customer,
+                    Position = 8,
+                    Stack =
+                    [
+                        MockSkills.GetSkillById(MockSkills.UnrealEngineId),
+                        MockSkills.GetSkillById(MockSkills.GitId),
+                        MockSkills.GetSkillById(MockSkills.CppId)
+                    ],
+                    Status = IdeaMarketStatusType.RECRUITMENT_IS_OPEN,
+                    Requests = 0,
+                    AcceptedRequests = 0,
+                    IsFavorite = false
+                },
+                new IdeaMarket
+                {
+                    Id = EMetricsViewerId,
+                    IdeaId = eMetricsViewer!.Id,
+                    Initiator = MockUsers.GetUserById(MockUsers.LubovId),
+                    Team = null,
+                    MarketId = MockMarkets.Autumn2023Id,
+                    Name = eMetricsViewer.Name,
+                    Problem = eMetricsViewer.Problem,
+                    Description = eMetricsViewer.Description,
+                    Solution = eMetricsViewer.Solution,
+                    Result = eMetricsViewer.Result,
+                    MaxTeamSize = eMetricsViewer.MaxTeamSize,
+                    Customer = eMetricsViewer.Customer,
+                    Position = 9,
+                    Stack =
+                    [
+                        MockSkills.GetSkillById(MockSkills.PythonId),
+                        MockSkills.GetSkillById(MockSkills.DockerId),
+                        MockSkills.GetSkillById(MockSkills.GoId),
+                        MockSkills.GetSkillById(MockSkills.CSharpId),
+                        MockSkills.GetSkillById(MockSkills.VueId),
+                        MockSkills.GetSkillById(MockSkills.GitId),
+                        MockSkills.GetSkillById(MockSkills.RedisId),
+                        MockSkills.GetSkillById(MockSkills.PostgreSQLId)
+                    ],
+                    Status = IdeaMarketStatusType.RECRUITMENT_IS_OPEN,
+                    Requests = 0,
+                    AcceptedRequests = 0,
+                    IsFavorite = false
+                },
+                new IdeaMarket
+                {
+                    Id = CalculatorId,
+                    IdeaId = calculator!.Id,
+                    Initiator = MockUsers.GetUserById(MockUsers.DmitryId),
+                    Team = null,
+                    MarketId = MockMarkets.Autumn2023Id,
+                    Name = calculator.Name,
+                    Problem = calculator.Problem,
+                    Description = calculator.Description,
+                    Solution = calculator.Solution,
+                    Result = calculator.Result,
+                    MaxTeamSize = calculator.MaxTeamSize,
+                    Customer = calculator.Customer,
+                    Position = 10,
+                    Stack =
+                    [
+                        MockSkills.GetSkillById(MockSkills.PythonId),
+                        MockSkills.GetSkillById(MockSkills.DockerId),
+                        MockSkills.GetSkillById(MockSkills.GoId),
+                        MockSkills.GetSkillById(MockSkills.CSharpId),
+                        MockSkills.GetSkillById(MockSkills.VueId),
+                        MockSkills.GetSkillById(MockSkills.GitId),
+                        MockSkills.GetSkillById(MockSkills.RedisId),
+                        MockSkills.GetSkillById(MockSkills.PostgreSQLId)
+                    ],
+                    Status = IdeaMarketStatusType.RECRUITMENT_IS_OPEN,
+                    Requests = 0,
+                    AcceptedRequests = 0,
+                    IsFavorite = false
+                },
+                new IdeaMarket
+                {
+                    Id = TestId,
+                    IdeaId = test!.Id,
+                    Initiator = MockUsers.GetUserById(MockUsers.KirillId),
+                    Team = null,
+                    MarketId = MockMarkets.Autumn2023Id,
+                    Name = test.Name,
+                    Problem = test.Problem,
+                    Description = test.Description,
+                    Solution = test.Solution,
+                    Result = test.Result,
+                    MaxTeamSize = test.MaxTeamSize,
+                    Customer = test.Customer,
+                    Position = 11,
+                    Stack =
+                    [
+                        MockSkills.GetSkillById(MockSkills.PythonId),
+                        MockSkills.GetSkillById(MockSkills.KerasId),
+                        MockSkills.GetSkillById(MockSkills.ScikitLearnId),
+                        MockSkills.GetSkillById(MockSkills.PostgreSQLId),
+                        MockSkills.GetSkillById(MockSkills.DockerId)
+                    ],
+                    Status = IdeaMarketStatusType.RECRUITMENT_IS_OPEN,
+                    Requests = 0,
+                    AcceptedRequests = 0,
+                    IsFavorite = false
+                }
+            ];
+        }
 
         public static IdeaMarket? GetIdeaMarketById(string id)
             => GetMockIdeaMarkets().FirstOrDefault(im => im.Id == id);

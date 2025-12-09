@@ -19,6 +19,7 @@ namespace HITSBlazor.Utils.Mocks.Users
         public static string TimurId { get; } = Guid.NewGuid().ToString();
         public static string AdminId { get; } = Guid.NewGuid().ToString();
         public static string DenisId { get; } = Guid.NewGuid().ToString();
+        public static string MagaId { get; } = Guid.NewGuid().ToString();
 
         public static List<string> CachedUserEmails => _cachedEmails ??= GetUserEmails();
 
@@ -40,7 +41,7 @@ namespace HITSBlazor.Utils.Mocks.Users
                     RoleType.TEAM_LEADER,
                     RoleType.TEACHER
                 ],
-                CreatedAt = "2023-10-20T11:02:17Z",
+                CreatedAt = new DateTime(2023, 10, 20, 11, 2, 17, DateTimeKind.Utc).ToString(Settings.DateFormat),
                 Telephone = "1111111111",
                 StudyGroup = "AAAA-22-1"
             },
@@ -60,7 +61,7 @@ namespace HITSBlazor.Utils.Mocks.Users
                     RoleType.MEMBER,
                     RoleType.TEACHER
                 ],
-                CreatedAt = "2023-10-20T11:02:17Z",
+                CreatedAt = new DateTime(2023, 10, 20, 11, 2, 17, DateTimeKind.Utc).ToString(Settings.DateFormat),
                 Telephone = "22222222222",
                 StudyGroup = "BBBB-22-1"
             },
@@ -80,7 +81,7 @@ namespace HITSBlazor.Utils.Mocks.Users
                     RoleType.MEMBER,
                     RoleType.TEACHER
                 ],
-                CreatedAt = "2023-10-20T11:02:17Z",
+                CreatedAt = new DateTime(2023, 10, 20, 11, 2, 17, DateTimeKind.Utc).ToString(Settings.DateFormat),
                 Telephone = "33333333333",
                 StudyGroup = "CCCC-22-1"
             },
@@ -100,7 +101,7 @@ namespace HITSBlazor.Utils.Mocks.Users
                     RoleType.MEMBER,
                     RoleType.TEACHER
                 ],
-                CreatedAt = "2023-10-20T11:02:17Z",
+                CreatedAt = new DateTime(2023, 10, 20, 11, 2, 17, DateTimeKind.Utc).ToString(Settings.DateFormat),
                 Telephone = "44444444444",
                 StudyGroup = "DDDD-22-1"
             },
@@ -119,7 +120,7 @@ namespace HITSBlazor.Utils.Mocks.Users
                     RoleType.ADMIN,
                     RoleType.MEMBER
                 ],
-                CreatedAt = "2023-10-20T11:02:17Z",
+                CreatedAt = new DateTime(2023, 10, 20, 11, 2, 17, DateTimeKind.Utc).ToString(Settings.DateFormat),
                 Telephone = "55555555555",
                 StudyGroup = "EEEE-22-1"
             },
@@ -138,7 +139,7 @@ namespace HITSBlazor.Utils.Mocks.Users
                     RoleType.ADMIN,
                     RoleType.MEMBER
                 ],
-                CreatedAt = "2023-10-20T11:02:17Z",
+                CreatedAt = new DateTime(2023, 10, 20, 11, 2, 17, DateTimeKind.Utc).ToString(Settings.DateFormat),
                 Telephone = "66666666666",
                 StudyGroup = "FFFF-22-1"
             },
@@ -157,7 +158,7 @@ namespace HITSBlazor.Utils.Mocks.Users
                     RoleType.ADMIN,
                     RoleType.MEMBER
                 ],
-                CreatedAt = "2023-10-20T11:02:17Z",
+                CreatedAt = new DateTime(2023, 10, 20, 11, 2, 17, DateTimeKind.Utc).ToString(Settings.DateFormat),
                 Telephone = "66667776666",
                 StudyGroup = "GGGG-22-1"
             },
@@ -176,7 +177,7 @@ namespace HITSBlazor.Utils.Mocks.Users
                     RoleType.ADMIN,
                     RoleType.MEMBER
                 ],
-                CreatedAt = "2023-10-20T11:02:17Z",
+                CreatedAt = new DateTime(2023, 10, 20, 11, 2, 17, DateTimeKind.Utc).ToString(Settings.DateFormat),
                 Telephone = "66933776666",
                 StudyGroup = "HHHH-22-1"
             },
@@ -195,7 +196,7 @@ namespace HITSBlazor.Utils.Mocks.Users
                     RoleType.ADMIN,
                     RoleType.MEMBER
                 ],
-                CreatedAt = "2023-10-20T11:02:17Z",
+                CreatedAt = new DateTime(2023, 10, 20, 11, 2, 17, DateTimeKind.Utc).ToString(Settings.DateFormat),
                 Telephone = "6699856666",
                 StudyGroup = "IIII-22-1"
             },
@@ -214,7 +215,7 @@ namespace HITSBlazor.Utils.Mocks.Users
                     RoleType.ADMIN,
                     RoleType.MEMBER
                 ],
-                CreatedAt = "2023-10-20T11:02:17Z",
+                CreatedAt = new DateTime(2023, 10, 20, 11, 2, 17, DateTimeKind.Utc).ToString(Settings.DateFormat),
                 Telephone = "6699856666",
                 StudyGroup = "AAAA-22-1"
             },
@@ -233,7 +234,7 @@ namespace HITSBlazor.Utils.Mocks.Users
                     RoleType.ADMIN,
                     RoleType.MEMBER
                 ],
-                CreatedAt = "2023-10-20T11:02:17Z",
+                CreatedAt = new DateTime(2023, 10, 20, 11, 2, 17, DateTimeKind.Utc).ToString(Settings.DateFormat),
                 Telephone = "6699986666",
                 StudyGroup = "JJJJ-22-1"
             },
@@ -252,8 +253,27 @@ namespace HITSBlazor.Utils.Mocks.Users
                     RoleType.ADMIN,
                     RoleType.MEMBER
                 ],
-                CreatedAt = "2023-10-20T11:02:17Z",
+                CreatedAt = new DateTime(2023, 10, 20, 11, 2, 17, DateTimeKind.Utc).ToString(Settings.DateFormat),
                 Telephone = "6699986726",
+                StudyGroup = "AAAA-22-1"
+            },
+            new User
+            {
+                Id = MagaId,
+                Token = "704103",
+                Email = "maga@mail.com",
+                FirstName = "Мамедага",
+                LastName = "Байрамов",
+                Roles =
+                [
+                    RoleType.INITIATOR,
+                    RoleType.PROJECT_OFFICE,
+                    RoleType.EXPERT,
+                    RoleType.ADMIN,
+                    RoleType.MEMBER
+                ],
+                CreatedAt = new DateTime(2023, 10, 20, 11, 2, 17, DateTimeKind.Utc).ToString(Settings.DateFormat),
+                Telephone = "6699986789",
                 StudyGroup = "KKKK-22-1"
             }
         ];

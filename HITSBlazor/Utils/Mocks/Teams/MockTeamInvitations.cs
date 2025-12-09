@@ -11,52 +11,23 @@ namespace HITSBlazor.Utils.Mocks.Teams
         public static string TimurInvitationId { get; } = Guid.NewGuid().ToString();
         public static string AdminInvitationId { get; } = Guid.NewGuid().ToString();
 
-        public static string MagaUserId { get; } = Guid.NewGuid().ToString();
+        public static List<TeamInvitation> GetMockTeamInvitations()
+        {
+            var maga = MockUsers.GetUserById(MockUsers.MagaId);
 
-        public static List<TeamInvitation> GetMockTeamInvitations() => [
-            //TODO: Добавить магу в базу данных моков
-            new TeamInvitation
-            {
-                Id = MagaInvitationId,
-                TeamId = MockTeams.CardId,
-                UserId = MagaUserId,
-                Email = "maga@mail.com",
-                Status = JoinStatus.ACCEPTED,
-                FirstName = "Мамедага",
-                LastName = "Байрамов"
-            },
-            //TODO: не соотвествуют правилу 1 пользователь = 1 команда
-            new TeamInvitation
-            {
-                Id = KirillInvitationId,
-                TeamId = "4",
-                UserId = MockUsers.KirillId,
-                Email = "kirill.vlasov.05@inbox.ru",
-                Status = JoinStatus.NEW,
-                FirstName = "Кирилл",
-                LastName = "Власов"
-            },
-            new TeamInvitation
-            {
-                Id = TimurInvitationId,
-                TeamId = "0",
-                UserId = MockUsers.TimurId,
-                Status = JoinStatus.ACCEPTED,
-                Email = "timyr@mail.com",
-                FirstName = "Тимур",
-                LastName = "Минязев"
-            },
-            new TeamInvitation
-            {
-                Id = AdminInvitationId,
-                TeamId = MockTeams.CardId,
-                UserId = MockUsers.AdminId,
-                Status = JoinStatus.ACCEPTED,
-                Email = "admin@mail.com",
-                FirstName = "Админ",
-                LastName = "Иванов"
-            }
-        ];
+            return [
+                new TeamInvitation
+                {
+                    Id = MagaInvitationId,
+                    TeamId = MockTeams.CardId,
+                    UserId = maga.Id,
+                    Email = maga.Email,
+                    Status = JoinStatus.ACCEPTED,
+                    FirstName = maga.FirstName,
+                    LastName = maga.LastName
+                }
+            ];
+        }
 
         public static TeamInvitation? GetInvitationById(string id)
             => GetMockTeamInvitations().FirstOrDefault(i => i.Id == id);

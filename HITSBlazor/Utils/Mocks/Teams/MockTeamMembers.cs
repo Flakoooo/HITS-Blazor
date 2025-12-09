@@ -1,5 +1,4 @@
 ﻿using HITSBlazor.Models.Teams.Entities;
-using HITSBlazor.Models.Users.Entities;
 using HITSBlazor.Utils.Mocks.Users;
 
 namespace HITSBlazor.Utils.Mocks.Teams
@@ -13,18 +12,18 @@ namespace HITSBlazor.Utils.Mocks.Teams
 
         public static List<TeamMember> GetMockTeamMembers()
         {
-            User kirill = MockUsers.GetUserById(MockUsers.KirillId);
-            User timur = MockUsers.GetUserById(MockUsers.TimurId);
-            User admin = MockUsers.GetUserById(MockUsers.AdminId);
-            User denis = MockUsers.GetUserById(MockUsers.DenisId);
+            var kirill = MockUsers.GetUserById(MockUsers.KirillId);
+            var timur = MockUsers.GetUserById(MockUsers.TimurId);
+            var admin = MockUsers.GetUserById(MockUsers.AdminId);
+            var denis = MockUsers.GetUserById(MockUsers.DenisId);
 
             return
             [
                 new TeamMember
                 {
                     Id = TimurId,
-                    TeamId = MockTeams.CardId,
-                    UserId = MockUsers.TimurId,
+                    TeamId = MockTeams.CactusId,
+                    UserId = timur.Id,
                     Email = timur.Email,
                     FirstName = timur.FirstName,
                     LastName = timur.LastName,
@@ -34,7 +33,7 @@ namespace HITSBlazor.Utils.Mocks.Teams
                 {
                     Id = KirillId,
                     TeamId = MockTeams.CardId,
-                    UserId = MockUsers.KirillId,
+                    UserId = kirill.Id,
                     Email = kirill.Email,
                     FirstName = kirill.FirstName,
                     LastName = kirill.LastName,
@@ -43,8 +42,8 @@ namespace HITSBlazor.Utils.Mocks.Teams
                 new TeamMember
                 {
                     Id = AdminId,
-                    TeamId = "0",
-                    UserId = MockUsers.AdminId,
+                    TeamId = MockTeams.CactusId,
+                    UserId = admin.Id,
                     Email = admin.Email,
                     FirstName = admin.FirstName,
                     LastName = admin.LastName,
@@ -54,7 +53,7 @@ namespace HITSBlazor.Utils.Mocks.Teams
                 {
                     Id = DenisId,
                     TeamId = MockTeams.CardId,
-                    UserId = MockUsers.DenisId,
+                    UserId = denis.Id,
                     Email = denis.Email,
                     FirstName = denis.FirstName,
                     LastName = denis.LastName,

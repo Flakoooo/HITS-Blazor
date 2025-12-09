@@ -5,6 +5,6 @@ namespace HITSBlazor.Models.Ideas.Entities
     public class IdeaSkills
     {
         public string IdeaId { get; set; } = string.Empty;
-        public List<Skill> Skills { get; set; } = new();
+        public List<Skill> Skills { get; set; } = [];
     }
 }
