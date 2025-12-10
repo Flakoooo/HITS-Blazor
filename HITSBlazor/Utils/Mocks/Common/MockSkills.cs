@@ -5,6 +5,8 @@ namespace HITSBlazor.Utils.Mocks.Common
 {
     public static class MockSkills
     {
+        private static readonly List<Skill> _skills = CreateSkills();
+
         public static string JavaScriptId { get; } = Guid.NewGuid().ToString();
         public static string PythonId { get; } = Guid.NewGuid().ToString();
         public static string RustId { get; } = Guid.NewGuid().ToString();
@@ -30,7 +32,7 @@ namespace HITSBlazor.Utils.Mocks.Common
         public static string KerasId { get; } = Guid.NewGuid().ToString();
         public static string ScikitLearnId { get; } = Guid.NewGuid().ToString();
 
-        public static List<Skill> GetMockSkills() => [
+        private static List<Skill> CreateSkills() => [
             new Skill { Id = JavaScriptId,      Name = "JavaScript",    Type = SkillType.LANGUAGE,      Confirmed = true },
             new Skill { Id = PythonId,          Name = "Python",        Type = SkillType.LANGUAGE,      Confirmed = true },
             new Skill { Id = RustId,            Name = "Rust",          Type = SkillType.LANGUAGE,      Confirmed = true },
@@ -58,27 +60,8 @@ namespace HITSBlazor.Utils.Mocks.Common
         ];
 
         public static Skill? GetSkillById(string id)
-            => GetMockSkills().FirstOrDefault(s => s.Id == id);
+            => _skills.FirstOrDefault(s => s.Id == id);
 
-        public static List<Skill> GetSkillsByType(SkillType type)
-            => [.. GetMockSkills().Where(s => s.Type == type)];
-
-        public static List<Skill> GetConfirmedSkills()
-            => [.. GetMockSkills().Where(s => s.Confirmed)];
-
-        public static Skill? GetSkillByName(string name)
-            => GetMockSkills().FirstOrDefault(s => s.Name == name);
-
-        public static List<Skill> GetLanguageSkills()
-            => GetSkillsByType(SkillType.LANGUAGE);
-
-        public static List<Skill> GetFrameworkSkills()
-            => GetSkillsByType(SkillType.FRAMEWORK);
-
-        public static List<Skill> GetDatabaseSkills()
-            => GetSkillsByType(SkillType.DATABASE);
-
-        public static List<Skill> GetDevOpsSkills()
-            => GetSkillsByType(SkillType.DEVOPS);
+        public static List<Skill> GetAllSkills() => _skills;
     }
 }

@@ -4,6 +4,8 @@ namespace HITSBlazor.Utils.Mocks.Common
 {
     public static class MockTags
     {
+        private static readonly List<Tag> _tags = CreateTags();
+
         public static string FrontendId { get; } = Guid.NewGuid().ToString();
         public static string BackendId { get; } = Guid.NewGuid().ToString();
         public static string RefactorId { get; } = Guid.NewGuid().ToString();
@@ -17,7 +19,7 @@ namespace HITSBlazor.Utils.Mocks.Common
         public static string SecurityId { get; } = Guid.NewGuid().ToString();
         public static string DesignId { get; } = Guid.NewGuid().ToString();
 
-        public static List<Tag> GetMockTags() => [
+        private static List<Tag> CreateTags() => [
             new Tag { Id = FrontendId,      Name = "Фронтенд",      Color = "#0D6EFD",  Confirmed = true    },
             new Tag { Id = BackendId,       Name = "Бекенд",        Color = "#FFA800",  Confirmed = true    },
             new Tag { Id = RefactorId,      Name = "Рефактор",      Color = "#AEA709",  Confirmed = true    },
@@ -33,15 +35,6 @@ namespace HITSBlazor.Utils.Mocks.Common
         ];
 
         public static Tag? GetTagById(string id)
-            => GetMockTags().FirstOrDefault(t => t.Id == id);
-
-        public static List<Tag> GetConfirmedTags()
-            => [.. GetMockTags().Where(t => t.Confirmed)];
-
-        public static List<Tag> GetPendingTags()
-            => [.. GetMockTags().Where(t => !t.Confirmed)];
-
-        public static Tag? GetTagByName(string name)
-            => GetMockTags().FirstOrDefault(t => t.Name == name);
+            => _tags.FirstOrDefault(t => t.Id == id);
     }
 }

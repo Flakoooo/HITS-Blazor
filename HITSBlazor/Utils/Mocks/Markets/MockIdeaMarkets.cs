@@ -1,4 +1,5 @@
-﻿using HITSBlazor.Models.Markets.Entities;
+﻿using HITSBlazor.Models.Common.Entities;
+using HITSBlazor.Models.Markets.Entities;
 using HITSBlazor.Models.Markets.Enums;
 using HITSBlazor.Utils.Mocks.Common;
 using HITSBlazor.Utils.Mocks.Ideas;
@@ -8,13 +9,15 @@ namespace HITSBlazor.Utils.Mocks.Markets
 {
     public static class MockIdeaMarkets
     {
+        private static readonly List<IdeaMarket> _ideaMarkets = CreateIdeaMarkets();
+
         public static string HelperId { get; } = Guid.NewGuid().ToString();
         public static string PWTechnologyId { get; } = Guid.NewGuid().ToString();
         public static string EMetricsViewerId { get; } = Guid.NewGuid().ToString();
         public static string CalculatorId { get; } = Guid.NewGuid().ToString();
         public static string TestId { get; } = Guid.NewGuid().ToString();
 
-        public static List<IdeaMarket> GetMockIdeaMarkets()
+        private static List<IdeaMarket> CreateIdeaMarkets()
         {
             var helper = MockIdeas.GetIdeaById(MockIdeas.HelperId);
             var pwTechnology = MockIdeas.GetIdeaById(MockIdeas.PWTechnologyId);
@@ -22,12 +25,37 @@ namespace HITSBlazor.Utils.Mocks.Markets
             var calculator = MockIdeas.GetIdeaById(MockIdeas.CalculatorId);
             var test = MockIdeas.GetIdeaById(MockIdeas.TestId);
 
+            var python = MockSkills.GetSkillById(MockSkills.PythonId)!;
+            var postgreSQL = MockSkills.GetSkillById(MockSkills.PostgreSQLId)!;
+            var docker = MockSkills.GetSkillById(MockSkills.DockerId)!;
+            var git = MockSkills.GetSkillById(MockSkills.GitId)!;
+
+            var stackAI = new List<Skill>() 
+            { 
+                python, 
+                MockSkills.GetSkillById(MockSkills.KerasId)!, 
+                MockSkills.GetSkillById(MockSkills.ScikitLearnId)!, 
+                postgreSQL, 
+                docker 
+            };
+            var stackWeb = new List<Skill>() 
+            { 
+                python, 
+                docker, 
+                MockSkills.GetSkillById(MockSkills.GoId)!, 
+                MockSkills.GetSkillById(MockSkills.CSharpId)!, 
+                MockSkills.GetSkillById(MockSkills.VueId)!, 
+                git, 
+                MockSkills.GetSkillById(MockSkills.RedisId)!, 
+                postgreSQL 
+            };
+
             return [
                 new IdeaMarket
                 {
                     Id = HelperId,
                     IdeaId = helper!.Id,
-                    Initiator = MockUsers.GetUserById(MockUsers.KirillId),
+                    Initiator = MockUsers.GetUserById(MockUsers.KirillId)!,
                     Team = null,
                     MarketId = MockMarkets.Autumn2023Id,
                     Name = helper.Name,
@@ -38,14 +66,7 @@ namespace HITSBlazor.Utils.Mocks.Markets
                     MaxTeamSize = helper.MaxTeamSize,
                     Customer = helper.Customer,
                     Position = 7,
-                    Stack =
-                    [
-                        MockSkills.GetSkillById(MockSkills.PythonId),
-                        MockSkills.GetSkillById(MockSkills.KerasId),
-                        MockSkills.GetSkillById(MockSkills.ScikitLearnId),
-                        MockSkills.GetSkillById(MockSkills.PostgreSQLId),
-                        MockSkills.GetSkillById(MockSkills.DockerId)
-                    ],
+                    Stack = [..stackAI],
                     Status = IdeaMarketStatusType.RECRUITMENT_IS_OPEN,
                     Requests = 0,
                     AcceptedRequests = 0,
@@ -55,7 +76,7 @@ namespace HITSBlazor.Utils.Mocks.Markets
                 {
                     Id = PWTechnologyId,
                     IdeaId = pwTechnology!.Id,
-                    Initiator = MockUsers.GetUserById(MockUsers.AntonId),
+                    Initiator = MockUsers.GetUserById(MockUsers.AntonId)!,
                     Team = null,
                     MarketId = MockMarkets.Autumn2023Id,
                     Name = pwTechnology.Name,
@@ -69,7 +90,7 @@ namespace HITSBlazor.Utils.Mocks.Markets
                     Stack =
                     [
                         MockSkills.GetSkillById(MockSkills.UnrealEngineId),
-                        MockSkills.GetSkillById(MockSkills.GitId),
+                        git,
                         MockSkills.GetSkillById(MockSkills.CppId)
                     ],
                     Status = IdeaMarketStatusType.RECRUITMENT_IS_OPEN,
@@ -81,7 +102,7 @@ namespace HITSBlazor.Utils.Mocks.Markets
                 {
                     Id = EMetricsViewerId,
                     IdeaId = eMetricsViewer!.Id,
-                    Initiator = MockUsers.GetUserById(MockUsers.LubovId),
+                    Initiator = MockUsers.GetUserById(MockUsers.LubovId)!,
                     Team = null,
                     MarketId = MockMarkets.Autumn2023Id,
                     Name = eMetricsViewer.Name,
@@ -92,17 +113,7 @@ namespace HITSBlazor.Utils.Mocks.Markets
                     MaxTeamSize = eMetricsViewer.MaxTeamSize,
                     Customer = eMetricsViewer.Customer,
                     Position = 9,
-                    Stack =
-                    [
-                        MockSkills.GetSkillById(MockSkills.PythonId),
-                        MockSkills.GetSkillById(MockSkills.DockerId),
-                        MockSkills.GetSkillById(MockSkills.GoId),
-                        MockSkills.GetSkillById(MockSkills.CSharpId),
-                        MockSkills.GetSkillById(MockSkills.VueId),
-                        MockSkills.GetSkillById(MockSkills.GitId),
-                        MockSkills.GetSkillById(MockSkills.RedisId),
-                        MockSkills.GetSkillById(MockSkills.PostgreSQLId)
-                    ],
+                    Stack = [..stackWeb],
                     Status = IdeaMarketStatusType.RECRUITMENT_IS_OPEN,
                     Requests = 0,
                     AcceptedRequests = 0,
@@ -112,7 +123,7 @@ namespace HITSBlazor.Utils.Mocks.Markets
                 {
                     Id = CalculatorId,
                     IdeaId = calculator!.Id,
-                    Initiator = MockUsers.GetUserById(MockUsers.DmitryId),
+                    Initiator = MockUsers.GetUserById(MockUsers.DmitryId)!,
                     Team = null,
                     MarketId = MockMarkets.Autumn2023Id,
                     Name = calculator.Name,
@@ -123,17 +134,7 @@ namespace HITSBlazor.Utils.Mocks.Markets
                     MaxTeamSize = calculator.MaxTeamSize,
                     Customer = calculator.Customer,
                     Position = 10,
-                    Stack =
-                    [
-                        MockSkills.GetSkillById(MockSkills.PythonId),
-                        MockSkills.GetSkillById(MockSkills.DockerId),
-                        MockSkills.GetSkillById(MockSkills.GoId),
-                        MockSkills.GetSkillById(MockSkills.CSharpId),
-                        MockSkills.GetSkillById(MockSkills.VueId),
-                        MockSkills.GetSkillById(MockSkills.GitId),
-                        MockSkills.GetSkillById(MockSkills.RedisId),
-                        MockSkills.GetSkillById(MockSkills.PostgreSQLId)
-                    ],
+                    Stack = [.. stackWeb],
                     Status = IdeaMarketStatusType.RECRUITMENT_IS_OPEN,
                     Requests = 0,
                     AcceptedRequests = 0,
@@ -143,7 +144,7 @@ namespace HITSBlazor.Utils.Mocks.Markets
                 {
                     Id = TestId,
                     IdeaId = test!.Id,
-                    Initiator = MockUsers.GetUserById(MockUsers.KirillId),
+                    Initiator = MockUsers.GetUserById(MockUsers.KirillId)!,
                     Team = null,
                     MarketId = MockMarkets.Autumn2023Id,
                     Name = test.Name,
@@ -154,14 +155,7 @@ namespace HITSBlazor.Utils.Mocks.Markets
                     MaxTeamSize = test.MaxTeamSize,
                     Customer = test.Customer,
                     Position = 11,
-                    Stack =
-                    [
-                        MockSkills.GetSkillById(MockSkills.PythonId),
-                        MockSkills.GetSkillById(MockSkills.KerasId),
-                        MockSkills.GetSkillById(MockSkills.ScikitLearnId),
-                        MockSkills.GetSkillById(MockSkills.PostgreSQLId),
-                        MockSkills.GetSkillById(MockSkills.DockerId)
-                    ],
+                    Stack = [.. stackAI],
                     Status = IdeaMarketStatusType.RECRUITMENT_IS_OPEN,
                     Requests = 0,
                     AcceptedRequests = 0,
@@ -169,23 +163,5 @@ namespace HITSBlazor.Utils.Mocks.Markets
                 }
             ];
         }
-
-        public static IdeaMarket? GetIdeaMarketById(string id)
-            => GetMockIdeaMarkets().FirstOrDefault(im => im.Id == id);
-
-        public static List<IdeaMarket> GetIdeaMarketsByMarketId(string marketId)
-            => [.. GetMockIdeaMarkets().Where(im => im.MarketId == marketId)];
-
-        public static List<IdeaMarket> GetOpenRecruitmentIdeaMarkets()
-            => [.. GetMockIdeaMarkets().Where(im => im.Status == IdeaMarketStatusType.RECRUITMENT_IS_OPEN)];
-
-        public static List<IdeaMarket> GetIdeaMarketsByInitiator(string initiatorId)
-            => [.. GetMockIdeaMarkets().Where(im => im.Initiator.Id == initiatorId)];
-
-        public static List<IdeaMarket> GetFavoriteIdeaMarkets()
-            => [.. GetMockIdeaMarkets().Where(im => im.IsFavorite)];
-
-        public static List<IdeaMarket> GetIdeaMarketsWithTeam()
-            => [.. GetMockIdeaMarkets().Where(im => im.Team != null)];
     }
 }

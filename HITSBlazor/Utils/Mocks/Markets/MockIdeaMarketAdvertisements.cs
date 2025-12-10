@@ -5,14 +5,16 @@ namespace HITSBlazor.Utils.Mocks.Markets
 {
     public static class MockIdeaMarketAdvertisements
     {
+        private static readonly List<IdeaMarketAdvertisement> _ideaMarketAdvertisements = CreateIdeaMarketAdvertisements();
+
         public static string BackendOnlyAdId { get; } = Guid.NewGuid().ToString();
         public static string ClosingSoonAdId { get; } = Guid.NewGuid().ToString();
         public static string NeedFrontendBackendAdId { get; } = Guid.NewGuid().ToString();
 
-        public static List<IdeaMarketAdvertisement> GetMockIdeaMarketAdvertisements()
+        private static List<IdeaMarketAdvertisement> CreateIdeaMarketAdvertisements()
         {
-            var manager = MockUsers.GetUserById(MockUsers.ManagerId);
-            var kirill = MockUsers.GetUserById(MockUsers.KirillId);
+            var manager = MockUsers.GetUserById(MockUsers.ManagerId)!;
+            var kirill = MockUsers.GetUserById(MockUsers.KirillId)!;
             
             return
             [
@@ -45,40 +47,5 @@ namespace HITSBlazor.Utils.Mocks.Markets
                 }
             ];
         }
-
-        public static IdeaMarketAdvertisement? GetAdvertisementById(string id)
-            => GetMockIdeaMarketAdvertisements().FirstOrDefault(a => a.Id == id);
-
-        public static List<IdeaMarketAdvertisement> GetAdvertisementsByIdeaMarketId(string ideaMarketId)
-            => [.. GetMockIdeaMarketAdvertisements().Where(a => a.IdeaMarketId == ideaMarketId)];
-
-        public static List<IdeaMarketAdvertisement> GetAdvertisementsBySender(string senderId)
-            => [.. GetMockIdeaMarketAdvertisements().Where(a => a.Sender.Id == senderId)];
-
-        public static List<IdeaMarketAdvertisement> GetAdvertisementsCheckedByUser(string userEmail)
-            => [.. GetMockIdeaMarketAdvertisements().Where(a => a.CheckedBy.Contains(userEmail))];
-
-        public static List<IdeaMarketAdvertisement> GetRecentAdvertisements(int count = 5)
-            => [.. GetMockIdeaMarketAdvertisements()
-                  .OrderByDescending(a => a.CreatedAt)
-                  .Take(count)];
-
-        public static bool IsAdvertisementCheckedByUser(string advertisementId, string userEmail)
-        {
-            var advertisement = GetAdvertisementById(advertisementId);
-            return advertisement?.CheckedBy.Contains(userEmail) ?? false;
-        }
-
-        public static void MarkAsChecked(string advertisementId, string userEmail)
-        {
-            var advertisement = GetAdvertisementById(advertisementId);
-            if (advertisement != null && !advertisement.CheckedBy.Contains(userEmail))
-            {
-                advertisement.CheckedBy.Add(userEmail);
-            }
-        }
-
-        public static int GetCheckCount(string advertisementId)
-            => GetAdvertisementById(advertisementId)?.CheckedBy.Count ?? 0;
     }
 }

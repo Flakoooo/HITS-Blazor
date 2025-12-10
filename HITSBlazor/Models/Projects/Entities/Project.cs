@@ -14,7 +14,7 @@ namespace HITSBlazor.Models.Projects.Entities
         public string Customer { get; set; } = string.Empty;
         public User Initiator { get; set; } = new();
         public Team Team { get; set; } = new();
-        public List<ProjectMember> Members { get; set; } = new();
+        public List<ProjectMember> Members { get; set; } = [];
 
         public ReportProject Report { get; set; } = new();
         public string StartDate { get; set; } = string.Empty;

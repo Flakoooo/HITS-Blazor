@@ -5,14 +5,16 @@ namespace HITSBlazor.Utils.Mocks.Ideas
 {
     public static class MockRatings
     {
+        private static readonly List<Rating> _ratings = CreateRatings();
+
         public static string Idea1Id { get; } = Guid.NewGuid().ToString();
         public static string Idea2Id { get; } = Guid.NewGuid().ToString();
         public static string Idea3Id { get; } = Guid.NewGuid().ToString();
 
-        public static List<Rating> GetMockRatings()
+        private static List<Rating> CreateRatings()
         {
-            var kirill = MockUsers.GetUserById(MockUsers.KirillId);
-            var ivan = MockUsers.GetUserById(MockUsers.IvanId);
+            var kirill = MockUsers.GetUserById(MockUsers.KirillId)!;
+            var ivan = MockUsers.GetUserById(MockUsers.IvanId)!;
 
             return
             [
@@ -63,26 +65,5 @@ namespace HITSBlazor.Utils.Mocks.Ideas
                 }
             ];
         }
-
-        public static Rating? GetRatingById(string id)
-            => GetMockRatings().FirstOrDefault(r => r.Id == id);
-
-        public static List<Rating> GetRatingsByIdeaId(string ideaId)
-            => [.. GetMockRatings().Where(r => r.IdeaId == ideaId)];
-
-        public static List<Rating> GetRatingsByExpertId(string expertId)
-            => [.. GetMockRatings().Where(r => r.ExpertId == expertId)];
-
-        public static List<Rating> GetConfirmedRatings()
-            => [.. GetMockRatings().Where(r => r.IsConfirmed)];
-
-        public static List<Rating> GetUnconfirmedRatings()
-            => [.. GetMockRatings().Where(r => !r.IsConfirmed)];
-
-        public static int GetRatingsCountForIdea(string ideaId)
-            => GetRatingsByIdeaId(ideaId).Count;
-
-        public static bool HasExpertRatedIdea(string expertId, string ideaId)
-            => GetMockRatings().Any(r => r.ExpertId == expertId && r.IdeaId == ideaId);
     }
 }

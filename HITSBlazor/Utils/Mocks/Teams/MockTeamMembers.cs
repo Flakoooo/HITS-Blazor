@@ -5,17 +5,19 @@ namespace HITSBlazor.Utils.Mocks.Teams
 {
     public static class MockTeamMembers
     {
+        private static readonly List<TeamMember> _teamMembers = CreateTeamMembers();
+
         public static string KirillId { get; } = Guid.NewGuid().ToString();
         public static string TimurId { get; } = Guid.NewGuid().ToString();
         public static string AdminId { get; } = Guid.NewGuid().ToString();
         public static string DenisId { get; } = Guid.NewGuid().ToString();
 
-        public static List<TeamMember> GetMockTeamMembers()
+        private static List<TeamMember> CreateTeamMembers()
         {
-            var kirill = MockUsers.GetUserById(MockUsers.KirillId);
-            var timur = MockUsers.GetUserById(MockUsers.TimurId);
-            var admin = MockUsers.GetUserById(MockUsers.AdminId);
-            var denis = MockUsers.GetUserById(MockUsers.DenisId);
+            var kirill = MockUsers.GetUserById(MockUsers.KirillId)!;
+            var timur = MockUsers.GetUserById(MockUsers.TimurId)!;
+            var admin = MockUsers.GetUserById(MockUsers.AdminId)!;
+            var denis = MockUsers.GetUserById(MockUsers.DenisId)!;
 
             return
             [
@@ -63,18 +65,6 @@ namespace HITSBlazor.Utils.Mocks.Teams
         }
 
         public static TeamMember? GetTeamMemberById(string id)
-            => GetMockTeamMembers().FirstOrDefault(tm => tm.Id == id);
-
-        public static List<TeamMember> GetTeamMembersByTeamId(string teamId)
-            => [.. GetMockTeamMembers().Where(tm => tm.TeamId == teamId)];
-
-        public static List<TeamMember> GetTeamMembersByUserId(string userId)
-            => [.. GetMockTeamMembers().Where(tm => tm.UserId == userId)];
-
-        public static TeamMember? GetTeamMemberByEmail(string email)
-            => GetMockTeamMembers().FirstOrDefault(tm => tm.Email == email);
-
-        public static string GetFullName(this TeamMember teamMember)
-            => $"{teamMember.FirstName} {teamMember.LastName}";
+            => _teamMembers.FirstOrDefault(tm => tm.Id == id);
     }
 }

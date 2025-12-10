@@ -6,6 +6,9 @@ namespace HITSBlazor.Utils.Mocks.Users
     public static class MockUsers
     {
         private static List<string>? _cachedEmails;
+        private static readonly List<User> _users = CreateUsers();
+
+        public static List<string> CachedUserEmails => _cachedEmails ??= GetUserEmails();
 
         public static string KirillId { get; } = Guid.NewGuid().ToString();
         public static string IvanId { get; } = Guid.NewGuid().ToString();
@@ -20,10 +23,9 @@ namespace HITSBlazor.Utils.Mocks.Users
         public static string AdminId { get; } = Guid.NewGuid().ToString();
         public static string DenisId { get; } = Guid.NewGuid().ToString();
         public static string MagaId { get; } = Guid.NewGuid().ToString();
+        public static string AlexId { get; } = Guid.NewGuid().ToString();
 
-        public static List<string> CachedUserEmails => _cachedEmails ??= GetUserEmails();
-
-        public static List<User> GetMockUsers() => [ 
+        private static List<User> CreateUsers() => [ 
             new User
             {
                 Id = KirillId,
@@ -255,7 +257,7 @@ namespace HITSBlazor.Utils.Mocks.Users
                 ],
                 CreatedAt = new DateTime(2023, 10, 20, 11, 2, 17, DateTimeKind.Utc).ToString(Settings.DateFormat),
                 Telephone = "6699986726",
-                StudyGroup = "AAAA-22-1"
+                StudyGroup = "KKKK-22-1"
             },
             new User
             {
@@ -274,23 +276,35 @@ namespace HITSBlazor.Utils.Mocks.Users
                 ],
                 CreatedAt = new DateTime(2023, 10, 20, 11, 2, 17, DateTimeKind.Utc).ToString(Settings.DateFormat),
                 Telephone = "6699986789",
-                StudyGroup = "KKKK-22-1"
+                StudyGroup = "AAAA-22-1"
+            },
+            new User
+            {
+                Id = AlexId,
+                Token = "709803",
+                Email = "alex@inbox.ru",
+                FirstName = "Алексей",
+                LastName = "Князев",
+                Roles =
+                [
+                    RoleType.INITIATOR,
+                    RoleType.PROJECT_OFFICE,
+                    RoleType.EXPERT,
+                    RoleType.ADMIN,
+                    RoleType.MEMBER
+                ],
+                CreatedAt = new DateTime(2023, 10, 20, 11, 2, 17, DateTimeKind.Utc).ToString(Settings.DateFormat),
+                Telephone = "6699986789",
+                StudyGroup = "LLLL-22-1"
             }
         ];
 
-        public static User GetUserById(string id)
-            => GetMockUsers().FirstOrDefault(u => u.Id == id) ?? new User();
-
-        public static User GetUserByEmail(string email)
-            => GetMockUsers().FirstOrDefault(u => u.Email == email) ?? new User();
-
-        public static List<User> GetUsersByRole(RoleType role)
-            => [.. GetMockUsers().Where(u => u.Roles.Contains(role))];
+        public static User? GetUserById(string id)
+            => _users.FirstOrDefault(u => u.Id == id);
 
         public static List<string> GetUserEmails() 
-            => [.. GetMockUsers().Select(u => u.Email)];
+            => [.. _users.Select(u => u.Email)];
 
-        public static User GetCurrentUser()
-            => GetMockUsers().First();
+        public static List<User> GetAllUsers() => _users;
     }
 }

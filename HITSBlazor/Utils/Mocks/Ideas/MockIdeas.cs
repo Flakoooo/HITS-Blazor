@@ -6,6 +6,8 @@ namespace HITSBlazor.Utils.Mocks.Ideas
 {
     public static class MockIdeas
     {
+        private static readonly List<Idea> _ideas = CreateIdeas();
+
         private static readonly string _lorem = "Lorem ipsum dolor sit amet consectetur adipisicing elit. Eius aperiam delectus possimus, voluptates quo accusamus? Consequatur, quasi rem temporibus blanditiis delectus aliquid officia aut, totam incidunt reiciendis eaque laborum fugiat!";
 
         public static string RefactorId { get; } = Guid.NewGuid().ToString();
@@ -18,15 +20,19 @@ namespace HITSBlazor.Utils.Mocks.Ideas
         public static string EMetricsViewerId { get; } = Guid.NewGuid().ToString();
         public static string CalculatorId { get; } = Guid.NewGuid().ToString();
         public static string TestId { get; } = Guid.NewGuid().ToString();
+        public static string ChatBotId { get; } = Guid.NewGuid().ToString();
+        public static string ArmatureId { get; } = Guid.NewGuid().ToString();
 
-        public static List<Idea> GetMockIdeas()
+        private static List<Idea> CreateIdeas()
         {
-            var kirill = MockUsers.GetUserById(MockUsers.KirillId);
-            var ivan = MockUsers.GetUserById(MockUsers.IvanId);
-            var manager = MockUsers.GetUserById(MockUsers.ManagerId);
-            var anton = MockUsers.GetUserById(MockUsers.AntonId);
-            var lubov = MockUsers.GetUserById(MockUsers.LubovId);
-            var dmitry = MockUsers.GetUserById(MockUsers.DmitryId);
+            var kirill = MockUsers.GetUserById(MockUsers.KirillId)!;
+            var ivan = MockUsers.GetUserById(MockUsers.IvanId)!;
+            var manager = MockUsers.GetUserById(MockUsers.ManagerId)!;
+            var anton = MockUsers.GetUserById(MockUsers.AntonId)!;
+            var lubov = MockUsers.GetUserById(MockUsers.LubovId)!;
+            var dmitry = MockUsers.GetUserById(MockUsers.DmitryId)!;
+            var alex = MockUsers.GetUserById(MockUsers.AlexId)!;
+            var admin = MockUsers.GetUserById(MockUsers.AdminId)!;
 
             return
             [
@@ -279,44 +285,61 @@ namespace HITSBlazor.Utils.Mocks.Ideas
                     Rating = 4,
                     IsChecked = false,
                     IsActive = true
+                },
+                new Idea
+                {
+                    Id = ChatBotId,
+                    Initiator = alex,
+                    Name = "Чат-бот в telegram для запросов и обращений к HR вне системы 1С",
+                    Problem = _lorem,
+                    Solution = _lorem,
+                    Result = _lorem,
+                    Description = _lorem,
+                    CreatedAt = new DateTime(2023, 10, 25, 11, 2, 17, DateTimeKind.Utc).ToString("yyyy-MM-ddTHH:mm:ssZ"),
+                    ModifiedAt = new DateTime(2023, 10, 25, 11, 2, 17, DateTimeKind.Utc).ToString("yyyy-MM-ddTHH:mm:ssZ"),
+                    Status = IdeaStatusType.ON_MARKET,
+                    MaxTeamSize = 7,
+                    MinTeamSize = 5,
+                    Customer = "ВШЦТ",
+                    ContactPerson = "ВШЦТ",
+                    Experts = null,
+                    ProjectOffice = null,
+                    Budget = 4,
+                    Suitability = 3,
+                    PreAssessment = 4,
+                    Rating = 4,
+                    IsChecked = false,
+                    IsActive = true
+                },
+                new Idea
+                {
+                    Id = ArmatureId,
+                    Initiator = admin,
+                    Name = "Прогнозирование закупок арматуры на основе исторических данных и обогащением доп. критериями",
+                    Problem = _lorem,
+                    Solution = _lorem,
+                    Result = _lorem,
+                    Description = _lorem,
+                    CreatedAt = new DateTime(2023, 10, 25, 11, 2, 17, DateTimeKind.Utc).ToString("yyyy-MM-ddTHH:mm:ssZ"),
+                    ModifiedAt = new DateTime(2023, 10, 25, 11, 2, 17, DateTimeKind.Utc).ToString("yyyy-MM-ddTHH:mm:ssZ"),
+                    Status = IdeaStatusType.ON_MARKET,
+                    MaxTeamSize = 7,
+                    MinTeamSize = 5,
+                    Customer = "ВШЦТ",
+                    ContactPerson = "ВШЦТ",
+                    Experts = null,
+                    ProjectOffice = null,
+                    Budget = 4,
+                    Suitability = 3,
+                    PreAssessment = 4,
+                    Rating = 4,
+                    IsChecked = false,
+                    IsActive = true
                 }
             ];
         }
 
         public static Idea? GetIdeaById(string id)
-            => GetMockIdeas().FirstOrDefault(i => i.Id == id);
-
-        public static List<Idea> GetIdeasByStatus(IdeaStatusType status)
-            => [.. GetMockIdeas().Where(i => i.Status == status)];
-
-        public static List<Idea> GetIdeasByInitiator(string initiatorId)
-            => [.. GetMockIdeas().Where(i => i.Initiator.Id == initiatorId)];
-
-        public static List<Idea> GetActiveIdeas()
-            => [.. GetMockIdeas().Where(i => i.IsActive)];
-
-        public static List<Idea> GetCheckedIdeas()
-            => [.. GetMockIdeas().Where(i => i.IsChecked)];
-
-        public static List<Idea> GetUncheckedIdeas()
-            => [.. GetMockIdeas().Where(i => !i.IsChecked)];
-
-        public static List<Idea> GetIdeasWithRating()
-            => [.. GetMockIdeas().Where(i => i.Rating.HasValue)];
-
-        public static List<Idea> GetIdeasWithoutRating()
-            => [.. GetMockIdeas().Where(i => !i.Rating.HasValue)];
-
-        public static List<Idea> SearchIdeasByName(string searchTerm)
-            => [.. GetMockIdeas().Where(i =>
-            i.Name.Contains(searchTerm, StringComparison.OrdinalIgnoreCase))];
-
-        public static List<Idea> GetIdeasByCustomer(string customer)
-            => [.. GetMockIdeas().Where(i =>
-            i.Customer.Equals(customer, StringComparison.OrdinalIgnoreCase))];
-
-        public static List<Idea> GetIdeasForTeamSize(int teamSize)
-            => [.. GetMockIdeas().Where(i =>
-            teamSize >= i.MinTeamSize && teamSize <= i.MaxTeamSize)];
+            => _ideas.FirstOrDefault(i => i.Id == id);
     }
 }
