@@ -14,10 +14,10 @@ namespace HITSBlazor.Utils.Mocks.Projects
             var ivan = MockUsers.GetUserById(MockUsers.IvanId)!;
             var manager = MockUsers.GetUserById(MockUsers.ManagerId)!;
 
-            var authIntegrationTask = MockTasks.GetTaskById(MockTasks.AuthIntegrationId);
-            var blackThemeTask = MockTasks.GetTaskById(MockTasks.BlackThemeId);
-            var fileUploadTask = MockTasks.GetTaskById(MockTasks.FileUploadId);
-            var templatesTask = MockTasks.GetTaskById(MockTasks.TaskTemplatesId);
+            var authIntegrationTask = MockSprints.GetTaskById(MockSprints.AuthIntegrationTaskId);
+            var blackThemeTask = MockSprints.GetTaskById(MockSprints.BlackThemeTaskId);
+            var fileUploadTask = MockSprints.GetTaskById(MockSprints.FileUploadTaskId);
+            var templatesTask = MockSprints.GetTaskById(MockSprints.TaskTemplatesTaskId);
 
             return
             [

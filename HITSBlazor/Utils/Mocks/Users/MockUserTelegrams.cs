@@ -11,5 +11,8 @@ namespace HITSBlazor.Utils.Mocks.Users
             new UserTelegram { UserId = MockUsers.IvanId,   UserTag = "@chipichipi",    ChatId = "5",   IsVisible = false   },
             new UserTelegram { UserId = MockUsers.IvanId,   UserTag = "@chapachapa",    ChatId = null,  IsVisible = true    }
         ];
+
+        public static UserTelegram? GetTelegramInfoByUserId(string userId)
+            => _telegramUsers.FirstOrDefault(ut => ut.UserId == userId);
     }
 }

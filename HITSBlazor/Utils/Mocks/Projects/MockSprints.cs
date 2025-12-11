@@ -1,29 +1,31 @@
 ﻿using HITSBlazor.Models.Common.Entities;
+using HITSBlazor.Models.Projects.Entities;
+using HITSBlazor.Models.Projects.Enums;
 using HITSBlazor.Utils.Mocks.Common;
 using HITSBlazor.Utils.Mocks.Users;
 
 namespace HITSBlazor.Utils.Mocks.Projects
 {
-    public static class MockTasks
+    public static class MockSprints
     {
+        private static readonly List<Sprint> _sprints = CreateSprints();
         private static readonly List<Models.Projects.Entities.Task> _tasks = CreateTasks();
 
-        public static string AdminPanelId { get; } = Guid.NewGuid().ToString();
-        public static string MoveFunctionalId { get; } = Guid.NewGuid().ToString();
-        public static string NotifyIntegrationId { get; } = Guid.NewGuid().ToString();
-        public static string OptimizationId { get; } = Guid.NewGuid().ToString();
-        public static string AddFiltrationId { get; } = Guid.NewGuid().ToString();
-        public static string CreateStatisticId { get; } = Guid.NewGuid().ToString();
-        public static string CreateNotifyId { get; } = Guid.NewGuid().ToString();
-        public static string CalendarIntegrationId { get; } = Guid.NewGuid().ToString();
-        public static string AddCommentsId { get; } = Guid.NewGuid().ToString();
-        public static string AuthIntegrationId { get; } = Guid.NewGuid().ToString();
-        public static string BlackThemeId { get; } = Guid.NewGuid().ToString();
-        public static string FileUploadId { get; } = Guid.NewGuid().ToString();
-        public static string TaskTemplatesId { get; } = Guid.NewGuid().ToString();
-        public static string MobileAppId { get; } = Guid.NewGuid().ToString();
-        public static string VersionControlId { get; } = Guid.NewGuid().ToString();
-        public static string AccessControlId { get; } = Guid.NewGuid().ToString();
+        public static string Sprint1Id { get; } = Guid.NewGuid().ToString();
+        public static string Sprint2Id { get; } = Guid.NewGuid().ToString();
+        public static string Sprint3Id { get; } = Guid.NewGuid().ToString();
+        public static string ScrumDesignSprintId { get; } = Guid.NewGuid().ToString();
+
+        public static string AuthIntegrationTaskId { get; } = Guid.NewGuid().ToString();
+        public static string BlackThemeTaskId { get; } = Guid.NewGuid().ToString();
+        public static string FileUploadTaskId { get; } = Guid.NewGuid().ToString();
+        public static string TaskTemplatesTaskId { get; } = Guid.NewGuid().ToString();
+
+        private static int SumSprintDate(int sprintCount, bool isFinishDate, int sprintDurationDays = 7)
+            => isFinishDate
+            ? sprintCount * 1 + ++sprintCount * sprintDurationDays
+            : sprintCount * (sprintDurationDays + 1);
+
 
         private static List<Models.Projects.Entities.Task> CreateTasks()
         {
@@ -45,9 +47,9 @@ namespace HITSBlazor.Utils.Mocks.Projects
             [
                 new Models.Projects.Entities.Task
                 {
-                    Id = AdminPanelId,
-                    SprintId = "3",
-                    ProjectId = "0",
+                    Id = Guid.NewGuid().ToString(),
+                    SprintId = Sprint3Id,
+                    ProjectId = MockProjects.ChatBotId,
                     Name = "Разработка административной панели управления задачами",
                     Description = "Необходимо создать административную панель для управления задачами, включая просмотр, создание, редактирование и удаление задач",
                     Initiator = kirill,
@@ -59,9 +61,9 @@ namespace HITSBlazor.Utils.Mocks.Projects
                 },
                 new Models.Projects.Entities.Task
                 {
-                    Id = MoveFunctionalId,
-                    SprintId = "3",
-                    ProjectId = "0",
+                    Id = Guid.NewGuid().ToString(),
+                    SprintId = Sprint3Id,
+                    ProjectId = MockProjects.ChatBotId,
                     Name = "Добавление функционала перетаскивания",
                     Description = "Расширить функционал системы задач, добавив возможность перетаскивать задачи для изменения их приоритета или порядка выполнения",
                     Initiator = ivan,
@@ -73,9 +75,9 @@ namespace HITSBlazor.Utils.Mocks.Projects
                 },
                 new Models.Projects.Entities.Task
                 {
-                    Id = NotifyIntegrationId,
-                    SprintId = "3",
-                    ProjectId = "0",
+                    Id = Guid.NewGuid().ToString(),
+                    SprintId = Sprint3Id,
+                    ProjectId = MockProjects.ChatBotId,
                     Name = "Интеграция с системой уведомлений",
                     Description = "Настроить интеграцию с системой уведомлений для отправки уведомлений о новых задачах, изменении статусов и прочих событиях",
                     Initiator = manager,
@@ -87,9 +89,9 @@ namespace HITSBlazor.Utils.Mocks.Projects
                 },
                 new Models.Projects.Entities.Task
                 {
-                    Id = OptimizationId,
-                    SprintId = "3",
-                    ProjectId = "0",
+                    Id = Guid.NewGuid().ToString(),
+                    SprintId = Sprint3Id,
+                    ProjectId = MockProjects.ChatBotId,
                     Name = "Улучшение производительности",
                     Description = "Провести оптимизацию работы с базой данных и алгоритмов для обеспечения быстрой работы системы даже при большом объеме задач",
                     Initiator = kirill,
@@ -101,9 +103,9 @@ namespace HITSBlazor.Utils.Mocks.Projects
                 },
                 new Models.Projects.Entities.Task
                 {
-                    Id = AddFiltrationId,
-                    SprintId = "3",
-                    ProjectId = "0",
+                    Id = Guid.NewGuid().ToString(),
+                    SprintId = Sprint3Id,
+                    ProjectId = MockProjects.ChatBotId,
                     Name = "Внедрение системы фильтрации и поиска задач",
                     Description = "Добавить возможность фильтрации и поиска задач по различным критериям для удобства работы пользователей",
                     Initiator = ivan,
@@ -116,9 +118,9 @@ namespace HITSBlazor.Utils.Mocks.Projects
                 },
                 new Models.Projects.Entities.Task
                 {
-                    Id = CreateStatisticId,
-                    SprintId = "3",
-                    ProjectId = "0",
+                    Id = Guid.NewGuid().ToString(),
+                    SprintId = Sprint3Id,
+                    ProjectId = MockProjects.ChatBotId,
                     Name = "Создание отчетности и статистики по выполненным задачам",
                     Description = "Разработать модуль для формирования отчетов и статистики по выполненным задачам в удобном для анализа формате",
                     Initiator = MockUsers.GetUserById(MockUsers.OwnerId)!,
@@ -130,9 +132,9 @@ namespace HITSBlazor.Utils.Mocks.Projects
                 },
                 new Models.Projects.Entities.Task
                 {
-                    Id = CreateNotifyId,
-                    SprintId = "3",
-                    ProjectId = "0",
+                    Id = Guid.NewGuid().ToString(),
+                    SprintId = Sprint3Id,
+                    ProjectId = MockProjects.ChatBotId,
                     Name = "Разработка механизма повторяющихся задач и напоминаний",
                     Description = "Добавить возможность создания повторяющихся задач и настройки напоминаний о них",
                     Initiator = kirill,
@@ -144,9 +146,9 @@ namespace HITSBlazor.Utils.Mocks.Projects
                 },
                 new Models.Projects.Entities.Task
                 {
-                    Id = CalendarIntegrationId,
-                    SprintId = "3",
-                    ProjectId = "0",
+                    Id = Guid.NewGuid().ToString(),
+                    SprintId = Sprint3Id,
+                    ProjectId = MockProjects.ChatBotId,
                     Name = "Интеграция с календарем",
                     Description = "Настроить интеграцию с календарем для отображения задач в виде событий и синхронизации данных",
                     Initiator = kirill,
@@ -158,9 +160,9 @@ namespace HITSBlazor.Utils.Mocks.Projects
                 },
                 new Models.Projects.Entities.Task
                 {
-                    Id = AddCommentsId,
-                    SprintId = "3",
-                    ProjectId = "0",
+                    Id = Guid.NewGuid().ToString(),
+                    SprintId = Sprint3Id,
+                    ProjectId = MockProjects.ChatBotId,
                     Name = "Добавление комментариев к задачам",
                     Description = "Расширить функционал задач путем добавления комментариев, обсуждений и возможности прикрепления файлов",
                     Initiator = ivan,
@@ -172,9 +174,9 @@ namespace HITSBlazor.Utils.Mocks.Projects
                 },
                 new Models.Projects.Entities.Task
                 {
-                    Id = AuthIntegrationId,
-                    SprintId = "3",
-                    ProjectId = "0",
+                    Id = AuthIntegrationTaskId,
+                    SprintId = Sprint3Id,
+                    ProjectId = MockProjects.ChatBotId,
                     Name = "Интеграция с системой аутентификации и авторизации",
                     Description = "Настроить интеграцию с системой аутентификации и авторизации пользователей для защиты данных и контроля доступа",
                     Initiator = kirill,
@@ -187,9 +189,9 @@ namespace HITSBlazor.Utils.Mocks.Projects
                 },
                 new Models.Projects.Entities.Task
                 {
-                    Id = BlackThemeId,
-                    SprintId = "3",
-                    ProjectId = "0",
+                    Id = BlackThemeTaskId,
+                    SprintId = Sprint3Id,
+                    ProjectId = MockProjects.ChatBotId,
                     Name = "Разработка темной темы интерфейса",
                     Description = "Создать альтернативную темную тему интерфейса для удобства пользователей",
                     Initiator = ivan,
@@ -202,9 +204,9 @@ namespace HITSBlazor.Utils.Mocks.Projects
                 },
                 new Models.Projects.Entities.Task
                 {
-                    Id = FileUploadId,
-                    SprintId = "3",
-                    ProjectId = "0",
+                    Id = FileUploadTaskId,
+                    SprintId = Sprint3Id,
+                    ProjectId = MockProjects.ChatBotId,
                     Name = "Добавление возможности прикрепления файлов",
                     Description = "Расширить функционал задач с возможностью прикрепления файлов, изображений и документов",
                     Initiator = kirill,
@@ -217,9 +219,9 @@ namespace HITSBlazor.Utils.Mocks.Projects
                 },
                 new Models.Projects.Entities.Task
                 {
-                    Id = TaskTemplatesId,
-                    SprintId = "3",
-                    ProjectId = "0",
+                    Id = TaskTemplatesTaskId,
+                    SprintId = Sprint3Id,
+                    ProjectId = MockProjects.ChatBotId,
                     Name = "Разработка системы шаблонов задач",
                     Description = "Создать возможность создания и использования шаблонов задач для быстрого добавления типовых задач",
                     Initiator = manager,
@@ -232,9 +234,9 @@ namespace HITSBlazor.Utils.Mocks.Projects
                 },
                 new Models.Projects.Entities.Task
                 {
-                    Id = MobileAppId,
+                    Id = Guid.NewGuid().ToString(),
                     SprintId = null,
-                    ProjectId = "0",
+                    ProjectId = MockProjects.ChatBotId,
                     Position = 1,
                     Name = "Разработка мобильного приложения для работы с задачами",
                     Description = "Создание мобильного приложения для удобной работы с задачами на мобильных устройствах",
@@ -247,9 +249,9 @@ namespace HITSBlazor.Utils.Mocks.Projects
                 },
                 new Models.Projects.Entities.Task
                 {
-                    Id = VersionControlId,
+                    Id = Guid.NewGuid().ToString(),
                     SprintId = null,
-                    ProjectId = "0",
+                    ProjectId = MockProjects.ChatBotId,
                     Position = 2,
                     Name = "Интеграция с системой управления версиями",
                     Description = "Настроить интеграцию с системой управления версиями для контроля изменений и хранения истории задач",
@@ -262,9 +264,9 @@ namespace HITSBlazor.Utils.Mocks.Projects
                 },
                 new Models.Projects.Entities.Task
                 {
-                    Id = AccessControlId,
+                    Id = Guid.NewGuid().ToString(),
                     SprintId = null,
-                    ProjectId = "0",
+                    ProjectId = MockProjects.ChatBotId,
                     Position = 3,
                     Name = "Внедрение системы контроля доступа ",
                     Description = "Настройка системы контроля доступа и ролевой модели для управления правами пользователей и доступом к функционалу",
@@ -278,7 +280,68 @@ namespace HITSBlazor.Utils.Mocks.Projects
             ];
         }
 
-        public static Models.Projects.Entities.Task? GetTaskById(string id)
-            => _tasks.FirstOrDefault(t => t.Id == id);
+        private static List<Sprint> CreateSprints()
+        {
+            var firstSprintDate = new DateTime(2023, 12, 26, 11, 2, 17, DateTimeKind.Utc);
+
+            return
+            [
+                new Sprint
+                {
+                    Id = Sprint1Id,
+                    ProjectId = MockProjects.ChatBotId,
+                    Name = "Спринт 1",
+                    Goal = "Цель 1",
+                    Report = "Отчет 1",
+                    StartDate = firstSprintDate.AddDays(SumSprintDate(0, false)).ToString(Settings.DateFormat),
+                    FinishDate = firstSprintDate.AddDays(SumSprintDate(0, true)).ToString(Settings.DateFormat),
+                    WorkingHours = 15,
+                    Status = SprintStatus.DONE,
+                    Tasks = [.. _tasks.Where(t => t.SprintId == Sprint1Id)]
+                },
+                new Sprint
+                {
+                    Id = Sprint2Id,
+                    ProjectId = MockProjects.ChatBotId,
+                    Name = "Спринт 2",
+                    Goal = "Цель 2",
+                    Report = "Отчет 2",
+                    StartDate = firstSprintDate.AddDays(SumSprintDate(1, false)).ToString(Settings.DateFormat),
+                    FinishDate = firstSprintDate.AddDays(SumSprintDate(1, true)).ToString(Settings.DateFormat),
+                    WorkingHours = 15,
+                    Status = SprintStatus.DONE,
+                    Tasks = [.. _tasks.Where(t => t.SprintId == Sprint2Id)]
+                },
+                new Sprint
+                {
+                    Id = Sprint3Id,
+                    ProjectId = MockProjects.ChatBotId,
+                    Name = "Спринт 3",
+                    Goal = "Цель 3",
+                    Report = "Отчет 3",
+                    StartDate = firstSprintDate.AddDays(SumSprintDate(2, false)).ToString(Settings.DateFormat),
+                    FinishDate = firstSprintDate.AddDays(SumSprintDate(2, true)).ToString(Settings.DateFormat),
+                    WorkingHours = 15,
+                    Status = SprintStatus.DONE,
+                    Tasks = [.. _tasks.Where(t => t.SprintId == Sprint3Id)]
+                },
+                new Sprint
+                {
+                    Id = ScrumDesignSprintId,
+                    ProjectId = MockProjects.ChatBotId,
+                    Name = "Проектировка скрама",
+                    Goal = "Цель 4",
+                    Report = "Отчет 4",
+                    StartDate = firstSprintDate.AddDays(SumSprintDate(3, false)).ToString(Settings.DateFormat),
+                    FinishDate = firstSprintDate.AddDays(SumSprintDate(3, true)).ToString(Settings.DateFormat),
+                    WorkingHours = 20,
+                    Status = SprintStatus.ACTIVE,
+                    Tasks = [.. _tasks.Where(t => t.SprintId == null)] // последний спринт
+                }
+            ];
+        }
+
+        public static Models.Projects.Entities.Task? GetTaskById(string taskId) =>
+            _tasks.FirstOrDefault(t => t.Id == taskId);
     }
 }

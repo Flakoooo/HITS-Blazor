@@ -44,5 +44,8 @@ namespace HITSBlazor.Utils.Mocks.Common
                 }
             ];
         }
+
+        public static List<Skill> GetUserSkillsById(string userId)
+            => _usersSkills.FirstOrDefault(us => us.IdUsers == userId)!.Skills;
     }
 }

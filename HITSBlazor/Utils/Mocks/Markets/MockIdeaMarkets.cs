@@ -3,7 +3,7 @@ using HITSBlazor.Models.Markets.Entities;
 using HITSBlazor.Models.Markets.Enums;
 using HITSBlazor.Utils.Mocks.Common;
 using HITSBlazor.Utils.Mocks.Ideas;
-using HITSBlazor.Utils.Mocks.Users;
+using HITSBlazor.Utils.Mocks.Teams;
 
 namespace HITSBlazor.Utils.Mocks.Markets
 {
@@ -15,15 +15,17 @@ namespace HITSBlazor.Utils.Mocks.Markets
         public static string PWTechnologyId { get; } = Guid.NewGuid().ToString();
         public static string EMetricsViewerId { get; } = Guid.NewGuid().ToString();
         public static string CalculatorId { get; } = Guid.NewGuid().ToString();
-        public static string TestId { get; } = Guid.NewGuid().ToString();
+        public static string ChatBotId { get; } = Guid.NewGuid().ToString();
+        public static string ArmatureId { get; } = Guid.NewGuid().ToString();
 
         private static List<IdeaMarket> CreateIdeaMarkets()
         {
-            var helper = MockIdeas.GetIdeaById(MockIdeas.HelperId);
-            var pwTechnology = MockIdeas.GetIdeaById(MockIdeas.PWTechnologyId);
-            var eMetricsViewer = MockIdeas.GetIdeaById(MockIdeas.EMetricsViewerId);
-            var calculator = MockIdeas.GetIdeaById(MockIdeas.CalculatorId);
-            var test = MockIdeas.GetIdeaById(MockIdeas.TestId);
+            var helper = MockIdeas.GetIdeaById(MockIdeas.HelperId)!;
+            var pwTechnology = MockIdeas.GetIdeaById(MockIdeas.PWTechnologyId)!;
+            var eMetricsViewer = MockIdeas.GetIdeaById(MockIdeas.EMetricsViewerId)!;
+            var calculator = MockIdeas.GetIdeaById(MockIdeas.CalculatorId)!;
+            var chatbot = MockIdeas.GetIdeaById(MockIdeas.ChatBotId)!;
+            var armature = MockIdeas.GetIdeaById(MockIdeas.ArmatureId)!;
 
             var python = MockSkills.GetSkillById(MockSkills.PythonId)!;
             var postgreSQL = MockSkills.GetSkillById(MockSkills.PostgreSQLId)!;
@@ -50,12 +52,13 @@ namespace HITSBlazor.Utils.Mocks.Markets
                 postgreSQL 
             };
 
-            return [
+            return 
+            [
                 new IdeaMarket
                 {
                     Id = HelperId,
-                    IdeaId = helper!.Id,
-                    Initiator = MockUsers.GetUserById(MockUsers.KirillId)!,
+                    IdeaId = helper.Id,
+                    Initiator = helper.Initiator,
                     Team = null,
                     MarketId = MockMarkets.Autumn2023Id,
                     Name = helper.Name,
@@ -75,8 +78,8 @@ namespace HITSBlazor.Utils.Mocks.Markets
                 new IdeaMarket
                 {
                     Id = PWTechnologyId,
-                    IdeaId = pwTechnology!.Id,
-                    Initiator = MockUsers.GetUserById(MockUsers.AntonId)!,
+                    IdeaId = pwTechnology.Id,
+                    Initiator = pwTechnology.Initiator,
                     Team = null,
                     MarketId = MockMarkets.Autumn2023Id,
                     Name = pwTechnology.Name,
@@ -101,8 +104,8 @@ namespace HITSBlazor.Utils.Mocks.Markets
                 new IdeaMarket
                 {
                     Id = EMetricsViewerId,
-                    IdeaId = eMetricsViewer!.Id,
-                    Initiator = MockUsers.GetUserById(MockUsers.LubovId)!,
+                    IdeaId = eMetricsViewer.Id,
+                    Initiator = eMetricsViewer.Initiator,
                     Team = null,
                     MarketId = MockMarkets.Autumn2023Id,
                     Name = eMetricsViewer.Name,
@@ -122,8 +125,8 @@ namespace HITSBlazor.Utils.Mocks.Markets
                 new IdeaMarket
                 {
                     Id = CalculatorId,
-                    IdeaId = calculator!.Id,
-                    Initiator = MockUsers.GetUserById(MockUsers.DmitryId)!,
+                    IdeaId = calculator.Id,
+                    Initiator = calculator.Initiator,
                     Team = null,
                     MarketId = MockMarkets.Autumn2023Id,
                     Name = calculator.Name,
@@ -142,21 +145,42 @@ namespace HITSBlazor.Utils.Mocks.Markets
                 },
                 new IdeaMarket
                 {
-                    Id = TestId,
-                    IdeaId = test!.Id,
-                    Initiator = MockUsers.GetUserById(MockUsers.KirillId)!,
-                    Team = null,
+                    Id = ChatBotId,
+                    IdeaId = chatbot.Id,
+                    Initiator = chatbot.Initiator,
+                    Team = MockTeams.GetTeamById(MockTeams.CardId),
                     MarketId = MockMarkets.Autumn2023Id,
-                    Name = test.Name,
-                    Problem = test.Problem,
-                    Description = test.Description,
-                    Solution = test.Solution,
-                    Result = test.Result,
-                    MaxTeamSize = test.MaxTeamSize,
-                    Customer = test.Customer,
+                    Name = chatbot.Name,
+                    Problem = chatbot.Problem,
+                    Description = chatbot.Description,
+                    Solution = chatbot.Solution,
+                    Result = chatbot.Result,
+                    MaxTeamSize = chatbot.MaxTeamSize,
+                    Customer = chatbot.Customer,
                     Position = 11,
                     Stack = [.. stackAI],
-                    Status = IdeaMarketStatusType.RECRUITMENT_IS_OPEN,
+                    Status = IdeaMarketStatusType.RECRUITMENT_IS_CLOSED,
+                    Requests = 0,
+                    AcceptedRequests = 0,
+                    IsFavorite = false
+                },
+                new IdeaMarket
+                {
+                    Id = ArmatureId,
+                    IdeaId = armature.Id,
+                    Initiator = armature.Initiator,
+                    Team = MockTeams.GetTeamById(MockTeams.CactusId),
+                    MarketId = MockMarkets.Autumn2023Id,
+                    Name = armature.Name,
+                    Problem = armature.Problem,
+                    Description = armature.Description,
+                    Solution = armature.Solution,
+                    Result = armature.Result,
+                    MaxTeamSize = armature.MaxTeamSize,
+                    Customer = armature.Customer,
+                    Position = 11,
+                    Stack = [.. stackAI],
+                    Status = IdeaMarketStatusType.RECRUITMENT_IS_CLOSED,
                     Requests = 0,
                     AcceptedRequests = 0,
                     IsFavorite = false

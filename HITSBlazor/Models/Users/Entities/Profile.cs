@@ -6,9 +6,9 @@ namespace HITSBlazor.Models.Users.Entities
 {
     public class Profile : User
     {
-        public List<Skill> Skills { get; set; } = new();
-        public List<Idea> Ideas { get; set; } = new();
-        public List<TeamExperience> Teams { get; set; } = new();
+        public List<Skill> Skills { get; set; } = [];
+        public List<Idea> Ideas { get; set; } = [];
+        public List<TeamExperience> Teams { get; set; } = [];
         public string? UserTag { get; set; }
         public bool? IsUserTagVisible { get; set; }
     }

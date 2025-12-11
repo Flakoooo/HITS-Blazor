@@ -13,6 +13,6 @@ namespace HITSBlazor.Models.Projects.Entities
         public string FinishDate { get; set; } = string.Empty;
         public int WorkingHours { get; set; }
         public SprintStatus Status { get; set; }
-        public List<Task> Tasks { get; set; } = new();
+        public List<Task> Tasks { get; set; } = [];
     }
 }

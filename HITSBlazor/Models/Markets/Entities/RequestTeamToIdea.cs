@@ -13,6 +13,6 @@ namespace HITSBlazor.Models.Markets.Entities
         public string Id { get; set; } = string.Empty;
         public string Name { get; set; } = string.Empty;
         public int MembersCount { get; set; }
-        public List<Skill> Skills { get; set; } = new();
+        public List<Skill> Skills { get; set; } = [];
     }
 }

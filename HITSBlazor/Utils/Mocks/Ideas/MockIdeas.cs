@@ -1,5 +1,6 @@
 ﻿using HITSBlazor.Models.Ideas.Entities;
 using HITSBlazor.Models.Ideas.Enums;
+using HITSBlazor.Utils.Mocks.Common;
 using HITSBlazor.Utils.Mocks.Users;
 
 namespace HITSBlazor.Utils.Mocks.Ideas
@@ -19,7 +20,6 @@ namespace HITSBlazor.Utils.Mocks.Ideas
         public static string PWTechnologyId { get; } = Guid.NewGuid().ToString();
         public static string EMetricsViewerId { get; } = Guid.NewGuid().ToString();
         public static string CalculatorId { get; } = Guid.NewGuid().ToString();
-        public static string TestId { get; } = Guid.NewGuid().ToString();
         public static string ChatBotId { get; } = Guid.NewGuid().ToString();
         public static string ArmatureId { get; } = Guid.NewGuid().ToString();
 
@@ -33,6 +33,8 @@ namespace HITSBlazor.Utils.Mocks.Ideas
             var dmitry = MockUsers.GetUserById(MockUsers.DmitryId)!;
             var alex = MockUsers.GetUserById(MockUsers.AlexId)!;
             var admin = MockUsers.GetUserById(MockUsers.AdminId)!;
+
+            var hits = MockCompanies.GetCompanyById(MockCompanies.HITSId)!;
 
             return
             [
@@ -50,8 +52,8 @@ namespace HITSBlazor.Utils.Mocks.Ideas
                     Status = IdeaStatusType.ON_CONFIRMATION,
                     MaxTeamSize = 7,
                     MinTeamSize = 3,
-                    Customer = "ВШЦТ",
-                    ContactPerson = "ВШЦТ",
+                    Customer = hits.Name,
+                    ContactPerson = hits.Name,
                     Experts = null,
                     ProjectOffice = null,
                     Budget = 1,
@@ -75,8 +77,8 @@ namespace HITSBlazor.Utils.Mocks.Ideas
                     Status = IdeaStatusType.ON_APPROVAL,
                     MaxTeamSize = 4,
                     MinTeamSize = 3,
-                    Customer = "ВШЦТ",
-                    ContactPerson = "ВШЦТ",
+                    Customer = hits.Name,
+                    ContactPerson = hits.Name,
                     Experts = null,
                     ProjectOffice = null,
                     Budget = 4,
@@ -100,8 +102,8 @@ namespace HITSBlazor.Utils.Mocks.Ideas
                     Status = IdeaStatusType.NEW,
                     MaxTeamSize = 5,
                     MinTeamSize = 5,
-                    Customer = "ВШЦТ",
-                    ContactPerson = "ВШЦТ",
+                    Customer = hits.Name,
+                    ContactPerson = hits.Name,
                     Experts = null,
                     ProjectOffice = null,
                     Budget = 4,
@@ -125,8 +127,8 @@ namespace HITSBlazor.Utils.Mocks.Ideas
                     Status = IdeaStatusType.CONFIRMED,
                     MaxTeamSize = 5,
                     MinTeamSize = 5,
-                    Customer = "ВШЦТ",
-                    ContactPerson = "ВШЦТ",
+                    Customer = hits.Name,
+                    ContactPerson = hits.Name,
                     Experts = null,
                     ProjectOffice = null,
                     Budget = 4,
@@ -150,8 +152,8 @@ namespace HITSBlazor.Utils.Mocks.Ideas
                     Status = IdeaStatusType.CONFIRMED,
                     MaxTeamSize = 5,
                     MinTeamSize = 5,
-                    Customer = "ВШЦТ",
-                    ContactPerson = "ВШЦТ",
+                    Customer = hits.Name,
+                    ContactPerson = hits.Name,
                     Experts = null,
                     ProjectOffice = null,
                     Budget = 4,
@@ -175,8 +177,8 @@ namespace HITSBlazor.Utils.Mocks.Ideas
                     Status = IdeaStatusType.ON_MARKET,
                     MaxTeamSize = 7,
                     MinTeamSize = 5,
-                    Customer = "ВШЦТ",
-                    ContactPerson = "ВШЦТ",
+                    Customer = hits.Name,
+                    ContactPerson = hits.Name,
                     Experts = null,
                     ProjectOffice = null,
                     Budget = 4,
@@ -275,8 +277,8 @@ namespace HITSBlazor.Utils.Mocks.Ideas
                     Status = IdeaStatusType.ON_MARKET,
                     MaxTeamSize = 7,
                     MinTeamSize = 5,
-                    Customer = "ВШЦТ",
-                    ContactPerson = "ВШЦТ",
+                    Customer = hits.Name,
+                    ContactPerson = hits.Name,
                     Experts = null,
                     ProjectOffice = null,
                     Budget = 4,
@@ -300,8 +302,8 @@ namespace HITSBlazor.Utils.Mocks.Ideas
                     Status = IdeaStatusType.ON_MARKET,
                     MaxTeamSize = 7,
                     MinTeamSize = 5,
-                    Customer = "ВШЦТ",
-                    ContactPerson = "ВШЦТ",
+                    Customer = hits.Name,
+                    ContactPerson = hits.Name,
                     Experts = null,
                     ProjectOffice = null,
                     Budget = 4,
@@ -325,8 +327,8 @@ namespace HITSBlazor.Utils.Mocks.Ideas
                     Status = IdeaStatusType.ON_MARKET,
                     MaxTeamSize = 7,
                     MinTeamSize = 5,
-                    Customer = "ВШЦТ",
-                    ContactPerson = "ВШЦТ",
+                    Customer = hits.Name,
+                    ContactPerson = hits.Name,
                     Experts = null,
                     ProjectOffice = null,
                     Budget = 4,
@@ -341,5 +343,8 @@ namespace HITSBlazor.Utils.Mocks.Ideas
 
         public static Idea? GetIdeaById(string id)
             => _ideas.FirstOrDefault(i => i.Id == id);
+
+        public static List<Idea> GetIdeasByInitiatorId(string initiatorId)
+            => [.. _ideas.Where(i => i.Initiator.Id == initiatorId)];
     }
 }

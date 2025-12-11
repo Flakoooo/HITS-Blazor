@@ -14,7 +14,8 @@ namespace HITSBlazor.Utils.Mocks.Markets
 
         
 
-        private static List<Market> CreateMarkets() => [
+        private static List<Market> CreateMarkets() => 
+        [
             new Market
             {
                 Id = Summer2023Id,

@@ -27,13 +27,16 @@ namespace HITSBlazor.Utils.Mocks.Projects
             var timur = MockUsers.GetUserById(MockUsers.TimurId)!;
             var admin = MockUsers.GetUserById(MockUsers.AdminId)!;
 
+            var chatBotProjectName = "Чат-бот в telegram для запросов и обращений к HR вне системы 1С";
+            var armatureProjectName = "Прогнозирование закупок арматуры на основе исторических данных и обогащением доп. критериями";
+
             return
             [
                 new Project
                 {
                     Id = ChatBotId,
                     IdeaId = chatBotIdea.Id,
-                    Name = "Чат-бот в telegram для запросов и обращений к HR вне системы 1С",
+                    Name = chatBotProjectName,
                     Description = chatBotIdea.Description,
                     Customer = chatBotIdea.Customer,
                     Initiator = chatBotIdea.Initiator,
@@ -42,7 +45,7 @@ namespace HITSBlazor.Utils.Mocks.Projects
                     [
                         new ProjectMember
                         {
-                            ProjectName = "Чат-бот в telegram для запросов и обращений к HR вне системы 1С",
+                            ProjectName = chatBotProjectName,
                             TeamId = cardTeam.Id,
                             TeamName = cardTeam.Name,
                             UserId = alex.Id,
@@ -55,7 +58,7 @@ namespace HITSBlazor.Utils.Mocks.Projects
                         },
                         new ProjectMember
                         {
-                            ProjectName = "Чат-бот в telegram для запросов и обращений к HR вне системы 1С",
+                            ProjectName = chatBotProjectName,
                             TeamId = cardTeam.Id,
                             TeamName = cardTeam.Name,
                             UserId = kirill.Id,
@@ -68,7 +71,7 @@ namespace HITSBlazor.Utils.Mocks.Projects
                         },
                         new ProjectMember
                         {
-                            ProjectName = "Чат-бот в telegram для запросов и обращений к HR вне системы 1С",
+                            ProjectName = chatBotProjectName,
                             TeamId = cardTeam.Id,
                             TeamName = cardTeam.Name,
                             UserId = denis.Id,
@@ -94,7 +97,7 @@ namespace HITSBlazor.Utils.Mocks.Projects
                 {
                     Id = ArmatureId,
                     IdeaId = armatureIdea.Id,
-                    Name = "Прогнозирование закупок арматуры на основе исторических данных и обогащением доп. критериями",
+                    Name = armatureProjectName,
                     Description = armatureIdea.Description,
                     Customer = armatureIdea.Customer,
                     Initiator = armatureIdea.Initiator,
@@ -103,7 +106,7 @@ namespace HITSBlazor.Utils.Mocks.Projects
                     [
                         new ProjectMember
                         {
-                            ProjectName = "Чат-бот в telegram для запросов и обращений к HR вне системы 1С",
+                            ProjectName = armatureProjectName,
                             TeamId = cactusTeam.Id,
                             TeamName = cactusTeam.Name,
                             UserId = admin.Id,
@@ -116,9 +119,9 @@ namespace HITSBlazor.Utils.Mocks.Projects
                         },
                         new ProjectMember
                         {
-                            ProjectName = "Чат-бот в telegram для запросов и обращений к HR вне системы 1С",
-                            TeamId = cardTeam.Id,
-                            TeamName = cardTeam.Name,
+                            ProjectName = armatureProjectName,
+                            TeamId = cactusTeam.Id,
+                            TeamName = cactusTeam.Name,
                             UserId = timur.Id,
                             Email = timur.Email,
                             FirstName = timur.FirstName,
@@ -140,5 +143,8 @@ namespace HITSBlazor.Utils.Mocks.Projects
                 }
             ];
         }
+
+        public static Project? GetProjectById(string id)
+            => _projects.FirstOrDefault(p => p.Id == id);
     }
 }
