@@ -2,6 +2,6 @@
 {
     public class QuestResultWrapper
     {
-        public List<QuestResult> Results { get; set; } = new();
+        public List<QuestResult> Results { get; set; } = [];
     }
 }

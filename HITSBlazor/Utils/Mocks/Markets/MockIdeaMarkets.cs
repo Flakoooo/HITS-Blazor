@@ -187,5 +187,8 @@ namespace HITSBlazor.Utils.Mocks.Markets
                 }
             ];
         }
+
+        public static IdeaMarket? GetIdeaMarketById(string id) =>
+            _ideaMarkets.FirstOrDefault(im => im.Id == id);
     }
 }

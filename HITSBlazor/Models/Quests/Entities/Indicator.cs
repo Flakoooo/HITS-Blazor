@@ -6,7 +6,7 @@ namespace HITSBlazor.Models.Quests.Entities
     {
         public string Id { get; set; } = string.Empty;
         public string Name { get; set; } = string.Empty;
-        public List<string> Answers { get; set; } = new();
+        public List<string> Answers { get; set; } = [];
         public IndicatorType Type { get; set; }
         public IndicatorRoleType Role { get; set; }
         public bool Visible { get; set; }
@@ -14,5 +14,4 @@ namespace HITSBlazor.Models.Quests.Entities
         public string IdCategory { get; set; } = string.Empty;
         public string? IdToUser { get; set; }
     }
-
 }

@@ -1,0 +1,232 @@
+﻿using HITSBlazor.Models.Quests.Entities;
+using HITSBlazor.Models.Quests.Enums;
+
+namespace HITSBlazor.Utils.Mocks.Quests
+{
+    public static class MockIndicators
+    {
+        private static readonly List<Indicator> _indicators = CreateIndicators();
+
+        private static List<Indicator> CreateIndicators()
+        {
+            var softCategory = MockIndicatorCategories.GetIndicatorCategoryById(MockIndicatorCategories.SoftId)!;
+
+            var answers = new List<string>() { "Хорошо", "Не очень" };
+
+            return
+            [
+                new Indicator
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Name = "Как вам отношения в команде?",
+                    Answers = answers,
+                    Type = IndicatorType.TEAM,
+                    Role = IndicatorRoleType.MEMBER,
+                    IdCategory = softCategory.IdCategory,
+                    CategoryName = softCategory.Name,
+                    Visible = true
+                },
+                new Indicator
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Name = "Как вам профессионализм команды?",
+                    Answers = answers,
+                    Type = IndicatorType.TEAM,
+                    Role = IndicatorRoleType.TEAM_LEADER,
+                    IdCategory = softCategory.IdCategory,
+                    CategoryName = softCategory.Name,
+                    Visible = true
+                },
+                new Indicator
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Name = "Каков ваш взгляд на коммуникацию с этим членом команды?",
+                    Answers = answers,
+                    Type = IndicatorType.MEMBER,
+                    Role = IndicatorRoleType.MEMBER,
+                    IdCategory = softCategory.IdCategory,
+                    CategoryName = softCategory.Name,
+                    Visible = true
+                },
+                new Indicator
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Name = "Как оцениваете общение в команде?",
+                    Answers = answers,
+                    Type = IndicatorType.TEAM,
+                    Role = IndicatorRoleType.TEAM_LEADER,
+                    IdCategory = softCategory.IdCategory,
+                    CategoryName = softCategory.Name,
+                    Visible = true
+                },
+                new Indicator
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Name = "Какие ваши мысли о навыках команды?",
+                    Answers = answers,
+                    Type = IndicatorType.TEAM,
+                    Role = IndicatorRoleType.MEMBER,
+                    IdCategory = softCategory.IdCategory,
+                    CategoryName = softCategory.Name,
+                    Visible = true
+                },
+                new Indicator
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Name = "Как оцените атмосферу в коллективе?",
+                    Answers = answers,
+                    Type = IndicatorType.TEAM,
+                    Role = IndicatorRoleType.INITIATOR,
+                    IdCategory = softCategory.IdCategory,
+                    CategoryName = softCategory.Name,
+                    Visible = true
+                },
+                new Indicator
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Name = "Что вы думаете о взаимодействии с этим коллегой?",
+                    Answers = answers,
+                    Type = IndicatorType.MEMBER,
+                    Role = IndicatorRoleType.TEACHER,
+                    IdCategory = softCategory.IdCategory,
+                    CategoryName = softCategory.Name,
+                    Visible = true
+                },
+                new Indicator
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Name = "Ваше мнение о компетентности команды?",
+                    Answers = answers,
+                    Type = IndicatorType.TEAM,
+                    Role = IndicatorRoleType.MEMBER,
+                    IdCategory = softCategory.IdCategory,
+                    CategoryName = softCategory.Name,
+                    Visible = true
+                },
+                new Indicator
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Name = "Что вы думаете о взаимодействии внутри группы?",
+                    Answers = answers,
+                    Type = IndicatorType.MEMBER,
+                    Role = IndicatorRoleType.MEMBER,
+                    IdCategory = softCategory.IdCategory,
+                    CategoryName = softCategory.Name,
+                    Visible = true
+                },
+                new Indicator
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Name = "Как воспринимаете атмосферу в команде?",
+                    Answers = answers,
+                    Type = IndicatorType.TEAM,
+                    Role = IndicatorRoleType.MEMBER,
+                    IdCategory = softCategory.IdCategory,
+                    CategoryName = softCategory.Name,
+                    Visible = true
+                },
+                new Indicator
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Name = "Как вы оцениваете профессионализм коллег?",
+                    Answers = answers,
+                    Type = IndicatorType.TEAM,
+                    Role = IndicatorRoleType.MEMBER,
+                    IdCategory = softCategory.IdCategory,
+                    CategoryName = softCategory.Name,
+                    Visible = true
+                },
+                new Indicator
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Name = "Ваш взгляд на взаимодействие с коллегами?",
+                    Answers = answers,
+                    Type = IndicatorType.MEMBER,
+                    Role = IndicatorRoleType.MEMBER,
+                    IdCategory = softCategory.IdCategory,
+                    CategoryName = softCategory.Name,
+                    Visible = true
+                },
+                new Indicator
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Name = "Что вы думаете о внутренних отношениях в команде?",
+                    Answers = answers,
+                    Type = IndicatorType.TEAM,
+                    Role = IndicatorRoleType.MEMBER,
+                    IdCategory = softCategory.IdCategory,
+                    CategoryName = softCategory.Name,
+                    Visible = true
+                },
+                new Indicator
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Name = "Как вы оцениваете профессиональные навыки команды?",
+                    Answers = answers,
+                    Type = IndicatorType.TEAM,
+                    Role = IndicatorRoleType.MEMBER,
+                    IdCategory = softCategory.IdCategory,
+                    CategoryName = softCategory.Name,
+                    Visible = true
+                },
+                new Indicator
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Name = "Ваше мнение о взаимодействии с коллегами?",
+                    Answers = answers,
+                    Type = IndicatorType.MEMBER,
+                    Role = IndicatorRoleType.MEMBER,
+                    IdCategory = softCategory.IdCategory,
+                    CategoryName = softCategory.Name,
+                    Visible = true
+                },
+                new Indicator
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Name = "Что вы думаете о взаимодействии в команде?",
+                    Answers = answers,
+                    Type = IndicatorType.MEMBER,
+                    Role = IndicatorRoleType.MEMBER,
+                    IdCategory = softCategory.IdCategory,
+                    CategoryName = softCategory.Name,
+                    Visible = true
+                },
+                new Indicator
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Name = "Как вы оцениваете атмосферу в команде?",
+                    Answers = answers,
+                    Type = IndicatorType.TEAM,
+                    Role = IndicatorRoleType.MEMBER,
+                    IdCategory = softCategory.IdCategory,
+                    CategoryName = softCategory.Name,
+                    Visible = true
+                },
+                new Indicator
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Name = "Что вы думаете о профессионализме команды?",
+                    Answers = answers,
+                    Type = IndicatorType.TEAM,
+                    Role = IndicatorRoleType.MEMBER,
+                    IdCategory = softCategory.IdCategory,
+                    CategoryName = softCategory.Name,
+                    Visible = true
+                },
+                new Indicator
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Name = "Ваш взгляд на взаимодействие с коллегой?",
+                    Answers = answers,
+                    Type = IndicatorType.MEMBER,
+                    Role = IndicatorRoleType.MEMBER,
+                    IdCategory = softCategory.IdCategory,
+                    CategoryName = softCategory.Name,
+                    Visible = true
+                }
+            ];
+        }
+
+        public static List<Indicator> GetAllIndicators() => _indicators;
+    }
+}

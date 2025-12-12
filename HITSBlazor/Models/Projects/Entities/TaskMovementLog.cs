@@ -11,6 +11,6 @@ namespace HITSBlazor.Models.Projects.Entities
         public string StartDate { get; set; } = string.Empty;
         public string EndDate { get; set; } = string.Empty;
         public string WastedTime { get; set; } = string.Empty;
-        public TaskStatus Status { get; set; }
+        public Enums.TaskStatus Status { get; set; }
     }
 }

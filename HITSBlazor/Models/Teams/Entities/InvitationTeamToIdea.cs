@@ -13,6 +13,6 @@ namespace HITSBlazor.Models.Teams.Entities
         public string TeamName { get; set; } = string.Empty;
         public InvitationTeamToIdeaStatus Status { get; set; }
         public int TeamMembersCount { get; set; }
-        public List<Skill> Skills { get; set; } = new();
+        public List<Skill> Skills { get; set; } = [];
     }
 }

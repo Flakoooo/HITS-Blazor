@@ -134,5 +134,7 @@ namespace HITSBlazor.Utils.Mocks.Teams
 
         public static Team? GetTeamById(string id) 
             => _teams.FirstOrDefault(t => t.Id == id);
+
+        public static List<Team> GetAllTeams() => _teams;
     }
 }

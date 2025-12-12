@@ -7,6 +7,6 @@
         public string IdQuestTemplate { get; set; } = string.Empty;
         public string Name { get; set; } = string.Empty;
         public string Progress { get; set; } = string.Empty;
-        public List<TeamQuestStat> Teams { get; set; } = new();
+        public List<TeamQuestStat> Teams { get; set; } = [];
     }
 }
