@@ -15,14 +15,15 @@ namespace HITSBlazor.Utils.Mocks.Quests
             Progress = progress
         };
 
-        // измеить моки, сделать тут участников команд
-
         private static List<UsersQuestStat> CreateUsersQuestStats() =>
         [
             CreateUsersQuestStat(MockUsers.GetUserById(MockUsers.KirillId)!, false),
-            CreateUsersQuestStat(MockUsers.GetUserById(MockUsers.IvanId)!, false),
-            CreateUsersQuestStat(MockUsers.GetUserById(MockUsers.ManagerId)!, false),
-            CreateUsersQuestStat(MockUsers.GetUserById(MockUsers.OwnerId)!, true)
+            CreateUsersQuestStat(MockUsers.GetUserById(MockUsers.DenisId)!, false),
+            CreateUsersQuestStat(MockUsers.GetUserById(MockUsers.TimurId)!, false),
+            CreateUsersQuestStat(MockUsers.GetUserById(MockUsers.AdminId)!, true)
         ];
+
+        public static UsersQuestStat? GetUsersQuestStatById(string id) =>
+            _questStats.FirstOrDefault(uqs => uqs.Id == id);
     }
 }
