@@ -1,5 +1,6 @@
 ﻿using HITSBlazor.Models.Tests.Entities;
 using HITSBlazor.Models.Users.Entities;
+using HITSBlazor.Utils.Mocks.Users;
 
 namespace HITSBlazor.Utils.Mocks.Tests
 {
@@ -159,127 +160,37 @@ namespace HITSBlazor.Utils.Mocks.Tests
             { BelbinRole.Controller,    new[] { 14, 27, 31, 45, 56, 63, 72 } }
         };
 
-        private static List<TestAnswer> GenerateBelbinAnswers(List<TestQuestion> questions, User user, BelbinRole primaryRole)
-        {
-            var answers = new List<TestAnswer>();
-
-            // Правила распределения баллов для теста Белбина:
-            // 7 блоков по 8 вопросов = 56 вопросов
-            // На каждый блок нужно распределить 10 баллов между вопросами
-            // Минимум 2 балла на вопрос, максимум 3 вопроса с баллами в блоке
-
-            foreach (var module in Enumerable.Range(1, 7))
-            {
-                var moduleQuestions = questions
-                    .Where(q => q.QuestionModuleNumber == module)
-                    .OrderBy(q => q.QuestionNumber)
-                    .ToList();
-
-                if (moduleQuestions.Count != 8) continue;
-
-                // Определяем, какие вопросы в этом модуле относятся к основной роли пользователя
-                var roleQuestionIndices = _belbinRoleQuestions[primaryRole]
-                    .Where(qNum => qNum >= (module - 1) * 8 + 1 && qNum <= module * 8)
-                    .Select(qNum => qNum - (module - 1) * 8 - 1)
-                    .ToList();
-
-                // Выбираем 3 вопроса для распределения баллов
-                var selectedQuestions = new List<int>();
-
-                // Добавляем хотя бы один вопрос из основной роли
-                if (roleQuestionIndices.Count != 0)
-                {
-                    var roleQuestion = roleQuestionIndices[_random.Next(roleQuestionIndices.Count)];
-                    selectedQuestions.Add(roleQuestion);
-                }
-
-                // Добавляем еще 2 случайных вопроса
-                while (selectedQuestions.Count < 3)
-                {
-                    var randomQuestion = _random.Next(0, 8);
-                    if (!selectedQuestions.Contains(randomQuestion))
-                        selectedQuestions.Add(randomQuestion);
-                }
-
-                // Распределяем 10 баллов между выбранными вопросами
-                // Минимум 2 балла на вопрос, максимум 5
-                // Гарантируем минимум 2 балла каждому
-                var points = new int[] { 2, 2, 2 };
-
-                // Распределяем оставшиеся 4 балла
-                var remaining = 4;
-                while (remaining > 0)
-                {
-                    var idx = _random.Next(0, 3);
-                    if (points[idx] < 5) // Максимум 5 баллов на вопрос
-                    {
-                        points[idx]++;
-                        remaining--;
-                    }
-                }
-
-                // Создаем ответы для всех вопросов модуля
-                for (int i = 0; i < 8; ++i)
-                {
-                    var question = moduleQuestions[i];
-                    var answerValue = "0";
-
-                    if (selectedQuestions.Contains(i))
-                    {
-                        var idx = selectedQuestions.IndexOf(i);
-                        answerValue = points[idx].ToString();
-                    }
-
-                    answers.Add(new TestAnswer
-                    {
-                        Id = Guid.NewGuid().ToString(),
-                        TestName = BelbinTestName,
-                        User = user,
-                        QuestionName = question.QuestionName,
-                        QuestionModuleNumber = question.QuestionModuleNumber,
-                        QuestionNumber = question.QuestionNumber,
-                        Answer = answerValue
-                    });
-                }
-            }
-
-            return answers;
-        }
-
         public static TestResult? GenerateBelbinTestResult(User user)
         {
-            try
+            // получаем ответы на тест
+            var answers = MockTestAnswers.GetTestAnswersByTestNameAndUserId(BelbinTestName, user.Id);
+
+            // подсчитываем баллы
+            var scores = new int[] { 0, 0, 0, 0, 0, 0, 0, 0 };
+
+            foreach (var answer in answers)
             {
-                var questions = MockTestQuestions.GetTestQuestionsByTestName(BelbinTestName);
-                if (questions.Count == 0) return null;
+                if (!int.TryParse(answer.Answer, out int score))
+                    throw new Exception("Ошибка создания мок ответов");
 
-                // Определяем случайный тип личности (с небольшим смещением для разнообразия)
-                var primaryRole = (BelbinRole)_random.Next(0, 8);
-
-                // Генерируем ответы с учетом типа личности
-                var answers = GenerateBelbinAnswers([.. questions], user, primaryRole);
-
-                // Добавляем ответы в коллекцию
-                _testAnswers.AddRange(answers);
-
-                return new TestResult
+                _ = answer.QuestionNumber switch
                 {
-                    Id = Guid.NewGuid().ToString(),
-                    User = user,
-                    TestName = BelbinTestName,
-                    TestResultValue = _belbinRoleDescriptions[primaryRole]
+                    16 or 20 or 37 or 43 or 51 or 65 or 74 => scores[0] += score, // готово
+                    13 or 21 or 37 or 43 or 51 or 65 or 74 => scores[1] += score, // остальные нет
+                    15 or 24 or 37 or 43 or 51 or 65 or 74 => scores[2] += score,
+                    12 or 26 or 37 or 43 or 51 or 65 or 74 => scores[3] += score,
+                    10 or 22 or 37 or 43 or 51 or 65 or 74 => scores[4] += score,
+                    17 or 23 or 37 or 43 or 51 or 65 or 74 => scores[5] += score,
+                    11 or 25 or 37 or 43 or 51 or 65 or 74 => scores[6] += score,
+                    14 or 27 or 37 or 43 or 51 or 65 or 74 => scores[7] += score,
+                    _ => throw new Exception("Ошибка создания мок ответов")
                 };
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Ошибка генерации результата ответов на тест Белбина для пользователя {user.Id}: {ex.Message}");
-                return null;
             }
         }
 
         private static List<TestResult> CreateTestResult()
         {
-
+            return [GenerateBelbinTestResult(MockUsers.GetUserById(MockUsers.KirillId)!)];
         }
     }
 }
