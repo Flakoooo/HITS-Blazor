@@ -24,7 +24,7 @@ namespace HITSBlazor.Utils.Mocks.Tests
             for (int i = 1; i <= 7; ++i)
             {
                 // Получаем вопросы модуля
-                var module1Questions = questions.Where(q => q.QuestionModuleNumber == i).ToList();
+                var moduleQuestions = questions.Where(q => q.QuestionModuleNumber == i).ToList();
 
                 // можно ответить минимум 2 балла, на вопрос,
                 // ответить можно максимум на 3 вопроса,
@@ -48,25 +48,23 @@ namespace HITSBlazor.Utils.Mocks.Tests
                     scores.AddRange(firstAnswer, secondAnswer, 10 - firstAnswer - secondAnswer);
                 }
 
-                // находим те самые вопросы, присваиваем сразу им баллы
                 var answersInModule = new Dictionary<string, string>();
+
+                // cоздаем список индексов всех вопросов модуля, мешаем и берем нужное количество
+                var questionIndices = Enumerable.Range(0, moduleQuestions.Count)
+                    .OrderBy(x => _random.Next())
+                    .Take(answersInModuleCount)
+                    .ToList();
+
+                // присваиваем баллы
                 for (int j = 0; j < answersInModuleCount; ++j)
                 {
-                    var currentQuestion = false;
-
-                    while (currentQuestion)
-                    {
-                        var question = module1Questions[_random.Next(0, 8)];
-                        if (!answersInModule.TryGetValue(question.QuestionName, out string? _))
-                        {
-                            answersInModule[question.QuestionName] = $"{scores[j]}";
-                            currentQuestion = true;
-                        }
-                    }
+                    var question = moduleQuestions[questionIndices[j]];
+                    answersInModule[question.QuestionName] = $"{scores[j]}";
                 }
 
                 // создаем ответы на вопросы, указывая там где нужно сгенерированный ответ
-                foreach (var question in module1Questions)
+                foreach (var question in moduleQuestions)
                 {
                     answers.Add(
                         new TestAnswer
@@ -86,9 +84,72 @@ namespace HITSBlazor.Utils.Mocks.Tests
             return answers;
         }
 
+        private static List<TestAnswer> GenerateTemperTestAnswers(User user)
+        {
+            var answers = new List<TestAnswer>();
+
+            var questions = MockTestQuestions.GetTestQuestionsByTestName(TemperTestName);
+
+            foreach (var question in questions)
+            {
+                var answer = _random.Next(0, 2);
+
+                answers.Add(
+                    new TestAnswer
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        TestName = question.TestName,
+                        User = user,
+                        QuestionName = question.QuestionName,
+                        QuestionModuleNumber = question.QuestionModuleNumber,
+                        QuestionNumber = question.QuestionNumber,
+                        Answer = answer == 0 ? "-" : "+"
+                    }
+                );
+            }
+
+            return answers;
+        }
+
+        private static List<TestAnswer> GenerateMindTestAnswers(User user)
+        {
+            var answers = new List<TestAnswer>();
+            var questions = MockTestQuestions.GetTestQuestionsByTestName(MindTestName);
+
+            var modules = questions.GroupBy(q => q.QuestionModuleNumber);
+
+            foreach (var module in modules)
+            {
+                var moduleQuestions = module.OrderBy(q => q.QuestionNumber).ToList();
+
+                var scores = Enumerable.Range(1, 5).OrderBy(x => _random.Next()).ToList();
+
+                for (int i = 0; i < moduleQuestions.Count; i++)
+                {
+                    answers.Add(new TestAnswer
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        TestName = MindTestName,
+                        User = user,
+                        QuestionName = moduleQuestions[i].QuestionName,
+                        QuestionModuleNumber = module.Key,
+                        QuestionNumber = moduleQuestions[i].QuestionNumber,
+                        Answer = scores[i].ToString()
+                    });
+                }
+            }
+
+            return answers;
+        }
+
         private static List<TestAnswer> CreateTestAnswer()
         {
-            return GenerateBelbinTestAnswers(MockUsers.GetUserById(MockUsers.KirillId)!);
+            return
+            [
+                ..GenerateBelbinTestAnswers(MockUsers.GetUserById(MockUsers.KirillId)!),
+                ..GenerateTemperTestAnswers(MockUsers.GetUserById(MockUsers.KirillId)!),
+                ..GenerateMindTestAnswers(MockUsers.GetUserById(MockUsers.KirillId)!)
+            ];
         }
 
         public static List<TestAnswer> GetTestAnswersByTestNameAndUserId(string testName, string userId) =>

@@ -6,8 +6,6 @@ namespace HITSBlazor.Utils.Mocks.Tests
 {
     public static class MockTestResults
     {
-        private static readonly Random _random = new();
-
         private static readonly List<TestResult> _testResults = CreateTestResult();
 
         private static string BelbinTestName => MockTests.GetTestById(MockTests.BelbinId)!.TestName;
@@ -40,7 +38,7 @@ namespace HITSBlazor.Utils.Mocks.Tests
             }
 
             // находим индекс максимального балла
-            var maxElementIndex = scores.Index().FirstOrDefault(s => s.Item == scores.Max()).Index;
+            var maxElementIndex = Array.IndexOf(scores, scores.Max());
 
             var result = maxElementIndex switch
             {
@@ -160,15 +158,187 @@ namespace HITSBlazor.Utils.Mocks.Tests
             { 
                 Id = Guid.NewGuid().ToString(),
                 User = user,
-                TestName = answers.First().TestName,
+                TestName = BelbinTestName,
                 TestResultValue = result
             };
 
         }
 
+        public static TestResult? GenerateTemperTestResult(User user)
+        {
+            var answers = MockTestAnswers.GetTestAnswersByTestNameAndUserId(TemperTestName, user.Id);
+
+            var scores = new int[] { 0, 0, 0 };
+
+            foreach (var answer in answers)
+            {
+                if (answer.Answer == "+")
+                    _ = answer.QuestionNumber switch
+                    {
+                        1 or 3 or 8 or 10 or 13 or 17 or 22 or 25 or 27 or 39 or 44 or 46 or 49 or 53 or 56 => ++scores[0],
+                        2 or 4 or 7 or 9 or 11 or 14 or 16 or 19 or 21 or 23 or 26 or 28 or 31 or 33 or 35 or 38 or 40 or 43 or 45 or 47 or 50 or 52 or 55 or 57 => ++scores[1],
+                        6 or 24 or 36 => ++scores[2],
+                        _ => 0
+                    };
+                else if (answer.Answer == "-")
+                    _ = answer.QuestionNumber switch
+                    {
+                        5 or 15 or 20 or 29 or 32 or 34 or 37 or 41 or 51 => ++scores[0],
+                        12 or 18 or 30 or 42 or 48 or 54 => ++scores[2],
+                        _ => 0
+                    };
+            }
+
+            var result = $"Уровень Экстраверсии: ({scores[0]}) ";
+            result += scores[0] switch
+            {
+                < 5 => "глубокий интроверт",
+                < 9 => "интроверт",
+                <= 15 => "среднее значение",
+                <= 19 => "экстраверт",
+                > 19 => "яркий экстраверт"
+            };
+            result += $"\nУровень Нейротизма: ({scores[1]}) ";
+            result += scores[1] switch
+            {
+                < 7 => "низкий уровень нейротизма",
+                <= 14 => "среднее значение",
+                <= 19 => "высокий уровень нейротизма",
+                > 19 => "очень высокий уровень нейротизма"
+            };
+            result += $"\nУровень Лжи: ({scores[2]}) ";
+            result += scores[2] switch
+            {
+                <= 4 => "норма",
+                > 4 => "неискренность в ответах, свидетельствующая также о некоторой демонстративности поведения и ориентированности испытуемого на социальное одобрение"
+            };
+
+            return new TestResult
+            {
+                Id = Guid.NewGuid().ToString(),
+                User = user,
+                TestName = TemperTestName,
+                TestResultValue = result
+            };
+        }
+
+        public static TestResult? GenerateMindTestResult(User user)
+        {
+            var answers = MockTestAnswers.GetTestAnswersByTestNameAndUserId(MindTestName, user.Id);
+
+            var scores = new List<int>() { 0, 0, 0, 0, 0 };
+
+            foreach (var answer in answers)
+            {
+                if (!int.TryParse(answer.Answer, out int score))
+                    throw new Exception("Ошибка создания мок данных ответов");
+
+                _ = answer.QuestionModuleNumber switch
+                {
+                    1 or 7 or 13 => answer.QuestionNumber switch
+                    {
+                        1 => scores[0] += score,
+                        2 => scores[1] += score,
+                        3 => scores[2] += score,
+                        4 => scores[3] += score,
+                        5 => scores[4] += score,
+                        _ => 0
+                    },
+                    2 or 8 or 14 => answer.QuestionNumber switch
+                    {
+                        1 => scores[1] += score,
+                        2 => scores[0] += score,
+                        3 => scores[3] += score,
+                        4 => scores[2] += score,
+                        5 => scores[4] += score,
+                        _ => 0
+                    },
+                    3 or 9 or 15 => answer.QuestionNumber switch
+                    {
+                        1 => scores[2] += score,
+                        2 => scores[4] += score,
+                        3 => scores[3] += score,
+                        4 => scores[1] += score,
+                        5 => scores[0] += score,
+                        _ => 0
+                    },
+                    4 or 10 or 16 => answer.QuestionNumber switch
+                    {
+                        1 => scores[3] += score,
+                        2 => scores[4] += score,
+                        3 => scores[1] += score,
+                        4 => scores[0] += score,
+                        5 => scores[2] += score,
+                        _ => 0
+                    },
+                    5 or 11 or 17 => answer.QuestionNumber switch
+                    {
+                        1 => scores[1] += score,
+                        2 => scores[2] += score,
+                        3 => scores[0] += score,
+                        4 => scores[4] += score,
+                        5 => scores[3] += score,
+                        _ => 0
+                    },
+                    6 or 12 or 18 => answer.QuestionNumber switch
+                    {
+                        1 => scores[4] += score,
+                        2 => scores[0] += score,
+                        3 => scores[1] += score,
+                        4 => scores[2] += score,
+                        5 => scores[3] += score,
+                        _ => 0
+                    },
+                    _ => 0
+                };
+            }
+
+            var result = $"Синтетический стиль: ({scores[0]}) {sumMindResult(scores[0])}\n";
+            result += $"Идеалистический стиль: ({scores[1]}) {sumMindResult(scores[1])}\n";
+            result += $"Прагматический стиль: ({scores[2]}) {sumMindResult(scores[2])}\n";
+            result += $"Аналитический стиль: ({scores[3]}) {sumMindResult(scores[3])}\n";
+            result += $"Реалистический стиль: ({scores[4]}) {sumMindResult(scores[4])}\n";
+
+            return new TestResult
+            {
+                Id = Guid.NewGuid().ToString(),
+                User = user,
+                TestName = MindTestName,
+                TestResultValue = result
+            };
+
+            static string sumMindResult(int score) => score switch
+            {
+                <= 36 => "этот стиль абсолютно чужд испытуемому, " +
+                            "он, вероятно, не пользуется им практически нигде и никогда, " +
+                            "даже если этот стиль является лучшим подходом к проблеме при данных обстоятельствах",
+                <= 42 => "вероятно стойкое игнорирование данного стиля",
+                <= 48 => "для испытуемого характерно умеренное пренебрежение этим стилем мышления, " + 
+                            "то есть, при прочих равных условиях, он, по возможности, " +
+                            "будет избегать использования данного стиля при решении значимых проблем",
+                <= 59 => "зона неопределенности. Данный стиль следует исключить из рассмотрения",
+                <= 65 => "испытуемый отдает умеренное предпочтение этому стилю. " +
+                            "Иначе говоря, при прочих равных условиях, " +
+                            "он будет предрасположен использовать этот стиль больше или чаще других",
+                <= 71 => "испытуемый оказывает сильное предпочтение такому стилю мышления. " +
+                            "Вероятно, он пользуется данным стилем систематически, последовательно и в большинстве ситуаций. " +
+                            "Возможно даже, что время от времени испытуемый злоупотребляет им, " +
+                            "то есть использует тогда, стиль не обеспечивает лучший подход к проблеме. " +
+                            "Чаще это может происходить в напряженных ситуациях (дефицит времени, конфликт и т.п.)",
+                > 71 => "у испытуемого очень сильное предпочтение этого стиля мышления. " +
+                            "Другими словами, он чрезмерно фиксирован на нем, использует его практически во всех ситуациях, " +
+                            "следовательно, и в таких, где этот стиль является далеко не лучшим (или даже неприемлемым) подходом к проблеме"
+            };
+        }
+
         private static List<TestResult> CreateTestResult()
         {
-            return [GenerateBelbinTestResult(MockUsers.GetUserById(MockUsers.KirillId)!)];
+            return 
+            [
+                GenerateBelbinTestResult(MockUsers.GetUserById(MockUsers.KirillId)!),
+                GenerateTemperTestResult(MockUsers.GetUserById(MockUsers.KirillId)!),
+                GenerateMindTestResult(MockUsers.GetUserById(MockUsers.KirillId)!)
+            ];
         }
     }
 }
