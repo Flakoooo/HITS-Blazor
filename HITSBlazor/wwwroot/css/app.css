@@ -1,114 +1,543 @@
-html, body {
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+﻿/* wwwroot/css/site.css */
+/* Основные глобальные стили для всего приложения */
+
+@font-face {
+    font-display: block;
+    font-family: "bootstrap-icons";
+    src: url("../fonts/bootstrap-icons.woff2") format("woff2");
 }
 
-h1:focus {
-    outline: none;
-}
-
-a, .btn-link {
-    color: #0071c1;
-}
-
-.btn-primary {
-    color: #fff;
-    background-color: #1b6ec2;
-    border-color: #1861ac;
-}
-
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
-}
-
-.content {
-    padding-top: 1.1rem;
-}
-
-.valid.modified:not([type=checkbox]) {
-    outline: 1px solid #26b050;
-}
-
-.invalid {
-    outline: 1px solid red;
-}
-
-.validation-message {
-    color: red;
-}
-
-#blazor-error-ui {
-    color-scheme: light only;
-    background: lightyellow;
-    bottom: 0;
-    box-shadow: 0 -1px 2px rgba(0, 0, 0, 0.2);
+* {
+    padding: 0;
+    margin: 0;
+    border: 0;
     box-sizing: border-box;
-    display: none;
-    left: 0;
-    padding: 0.6rem 1.25rem 0.7rem 1.25rem;
-    position: fixed;
-    width: 100%;
-    z-index: 1000;
+    scrollbar-width: thin;
+    scrollbar-color: #888 transparent;
 }
 
-    #blazor-error-ui .dismiss {
-        cursor: pointer;
-        position: absolute;
-        right: 0.75rem;
-        top: 0.5rem;
-    }
-
-.blazor-error-boundary {
-    background: url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTYiIGhlaWdodD0iNDkiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIG92ZXJmbG93PSJoaWRkZW4iPjxkZWZzPjxjbGlwUGF0aCBpZD0iY2xpcDAiPjxyZWN0IHg9IjIzNSIgeT0iNTEiIHdpZHRoPSI1NiIgaGVpZ2h0PSI0OSIvPjwvY2xpcFBhdGg+PC9kZWZzPjxnIGNsaXAtcGF0aD0idXJsKCNjbGlwMCkiIHRyYW5zZm9ybT0idHJhbnNsYXRlKC0yMzUgLTUxKSI+PHBhdGggZD0iTTI2My41MDYgNTFDMjY0LjcxNyA1MSAyNjUuODEzIDUxLjQ4MzcgMjY2LjYwNiA1Mi4yNjU4TDI2Ny4wNTIgNTIuNzk4NyAyNjcuNTM5IDUzLjYyODMgMjkwLjE4NSA5Mi4xODMxIDI5MC41NDUgOTIuNzk1IDI5MC42NTYgOTIuOTk2QzI5MC44NzcgOTMuNTEzIDI5MSA5NC4wODE1IDI5MSA5NC42NzgyIDI5MSA5Ny4wNjUxIDI4OS4wMzggOTkgMjg2LjYxNyA5OUwyNDAuMzgzIDk5QzIzNy45NjMgOTkgMjM2IDk3LjA2NTEgMjM2IDk0LjY3ODIgMjM2IDk0LjM3OTkgMjM2LjAzMSA5NC4wODg2IDIzNi4wODkgOTMuODA3MkwyMzYuMzM4IDkzLjAxNjIgMjM2Ljg1OCA5Mi4xMzE0IDI1OS40NzMgNTMuNjI5NCAyNTkuOTYxIDUyLjc5ODUgMjYwLjQwNyA1Mi4yNjU4QzI2MS4yIDUxLjQ4MzcgMjYyLjI5NiA1MSAyNjMuNTA2IDUxWk0yNjMuNTg2IDY2LjAxODNDMjYwLjczNyA2Ni4wMTgzIDI1OS4zMTMgNjcuMTI0NSAyNTkuMzEzIDY5LjMzNyAyNTkuMzEzIDY5LjYxMDIgMjU5LjMzMiA2OS44NjA4IDI1OS4zNzEgNzAuMDg4N0wyNjEuNzk1IDg0LjAxNjEgMjY1LjM4IDg0LjAxNjEgMjY3LjgyMSA2OS43NDc1QzI2Ny44NiA2OS43MzA5IDI2Ny44NzkgNjkuNTg3NyAyNjcuODc5IDY5LjMxNzkgMjY3Ljg3OSA2Ny4xMTgyIDI2Ni40NDggNjYuMDE4MyAyNjMuNTg2IDY2LjAxODNaTTI2My41NzYgODYuMDU0N0MyNjEuMDQ5IDg2LjA1NDcgMjU5Ljc4NiA4Ny4zMDA1IDI1OS43ODYgODkuNzkyMSAyNTkuNzg2IDkyLjI4MzcgMjYxLjA0OSA5My41Mjk1IDI2My41NzYgOTMuNTI5NSAyNjYuMTE2IDkzLjUyOTUgMjY3LjM4NyA5Mi4yODM3IDI2Ny4zODcgODkuNzkyMSAyNjcuMzg3IDg3LjMwMDUgMjY2LjExNiA4Ni4wNTQ3IDI2My41NzYgODYuMDU0N1oiIGZpbGw9IiNGRkU1MDAiIGZpbGwtcnVsZT0iZXZlbm9kZCIvPjwvZz48L3N2Zz4=) no-repeat 1rem/1.8rem, #b32121;
-    padding: 1rem 1rem 1rem 3.7rem;
-    color: white;
+:root {
+    /* Bootstrap цветовая схема */
+    --bs-blue: #0d6efd;
+    --bs-indigo: #6610f2;
+    --bs-purple: #6f42c1;
+    --bs-pink: #d63384;
+    --bs-red: #dc3545;
+    --bs-orange: #fd7e14;
+    --bs-yellow: #ffc107;
+    --bs-green: #198754;
+    --bs-teal: #20c997;
+    --bs-cyan: #0dcaf0;
+    --bs-black: #000;
+    --bs-white: #fff;
+    --bs-gray: #6c757d;
+    --bs-gray-dark: #343a40;
+    /* Основные цвета из variables.scss */
+    --primary-color: #0d6efd;
+    --secondary-color: #ced4da;
+    --success-color: #198754;
+    --danger-color: #dc3545;
+    --white-color: #ffffff;
+    --black-color: #000000;
+    --background-color-blured: #0000005d;
+    /* Анимации */
+    --default-transition-settings: 0.15s ease-out;
+    --default-animation-settings: 0.3s ease-out forwards;
+    /* Дополнительные CSS переменные */
+    --bs-font-sans-serif: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+    --bs-border-radius: 0.375rem;
+    --bs-border-radius-sm: 0.25rem;
+    --bs-border-radius-lg: 0.5rem;
+    --bs-box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, .15);
+    scroll-behavior: smooth;
 }
 
-    .blazor-error-boundary::after {
-        content: "An error has occurred."
-    }
+html, body {
+    height: 100%;
+    margin: 0;
+    font-family: var(--bs-font-sans-serif);
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.5;
+    color: #212529;
+    background-color: #fff;
+    -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
+}
 
-.loading-progress {
-    position: relative;
+body {
+    background: url('../images/backgroundImage.webp') center #ffffff;
+    background-size: cover;
+}
+
+/* Утилитарные классы */
+.w-100 {
+    width: 100% !important;
+}
+
+.p-3 {
+    padding: 1rem !important;
+}
+
+.rounded-3 {
+    border-radius: .3rem !important;
+}
+
+.shadow {
+    box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .15) !important;
+}
+
+.d-flex {
+    display: flex !important;
+}
+
+.fs-3 {
+    font-size: 1.75rem !important;
+}
+
+.fs-6 {
+    font-size: 1rem !important;
+}
+
+.text-primary {
+    color: var(--primary-color) !important;
+}
+
+.text-center {
+    text-align: center !important;
+}
+
+.text-decoration-none {
+    text-decoration: none !important;
+}
+
+.overflow-y-scroll {
+    overflow-y: scroll !important;
+}
+
+.position-absolute {
+    position: absolute !important;
+}
+
+.top-0 {
+    top: 0 !important;
+}
+
+.end-0 {
+    right: 0 !important;
+}
+
+.m-3 {
+    margin: 1rem !important;
+}
+
+.mb-3 {
+    margin-bottom: 0.5rem !important; /* Еще меньше */
+}
+
+.mb-4 {
+    margin-bottom: 1rem !important; /* Уменьшили отступ */
+}
+
+/* Отступы для группы инпутов (уменьшены) */
+.form-group {
+    margin-bottom: 0.75rem !important;
+}
+
+/* Формы */
+.form-control {
     display: block;
-    width: 8rem;
-    height: 8rem;
-    margin: 20vh auto 1rem auto;
+    width: 100%;
+    padding: .375rem .75rem;
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.5;
+    color: #212529;
+    background-color: #fff;
+    background-clip: padding-box;
+    border: 1px solid #ced4da;
+    appearance: none;
+    border-radius: .25rem;
+    transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
 }
 
-    .loading-progress circle {
-        fill: none;
-        stroke: #e0e0e0;
-        stroke-width: 0.6rem;
-        transform-origin: 50% 50%;
-        transform: rotate(-90deg);
+    .form-control:focus {
+        border-color: #86b7fe;
+        outline: 0;
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
     }
 
-        .loading-progress circle:last-child {
-            stroke: #1b6ec2;
-            stroke-dasharray: calc(3.141 * var(--blazor-load-percentage, 0%) * 0.8), 500%;
-            transition: stroke-dasharray 0.05s ease-in-out;
-        }
+.rounded-end {
+    border-top-right-radius: 0.25rem !important;
+    border-bottom-right-radius: 0.25rem !important;
+}
 
-.loading-progress-text {
-    position: absolute;
+.input-group {
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: stretch;
+    width: 100%;
+}
+
+.input-group-text {
+    display: flex;
+    align-items: center;
+    padding: .375rem .75rem;
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.5;
+    color: #212529;
     text-align: center;
-    font-weight: bold;
-    inset: calc(20vh + 3.25rem) 0 auto 0.2rem;
+    white-space: nowrap;
+    background-color: #e9ecef;
+    border: 1px solid #ced4da;
+    border-radius: .25rem;
 }
 
-    .loading-progress-text:after {
-        content: var(--blazor-load-percentage-text, "Loading");
+.input-group:not(.has-validation) > .dropdown-toggle:nth-last-child(n+3),
+.input-group:not(.has-validation) > :not(:last-child):not(.dropdown-toggle):not(.dropdown-menu) {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.input-group > :not(:first-child):not(.dropdown-menu):not(.valid-tooltip):not(.valid-feedback):not(.invalid-tooltip):not(.invalid-feedback) {
+    margin-left: -1px;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
+/* КНОПКИ - ИСПРАВЛЕННЫЕ СТИЛИ */
+.btn {
+    --bs-btn-padding-x: 0.75rem;
+    --bs-btn-padding-y: 0.375rem;
+    display: inline-block;
+    padding: var(--bs-btn-padding-y) var(--bs-btn-padding-x);
+    font-family: inherit;
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.5;
+    color: #fff; /* Белый текст всегда */
+    text-align: center;
+    text-decoration: none;
+    vertical-align: middle;
+    cursor: pointer;
+    user-select: none;
+    border: 1px solid transparent;
+    border-radius: var(--bs-border-radius);
+    background-color: var(--primary-color); /* Синий цвет по умолчанию */
+    transition: all 0.15s ease-in-out;
+}
+
+/* Основная кнопка */
+.btn-primary {
+    background-color: var(--primary-color) !important; /* #0d6efd - синий */
+    border-color: var(--primary-color) !important;
+    color: white !important;
+}
+
+    /* Состояния кнопки */
+    .btn-primary:hover {
+        background-color: #0b5ed7 !important; /* Темнее при наведении */
+        border-color: #0a58ca !important;
     }
 
-code {
-    color: #c02d76;
+    .btn-primary:active,
+    .btn-primary:focus:active {
+        background-color: #0a58ca !important;
+        border-color: #0a53be !important;
+        box-shadow: none !important; /* Убираем тень при нажатии */
+        outline: none !important; /* Убираем outline */
+    }
+
+    .btn-primary:focus {
+        box-shadow: none !important;
+        outline: none !important;
+    }
+
+    /* Заблокированная кнопка */
+    .btn-primary:disabled,
+    .btn-primary.disabled {
+        background-color: var(--primary-color) !important;
+        border-color: var(--primary-color) !important;
+        opacity: 0.65 !important;
+        cursor: not-allowed;
+    }
+
+    /* Убираем стандартный outline у всех кнопок */
+    .btn:focus {
+        outline: none !important;
+        box-shadow: none !important;
+    }
+
+    /* Только при фокусе с клавиатуры (для доступности) */
+    .btn:focus-visible {
+        outline: 2px solid #0d6efd !important;
+        outline-offset: 2px !important;
+    }
+
+/* Bootstrap Icons */
+.bi {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: nowrap;
 }
 
-.form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
-    color: var(--bs-secondary-color);
-    text-align: end;
+    .bi::before,
+    [class*=" bi-"]::before,
+    [class^=bi-]::before {
+        display: inline-block;
+        font-family: bootstrap-icons !important;
+        font-style: normal;
+        font-weight: 400 !important;
+        font-variant: normal;
+        text-transform: none;
+        line-height: 1;
+        vertical-align: -.125em;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+
+.bi-key::before {
+    content: "\f44f";
 }
 
-.form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
-    text-align: start;
+/* Алерты */
+.alert {
+    position: relative;
+    padding: 0.75rem 1rem; /* Уменьшили отступы */
+    margin-bottom: 1rem;
+    border: 1px solid transparent;
+    border-radius: var(--bs-border-radius);
+}
+
+.alert-danger {
+    color: #721c24;
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+}
+
+.alert-dismissible {
+    padding-right: 3rem;
+}
+
+.btn-close {
+    box-sizing: content-box;
+    width: 1em;
+    height: 1em;
+    padding: 0.25em;
+    color: #000;
+    background: transparent url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23000'%3e%3cpath d='M.293.293a1 1 0 0 1 1.414 0L8 6.586 14.293.293a1 1 0 1 1 1.414 1.414L9.414 8l6.293 6.293a1 1 0 0 1-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 0 1-1.414-1.414L6.586 8 .293 1.707a1 1 0 0 1 0-1.414z'/%3e%3c/svg%3e") center/1em no-repeat;
+    border: 0;
+    border-radius: 0.25rem;
+    opacity: 0.5;
+    cursor: pointer;
+}
+
+    .btn-close:hover {
+        opacity: 0.75;
+    }
+
+.fade {
+    transition: opacity var(--default-animation-settings);
+}
+
+    .fade.show {
+        opacity: 1;
+    }
+
+/* Спиннер */
+.spinner-border {
+    display: inline-block;
+    width: 1rem;
+    height: 1rem;
+    vertical-align: text-bottom;
+    border: 0.25em solid currentColor;
+    border-right-color: transparent;
+    border-radius: 50%;
+    animation: spinner-border .75s linear infinite;
+}
+
+.spinner-border-sm {
+    width: 0.8rem;
+    height: 0.8rem;
+    border-width: 0.2em;
+}
+
+@keyframes spinner-border {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.me-2 {
+    margin-right: 0.5rem !important;
+}
+
+/* Основные стили макета */
+.page-layout {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.page-layout__content-wrapper {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.page-layout__content {
+    flex: 1;
+    overflow-y: auto;
+}
+
+.page-layout__content--no-header {
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.login-page__content,
+.register-page__content {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Форма логина */
+.form-layout {
+    width: 400px;
+    background-color: #fff;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px; /* Уменьшили отступы между элементами формы */
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+}
+
+/* Ссылка "Забыли пароль?" - ИСПРАВЛЕННЫЙ СТИЛЬ */
+.forgot-password-link {
+    display: block !important; /* Блочный элемент */
+    text-align: center !important; /* По центру */
+    text-decoration: underline !important; /* Подчеркнутая */
+    color: var(--primary-color) !important;
+    transition: color 0.15s ease-in-out !important;
+}
+
+    .forgot-password-link:hover {
+        color: #0b5ed7 !important; /* Темнее при наведении */
+        text-decoration: underline !important;
+    }
+
+/* Текст ошибок валидации */
+.text-danger {
+    color: var(--danger-color) !important;
+}
+
+.small {
+    font-size: 0.875rem;
+}
+
+/* Дополнительные утилиты */
+.text-decoration-underline {
+    text-decoration: underline !important;
+}
+
+/* Стили для загрузки */
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+
+    .loading-overlay .spinner {
+        width: 50px;
+        height: 50px;
+        border: 4px solid var(--secondary-color);
+        border-top: 4px solid var(--primary-color);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin-bottom: 1rem;
+    }
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* Стили для ошибок */
+#blazor-error-ui {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 10000;
+    padding: 0.75rem; /* Уменьшили отступы */
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+}
+
+/* Стили для фиксированного алерта (как в оригинале) */
+.position-fixed {
+    position: fixed !important;
+}
+
+/* Анимация появления алерта */
+.alert.fade.show {
+    animation: slideInAlert 0.3s ease-out;
+}
+
+@keyframes slideInAlert {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* Скрываем алерт при закрытии */
+.alert.fade:not(.show) {
+    display: none;
+}
+
+/* Чтобы форма не прыгала при появлении алерта */
+.login-page__content {
+    padding-top: 0 !important;
+}
+
+/* Убираем стандартные сообщения об ошибках валидации Blazor */
+.validation-message {
+    display: none !important;
+}
+
+.fs-3.text-primary.text-center.mb-4 {
+    margin-bottom: 0.5rem !important; /* Уменьшили с 1.5rem до 0.5rem */
 }

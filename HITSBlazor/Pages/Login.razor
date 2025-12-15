@@ -1,0 +1,147 @@
+﻿@page "/login"
+@using HITSBlazor.Services
+@using HITSBlazor.Models.Auth.Requests
+@using HITSBlazor.Models.Auth.Response
+@inject AuthService AuthService
+@inject NavigationManager Navigation
+
+<PageTitle>Авторизация</PageTitle>
+
+<div class="page-layout">
+    <div class="page-layout__content-wrapper w-100">
+        <div class="page-layout__content page-layout__content--no-header login-page__content p-3">
+
+            <!-- Алерт для ошибок валидации и авторизации -->
+            @if (!string.IsNullOrEmpty(ErrorMessage))
+            {
+                <div class="alert alert-danger alert-dismissible fade show position-fixed top-0 end-0 m-3"
+                     style="z-index: 1050; max-width: 400px;" role="alert">
+                    @ErrorMessage
+                    <button type="button" class="btn-close" @onclick="DismissError"></button>
+                </div>
+            }
+
+            <EditForm Model="@loginRequest" OnValidSubmit="@HandleLogin" class="form-layout p-3 rounded-3 shadow">
+                @* Убираем ValidationSummary - он показывает ошибки в форме *@
+                @* <DataAnnotationsValidator /> - тоже можно убрать, если не хотим валидацию в форме *@
+
+                <span class="fs-3 text-primary text-center">Авторизация</span> <!-- Убрали mb-4 -->
+
+                <div class="mb-3">
+                    <div class="input-group">
+                        <span class="input-group-text fs-6">&#64;</span>
+                        <InputText @bind-Value="loginRequest.Email"
+                                   class="form-control"
+                                   placeholder="Введите логин" />
+                    </div>
+                    @* Убираем ValidationMessage - не показываем ошибки под полями *@
+                </div>
+
+                <div class="mb-3">
+                    <div class="input-group">
+                        <span class="input-group-text fs-6">
+                            <i class="bi bi-key"></i>
+                        </span>
+                        <InputText type="password"
+                                   @bind-Value="loginRequest.Password"
+                                   class="form-control"
+                                   placeholder="Введите пароль" />
+                    </div>
+                    @* Убираем ValidationMessage *@
+                </div>
+
+                <div class="text-center mb-3">
+                    <a href="/recovery-password" class="forgot-password-link text-decoration-underline">
+                        Забыли пароль?
+                    </a>
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100" disabled="@isLoading">
+                    @if (isLoading)
+                    {
+                        <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                        <span>Вход...</span>
+                    }
+                    else
+                    {
+                        <span>Войти</span>
+                    }
+                </button>
+            </EditForm>
+        </div>
+    </div>
+</div>
+
+@code {
+    private LoginRequest loginRequest = new();
+    private string? errorMessage;
+    private bool isLoading;
+
+    private string? ErrorMessage
+    {
+        get => errorMessage;
+        set
+        {
+            errorMessage = value;
+            StateHasChanged();
+        }
+    }
+
+    protected override void OnInitialized()
+    {
+        if (AuthService.IsAuthenticated)
+        {
+            Navigation.NavigateTo("/", true);
+        }
+    }
+
+    private async Task HandleLogin()
+    {
+        if (isLoading) return;
+
+        isLoading = true;
+        ErrorMessage = null; // Сначала очищаем предыдущие ошибки
+
+        try
+        {
+            // Ручная валидация перед отправкой
+            var validationResults = new List<System.ComponentModel.DataAnnotations.ValidationResult>();
+            var validationContext = new System.ComponentModel.DataAnnotations.ValidationContext(loginRequest);
+
+            bool isValid = System.ComponentModel.DataAnnotations.Validator.TryValidateObject(
+                loginRequest, validationContext, validationResults, true);
+
+            if (!isValid)
+            {
+                // Показываем первую ошибку в алерте
+                ErrorMessage = validationResults.FirstOrDefault()?.ErrorMessage ??
+                              "Пожалуйста, заполните все поля корректно";
+                isLoading = false;
+                return;
+            }
+
+            // Если валидация прошла, отправляем запрос
+            var result = await AuthService.LoginAsync(loginRequest);
+
+            if (result.Success)
+            {
+                loginRequest = new LoginRequest();
+                Navigation.NavigateTo("/", true);
+            }
+            else
+            {
+                ErrorMessage = result.ErrorMessage ?? "Вы указали неверные данные для входа. Попробуйте снова.";
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = $"Произошла ошибка: {ex.Message}";
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private void DismissError() => ErrorMessage = null;
+}

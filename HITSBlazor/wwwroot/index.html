@@ -4,31 +4,36 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>HITS-Blazor</title>
+    <title>Портал ВШЦТ</title>
     <base href="/" />
     <link rel="stylesheet" href="lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+
     <link rel="stylesheet" href="css/app.css" />
-    <link rel="icon" type="image/png" href="favicon.png" />
+
+    <link rel="icon" href="./favicon.svg" />
+    <link rel="mask-icon" href="./favicon.svg" />
+
     <link href="HITS-Blazor.styles.css" rel="stylesheet" />
     <link href="manifest.webmanifest" rel="manifest" />
-    <link rel="apple-touch-icon" sizes="512x512" href="icon-512.png" />
-    <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png" />
 </head>
 
 <body>
     <div id="app">
-        <svg class="loading-progress">
-            <circle r="40%" cx="50%" cy="50%" />
-            <circle r="40%" cx="50%" cy="50%" />
-        </svg>
-        <div class="loading-progress-text"></div>
+        <div class="loading-overlay">
+            <div class="spinner"></div>
+            <p>Загрузка приложения...</p>
+        </div>
     </div>
 
-    <div id="blazor-error-ui">
-        An unhandled error has occurred.
-        <a href="." class="reload">Reload</a>
-        <span class="dismiss">🗙</span>
+    <div id="blazor-error-ui" class="alert alert-danger" style="display: none;">
+        <span class="error-message">Произошла ошибка в приложении</span>
+        <button class="btn btn-sm btn-light ms-3" onclick="location.reload()">Перезагрузить</button>
+        <button class="btn btn-sm btn-link ms-2" onclick="document.getElementById('blazor-error-ui').style.display='none'">
+            Скрыть
+        </button>
     </div>
+
     <script src="_framework/blazor.webassembly.js"></script>
     <script>navigator.serviceWorker.register('service-worker.js');</script>
 </body>
