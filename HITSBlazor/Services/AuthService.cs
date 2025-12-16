@@ -28,6 +28,11 @@ namespace HITSBlazor.Services
             {
                 await LoadMockUserAsync();
             }
+            else
+            {
+                CurrentUser = null;
+                OnAuthStateChanged?.Invoke();
+            }
         }
 
         private async Task LoadMockUserAsync()

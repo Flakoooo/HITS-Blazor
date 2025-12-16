@@ -1,4 +1,5 @@
 using HITSBlazor.Services;
+using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 
@@ -17,6 +18,12 @@ namespace HITSBlazor
             });
 
             builder.Services.AddScoped<AuthService>();
+
+            builder.Services.AddScoped<CustomAuthenticationStateProvider>();
+            builder.Services.AddScoped<AuthenticationStateProvider>(sp =>
+                sp.GetRequiredService<CustomAuthenticationStateProvider>()
+            );
+            builder.Services.AddCascadingAuthenticationState();
             builder.Services.AddAuthorizationCore();
 
             await builder.Build().RunAsync();

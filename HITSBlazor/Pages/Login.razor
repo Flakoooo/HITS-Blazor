@@ -1,11 +1,4 @@
-﻿@page "/login"
-@using HITSBlazor.Services
-@using HITSBlazor.Models.Auth.Requests
-@using HITSBlazor.Models.Auth.Response
-@inject AuthService AuthService
-@inject NavigationManager Navigation
-
-<PageTitle>Авторизация</PageTitle>
+﻿<PageTitle>Авторизация</PageTitle>
 
 <div class="page-layout">
     <div class="page-layout__content-wrapper w-100">
@@ -59,75 +52,3 @@
         </div>
     </div>
 </div>
-
-@code {
-    private LoginRequest loginRequest = new();
-    private string? errorMessage;
-    private bool isLoading;
-
-    private string? ErrorMessage
-    {
-        get => errorMessage;
-        set
-        {
-            errorMessage = value;
-            StateHasChanged();
-        }
-    }
-
-    protected override void OnInitialized()
-    {
-        if (AuthService.IsAuthenticated)
-        {
-            Navigation.NavigateTo("/", true);
-        }
-    }
-
-    private async Task HandleLogin()
-    {
-        if (isLoading) return;
-
-        isLoading = true;
-        ErrorMessage = null;
-
-        try
-        {
-            // Ручная валидация перед отправкой
-            var validationResults = new List<System.ComponentModel.DataAnnotations.ValidationResult>();
-            var validationContext = new System.ComponentModel.DataAnnotations.ValidationContext(loginRequest);
-
-            bool isValid = System.ComponentModel.DataAnnotations.Validator.TryValidateObject(
-                loginRequest, validationContext, validationResults, true);
-
-            if (!isValid)
-            {
-                ErrorMessage = "Вы указали неверные данные для входа. Попробуйте снова.";
-                isLoading = false;
-                return;
-            }
-
-            // Если валидация прошла, отправляем запрос
-            var result = await AuthService.LoginAsync(loginRequest);
-
-            if (result.Success)
-            {
-                loginRequest = new LoginRequest();
-                Navigation.NavigateTo("/", true);
-            }
-            else
-            {
-                ErrorMessage = "Вы указали неверные данные для входа. Попробуйте снова.";
-            }
-        }
-        catch (Exception ex)
-        {
-            ErrorMessage = $"Произошла ошибка: {ex.Message}";
-        }
-        finally
-        {
-            isLoading = false;
-        }
-    }
-
-    private void DismissError() => ErrorMessage = null;
-}
