@@ -17,7 +17,10 @@ namespace HITSBlazor
                 BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) 
             });
 
+            // Auth
             builder.Services.AddScoped<AuthService>();
+            // Utils
+            builder.Services.AddScoped<NotificationService>();
 
             builder.Services.AddScoped<CustomAuthenticationStateProvider>();
             builder.Services.AddScoped<AuthenticationStateProvider>(sp =>

@@ -27,25 +27,3 @@
     margin: 0.5rem auto !important;
     width: 100%;
 }
-
-/* Адаптивность для мобильных */
-@media (max-width: 576px) {
-    ::deep .form-layout {
-        width: 90% !important;
-        padding: 1.5rem !important;
-        gap: 8px !important; /* Еще меньше отступы на мобильных */
-    }
-
-    ::deep .fs-3 {
-        font-size: 1.5rem !important;
-        margin-bottom: 0.75rem !important;
-    }
-
-    ::deep .mb-3 {
-        margin-bottom: 0.5rem !important;
-    }
-
-    ::deep .mb-4 {
-        margin-bottom: 0.75rem !important;
-    }
-}

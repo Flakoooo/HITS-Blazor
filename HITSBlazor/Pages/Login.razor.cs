@@ -10,7 +10,6 @@ namespace HITSBlazor.Pages
     public partial class Login
     {
         private LoginRequest loginRequest = new();
-        private string? errorMessage;
         private bool isLoading;
 
         [Inject]
@@ -19,15 +18,8 @@ namespace HITSBlazor.Pages
         [Inject]
         private NavigationManager Navigation { get; set; } = null!;
 
-        private string? ErrorMessage
-        {
-            get => errorMessage;
-            set
-            {
-                errorMessage = value;
-                StateHasChanged();
-            }
-        }
+        [Inject]
+        private NotificationService NotificationService { get; set; } = null!;
 
         protected override void OnInitialized()
         {
@@ -42,7 +34,6 @@ namespace HITSBlazor.Pages
             if (isLoading) return;
 
             isLoading = true;
-            ErrorMessage = null;
 
             try
             {
@@ -55,7 +46,7 @@ namespace HITSBlazor.Pages
 
                 if (!isValid)
                 {
-                    ErrorMessage = "Вы указали неверные данные для входа. Попробуйте снова.";
+                    NotificationService.ShowError("Вы указали неверные данные для входа. Попробуйте снова.");
                     isLoading = false;
                     return;
                 }
@@ -70,19 +61,17 @@ namespace HITSBlazor.Pages
                 }
                 else
                 {
-                    ErrorMessage = "Вы указали неверные данные для входа. Попробуйте снова.";
+                    NotificationService.ShowError("Вы указали неверные данные для входа. Попробуйте снова.");
                 }
             }
             catch (Exception ex)
             {
-                ErrorMessage = $"Произошла ошибка: {ex.Message}";
+                NotificationService.ShowError($"Произошла ошибка: {ex.Message}");
             }
             finally
             {
                 isLoading = false;
             }
         }
-
-        private void DismissError() => ErrorMessage = null;
     }
 }

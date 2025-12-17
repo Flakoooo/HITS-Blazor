@@ -1,5 +1,4 @@
-﻿/* wwwroot/css/site.css */
-/* Основные глобальные стили для всего приложения */
+﻿/* Основные глобальные стили для всего приложения */
 
 @font-face {
     font-display: block;
@@ -119,6 +118,10 @@ body {
     position: absolute !important;
 }
 
+.position-fixed {
+    position: fixed !important;
+}
+
 .top-0 {
     top: 0 !important;
 }
@@ -132,14 +135,14 @@ body {
 }
 
 .mb-3 {
-    margin-bottom: 0.5rem !important; /* Еще меньше */
+    margin-bottom: 0.5rem !important;
 }
 
 .mb-4 {
-    margin-bottom: 1rem !important; /* Уменьшили отступ */
+    margin-bottom: 1rem !important;
 }
 
-/* Отступы для группы инпутов (уменьшены) */
+/* Отступы для группы инпутов */
 .form-group {
     margin-bottom: 0.75rem !important;
 }
@@ -204,7 +207,7 @@ body {
     border-bottom-left-radius: 0;
 }
 
-/* КНОПКИ - ИСПРАВЛЕННЫЕ СТИЛИ */
+/* КНОПКИ */
 .btn {
     --bs-btn-padding-x: 0.75rem;
     --bs-btn-padding-y: 0.375rem;
@@ -214,7 +217,7 @@ body {
     font-size: 1rem;
     font-weight: 400;
     line-height: 1.5;
-    color: #fff; /* Белый текст всегда */
+    color: #fff;
     text-align: center;
     text-decoration: none;
     vertical-align: middle;
@@ -222,20 +225,18 @@ body {
     user-select: none;
     border: 1px solid transparent;
     border-radius: var(--bs-border-radius);
-    background-color: var(--primary-color); /* Синий цвет по умолчанию */
+    background-color: var(--primary-color);
     transition: all 0.15s ease-in-out;
 }
 
-/* Основная кнопка */
 .btn-primary {
-    background-color: var(--primary-color) !important; /* #0d6efd - синий */
+    background-color: var(--primary-color) !important;
     border-color: var(--primary-color) !important;
     color: white !important;
 }
 
-    /* Состояния кнопки */
     .btn-primary:hover {
-        background-color: #0b5ed7 !important; /* Темнее при наведении */
+        background-color: #0b5ed7 !important;
         border-color: #0a58ca !important;
     }
 
@@ -243,8 +244,8 @@ body {
     .btn-primary:focus:active {
         background-color: #0a58ca !important;
         border-color: #0a53be !important;
-        box-shadow: none !important; /* Убираем тень при нажатии */
-        outline: none !important; /* Убираем outline */
+        box-shadow: none !important;
+        outline: none !important;
     }
 
     .btn-primary:focus {
@@ -252,7 +253,6 @@ body {
         outline: none !important;
     }
 
-    /* Заблокированная кнопка */
     .btn-primary:disabled,
     .btn-primary.disabled {
         background-color: var(--primary-color) !important;
@@ -261,17 +261,15 @@ body {
         cursor: not-allowed;
     }
 
-    /* Убираем стандартный outline у всех кнопок */
-    .btn:focus {
-        outline: none !important;
-        box-shadow: none !important;
-    }
+.btn:focus {
+    outline: none !important;
+    box-shadow: none !important;
+}
 
-    /* Только при фокусе с клавиатуры (для доступности) */
-    .btn:focus-visible {
-        outline: 2px solid #0d6efd !important;
-        outline-offset: 2px !important;
-    }
+.btn:focus-visible {
+    outline: 2px solid #0d6efd !important;
+    outline-offset: 2px !important;
+}
 
 /* Bootstrap Icons */
 .bi {
@@ -301,43 +299,17 @@ body {
     content: "\f44f";
 }
 
-/* Алерты */
-.alert {
-    position: relative;
-    padding: 1rem 1rem; /* Уменьшили отступы */
-    margin-bottom: 1rem;
-    border: 1px solid transparent;
-    border-radius: var(--bs-border-radius);
+.bi-arrow-left::before {
+    content: "\f12f";
 }
 
-.alert-danger {
-    color: #58151c;
-    background-color: #f8d7da;
-    border-color: #f1aeb5;
+.bi-check-circle-fill::before {
+    content: "\f26a";
 }
 
-.alert-dismissible {
-    padding-right: 3rem;
+.bi-info-circle::before {
+    content: "\f431";
 }
-
-.btn-close {
-    color: #000;
-    background: transparent url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23000'%3e%3cpath d='M.293.293a1 1 0 0 1 1.414 0L8 6.586 14.293.293a1 1 0 1 1 1.414 1.414L9.414 8l6.293 6.293a1 1 0 0 1-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 0 1-1.414-1.414L6.586 8 .293 1.707a1 1 0 0 1 0-1.414z'/%3e%3c/svg%3e") center/1em no-repeat;
-    opacity: 0.5;
-    cursor: pointer;
-}
-
-    .btn-close:hover {
-        opacity: 0.75;
-    }
-
-.fade {
-    transition: opacity var(--default-animation-settings);
-}
-
-    .fade.show {
-        opacity: 1;
-    }
 
 /* Спиннер */
 .spinner-border {
@@ -398,7 +370,8 @@ body {
 }
 
 .login-page__content,
-.register-page__content {
+.register-page__content,
+.recovery-pass__content {
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
@@ -413,22 +386,22 @@ body {
     display: flex;
     flex-direction: column;
     align-items: stretch;
-    gap: 12px; /* Уменьшили отступы между элементами формы */
+    gap: 12px;
     flex-wrap: nowrap;
     justify-content: flex-start;
 }
 
-/* Ссылка "Забыли пароль?" - ИСПРАВЛЕННЫЙ СТИЛЬ */
+/* Ссылка "Забыли пароль?" */
 .forgot-password-link {
-    display: block !important; /* Блочный элемент */
-    text-align: center !important; /* По центру */
-    text-decoration: underline !important; /* Подчеркнутая */
+    display: block !important;
+    text-align: center !important;
+    text-decoration: underline !important;
     color: var(--primary-color) !important;
     transition: color 0.15s ease-in-out !important;
 }
 
     .forgot-password-link:hover {
-        color: #0b5ed7 !important; /* Темнее при наведении */
+        color: #0b5ed7 !important;
         text-decoration: underline !important;
     }
 
@@ -481,47 +454,15 @@ body {
     }
 }
 
-/* Стили для ошибок */
+/* Стили для ошибок Blazor */
 #blazor-error-ui {
     position: fixed;
     bottom: 0;
     left: 0;
     right: 0;
     z-index: 10000;
-    padding: 0.75rem; /* Уменьшили отступы */
+    padding: 0.75rem;
     box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
-}
-
-/* Стили для фиксированного алерта (как в оригинале) */
-.position-fixed {
-    position: fixed !important;
-}
-
-/* Анимация появления алерта */
-.alert.fade.show {
-    animation: slideInAlert 0.3s ease-out;
-}
-
-@keyframes slideInAlert {
-    from {
-        transform: translateX(100%);
-        opacity: 0;
-    }
-
-    to {
-        transform: translateX(0);
-        opacity: 1;
-    }
-}
-
-/* Скрываем алерт при закрытии */
-.alert.fade:not(.show) {
-    display: none;
-}
-
-/* Чтобы форма не прыгала при появлении алерта */
-.login-page__content {
-    padding-top: 0 !important;
 }
 
 /* Убираем стандартные сообщения об ошибках валидации Blazor */

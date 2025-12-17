@@ -86,6 +86,31 @@ namespace HITSBlazor.Services
             }
         }
 
+        public async Task<RecoveryResponse> RequestPasswordRecoveryAsync(string email)
+        {
+            try
+            {
+                // TODO: Реализовать реальный вызов API
+                // var response = await _httpClient.PostAsJsonAsync("/api/auth/recovery-password", new { email });
+
+                await Task.Delay(1000); // Имитация задержки
+
+                return new RecoveryResponse
+                {
+                    Success = true,
+                    Message = "Инструкции по восстановлению отправлены на email"
+                };
+            }
+            catch (Exception ex)
+            {
+                return new RecoveryResponse
+                {
+                    Success = false,
+                    Message = $"Ошибка: {ex.Message}"
+                };
+            }
+        }
+
         public async Task LogoutAsync()
         {
             await RemoveTokenAsync();

@@ -1,0 +1,84 @@
+﻿@using HITSBlazor.Services
+@implements IDisposable
+
+@if (!string.IsNullOrEmpty(currentMessage))
+{
+    <div class="alert @alertClass alert-dismissible fade show position-fixed top-0 end-0 m-3 @animationClass"
+         role="alert">
+        @currentMessage
+        <button type="button" class="btn-close" @onclick="Hide"></button>
+    </div>
+}
+
+@code {
+    private string? currentMessage;
+    private bool isError = true;
+    private System.Threading.Timer? autoHideTimer;
+    private DateTime? lastShownTime;
+    private string animationClass = "alert-slide-in";
+
+    private string alertClass => isError ? "alert-danger" : "alert-success";
+
+    [Inject]
+    private NotificationService NotificationService { get; set; } = null!;
+
+    protected override void OnInitialized()
+    {
+        NotificationService.OnErrorNotification += ShowError;
+        NotificationService.OnSuccessNotification += ShowSuccess;
+        NotificationService.OnClearNotification += Hide;
+    }
+
+    private void ShowError(string errorMessage) => ShowNotification(errorMessage, true);
+
+    private void ShowSuccess(string successMessage) => ShowNotification(successMessage, false);
+
+    private void ShowNotification(string message, bool error)
+    {
+        autoHideTimer?.Dispose();
+
+        currentMessage = message;
+        isError = error;
+        animationClass = "alert-slide-in";
+        lastShownTime = DateTime.UtcNow;
+        StateHasChanged();
+
+        autoHideTimer = new System.Threading.Timer(_ =>
+        {
+            InvokeAsync(Hide);
+        }, null, 5000, Timeout.Infinite);
+    }
+
+    private async void Hide()
+    {
+        if (!string.IsNullOrEmpty(currentMessage))
+        {
+            if (lastShownTime.HasValue)
+            {
+                var timeShown = DateTime.UtcNow - lastShownTime.Value;
+                var timeRemaining = TimeSpan.FromSeconds(5) - timeShown;
+
+                if (timeRemaining > TimeSpan.Zero)
+                    await Task.Delay(timeRemaining);
+            }
+
+            animationClass = "alert-slide-out";
+            StateHasChanged();
+
+            await Task.Delay(300);
+
+            autoHideTimer?.Dispose();
+            currentMessage = null;
+            StateHasChanged();
+        }
+    }
+
+    public void Dispose()
+    {
+        autoHideTimer?.Dispose();
+
+        NotificationService.OnErrorNotification -= ShowError;
+        NotificationService.OnSuccessNotification -= ShowSuccess;
+        NotificationService.OnClearNotification -= Hide;
+    }
+}

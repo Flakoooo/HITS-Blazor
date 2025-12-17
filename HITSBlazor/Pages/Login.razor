@@ -1,17 +1,11 @@
-﻿<PageTitle>Авторизация</PageTitle>
+﻿@using HITSBlazor.Components
+
+<PageTitle>Авторизация</PageTitle>
 
 <div class="page-layout">
     <div class="page-layout__content-wrapper w-100">
         <div class="page-layout__content page-layout__content--no-header login-page__content p-3">
-            @if (!string.IsNullOrEmpty(ErrorMessage))
-            {
-                <div class="alert alert-danger alert-dismissible fade show position-absolute top-0 end-0 m-3"
-                     role="alert">
-                    @ErrorMessage
-                    <button type="button" class="btn-close" @onclick="DismissError"></button>
-                </div>
-            }
-            <EditForm Model="@loginRequest" OnValidSubmit="@HandleLogin" class="form-layout p-3 rounded-3 shadow">
+            <EditForm Model="@loginRequest" OnValidSubmit="@HandleLogin" class="form-layout p-3 rounded-3 shadow" style="margin-bottom: 1rem">
                 <span class="fs-3 text-primary text-center">Авторизация</span>
                 <div>
                     <div class="input-group">
