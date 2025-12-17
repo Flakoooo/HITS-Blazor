@@ -1,0 +1,13 @@
+﻿/* Текст ошибок валидации */
+.text-danger {
+    color: var(--danger-color) !important;
+}
+
+.small {
+    font-size: 0.875rem;
+}
+
+/* Дополнительные утилиты */
+.text-decoration-underline {
+    text-decoration: underline !important;
+}

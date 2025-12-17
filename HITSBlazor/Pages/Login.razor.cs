@@ -13,7 +13,7 @@ namespace HITSBlazor.Pages
         private bool isLoading;
 
         [Inject]
-        private AuthService AuthService { get; set; } = null!;
+        private IAuthService AuthService { get; set; } = null!;
 
         [Inject]
         private NavigationManager Navigation { get; set; } = null!;
@@ -24,9 +24,7 @@ namespace HITSBlazor.Pages
         protected override void OnInitialized()
         {
             if (AuthService.IsAuthenticated)
-            {
                 Navigation.NavigateTo("/", true);
-            }
         }
 
         private async Task HandleLogin()
@@ -37,31 +35,54 @@ namespace HITSBlazor.Pages
 
             try
             {
-                // Ручная валидация перед отправкой
-                var validationResults = new List<System.ComponentModel.DataAnnotations.ValidationResult>();
-                var validationContext = new System.ComponentModel.DataAnnotations.ValidationContext(loginRequest);
+                bool emailIsEmpty = string.IsNullOrWhiteSpace(loginRequest.Email);
+                bool passwordIsEmpty = string.IsNullOrWhiteSpace(loginRequest.Password);
 
-                bool isValid = System.ComponentModel.DataAnnotations.Validator.TryValidateObject(
-                    loginRequest, validationContext, validationResults, true);
-
-                if (!isValid)
+                if (emailIsEmpty || passwordIsEmpty)
                 {
-                    NotificationService.ShowError("Вы указали неверные данные для входа. Попробуйте снова.");
+                    var errorMessage = "";
+
+                    if (emailIsEmpty && passwordIsEmpty)
+                        errorMessage = "Пожалуйста, заполните логин и пароль";
+                    else if (emailIsEmpty)
+                        errorMessage = "Пожалуйста, заполните логин";
+                    else
+                        errorMessage = "Пожалуйста, заполните пароль";
+
+                    NotificationService.ShowError(errorMessage);
                     isLoading = false;
                     return;
                 }
 
-                // Если валидация прошла, отправляем запрос
+                var email = loginRequest.Email.Trim();
+                var atIndex = email.IndexOf('@');
+
+                if (atIndex <= 0 || atIndex == email.Length - 1 || email.Count(c => c == '@') != 1)
+                {
+                    NotificationService.ShowError("Неверный формат почты");
+                    isLoading = false;
+                    return;
+                }
+
+                if (loginRequest.Password.Length < 8)
+                {
+                    NotificationService.ShowError("Длина пароля не может быть меньше 8 символов");
+                    isLoading = false;
+                    return;
+                }
+
                 var result = await AuthService.LoginAsync(loginRequest);
 
-                if (result.Success)
+                if (result.IsSuccess)
                 {
                     loginRequest = new LoginRequest();
                     Navigation.NavigateTo("/", true);
                 }
                 else
                 {
-                    NotificationService.ShowError("Вы указали неверные данные для входа. Попробуйте снова.");
+                    NotificationService.ShowError(
+                        result.ErrorMessage ?? "Вы указали неверные данные для входа. Попробуйте снова."
+                    );
                 }
             }
             catch (Exception ex)

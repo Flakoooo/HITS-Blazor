@@ -10,7 +10,7 @@ namespace HITSBlazor.Services
 {
     public class AuthService(
         HttpClient httpClient, IJSRuntime jsRuntime, NavigationManager navigationManager
-    )
+    ) : IAuthService
     {
         private readonly HttpClient _httpClient = httpClient;
         private readonly IJSRuntime _jsRuntime = jsRuntime;
@@ -53,13 +53,9 @@ namespace HITSBlazor.Services
                     .FirstOrDefault(u => u.Email == request.Email);
 
                 if (user == null)
-                    return new LoginResponse
-                    {
-                        Success = false,
-                        ErrorMessage = "Неверный логин или пароль"
-                    };
+                    return LoginResponse.Failure("Неверный логин или пароль");
 
-                var mockToken = $"mock-token-{Guid.NewGuid()}";
+                var mockToken = $"mock-token-{user.Id}";
 
                 await SaveTokenAsync(mockToken);
 
@@ -69,49 +65,29 @@ namespace HITSBlazor.Services
 
                 OnAuthStateChanged?.Invoke();
 
-                return new LoginResponse
-                {
-                    Success = true,
-                    Token = mockToken,
-                    User = user
-                };
+                return LoginResponse.Success(mockToken, user);
             }
             catch (Exception ex)
             {
-                return new LoginResponse
-                {
-                    Success = false,
-                    ErrorMessage = $"Ошибка при авторизации: {ex.Message}"
-                };
+                return LoginResponse.Failure($"Ошибка при авторизации: {ex.Message}");
             }
         }
 
-        public static async Task<RecoveryResponse> RequestPasswordRecoveryAsync(string email)
+        public async Task<RecoveryResponse> RequestPasswordRecoveryAsync(string email)
         {
             try
             {
-                // TODO: Реализовать реальный вызов API
-                // var response = await _httpClient.PostAsJsonAsync("/api/auth/recovery-password", new { email });
+                await Task.Delay(1000);
 
-                await Task.Delay(1000); // Имитация задержки
-
-                return new RecoveryResponse
-                {
-                    Success = true,
-                    Message = "Инструкции по восстановлению отправлены на email"
-                };
+                return RecoveryResponse.Success("Инструкции по восстановлению отправлены на email");
             }
             catch (Exception ex)
             {
-                return new RecoveryResponse
-                {
-                    Success = false,
-                    Message = $"Ошибка: {ex.Message}"
-                };
+                return RecoveryResponse.Failure($"Ошибка: {ex.Message}");
             }
         }
 
-        public static async Task<ResetPasswordResponse> ResetPasswordAsync(string code, string newPassword)
+        public async Task<ResetPasswordResponse> ResetPasswordAsync(string code, string newPassword)
         {
             try
             {

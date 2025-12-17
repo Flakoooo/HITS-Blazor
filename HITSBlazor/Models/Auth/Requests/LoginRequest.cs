@@ -4,13 +4,11 @@ namespace HITSBlazor.Models.Auth.Requests
 {
     public class LoginRequest
     {
-        [Required(ErrorMessage = "Введите логин или email")]
-        [Display(Name = "Логин")]
+        [Required]
         public string Email { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "Введите пароль")]
+        [Required]
         [DataType(DataType.Password)]
-        [Display(Name = "Пароль")]
         public string Password { get; set; } = string.Empty;
     }
 }

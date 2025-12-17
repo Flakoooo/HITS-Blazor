@@ -2,7 +2,6 @@
 using HITSBlazor.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
-using System.ComponentModel.DataAnnotations;
 
 namespace HITSBlazor.Pages
 {
@@ -10,14 +9,14 @@ namespace HITSBlazor.Pages
     [Route("/recovery-password")]
     public partial class RecoveryPassword
     {
-        private readonly RecoveryRequest recoveryRequest = new();
+        private RecoveryRequest recoveryRequest = new();
         private bool isLoading;
 
         [Inject]
         private NavigationManager Navigation { get; set; } = null!;
 
         [Inject]
-        private AuthService AuthService { get; set; } = null!;
+        private IAuthService AuthService { get; set; } = null!;
 
         [Inject]
         private NotificationService NotificationService { get; set; } = null!;
@@ -30,36 +29,38 @@ namespace HITSBlazor.Pages
 
             try
             {
-                // Ручная валидация (как на странице логина)
-                var validationResults = new List<ValidationResult>();
-                var validationContext = new ValidationContext(recoveryRequest);
-
-                bool isValid = Validator.TryValidateObject(
-                    recoveryRequest, validationContext, validationResults, true);
-
-                if (!isValid)
+                if (string.IsNullOrWhiteSpace(recoveryRequest.Email))
                 {
-                    NotificationService.ShowError("Введите корректный email адрес");
+                    NotificationService.ShowError("Пожалуйста, укажите почту");
                     isLoading = false;
                     return;
                 }
 
-                // Имитация вызова API (заменить на реальный)
-                await Task.Delay(1500);
+                var email = recoveryRequest.Email.Trim();
+                var atIndex = email.IndexOf('@');
 
-                // Проверка существования email (мок)
-                var mockUsers = new[] { "user@example.com", "admin@example.com" };
-                if (!mockUsers.Contains(recoveryRequest.Email.ToLower()))
+                if (atIndex <= 0 || atIndex == email.Length - 1 || email.Count(c => c == '@') != 1)
                 {
-                    NotificationService.ShowError("Пользователь с таким email не найден");
+                    NotificationService.ShowError("Неверный формат почты");
                     isLoading = false;
                     return;
                 }
 
-                // Автоматический редирект через 5 секунд
-                await Task.Delay(5000);
-                NotificationService.ShowSuccess("На указанную почту был отправлен код смены пароля");
-                Navigation.NavigateTo("/new-password");
+                var result = await AuthService.RequestPasswordRecoveryAsync(recoveryRequest.Email);
+
+                if (result.IsSuccess)
+                {
+                    NotificationService.ShowSuccess(result.Message);
+
+                    recoveryRequest = new RecoveryRequest();
+                    Navigation.NavigateTo("/new-password");
+                }
+                else
+                {
+                    NotificationService.ShowError(
+                        result.Message ?? "Вы указали неверную почту для восстановления пароля. Попробуйте снова."
+                    );
+                }
             }
             catch (Exception ex)
             {
