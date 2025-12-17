@@ -211,7 +211,9 @@ body {
 .btn {
     --bs-btn-padding-x: 0.75rem;
     --bs-btn-padding-y: 0.375rem;
-    display: inline-block;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
     padding: var(--bs-btn-padding-y) var(--bs-btn-padding-x);
     font-family: inherit;
     font-size: 1rem;
@@ -311,12 +313,16 @@ body {
     content: "\f431";
 }
 
+.bi-fonts::before {
+    content: "\f3da";
+}
+
 /* Спиннер */
 .spinner-border {
     display: inline-block;
     width: 1rem;
     height: 1rem;
-    vertical-align: text-bottom;
+    vertical-align: middle; /* ← ИЗМЕНИТЕ ЭТУ СТРОЧКУ */
     border: 0.25em solid currentColor;
     border-right-color: transparent;
     border-radius: 50%;
@@ -327,6 +333,7 @@ body {
     width: 0.8rem;
     height: 0.8rem;
     border-width: 0.2em;
+    vertical-align: middle; /* ← ДОБАВЬТЕ ЭТУ СТРОЧКУ */
 }
 
 @keyframes spinner-border {

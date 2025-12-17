@@ -58,7 +58,8 @@ namespace HITSBlazor.Pages
 
                 // Автоматический редирект через 5 секунд
                 await Task.Delay(5000);
-                Navigation.NavigateTo("/login");
+                NotificationService.ShowSuccess("На указанную почту был отправлен код смены пароля");
+                Navigation.NavigateTo("/new-password");
             }
             catch (Exception ex)
             {

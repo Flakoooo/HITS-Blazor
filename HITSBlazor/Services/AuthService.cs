@@ -86,7 +86,7 @@ namespace HITSBlazor.Services
             }
         }
 
-        public async Task<RecoveryResponse> RequestPasswordRecoveryAsync(string email)
+        public static async Task<RecoveryResponse> RequestPasswordRecoveryAsync(string email)
         {
             try
             {
@@ -104,6 +104,52 @@ namespace HITSBlazor.Services
             catch (Exception ex)
             {
                 return new RecoveryResponse
+                {
+                    Success = false,
+                    Message = $"Ошибка: {ex.Message}"
+                };
+            }
+        }
+
+        public static async Task<ResetPasswordResponse> ResetPasswordAsync(string code, string newPassword)
+        {
+            try
+            {
+                // TODO: Заменить на реальный вызов API
+                // var response = await _httpClient.PostAsJsonAsync("/api/auth/reset-password", 
+                //     new { Code = code, NewPassword = newPassword });
+
+                await Task.Delay(1000); // Имитация задержки
+
+                // Простая проверка кода (для демо)
+                if (code != "123456") // В реальном приложении код будет приходить на email
+                {
+                    return new ResetPasswordResponse
+                    {
+                        Success = false,
+                        Message = "Неверный код подтверждения"
+                    };
+                }
+
+                // Проверка сложности пароля
+                if (newPassword.Length < 8)
+                {
+                    return new ResetPasswordResponse
+                    {
+                        Success = false,
+                        Message = "Пароль должен содержать минимум 8 символов"
+                    };
+                }
+
+                return new ResetPasswordResponse
+                {
+                    Success = true,
+                    Message = "Пароль успешно изменен"
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ResetPasswordResponse
                 {
                     Success = false,
                     Message = $"Ошибка: {ex.Message}"

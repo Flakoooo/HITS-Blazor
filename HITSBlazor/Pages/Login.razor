@@ -7,24 +7,20 @@
         <div class="page-layout__content page-layout__content--no-header login-page__content p-3">
             <EditForm Model="@loginRequest" OnValidSubmit="@HandleLogin" class="form-layout p-3 rounded-3 shadow" style="margin-bottom: 1rem">
                 <span class="fs-3 text-primary text-center">Авторизация</span>
-                <div>
-                    <div class="input-group">
-                        <span class="input-group-text fs-6">&#64;</span>
-                        <InputText @bind-Value="loginRequest.Email"
-                                   class="form-control"
-                                   placeholder="Введите логин" />
-                    </div>
+                <div class="input-group">
+                    <span class="input-group-text fs-6">&#64;</span>
+                    <InputText @bind-Value="loginRequest.Email"
+                               class="form-control"
+                               placeholder="Введите логин" />
                 </div>
-                <div>
-                    <div class="input-group">
-                        <span class="input-group-text fs-6">
-                            <i class="bi bi-key"></i>
-                        </span>
-                        <InputText type="password"
-                                   @bind-Value="loginRequest.Password"
-                                   class="form-control"
-                                   placeholder="Введите пароль" />
-                    </div>
+                <div class="input-group">
+                    <span class="input-group-text fs-6">
+                        <i class="bi bi-key"></i>
+                    </span>
+                    <InputText type="password"
+                               @bind-Value="loginRequest.Password"
+                               class="form-control"
+                               placeholder="Введите пароль" />
                 </div>
                 <div class="text-center">
                     <a href="/recovery-password" class="forgot-password-link text-decoration-underline">
