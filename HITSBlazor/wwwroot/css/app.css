@@ -317,6 +317,14 @@ body {
     content: "\f3da";
 }
 
+.bi-telephone::before {
+    content: "\f5c1";
+}
+
+.bi-people::before {
+    content: "\f4d0";
+}
+
 /* Спиннер */
 .spinner-border {
     display: inline-block;

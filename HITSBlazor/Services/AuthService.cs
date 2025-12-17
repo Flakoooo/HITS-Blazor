@@ -157,6 +157,55 @@ namespace HITSBlazor.Services
             }
         }
 
+        public async Task<RegisterResponse> RegisterAsync(RegisterRequest request, string? invitationCode = null)
+        {
+            try
+            {
+                // TODO: Заменить на реальный вызов API
+                // var response = await _httpClient.PostAsJsonAsync("/api/auth/register", 
+                //     new { request, InvitationCode = invitationCode });
+
+                await Task.Delay(1000); // Имитация задержки
+
+                // Проверка кода приглашения (если требуется)
+                if (!string.IsNullOrEmpty(invitationCode) && invitationCode != "valid-invitation-code")
+                {
+                    return new RegisterResponse
+                    {
+                        Success = false,
+                        Message = "Неверный код приглашения"
+                    };
+                }
+
+                // Проверка существующего email
+                var existingUser = MockUsers.GetAllUsers()
+                    .FirstOrDefault(u => u.Email == request.Email);
+
+                if (existingUser != null)
+                {
+                    return new RegisterResponse
+                    {
+                        Success = false,
+                        Message = "Пользователь с таким email уже существует"
+                    };
+                }
+
+                return new RegisterResponse
+                {
+                    Success = true,
+                    Message = "Регистрация успешна"
+                };
+            }
+            catch (Exception ex)
+            {
+                return new RegisterResponse
+                {
+                    Success = false,
+                    Message = $"Ошибка: {ex.Message}"
+                };
+            }
+        }
+
         public async Task LogoutAsync()
         {
             await RemoveTokenAsync();

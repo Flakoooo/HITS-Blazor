@@ -1,0 +1,87 @@
+﻿/* Точные стили из HTML */
+.page_layout {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: flex-start;
+    justify-content: flex-start;
+}
+
+.page-layout__content-wrapper {
+    height: 100vh;
+    display: grid;
+    grid-template-rows: min-content auto;
+}
+
+.register-page__content {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: center;
+}
+
+.page-layout__content--no-header {
+    height: 100vh;
+}
+
+.btn {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.375rem;
+    gap: 4px;
+}
+
+.form-layout {
+    width: 400px;
+    background-color: #ffffff;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: stretch;
+    justify-content: flex-start;
+    gap: 12px;
+}
+
+/* Дополнительные стили */
+.invalid-feedback {
+    display: none;
+    width: 100%;
+    margin-top: 0.25rem;
+    font-size: .875em;
+    color: #dc3545;
+}
+
+.is-invalid ~ .invalid-feedback {
+    display: block;
+}
+
+.is-invalid {
+    border-color: #dc3545 !important;
+}
+
+.d-none {
+    display: none !important;
+}
+
+.overflow-y-scroll {
+    overflow-y: scroll !important;
+}
+
+/* Стили для отключенного поля email */
+input:disabled {
+    background-color: #e9ecef !important;
+    opacity: 1 !important;
+    cursor: not-allowed !important;
+}
+
+/* Адаптивность */
+@media (max-width: 576px) {
+    .form-layout {
+        width: 90% !important;
+        padding: 1.5rem !important;
+    }
+}
