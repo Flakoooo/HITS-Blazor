@@ -13,7 +13,7 @@ namespace HITSBlazor.Services
         Task InitializeAsync();
         Task<LoginResponse> LoginAsync(LoginRequest request);
         Task<RecoveryResponse> RequestPasswordRecoveryAsync(string email);
-        Task<ResetPasswordResponse> ResetPasswordAsync(string code, string newPassword);
+        Task<ResetPasswordResponse> ResetPasswordAsync(ResetPasswordRequest resetPassword);
         Task<RegisterResponse> RegisterAsync(RegisterRequest request, string? invitationCode = null);
         Task LogoutAsync();
     }

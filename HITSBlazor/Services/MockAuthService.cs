@@ -64,14 +64,28 @@ namespace HITSBlazor.Services
             }
         }
 
-        public Task LogoutAsync()
+        public async Task LogoutAsync()
         {
-            throw new NotImplementedException();
+            await RemoveTokenAsync();
+            await RemoveUserInfoAsync();
+            CurrentUser = null;
+            OnAuthStateChanged?.Invoke();
+            _navigationManager.NavigateTo("/login", true);
         }
 
-        public Task<RegisterResponse> RegisterAsync(RegisterRequest request, string? invitationCode = null)
+        public async Task<RegisterResponse> RegisterAsync(RegisterRequest request, string? invitationCode = null)
         {
-            throw new NotImplementedException();
+            try
+            {
+                if (!MockUsers.GetAllUsers().Select(u => u.Email).Contains(request.Email))
+                    return RegisterResponse.Failure("Пользователь с таким email уже существует");
+
+                return RegisterResponse.Success("Регистрация успешна");
+            }
+            catch (Exception ex)
+            {
+                return RegisterResponse.Failure($"Ошибка: {ex.Message}");
+            }
         }
 
         public async Task<RecoveryResponse> RequestPasswordRecoveryAsync(string email)
@@ -89,9 +103,19 @@ namespace HITSBlazor.Services
             }
         }
 
-        public Task<ResetPasswordResponse> ResetPasswordAsync(string code, string newPassword)
+        public async Task<ResetPasswordResponse> ResetPasswordAsync(ResetPasswordRequest resetPassword)
         {
-            throw new NotImplementedException();
+            try
+            {
+                if (resetPassword.Code != "123456")
+                    return ResetPasswordResponse.Failure("Указан неверный код");
+
+                return ResetPasswordResponse.Success("Пароль успешно изменен!");
+            }
+            catch (Exception ex)
+            {
+                return ResetPasswordResponse.Failure($"Ошибка: {ex.Message}");
+            }
         }
 
         private async Task SaveTokenAsync(string token)

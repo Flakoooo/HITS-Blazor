@@ -42,6 +42,7 @@ namespace HITSBlazor
             // Utils
             builder.Services.AddScoped<NotificationService>();
 
+
             builder.Services.AddScoped<CustomAuthenticationStateProvider>();
             builder.Services.AddScoped<AuthenticationStateProvider>(sp =>
                 sp.GetRequiredService<CustomAuthenticationStateProvider>()

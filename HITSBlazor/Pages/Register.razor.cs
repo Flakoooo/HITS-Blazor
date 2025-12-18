@@ -2,6 +2,7 @@
 using HITSBlazor.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace HITSBlazor.Pages
@@ -12,11 +13,15 @@ namespace HITSBlazor.Pages
     {
         private RegisterRequest registerRequest = new();
         private bool isLoading;
-        private string? emailFromQuery;
+
+        private readonly string telephonePattern = @"^\+7\s\(\d{3}\)\s\d{3}-\d{2}-\d{2}$";
+        private readonly string namePattern = @"^[А-ЯЁA-Z][а-яёa-z]+(-[А-ЯЁA-Z][а-яёa-z]+)?$";
 
         [Parameter]
         [SupplyParameterFromQuery(Name = "email")]
         public string? Email { get; set; }
+
+        private bool IsEmailDisabled => !string.IsNullOrEmpty(Email);
 
         [Parameter]
         [SupplyParameterFromQuery(Name = "code")]
@@ -26,15 +31,27 @@ namespace HITSBlazor.Pages
         private NavigationManager Navigation { get; set; } = null!;
 
         [Inject]
+        private IAuthService AuthService { get; set; } = null!;
+
+        [Inject]
         private NotificationService NotificationService { get; set; } = null!;
 
         protected override void OnInitialized()
         {
-            // Если email передан в query string, устанавливаем его
             if (!string.IsNullOrEmpty(Email))
-            {
                 registerRequest.Email = Email;
-            }
+        }
+
+        private void HandleEmailInput(ChangeEventArgs e)
+        {
+            if (!IsEmailDisabled)
+                registerRequest.Email = e.Value?.ToString() ?? "";
+        }
+
+        private void HandlePhoneInput(ChangeEventArgs e)
+        {
+            var value = e.Value?.ToString() ?? "";
+            registerRequest.Telephone = value;
         }
 
         private async Task HandleRegister()
@@ -45,83 +62,89 @@ namespace HITSBlazor.Pages
 
             try
             {
-                // Ручная валидация как в JavaScript
+                // 1. Проверка заполнения обязательных полей
                 var validationErrors = new List<string>();
 
-                // Валидация email (если не передан в query string)
-                if (string.IsNullOrEmpty(registerRequest.Email))
-                {
-                    validationErrors.Add("Пожалуйста, заполните email");
-                }
-                else if (!IsValidEmail(registerRequest.Email))
-                {
-                    validationErrors.Add("Неверно введена почта");
-                }
+                if (string.IsNullOrWhiteSpace(registerRequest.Email))
+                    validationErrors.Add("почту");
 
-                // Валидация имени
-                if (string.IsNullOrEmpty(registerRequest.FirstName))
-                {
-                    validationErrors.Add("Имя обязательно");
-                }
-                else if (!Regex.IsMatch(registerRequest.FirstName, @"^([А-ЯЁA-Z][а-яёa-z]{1,})|([A-Z][a-z]{1,})$"))
-                {
-                    validationErrors.Add("Неверно введено имя");
-                }
+                if (string.IsNullOrWhiteSpace(registerRequest.FirstName))
+                    validationErrors.Add("имя");
 
-                // Валидация фамилии
-                if (string.IsNullOrEmpty(registerRequest.LastName))
-                {
-                    validationErrors.Add("Фамилия обязательна");
-                }
-                else if (!Regex.IsMatch(registerRequest.LastName, @"^([А-ЯЁA-Z][а-яёa-z]{1,})|([A-Z][a-z]{1,})$"))
-                {
-                    validationErrors.Add("Неверно введена фамилия");
-                }
+                if (string.IsNullOrWhiteSpace(registerRequest.LastName))
+                    validationErrors.Add("фамилию");
 
-                // Валидация телефона
-                if (string.IsNullOrEmpty(registerRequest.Telephone))
-                {
-                    validationErrors.Add("Телефон обязателен");
-                }
-                else if (!Regex.IsMatch(registerRequest.Telephone, @"^\+\d{1,3}\s\(\d{3}\)\s\d{3}-\d{2}-\d{2}$"))
-                {
-                    validationErrors.Add("Неверно введен номер телефона");
-                }
+                if (string.IsNullOrWhiteSpace(registerRequest.Telephone))
+                    validationErrors.Add("телефон");
 
-                // Валидация пароля
-                if (string.IsNullOrEmpty(registerRequest.Password))
-                {
-                    validationErrors.Add("Пароль обязателен");
-                }
-                else if (registerRequest.Password.Length < 8)
-                {
-                    validationErrors.Add("Пароль должен состоять как минимум из 8 символов");
-                }
+                if (string.IsNullOrWhiteSpace(registerRequest.Password))
+                    validationErrors.Add("пароль");
 
-                if (validationErrors.Any())
+                if (validationErrors.Count > 0)
                 {
-                    NotificationService.ShowError(string.Join(" ", validationErrors));
+                    var errorMessage = "Заполните " + string.Join(", ", validationErrors);
+                    NotificationService.ShowError(errorMessage);
                     isLoading = false;
                     return;
                 }
 
-                // Проверка кода приглашения (если требуется)
-                if (!string.IsNullOrEmpty(Code) && Code != "valid-invitation-code") // Заменить на реальную проверку
+                // 2. Валидация email
+                var email = registerRequest.Email.Trim();
+                var atIndex = email.IndexOf('@');
+
+                if (atIndex <= 0 || atIndex == email.Length - 1 || email.Count(c => c == '@') != 1)
                 {
-                    NotificationService.ShowError("Неверный код приглашения");
+                    NotificationService.ShowError("Неверный формат почты");
                     isLoading = false;
                     return;
                 }
 
-                // Имитация регистрации
-                await Task.Delay(1500);
+                // 3. Валидация имени и фамилии
+                if (!Regex.IsMatch(registerRequest.FirstName, namePattern))
+                {
+                    NotificationService.ShowError("Имя должно начинаться с заглавной буквы и содержать только буквы (и дефис для двойных имён)");
+                    isLoading = false;
+                    return;
+                }
 
-                // Успешная регистрация
-                NotificationService.ShowSuccess("Регистрация успешна!");
+                if (!Regex.IsMatch(registerRequest.LastName, namePattern))
+                {
+                    NotificationService.ShowError("Фамилия должна начинаться с заглавной буквы и содержать только буквы (и дефис для двойных фамилий)");
+                    isLoading = false;
+                    return;
+                }
 
-                // Редирект на страницу логина через 2 секунды
-                await Task.Delay(2000);
-                Navigation.NavigateTo("/login");
+                // 4. Валидация телефона (формат +7 (XXX) XXX-XX-XX)
+                if (!Regex.IsMatch(registerRequest.Telephone, telephonePattern))
+                {
+                    NotificationService.ShowError("Неверный формат телефона. Введите номер в формате: +7 (XXX) XXX-XX-XX");
+                    isLoading = false;
+                    return;
+                }
+
+                // 5. Валидация пароля
+                if (registerRequest.Password.Length < 8)
+                {
+                    NotificationService.ShowError("Длина пароля не может быть меньше 8 символов");
+                    isLoading = false;
+                    return;
+                }
+
+                // 6. Отправка запроса
+                var result = await AuthService.RegisterAsync(registerRequest);
+
+                if (result.IsSuccess)
+                {
+                    registerRequest = new RegisterRequest();
+                    NotificationService.ShowSuccess(result.Message);
+                    Navigation.NavigateTo("/login", true);
+                }
+                else
+                {
+                    NotificationService.ShowError(
+                        result.Message ?? "Вы указали неверные данные для регистрации. Попробуйте снова."
+                    );
+                }
             }
             catch (Exception ex)
             {
@@ -131,72 +154,6 @@ namespace HITSBlazor.Pages
             {
                 isLoading = false;
             }
-        }
-
-        private bool IsValidEmail(string email)
-        {
-            try
-            {
-                var addr = new System.Net.Mail.MailAddress(email);
-                return addr.Address == email;
-            }
-            catch
-            {
-                return false;
-            }
-        }
-
-        private void HandlePhoneInput(ChangeEventArgs e)
-        {
-            var value = e.Value?.ToString() ?? "";
-            var cleaned = new string(value.Where(char.IsDigit).ToArray());
-
-            if (string.IsNullOrEmpty(cleaned))
-            {
-                registerRequest.Telephone = "";
-                return;
-            }
-
-            // Форматирование телефона как в JavaScript
-            var result = "+";
-
-            if (cleaned.StartsWith("8") || value.Contains("+8"))
-            {
-                result = "";
-            }
-
-            for (int i = 0; i < cleaned.Length && i < 11; i++)
-            {
-                switch (i)
-                {
-                    case 0:
-                        result += PrefixNumber(cleaned[i]);
-                        continue;
-                    case 4:
-                        result += ") ";
-                        break;
-                    case 7:
-                        result += "-";
-                        break;
-                    case 9:
-                        result += "-";
-                        break;
-                }
-                result += cleaned[i];
-            }
-
-            registerRequest.Telephone = result;
-        }
-
-        private string PrefixNumber(char digit)
-        {
-            return digit switch
-            {
-                '7' => "7 (",
-                '8' => "8 (",
-                '9' => "7 (9",
-                _ => "7 ("
-            };
         }
     }
 }

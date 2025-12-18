@@ -3,97 +3,79 @@
 <div class="page-layout">
     <div class="page-layout__content-wrapper w-100 overflow-y-scroll">
         <div class="page-layout__content page-layout__content--no-header register-page__content">
-            <EditForm Model="@registerRequest" OnValidSubmit="@HandleRegister" class="form-layout p-3 rounded-3 shadow">
+            <form @onsubmit="HandleRegister" @onsubmit:preventDefault="true" class="form-layout p-3 rounded-3 shadow">
                 <span class="fs-3 text-primary text-center">Регистрация</span>
 
-                <div class="w-100">
-                    <div class="input-group">
-                        <span class="input-group-text fs-6">&#64;</span>
-                        <InputText @bind-Value="registerRequest.Email"
-                                   name="email"
-                                   class="form-control rounded-end"
-                                   placeholder="Введите email"
-                                   disabled="@(!string.IsNullOrEmpty(Email))" />
-                        <div class="invalid-feedback"></div>
-                    </div>
+                <div class="input-group">
+                    <span class="input-group-text fs-6">&#64;</span>
+                    <input type="text"
+                           value="@registerRequest.Email"
+                           @oninput="HandleEmailInput"
+                           class="form-control"
+                           placeholder="Введите email"
+                           disabled="@IsEmailDisabled" />
                 </div>
 
-                <div class="w-100">
-                    <div class="input-group">
-                        <span class="input-group-text fs-6">
-                            <i class="bi bi-fonts"></i>
-                        </span>
-                        <InputText @bind-Value="registerRequest.FirstName"
-                                   name="firstName"
-                                   class="form-control rounded-end"
-                                   placeholder="Введите имя" />
-                        <div class="invalid-feedback"></div>
-                    </div>
+                <div class="input-group">
+                    <span class="input-group-text fs-6">
+                        <i class="bi bi-fonts"></i>
+                    </span>
+                    <input type="text"
+                           @bind="registerRequest.FirstName"
+                           @bind:event="oninput"
+                           class="form-control"
+                           placeholder="Введите имя" />
                 </div>
 
-                <div class="w-100">
-                    <div class="input-group">
-                        <span class="input-group-text fs-6">
-                            <i class="bi bi-fonts"></i>
-                        </span>
-                        <InputText @bind-Value="registerRequest.LastName"
-                                   name="lastName"
-                                   class="form-control rounded-end"
-                                   placeholder="Введите фамилию" />
-                        <div class="invalid-feedback"></div>
-                    </div>
+                <div class="input-group">
+                    <span class="input-group-text fs-6">
+                        <i class="bi bi-fonts"></i>
+                    </span>
+                    <input type="text"
+                           @bind="registerRequest.LastName"
+                           @bind:event="oninput"
+                           class="form-control"
+                           placeholder="Введите фамилию" />
                 </div>
 
-                <div class="w-100">
-                    <div class="input-group">
-                        <span class="input-group-text fs-6">
-                            <i class="bi bi-telephone"></i>
-                        </span>
-                        <InputText @bind-Value="registerRequest.Telephone"
-                                   @oninput="HandlePhoneInput"
-                                   name="telephone"
-                                   id="phone"
-                                   class="form-control rounded-end"
-                                   type="tel"
-                                   placeholder="+7 (___)-___-__-__"
-                                   maxlength="18" />
-                        <div class="invalid-feedback"></div>
-                    </div>
+                <div class="input-group">
+                    <span class="input-group-text fs-6">
+                        <i class="bi bi-telephone"></i>
+                    </span>
+                    <input type="tel"
+                           value="@registerRequest.Telephone"
+                           @oninput="HandlePhoneInput"
+                           class="form-control"
+                           placeholder="+7 (___)-___-__-__"
+                           maxlength="18" />
                 </div>
 
-                <div class="w-100">
-                    <div class="input-group">
-                        <span class="input-group-text fs-6">
-                            <i class="bi bi-people"></i>
-                        </span>
-                        <InputText @bind-Value="registerRequest.StudyGroup"
-                                   name="group"
-                                   class="form-control rounded-end"
-                                   type="text"
-                                   placeholder="Введите номер группы" />
-                    </div>
+                <div class="input-group">
+                    <span class="input-group-text fs-6">
+                        <i class="bi bi-people"></i>
+                    </span>
+                    <input type="text"
+                           @bind="registerRequest.StudyGroup"
+                           @bind:event="oninput"
+                           class="form-control"
+                           placeholder="Введите номер группы" />
                 </div>
 
-                <div class="w-100">
-                    <div class="input-group">
-                        <span class="input-group-text fs-6">
-                            <i class="bi bi-key"></i>
-                        </span>
-                        <InputText type="password"
-                                   @bind-Value="registerRequest.Password"
-                                   name="password"
-                                   class="form-control rounded-end"
-                                   placeholder="Введите пароль" />
-                        <div class="invalid-feedback">
-                            Пароль должен состоять как минимум из 8 символов
-                        </div>
-                    </div>
+                <div class="input-group">
+                    <span class="input-group-text fs-6">
+                        <i class="bi bi-key"></i>
+                    </span>
+                    <input type="password"
+                           @bind="registerRequest.Password"
+                           @bind:event="oninput"
+                           class="form-control"
+                           placeholder="Введите пароль" />
                 </div>
 
-                <button type="submit" class="btn d-flex btn-primary" disabled="@isLoading">
+                <button type="submit" class="btn btn-primary w-100" disabled="@isLoading">
                     @if (isLoading)
                     {
-                        <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                        <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
                         <span>Регистрация...</span>
                     }
                     else
@@ -101,7 +83,7 @@
                         <span>Зарегистрироваться</span>
                     }
                 </button>
-            </EditForm>
+            </form>
         </div>
     </div>
 </div>

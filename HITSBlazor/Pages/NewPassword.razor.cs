@@ -2,7 +2,6 @@
 using HITSBlazor.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
-using System.ComponentModel.DataAnnotations;
 
 namespace HITSBlazor.Pages
 {
@@ -12,71 +11,64 @@ namespace HITSBlazor.Pages
     {
         private ResetPasswordRequest resetRequest = new();
         private bool isLoading;
-        private string? errorMessage;
 
         [Inject]
         private NavigationManager Navigation { get; set; } = null!;
 
         [Inject]
-        private NotificationService NotificationService { get; set; } = null!;
+        private IAuthService AuthService { get; set; } = null!;
 
-        private string? ErrorMessage
-        {
-            get => errorMessage;
-            set
-            {
-                errorMessage = value;
-                StateHasChanged();
-            }
-        }
+        [Inject]
+        private NotificationService NotificationService { get; set; } = null!;
 
         private async Task HandleResetPassword()
         {
             if (isLoading) return;
 
             isLoading = true;
-            ErrorMessage = null;
 
             try
             {
-                // Валидация
-                var validationResults = new List<ValidationResult>();
-                var validationContext = new ValidationContext(resetRequest);
+                bool codeIsEmpty = string.IsNullOrWhiteSpace(resetRequest.Code);
+                bool passwordIsEmpty = string.IsNullOrWhiteSpace(resetRequest.Password);
 
-                bool isValid = Validator.TryValidateObject(
-                    resetRequest, validationContext, validationResults, true);
-
-                if (!isValid)
+                if (codeIsEmpty || passwordIsEmpty)
                 {
-                    var firstError = validationResults.FirstOrDefault()?.ErrorMessage;
-                    NotificationService.ShowError(firstError ?? "Пожалуйста, заполните все поля корректно.");
+                    var errorMessage = "";
+
+                    if (codeIsEmpty && passwordIsEmpty)
+                        errorMessage = "Пожалуйста, введите код и новый пароль";
+                    else if (codeIsEmpty)
+                        errorMessage = "Пожалуйста, введите код";
+                    else
+                        errorMessage = "Пожалуйста, введите новый пароль";
+
+                    NotificationService.ShowError(errorMessage);
                     isLoading = false;
                     return;
                 }
 
-                // Проверка минимальной длины пароля
                 if (resetRequest.Password.Length < 8)
                 {
-                    NotificationService.ShowError("Пароль должен состоять как минимум из 8 символов");
+                    NotificationService.ShowError("Длина пароля не может быть меньше 8 символов");
                     isLoading = false;
                     return;
                 }
 
-                // Проверка кода (простая мок-проверка)
-                if (resetRequest.Code != "123456") // Заменить на реальную проверку
+                var result = await AuthService.ResetPasswordAsync(resetRequest);
+
+                if (result.IsSuccess)
                 {
-                    NotificationService.ShowError("Неверно введен код");
-                    isLoading = false;
-                    return;
+                    resetRequest = new ResetPasswordRequest();
+                    NotificationService.ShowSuccess(result.Message);
+                    Navigation.NavigateTo("/login", true);
                 }
-
-                // Имитация отправки запроса
-                await Task.Delay(1500);
-
-                // Редирект на страницу логина через 2 секунды
-                await Task.Delay(2000);
-                NotificationService.ShowSuccess("Пароль успешно изменен!");
-                Navigation.NavigateTo("/login");
+                else
+                {
+                    NotificationService.ShowError(
+                        result.Message ?? "Вы указали неверные данные для входа. Попробуйте снова."
+                    );
+                }
             }
             catch (Exception ex)
             {
@@ -86,11 +78,6 @@ namespace HITSBlazor.Pages
             {
                 isLoading = false;
             }
-        }
-
-        private void GoBack()
-        {
-            Navigation.NavigateTo("/recovery-password");
         }
     }
 }

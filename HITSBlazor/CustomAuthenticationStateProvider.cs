@@ -6,9 +6,9 @@ namespace HITSBlazor
 {
     public class CustomAuthenticationStateProvider : AuthenticationStateProvider
     {
-        private readonly AuthService _authService;
+        private readonly IAuthService _authService;
 
-        public CustomAuthenticationStateProvider(AuthService authService)
+        public CustomAuthenticationStateProvider(IAuthService authService)
         {
             _authService = authService;
             _authService.OnAuthStateChanged += AuthStateChanged;

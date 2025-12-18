@@ -87,49 +87,18 @@ namespace HITSBlazor.Services
             }
         }
 
-        public async Task<ResetPasswordResponse> ResetPasswordAsync(string code, string newPassword)
+        public async Task<ResetPasswordResponse> ResetPasswordAsync(ResetPasswordRequest resetPassword)
         {
             try
             {
-                // TODO: Заменить на реальный вызов API
-                // var response = await _httpClient.PostAsJsonAsync("/api/auth/reset-password", 
-                //     new { Code = code, NewPassword = newPassword });
+                if (resetPassword.Code != "123456")
+                    return ResetPasswordResponse.Failure("Указан неверный код");
 
-                await Task.Delay(1000); // Имитация задержки
-
-                // Простая проверка кода (для демо)
-                if (code != "123456") // В реальном приложении код будет приходить на email
-                {
-                    return new ResetPasswordResponse
-                    {
-                        Success = false,
-                        Message = "Неверный код подтверждения"
-                    };
-                }
-
-                // Проверка сложности пароля
-                if (newPassword.Length < 8)
-                {
-                    return new ResetPasswordResponse
-                    {
-                        Success = false,
-                        Message = "Пароль должен содержать минимум 8 символов"
-                    };
-                }
-
-                return new ResetPasswordResponse
-                {
-                    Success = true,
-                    Message = "Пароль успешно изменен"
-                };
+                return ResetPasswordResponse.Success("Пароль успешно изменен!");
             }
             catch (Exception ex)
             {
-                return new ResetPasswordResponse
-                {
-                    Success = false,
-                    Message = $"Ошибка: {ex.Message}"
-                };
+                return ResetPasswordResponse.Failure($"Ошибка: {ex.Message}");
             }
         }
 
@@ -137,48 +106,14 @@ namespace HITSBlazor.Services
         {
             try
             {
-                // TODO: Заменить на реальный вызов API
-                // var response = await _httpClient.PostAsJsonAsync("/api/auth/register", 
-                //     new { request, InvitationCode = invitationCode });
+                if (!MockUsers.GetAllUsers().Select(u => u.Email).Contains(request.Email))
+                    return RegisterResponse.Failure("Пользователь с таким email уже существует");
 
-                await Task.Delay(1000); // Имитация задержки
-
-                // Проверка кода приглашения (если требуется)
-                if (!string.IsNullOrEmpty(invitationCode) && invitationCode != "valid-invitation-code")
-                {
-                    return new RegisterResponse
-                    {
-                        Success = false,
-                        Message = "Неверный код приглашения"
-                    };
-                }
-
-                // Проверка существующего email
-                var existingUser = MockUsers.GetAllUsers()
-                    .FirstOrDefault(u => u.Email == request.Email);
-
-                if (existingUser != null)
-                {
-                    return new RegisterResponse
-                    {
-                        Success = false,
-                        Message = "Пользователь с таким email уже существует"
-                    };
-                }
-
-                return new RegisterResponse
-                {
-                    Success = true,
-                    Message = "Регистрация успешна"
-                };
+                return RegisterResponse.Success("Регистрация успешна");
             }
             catch (Exception ex)
             {
-                return new RegisterResponse
-                {
-                    Success = false,
-                    Message = $"Ошибка: {ex.Message}"
-                };
+                return RegisterResponse.Failure($"Ошибка: {ex.Message}");
             }
         }
 
