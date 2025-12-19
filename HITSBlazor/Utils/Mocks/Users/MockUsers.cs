@@ -10,20 +10,20 @@ namespace HITSBlazor.Utils.Mocks.Users
 
         public static List<string> CachedUserEmails => _cachedEmails ??= GetUserEmails();
 
-        public static string KirillId { get; } = Guid.NewGuid().ToString();
-        public static string IvanId { get; } = Guid.NewGuid().ToString();
-        public static string ManagerId { get; } = Guid.NewGuid().ToString();
-        public static string OwnerId { get; } = Guid.NewGuid().ToString();
-        public static string WinritId { get; } = Guid.NewGuid().ToString();
-        public static string VersalId { get; } = Guid.NewGuid().ToString();
-        public static string AntonId { get; } = Guid.NewGuid().ToString();
-        public static string LubovId { get; } = Guid.NewGuid().ToString();
-        public static string DmitryId { get; } = Guid.NewGuid().ToString();
-        public static string TimurId { get; } = Guid.NewGuid().ToString();
-        public static string AdminId { get; } = Guid.NewGuid().ToString();
-        public static string DenisId { get; } = Guid.NewGuid().ToString();
-        public static string MagaId { get; } = Guid.NewGuid().ToString();
-        public static string AlexId { get; } = Guid.NewGuid().ToString();
+        public static Guid KirillId { get; } = Guid.NewGuid();
+        public static Guid IvanId { get; } = Guid.NewGuid();
+        public static Guid ManagerId { get; } = Guid.NewGuid();
+        public static Guid OwnerId { get; } = Guid.NewGuid();
+        public static Guid WinritId { get; } = Guid.NewGuid();
+        public static Guid VersalId { get; } = Guid.NewGuid();
+        public static Guid AntonId { get; } = Guid.NewGuid();
+        public static Guid LubovId { get; } = Guid.NewGuid();
+        public static Guid DmitryId { get; } = Guid.NewGuid();
+        public static Guid TimurId { get; } = Guid.NewGuid();
+        public static Guid AdminId { get; } = Guid.NewGuid();
+        public static Guid DenisId { get; } = Guid.NewGuid();
+        public static Guid MagaId { get; } = Guid.NewGuid();
+        public static Guid AlexId { get; } = Guid.NewGuid();
 
         private static List<User> CreateUsers() => [ 
             new User
@@ -299,7 +299,7 @@ namespace HITSBlazor.Utils.Mocks.Users
             }
         ];
 
-        public static User? GetUserById(string id)
+        public static User? GetUserById(Guid id)
             => _users.FirstOrDefault(u => u.Id == id);
 
         public static List<string> GetUserEmails() 

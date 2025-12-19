@@ -8,7 +8,7 @@ namespace HITSBlazor.Utils.Mocks.Teams
     {
         private static readonly List<RequestToTeam> _requestsToTeam = CreateRequestsToTeam();
 
-        public static string MagaId { get; } = Guid.NewGuid().ToString();
+        public static Guid MagaId { get; } = Guid.NewGuid();
 
         private static List<RequestToTeam> CreateRequestsToTeam()
         {

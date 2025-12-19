@@ -11,17 +11,17 @@ namespace HITSBlazor.Utils.Mocks.Ideas
 
         private static readonly string _lorem = "Lorem ipsum dolor sit amet consectetur adipisicing elit. Eius aperiam delectus possimus, voluptates quo accusamus? Consequatur, quasi rem temporibus blanditiis delectus aliquid officia aut, totam incidunt reiciendis eaque laborum fugiat!";
 
-        public static string RefactorId { get; } = Guid.NewGuid().ToString();
-        public static string MyNewIdeaId { get; } = Guid.NewGuid().ToString();
-        public static string Idea2Id { get; } = Guid.NewGuid().ToString();
-        public static string FoldingBedId { get; } = Guid.NewGuid().ToString();
-        public static string Strawberry1Id { get; } = Guid.NewGuid().ToString();
-        public static string HelperId { get; } = Guid.NewGuid().ToString();
-        public static string PWTechnologyId { get; } = Guid.NewGuid().ToString();
-        public static string EMetricsViewerId { get; } = Guid.NewGuid().ToString();
-        public static string CalculatorId { get; } = Guid.NewGuid().ToString();
-        public static string ChatBotId { get; } = Guid.NewGuid().ToString();
-        public static string ArmatureId { get; } = Guid.NewGuid().ToString();
+        public static Guid RefactorId { get; } = Guid.NewGuid();
+        public static Guid MyNewIdeaId { get; } = Guid.NewGuid();
+        public static Guid Idea2Id { get; } = Guid.NewGuid();
+        public static Guid FoldingBedId { get; } = Guid.NewGuid();
+        public static Guid Strawberry1Id { get; } = Guid.NewGuid();
+        public static Guid HelperId { get; } = Guid.NewGuid();
+        public static Guid PWTechnologyId { get; } = Guid.NewGuid();
+        public static Guid EMetricsViewerId { get; } = Guid.NewGuid();
+        public static Guid CalculatorId { get; } = Guid.NewGuid();
+        public static Guid ChatBotId { get; } = Guid.NewGuid();
+        public static Guid ArmatureId { get; } = Guid.NewGuid();
 
         private static List<Idea> CreateIdeas()
         {
@@ -341,10 +341,10 @@ namespace HITSBlazor.Utils.Mocks.Ideas
             ];
         }
 
-        public static Idea? GetIdeaById(string id)
+        public static Idea? GetIdeaById(Guid id)
             => _ideas.FirstOrDefault(i => i.Id == id);
 
-        public static List<Idea> GetIdeasByInitiatorId(string initiatorId)
+        public static List<Idea> GetIdeasByInitiatorId(Guid initiatorId)
             => [.. _ideas.Where(i => i.Initiator.Id == initiatorId)];
     }
 }

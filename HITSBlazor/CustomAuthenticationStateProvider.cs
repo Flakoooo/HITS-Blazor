@@ -1,4 +1,4 @@
-﻿using HITSBlazor.Services;
+﻿using HITSBlazor.Services.Service.Interfaces;
 using Microsoft.AspNetCore.Components.Authorization;
 using System.Security.Claims;
 

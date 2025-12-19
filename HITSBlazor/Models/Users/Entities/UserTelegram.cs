@@ -2,9 +2,9 @@
 {
     public class UserTelegram
     {
-        public string UserId { get; set; } = string.Empty;
+        public Guid UserId { get; set; }
         public string UserTag { get; set; } = string.Empty;
-        public string? ChatId { get; set; }
+        public Guid ChatId { get; set; } //nullable
         public bool IsVisible { get; set; }
     }
 }

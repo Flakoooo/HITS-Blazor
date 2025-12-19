@@ -2,7 +2,7 @@
 {
     public class IndicatorCategory
     {
-        public string IdCategory { get; set; } = string.Empty;
+        public Guid IdCategory { get; set; }
         public string Name { get; set; } = string.Empty;
     }
 }

@@ -7,9 +7,9 @@ namespace HITSBlazor.Utils.Mocks.Common
     {
         private static readonly List<Notification> _notifications = CreateNotifications();
 
-        public static string Project1KirillId { get; } = Guid.NewGuid().ToString();
-        public static string Project2TimurId { get; } = Guid.NewGuid().ToString();
-        public static string Project1DenisId { get; } = Guid.NewGuid().ToString();
+        public static Guid Project1KirillId { get; } = Guid.NewGuid();
+        public static Guid Project2TimurId { get; } = Guid.NewGuid();
+        public static Guid Project1DenisId { get; } = Guid.NewGuid();
 
         private static List<Notification> CreateNotifications()
         {

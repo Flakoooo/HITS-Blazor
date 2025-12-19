@@ -14,10 +14,10 @@ namespace HITSBlazor.Utils.Mocks.Projects
             var ivan = MockUsers.GetUserById(MockUsers.IvanId)!;
             var manager = MockUsers.GetUserById(MockUsers.ManagerId)!;
 
-            var authIntegrationTask = MockSprints.GetTaskById(MockSprints.AuthIntegrationTaskId);
-            var blackThemeTask = MockSprints.GetTaskById(MockSprints.BlackThemeTaskId);
-            var fileUploadTask = MockSprints.GetTaskById(MockSprints.FileUploadTaskId);
-            var templatesTask = MockSprints.GetTaskById(MockSprints.TaskTemplatesTaskId);
+            var authIntegrationTask = MockSprints.GetTaskById(MockSprints.AuthIntegrationTaskId)!;
+            var blackThemeTask = MockSprints.GetTaskById(MockSprints.BlackThemeTaskId)!;
+            var fileUploadTask = MockSprints.GetTaskById(MockSprints.FileUploadTaskId)!;
+            var templatesTask = MockSprints.GetTaskById(MockSprints.TaskTemplatesTaskId)!;
 
             return
             [
@@ -54,7 +54,7 @@ namespace HITSBlazor.Utils.Mocks.Projects
             ];
         }
 
-        public static List<AverageMark> GetAverageMarkByProjectId(string projectId)
+        public static List<AverageMark> GetAverageMarkByProjectId(Guid projectId)
             => [.. _averageMarks.Where(am => am.ProjectId == projectId)];
     }
 }

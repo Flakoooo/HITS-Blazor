@@ -2,9 +2,9 @@
 {
     public class TeamExperience
     {
-        public string TeamId { get; set; } = string.Empty;
+        public Guid TeamId { get; set; }
         public string TeamName { get; set; } = string.Empty;
-        public string UserId { get; set; } = string.Empty;
+        public Guid UserId { get; set; }
         public string FirstName { get; set; } = string.Empty;
         public string LastName { get; set; } = string.Empty;
         public string StartDate { get; set; } = string.Empty;

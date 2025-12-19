@@ -10,8 +10,8 @@ namespace HITSBlazor.Utils.Mocks.Projects
     {
         private static readonly List<Project> _projects = CreateProjects();
 
-        public static string ChatBotId { get; } = Guid.NewGuid().ToString();
-        public static string ArmatureId { get; } = Guid.NewGuid().ToString();
+        public static Guid ChatBotId { get; } = Guid.NewGuid();
+        public static Guid ArmatureId { get; } = Guid.NewGuid();
 
         private static List<Project> CreateProjects()
         {
@@ -144,7 +144,7 @@ namespace HITSBlazor.Utils.Mocks.Projects
             ];
         }
 
-        public static Project? GetProjectById(string id)
+        public static Project? GetProjectById(Guid id)
             => _projects.FirstOrDefault(p => p.Id == id);
     }
 }

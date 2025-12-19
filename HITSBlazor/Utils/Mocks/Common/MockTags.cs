@@ -6,18 +6,18 @@ namespace HITSBlazor.Utils.Mocks.Common
     {
         private static readonly List<Tag> _tags = CreateTags();
 
-        public static string FrontendId { get; } = Guid.NewGuid().ToString();
-        public static string BackendId { get; } = Guid.NewGuid().ToString();
-        public static string RefactorId { get; } = Guid.NewGuid().ToString();
-        public static string LearningId { get; } = Guid.NewGuid().ToString();
-        public static string RunId { get; } = Guid.NewGuid().ToString();
-        public static string UIUXId { get; } = Guid.NewGuid().ToString();
-        public static string NotificationId { get; } = Guid.NewGuid().ToString();
-        public static string IntegrationId { get; } = Guid.NewGuid().ToString();
-        public static string OptimizationId { get; } = Guid.NewGuid().ToString();
-        public static string StatisticId { get; } = Guid.NewGuid().ToString();
-        public static string SecurityId { get; } = Guid.NewGuid().ToString();
-        public static string DesignId { get; } = Guid.NewGuid().ToString();
+        public static Guid FrontendId { get; } = Guid.NewGuid();
+        public static Guid BackendId { get; } = Guid.NewGuid();
+        public static Guid RefactorId { get; } = Guid.NewGuid();
+        public static Guid LearningId { get; } = Guid.NewGuid();
+        public static Guid RunId { get; } = Guid.NewGuid();
+        public static Guid UIUXId { get; } = Guid.NewGuid();
+        public static Guid NotificationId { get; } = Guid.NewGuid();
+        public static Guid IntegrationId { get; } = Guid.NewGuid();
+        public static Guid OptimizationId { get; } = Guid.NewGuid();
+        public static Guid StatisticId { get; } = Guid.NewGuid();
+        public static Guid SecurityId { get; } = Guid.NewGuid();
+        public static Guid DesignId { get; } = Guid.NewGuid();
 
         private static List<Tag> CreateTags() => [
             new Tag { Id = FrontendId,      Name = "Фронтенд",      Color = "#0D6EFD",  Confirmed = true    },
@@ -34,7 +34,7 @@ namespace HITSBlazor.Utils.Mocks.Common
             new Tag { Id = DesignId,        Name = "Дизайн",        Color = "#8fce00",  Confirmed = true    }
         ];
 
-        public static Tag? GetTagById(string id)
+        public static Tag? GetTagById(Guid id)
             => _tags.FirstOrDefault(t => t.Id == id);
     }
 }

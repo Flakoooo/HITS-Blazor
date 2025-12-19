@@ -1,8 +1,14 @@
-using HITSBlazor.Services;
-using HITSBlazor.Utils;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+using HITSBlazor.Services.Service.Interfaces;
+using HITSBlazor.Services.Service.Class;
+#if DEBUG
+using HITSBlazor.Services.Service.Mock;
+#else
+using HITSBlazor.Services.Api;
+#endif
+using HITSBlazor.Utils;
 
 namespace HITSBlazor
 {
@@ -38,8 +44,10 @@ namespace HITSBlazor
             builder.Services.AddScoped<IAuthService, MockAuthService>();
 #else
             builder.Services.AddScoped<IAuthService, AuthService>();
+            builder.Services.AddScoped<AuthApi>();
 #endif
             // Utils
+            builder.Services.AddScoped<ICookieService, CookieService>();
             builder.Services.AddScoped<NotificationService>();
 
 

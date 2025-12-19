@@ -2,7 +2,7 @@
 {
     public class UsersSkills
     {
-        public string IdUsers { get; set; } = string.Empty;
+        public Guid IdUsers { get; set; }
         public List<Skill> Skills { get; set; } = [];
     }
 }

@@ -19,7 +19,7 @@ namespace HITSBlazor.Utils.Mocks.Quests
             {
                 new() 
                 {
-                    IdResult = Guid.NewGuid().ToString(),
+                    IdResult = Guid.NewGuid(),
                     IdIndicator = indicators[0].Id,
                     IdQuest = MockQuests.QuestSpring2024Id,
                     IdFromUser = kirill.Id,
@@ -27,11 +27,11 @@ namespace HITSBlazor.Utils.Mocks.Quests
                 },
                 new()
                 {
-                    IdResult = Guid.NewGuid().ToString(),
+                    IdResult = Guid.NewGuid(),
                     IdIndicator = indicators[1].Id,
                     IdQuest = MockQuests.QuestSpring2024Id,
                     IdFromUser = kirill.Id,
-                    IdToUser = string.Empty,
+                    IdToUser = Guid.Empty,
                     Value = string.Empty
                 }
             };
@@ -40,7 +40,7 @@ namespace HITSBlazor.Utils.Mocks.Quests
                 foreach (var member in teamCard.Members)
                     results.Add(new QuestResult
                     {
-                        IdResult = Guid.NewGuid().ToString(),
+                        IdResult = Guid.NewGuid(),
                         IdIndicator = indicators[2].Id,
                         IdQuest = MockQuests.QuestSpring2024Id,
                         IdFromUser = kirill.Id,
@@ -51,20 +51,20 @@ namespace HITSBlazor.Utils.Mocks.Quests
             results.AddRange([
                 new QuestResult
                 {
-                    IdResult = "4",
+                    IdResult = Guid.NewGuid(),
                     IdIndicator = indicators[0].Id,
                     IdQuest = MockQuests.QuestSpring2024Id,
                     IdFromUser = kirill.Id,
-                    IdToUser = string.Empty,
+                    IdToUser = Guid.Empty,
                     Value = string.Empty
                 },
                 new QuestResult
                 {
-                    IdResult = "3",
+                    IdResult = Guid.NewGuid(),
                     IdIndicator = indicators[1].Id,
                     IdQuest = MockQuests.QuestSpring2024Id,
                     IdFromUser = kirill.Id,
-                    IdToUser = string.Empty,
+                    IdToUser = Guid.Empty,
                     Value = string.Empty
                 }
             ]);
@@ -73,7 +73,7 @@ namespace HITSBlazor.Utils.Mocks.Quests
                 foreach (var member in teamCard.Members)
                     results.Add(new QuestResult
                     {
-                        IdResult = Guid.NewGuid().ToString(),
+                        IdResult = Guid.NewGuid(),
                         IdIndicator = indicators[2].Id,
                         IdQuest = MockQuests.QuestSpring2024Id,
                         IdFromUser = kirill.Id,

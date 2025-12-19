@@ -2,8 +2,8 @@
 {
     public class ReportProject
     {
-        public string ProjectId { get; set; } = string.Empty;
-        public List<AverageMark> Marks { get; set; } = new();
+        public Guid ProjectId { get; set; }
+        public List<AverageMark> Marks { get; set; } = [];
         public string Report { get; set; } = string.Empty;
     }
 }

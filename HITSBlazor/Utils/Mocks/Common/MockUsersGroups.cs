@@ -8,8 +8,8 @@ namespace HITSBlazor.Utils.Mocks.Common
     {
         private static readonly List<UsersGroup> _usersGroups = CreateUsersGroups();
 
-        public static string DevelopersId { get; } = Guid.NewGuid().ToString();
-        public static string ExpertsId { get; } = Guid.NewGuid().ToString();
+        public static Guid DevelopersId { get; } = Guid.NewGuid();
+        public static Guid ExpertsId { get; } = Guid.NewGuid();
 
         private static List<UsersGroup> CreateUsersGroups() => [
             new UsersGroup
@@ -28,7 +28,7 @@ namespace HITSBlazor.Utils.Mocks.Common
             }
         ];
 
-        public static UsersGroup? GetGroupById(string id)
+        public static UsersGroup? GetGroupById(Guid id)
             => _usersGroups.FirstOrDefault(g => g.Id == id);
     }
 }

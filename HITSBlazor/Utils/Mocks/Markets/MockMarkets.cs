@@ -7,10 +7,10 @@ namespace HITSBlazor.Utils.Mocks.Markets
     {
         private static readonly List<Market> _markets = CreateMarkets();
 
-        public static string Summer2023Id { get; } = Guid.NewGuid().ToString();
-        public static string Autumn2023Id { get; } = Guid.NewGuid().ToString();
-        public static string Winter2024Id { get; } = Guid.NewGuid().ToString();
-        public static string Spring2024Id { get; } = Guid.NewGuid().ToString();
+        public static Guid Summer2023Id { get; } = Guid.NewGuid();
+        public static Guid Autumn2023Id { get; } = Guid.NewGuid();
+        public static Guid Winter2024Id { get; } = Guid.NewGuid();
+        public static Guid Spring2024Id { get; } = Guid.NewGuid();
 
         
 

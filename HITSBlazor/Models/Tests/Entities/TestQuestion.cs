@@ -2,7 +2,7 @@
 {
     public class TestQuestion
     {
-        public string Id { get; set; } = string.Empty;
+        public Guid Id { get; set; }
         public string TestName { get; set; } = string.Empty;
         public int QuestionNumber { get; set; }
         public string QuestionName { get; set; } = string.Empty;

@@ -6,8 +6,8 @@ namespace HITSBlazor.Utils.Mocks.Quests
     {
         private static readonly List<IndicatorCategory> _indicatorCategories = CreateIndicatorCategories();
 
-        public static string SoftId { get; } = Guid.NewGuid().ToString();
-        public static string HardId { get; } = Guid.NewGuid().ToString();
+        public static Guid SoftId { get; } = Guid.NewGuid();
+        public static Guid HardId { get; } = Guid.NewGuid();
 
         private static List<IndicatorCategory> CreateIndicatorCategories() =>
         [
@@ -15,7 +15,7 @@ namespace HITSBlazor.Utils.Mocks.Quests
             new IndicatorCategory { IdCategory = HardId, Name = "hard" }
         ];
 
-        public static IndicatorCategory? GetIndicatorCategoryById(string id) =>
+        public static IndicatorCategory? GetIndicatorCategoryById(Guid id) =>
             _indicatorCategories.FirstOrDefault(ic => ic.IdCategory == id);
     }
 }

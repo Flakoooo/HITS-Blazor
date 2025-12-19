@@ -156,7 +156,7 @@ namespace HITSBlazor.Utils.Mocks.Tests
 
             return new TestResult
             { 
-                Id = Guid.NewGuid().ToString(),
+                Id = Guid.NewGuid(),
                 User = user,
                 TestName = BelbinTestName,
                 TestResultValue = result
@@ -215,7 +215,7 @@ namespace HITSBlazor.Utils.Mocks.Tests
 
             return new TestResult
             {
-                Id = Guid.NewGuid().ToString(),
+                Id = Guid.NewGuid(),
                 User = user,
                 TestName = TemperTestName,
                 TestResultValue = result
@@ -301,7 +301,7 @@ namespace HITSBlazor.Utils.Mocks.Tests
 
             return new TestResult
             {
-                Id = Guid.NewGuid().ToString(),
+                Id = Guid.NewGuid(),
                 User = user,
                 TestName = MindTestName,
                 TestResultValue = result
@@ -335,9 +335,9 @@ namespace HITSBlazor.Utils.Mocks.Tests
         {
             return 
             [
-                GenerateBelbinTestResult(MockUsers.GetUserById(MockUsers.KirillId)!),
-                GenerateTemperTestResult(MockUsers.GetUserById(MockUsers.KirillId)!),
-                GenerateMindTestResult(MockUsers.GetUserById(MockUsers.KirillId)!)
+                GenerateBelbinTestResult(MockUsers.GetUserById(MockUsers.KirillId)!)!,
+                GenerateTemperTestResult(MockUsers.GetUserById(MockUsers.KirillId)!)!,
+                GenerateMindTestResult(MockUsers.GetUserById(MockUsers.KirillId)!)!
             ];
         }
     }

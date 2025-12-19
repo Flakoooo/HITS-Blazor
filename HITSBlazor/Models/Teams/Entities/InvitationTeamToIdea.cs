@@ -5,10 +5,10 @@ namespace HITSBlazor.Models.Teams.Entities
 {
     public class InvitationTeamToIdea
     {
-        public string Id { get; set; } = string.Empty;
-        public string TeamId { get; set; } = string.Empty;
-        public string IdeaId { get; set; } = string.Empty;
-        public string InitiatorId { get; set; } = string.Empty;
+        public Guid Id { get; set; }
+        public Guid TeamId { get; set; }
+        public Guid IdeaId { get; set; }
+        public Guid InitiatorId { get; set; }
         public string IdeaName { get; set; } = string.Empty;
         public string TeamName { get; set; } = string.Empty;
         public InvitationTeamToIdeaStatus Status { get; set; }

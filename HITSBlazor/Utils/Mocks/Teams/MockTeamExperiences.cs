@@ -29,7 +29,7 @@ namespace HITSBlazor.Utils.Mocks.Teams
             ];
         }
 
-        public static List<TeamExperience> GetTeamExperiencesByUserId(string userId)
+        public static List<TeamExperience> GetTeamExperiencesByUserId(Guid userId)
             => [.. _teamExperiences.Where(te => te.UserId == userId)];
     }
 }

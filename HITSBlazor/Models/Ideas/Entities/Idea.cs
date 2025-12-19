@@ -6,7 +6,7 @@ namespace HITSBlazor.Models.Ideas.Entities
 {
     public class Idea
     {
-        public string Id { get; set; } = string.Empty;
+        public Guid Id { get; set; }
         public User Initiator { get; set; } = new();
         public string CreatedAt { get; set; } = string.Empty;
         public string ModifiedAt { get; set; } = string.Empty;

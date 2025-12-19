@@ -11,12 +11,12 @@ namespace HITSBlazor.Utils.Mocks.Markets
     {
         private static readonly List<IdeaMarket> _ideaMarkets = CreateIdeaMarkets();
 
-        public static string HelperId { get; } = Guid.NewGuid().ToString();
-        public static string PWTechnologyId { get; } = Guid.NewGuid().ToString();
-        public static string EMetricsViewerId { get; } = Guid.NewGuid().ToString();
-        public static string CalculatorId { get; } = Guid.NewGuid().ToString();
-        public static string ChatBotId { get; } = Guid.NewGuid().ToString();
-        public static string ArmatureId { get; } = Guid.NewGuid().ToString();
+        public static Guid HelperId { get; } = Guid.NewGuid();
+        public static Guid PWTechnologyId { get; } = Guid.NewGuid();
+        public static Guid EMetricsViewerId { get; } = Guid.NewGuid();
+        public static Guid CalculatorId { get; } = Guid.NewGuid();
+        public static Guid ChatBotId { get; } = Guid.NewGuid();
+        public static Guid ArmatureId { get; } = Guid.NewGuid();
 
         private static List<IdeaMarket> CreateIdeaMarkets()
         {
@@ -92,9 +92,9 @@ namespace HITSBlazor.Utils.Mocks.Markets
                     Position = 8,
                     Stack =
                     [
-                        MockSkills.GetSkillById(MockSkills.UnrealEngineId),
+                        MockSkills.GetSkillById(MockSkills.UnrealEngineId)!,
                         git,
-                        MockSkills.GetSkillById(MockSkills.CppId)
+                        MockSkills.GetSkillById(MockSkills.CppId)!
                     ],
                     Status = IdeaMarketStatusType.RECRUITMENT_IS_OPEN,
                     Requests = 0,
@@ -188,7 +188,7 @@ namespace HITSBlazor.Utils.Mocks.Markets
             ];
         }
 
-        public static IdeaMarket? GetIdeaMarketById(string id) =>
+        public static IdeaMarket? GetIdeaMarketById(Guid id) =>
             _ideaMarkets.FirstOrDefault(im => im.Id == id);
     }
 }

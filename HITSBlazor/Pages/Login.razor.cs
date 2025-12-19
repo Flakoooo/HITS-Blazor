@@ -1,7 +1,10 @@
 ﻿using HITSBlazor.Models.Auth.Requests;
-using HITSBlazor.Services;
+using HITSBlazor.Services.Service.Class;
+using HITSBlazor.Services.Service.Interfaces;
+using HITSBlazor.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
+using System.Net;
 
 namespace HITSBlazor.Pages
 {
@@ -84,6 +87,10 @@ namespace HITSBlazor.Pages
                         result.ErrorMessage ?? "Вы указали неверные данные для входа. Попробуйте снова."
                     );
                 }
+            }
+            catch (HttpRequestException ex)
+            {
+                NotificationService.ShowError($"Ошибка сети: {ex.Message}");
             }
             catch (Exception ex)
             {

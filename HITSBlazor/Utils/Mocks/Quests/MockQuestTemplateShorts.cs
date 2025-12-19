@@ -6,8 +6,8 @@ namespace HITSBlazor.Utils.Mocks.Quests
     {
         private static readonly List<QuestTemplateShort> _questTemplateShorts = CreateQuestTemplateShorts();
 
-        public static string QuestTemplate1Id { get; } = Guid.NewGuid().ToString();
-        public static string QuestTemplate2Id { get; } = Guid.NewGuid().ToString();
+        public static Guid QuestTemplate1Id { get; } = Guid.NewGuid();
+        public static Guid QuestTemplate2Id { get; } = Guid.NewGuid();
 
         private static List<QuestTemplateShort> CreateQuestTemplateShorts() =>
         [
@@ -15,7 +15,7 @@ namespace HITSBlazor.Utils.Mocks.Quests
             new QuestTemplateShort { IdQuestTemplate = QuestTemplate2Id, Available = true, Name = "Опрос компетенций" }
         ];
 
-        public static QuestTemplateShort? GetQuestTemplateShortById(string id) =>
+        public static QuestTemplateShort? GetQuestTemplateShortById(Guid id) =>
             _questTemplateShorts.FirstOrDefault(qts => qts.IdQuestTemplate == id);
     }
 }

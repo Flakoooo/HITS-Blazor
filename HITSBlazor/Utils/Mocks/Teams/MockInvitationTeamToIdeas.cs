@@ -8,8 +8,8 @@ namespace HITSBlazor.Utils.Mocks.Teams
     {
         private static readonly List<InvitationTeamToIdea> _invitationTeamToIdeas = CreateInvitationTeamToIdeas();
 
-        public static string CarpArmatureId { get; } = Guid.NewGuid().ToString();
-        public static string CarpEMetricsViewerId { get; } = Guid.NewGuid().ToString();
+        public static Guid CarpArmatureId { get; } = Guid.NewGuid();
+        public static Guid CarpEMetricsViewerId { get; } = Guid.NewGuid();
 
         private static List<InvitationTeamToIdea> CreateInvitationTeamToIdeas()
         {

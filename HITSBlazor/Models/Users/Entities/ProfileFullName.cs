@@ -6,6 +6,6 @@
         public string FirstName { get; set; } = string.Empty;
         public string StudyGroup { get; set; } = string.Empty;
         public string Telephone { get; set; } = string.Empty;
-        public string Id { get; set; } = string.Empty;
+        public Guid Id { get; set; }
     }
 }

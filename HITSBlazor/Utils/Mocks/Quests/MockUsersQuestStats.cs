@@ -23,7 +23,7 @@ namespace HITSBlazor.Utils.Mocks.Quests
             CreateUsersQuestStat(MockUsers.GetUserById(MockUsers.AdminId)!, true)
         ];
 
-        public static UsersQuestStat? GetUsersQuestStatById(string id) =>
+        public static UsersQuestStat? GetUsersQuestStatById(Guid id) =>
             _questStats.FirstOrDefault(uqs => uqs.Id == id);
     }
 }

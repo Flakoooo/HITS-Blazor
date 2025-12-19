@@ -29,7 +29,7 @@ namespace HITSBlazor.Utils.Mocks.Teams
                 new TeamSkills
                 {
                     TeamId = MockTeams.CardId,
-                    WantedSkills = [ javaScript, MockSkills.GetSkillById(MockSkills.RustId) ],
+                    WantedSkills = [ javaScript, MockSkills.GetSkillById(MockSkills.RustId)! ],
                     Skills = []
                 },
                 new TeamSkills
@@ -37,15 +37,15 @@ namespace HITSBlazor.Utils.Mocks.Teams
                     TeamId = MockTeams.CactusId,
                     WantedSkills = [
                         .. baseSkills,
-                        MockSkills.GetSkillById(MockSkills.GoId),
-                        MockSkills.GetSkillById(MockSkills.NodeId),
-                        MockSkills.GetSkillById(MockSkills.MongoDBId),
+                        MockSkills.GetSkillById(MockSkills.GoId)!,
+                        MockSkills.GetSkillById(MockSkills.NodeId)!,
+                        MockSkills.GetSkillById(MockSkills.MongoDBId)!,
                     ],
                     Skills = [
                         .. baseSkills,
-                        MockSkills.GetSkillById(MockSkills.CppId),
-                        MockSkills.GetSkillById(MockSkills.ElasticsearchId),
-                        MockSkills.GetSkillById(MockSkills.RedisId)
+                        MockSkills.GetSkillById(MockSkills.CppId)!,
+                        MockSkills.GetSkillById(MockSkills.ElasticsearchId)!,
+                        MockSkills.GetSkillById(MockSkills.RedisId)!
                     ]
                 }
             ];

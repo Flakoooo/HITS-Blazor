@@ -22,8 +22,8 @@ namespace HITSBlazor.Utils.Mocks.Quests
                     Progress = $"{2 / 3 * 100}",
                     Users = 
                     [
-                        MockUsersQuestStats.GetUsersQuestStatById(MockUsers.KirillId),
-                        MockUsersQuestStats.GetUsersQuestStatById(MockUsers.DenisId)
+                        MockUsersQuestStats.GetUsersQuestStatById(MockUsers.KirillId)!,
+                        MockUsersQuestStats.GetUsersQuestStatById(MockUsers.DenisId)!
                     ]
                 },
                 new TeamQuestStat
@@ -33,14 +33,14 @@ namespace HITSBlazor.Utils.Mocks.Quests
                     Progress = $"{2 / 3 * 100}",
                     Users =
                     [
-                        MockUsersQuestStats.GetUsersQuestStatById(MockUsers.TimurId),
-                        MockUsersQuestStats.GetUsersQuestStatById(MockUsers.AdminId)
+                        MockUsersQuestStats.GetUsersQuestStatById(MockUsers.TimurId)!,
+                        MockUsersQuestStats.GetUsersQuestStatById(MockUsers.AdminId)!
                     ]
                 }
             ];
         }
 
-        public static TeamQuestStat? GetTeamQuestStatByIt(string teamId) =>
+        public static TeamQuestStat? GetTeamQuestStatByIt(Guid teamId) =>
             _teamQuestStats.FirstOrDefault(tqs => tqs.Id == teamId);
     }
 }

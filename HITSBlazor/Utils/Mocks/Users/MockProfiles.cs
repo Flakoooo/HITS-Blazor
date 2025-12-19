@@ -22,7 +22,7 @@ namespace HITSBlazor.Utils.Mocks.Users
             return profiles;
         }
 
-        public static Profile? CreateProfile(string userId)
+        public static Profile? CreateProfile(Guid userId)
         {
             var user = MockUsers.GetUserById(userId);
             if (user == null) return null;

@@ -33,7 +33,7 @@ namespace HITSBlazor.Utils.Mocks.Projects
                 CreateLog(authIntegrationTask, ivan, kirill, verificationStart, finishDate, Models.Projects.Enums.TaskStatus.OnVerification, 4.0),
                 new TaskMovementLog
                 {
-                    Id = Guid.NewGuid().ToString(),
+                    Id = Guid.NewGuid(),
                     Task = authIntegrationTask,
                     Executor = ivan,
                     User = kirill,
@@ -95,7 +95,7 @@ namespace HITSBlazor.Utils.Mocks.Projects
             double workingHours = 8.0) =>
         new()
         {
-            Id = Guid.NewGuid().ToString(),
+            Id = Guid.NewGuid(),
             Task = task,
             Executor = executor,
             User = user,

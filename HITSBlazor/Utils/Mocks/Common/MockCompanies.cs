@@ -7,9 +7,9 @@ namespace HITSBlazor.Utils.Mocks.Common
     {
         private static readonly List<Company> _companies = CreateCompanies();
 
-        public static string HITSId { get; } = Guid.NewGuid().ToString();
-        public static string GazpromId { get; } = Guid.NewGuid().ToString();
-        public static string RosneftId { get; } = Guid.NewGuid().ToString();
+        public static Guid HITSId { get; } = Guid.NewGuid();
+        public static Guid GazpromId { get; } = Guid.NewGuid();
+        public static Guid RosneftId { get; } = Guid.NewGuid();
 
         private static List<Company> CreateCompanies()
         {
@@ -24,7 +24,7 @@ namespace HITSBlazor.Utils.Mocks.Common
             ];
         }
 
-        public static Company? GetCompanyById(string id)
+        public static Company? GetCompanyById(Guid id)
             => _companies.FirstOrDefault(c => c.Id == id);
     }
 }

@@ -7,9 +7,9 @@ namespace HITSBlazor.Utils.Mocks.Markets
     {
         private static readonly List<IdeaMarketAdvertisement> _ideaMarketAdvertisements = CreateIdeaMarketAdvertisements();
 
-        public static string BackendOnlyAdId { get; } = Guid.NewGuid().ToString();
-        public static string ClosingSoonAdId { get; } = Guid.NewGuid().ToString();
-        public static string NeedFrontendBackendAdId { get; } = Guid.NewGuid().ToString();
+        public static Guid BackendOnlyAdId { get; } = Guid.NewGuid();
+        public static Guid ClosingSoonAdId { get; } = Guid.NewGuid();
+        public static Guid NeedFrontendBackendAdId { get; } = Guid.NewGuid();
 
         private static List<IdeaMarketAdvertisement> CreateIdeaMarketAdvertisements()
         {

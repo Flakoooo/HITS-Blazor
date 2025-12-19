@@ -2,7 +2,7 @@
 using HITSBlazor.Models.Auth.Response;
 using HITSBlazor.Models.Users.Entities;
 
-namespace HITSBlazor.Services
+namespace HITSBlazor.Services.Service.Interfaces
 {
     public interface IAuthService
     {

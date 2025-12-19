@@ -69,7 +69,7 @@ namespace HITSBlazor.Utils.Mocks.Tests
                     answers.Add(
                         new TestAnswer
                         {
-                            Id = Guid.NewGuid().ToString(),
+                            Id = Guid.NewGuid(),
                             TestName = question.TestName,
                             User = user,
                             QuestionName = question.QuestionName,
@@ -97,7 +97,7 @@ namespace HITSBlazor.Utils.Mocks.Tests
                 answers.Add(
                     new TestAnswer
                     {
-                        Id = Guid.NewGuid().ToString(),
+                        Id = Guid.NewGuid(),
                         TestName = question.TestName,
                         User = user,
                         QuestionName = question.QuestionName,
@@ -128,7 +128,7 @@ namespace HITSBlazor.Utils.Mocks.Tests
                 {
                     answers.Add(new TestAnswer
                     {
-                        Id = Guid.NewGuid().ToString(),
+                        Id = Guid.NewGuid(),
                         TestName = MindTestName,
                         User = user,
                         QuestionName = moduleQuestions[i].QuestionName,
@@ -152,7 +152,7 @@ namespace HITSBlazor.Utils.Mocks.Tests
             ];
         }
 
-        public static List<TestAnswer> GetTestAnswersByTestNameAndUserId(string testName, string userId) =>
+        public static List<TestAnswer> GetTestAnswersByTestNameAndUserId(string testName, Guid userId) =>
             [.. _testAnswers.Where(ta => ta.TestName == testName && ta.User.Id == userId)];
     }
 }

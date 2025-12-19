@@ -7,30 +7,30 @@ namespace HITSBlazor.Utils.Mocks.Common
     {
         private static readonly List<Skill> _skills = CreateSkills();
 
-        public static string JavaScriptId { get; } = Guid.NewGuid().ToString();
-        public static string PythonId { get; } = Guid.NewGuid().ToString();
-        public static string RustId { get; } = Guid.NewGuid().ToString();
-        public static string SwiftId { get; } = Guid.NewGuid().ToString();
-        public static string KotlinId { get; } = Guid.NewGuid().ToString();
-        public static string GoId { get; } = Guid.NewGuid().ToString();
-        public static string ReactId { get; } = Guid.NewGuid().ToString();
-        public static string CppId { get; } = Guid.NewGuid().ToString();
-        public static string VueId { get; } = Guid.NewGuid().ToString();
-        public static string AngularId { get; } = Guid.NewGuid().ToString();
-        public static string NodeId { get; } = Guid.NewGuid().ToString();
-        public static string DockerId { get; } = Guid.NewGuid().ToString();
-        public static string GitId { get; } = Guid.NewGuid().ToString();
-        public static string GrafanaId { get; } = Guid.NewGuid().ToString();
-        public static string ElasticsearchId { get; } = Guid.NewGuid().ToString();
-        public static string MongoDBId { get; } = Guid.NewGuid().ToString();
-        public static string PostgreSQLId { get; } = Guid.NewGuid().ToString();
-        public static string MySQLId { get; } = Guid.NewGuid().ToString();
-        public static string SQLite { get; } = Guid.NewGuid().ToString();
-        public static string RedisId { get; } = Guid.NewGuid().ToString();
-        public static string UnrealEngineId { get; } = Guid.NewGuid().ToString();
-        public static string CSharpId { get; } = Guid.NewGuid().ToString();
-        public static string KerasId { get; } = Guid.NewGuid().ToString();
-        public static string ScikitLearnId { get; } = Guid.NewGuid().ToString();
+        public static Guid JavaScriptId { get; } = Guid.NewGuid();
+        public static Guid PythonId { get; } = Guid.NewGuid();
+        public static Guid RustId { get; } = Guid.NewGuid();
+        public static Guid SwiftId { get; } = Guid.NewGuid();
+        public static Guid KotlinId { get; } = Guid.NewGuid();
+        public static Guid GoId { get; } = Guid.NewGuid();
+        public static Guid ReactId { get; } = Guid.NewGuid();
+        public static Guid CppId { get; } = Guid.NewGuid();
+        public static Guid VueId { get; } = Guid.NewGuid();
+        public static Guid AngularId { get; } = Guid.NewGuid();
+        public static Guid NodeId { get; } = Guid.NewGuid();
+        public static Guid DockerId { get; } = Guid.NewGuid();
+        public static Guid GitId { get; } = Guid.NewGuid();
+        public static Guid GrafanaId { get; } = Guid.NewGuid();
+        public static Guid ElasticsearchId { get; } = Guid.NewGuid();
+        public static Guid MongoDBId { get; } = Guid.NewGuid();
+        public static Guid PostgreSQLId { get; } = Guid.NewGuid();
+        public static Guid MySQLId { get; } = Guid.NewGuid();
+        public static Guid SQLite { get; } = Guid.NewGuid();
+        public static Guid RedisId { get; } = Guid.NewGuid();
+        public static Guid UnrealEngineId { get; } = Guid.NewGuid();
+        public static Guid CSharpId { get; } = Guid.NewGuid();
+        public static Guid KerasId { get; } = Guid.NewGuid();
+        public static Guid ScikitLearnId { get; } = Guid.NewGuid();
 
         private static List<Skill> CreateSkills() => [
             new Skill { Id = JavaScriptId,      Name = "JavaScript",    Type = SkillType.LANGUAGE,      Confirmed = true },
@@ -59,7 +59,7 @@ namespace HITSBlazor.Utils.Mocks.Common
             new Skill { Id = ScikitLearnId,     Name = "Scikit Learn",  Type = SkillType.FRAMEWORK,     Confirmed = true }
         ];
 
-        public static Skill? GetSkillById(string id)
+        public static Skill? GetSkillById(Guid id)
             => _skills.FirstOrDefault(s => s.Id == id);
 
         public static List<Skill> GetAllSkills() => _skills;

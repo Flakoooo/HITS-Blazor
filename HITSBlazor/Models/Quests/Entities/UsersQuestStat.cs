@@ -2,7 +2,7 @@
 {
     public class UsersQuestStat
     {
-        public string Id { get; set; } = string.Empty;
+        public Guid Id { get; set; }
         public string Name { get; set; } = string.Empty;
         public bool Progress { get; set; }
     }

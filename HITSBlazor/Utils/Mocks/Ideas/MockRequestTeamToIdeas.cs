@@ -11,14 +11,14 @@ namespace HITSBlazor.Utils.Mocks.Ideas
 
         private static readonly string _lorem = "Lorem ipsum dolor sit amet consectetur adipisicing elit. Dolorbeatae ipsum dicta omnis adipisci magni autem eos quisquam doloresmaxime. Dignissimos cum nulla consequatur accusantium distinctioaut. Velit, assumenda porro!";
 
-        public static string Card1Id { get; } = Guid.NewGuid().ToString();
-        public static string Card2Id { get; } = Guid.NewGuid().ToString();
-        public static string Card3Id { get; } = Guid.NewGuid().ToString();
-        public static string Cactus1Id { get; } = Guid.NewGuid().ToString();
-        public static string Cactus2Id { get; } = Guid.NewGuid().ToString();
-        public static string Carp1Id { get; } = Guid.NewGuid().ToString();
-        public static string Carp2Id { get; } = Guid.NewGuid().ToString();
-        public static string Carp3Id { get; } = Guid.NewGuid().ToString();
+        public static Guid Card1Id { get; } = Guid.NewGuid();
+        public static Guid Card2Id { get; } = Guid.NewGuid();
+        public static Guid Card3Id { get; } = Guid.NewGuid();
+        public static Guid Cactus1Id { get; } = Guid.NewGuid();
+        public static Guid Cactus2Id { get; } = Guid.NewGuid();
+        public static Guid Carp1Id { get; } = Guid.NewGuid();
+        public static Guid Carp2Id { get; } = Guid.NewGuid();
+        public static Guid Carp3Id { get; } = Guid.NewGuid();
 
         private static List<RequestTeamToIdea> CreateRequestTeamToIdeas()
         {

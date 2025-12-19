@@ -7,10 +7,10 @@ namespace HITSBlazor.Utils.Mocks.Quests
     {
         private static readonly List<Quest> _quests = CreateQuests();
 
-        public static string QuestSpring2024Id { get; } = Guid.NewGuid().ToString();
-        public static string QuestAutumn2023Id { get; } = Guid.NewGuid().ToString();
-        public static string QuestSpring2023Id { get; } = Guid.NewGuid().ToString();
-        public static string QuestAutumn2022Id { get; } = Guid.NewGuid().ToString();
+        public static Guid QuestSpring2024Id { get; } = Guid.NewGuid();
+        public static Guid QuestAutumn2023Id { get; } = Guid.NewGuid();
+        public static Guid QuestSpring2023Id { get; } = Guid.NewGuid();
+        public static Guid QuestAutumn2022Id { get; } = Guid.NewGuid();
 
         private static List<Quest> CreateQuests()
         {
@@ -74,7 +74,7 @@ namespace HITSBlazor.Utils.Mocks.Quests
             ];
         }
 
-        public static Quest? GetQuestById(string id) =>
+        public static Quest? GetQuestById(Guid id) =>
             _quests.FirstOrDefault(q => q.IdQuest == id);
     }
 }

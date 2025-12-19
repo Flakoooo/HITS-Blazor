@@ -4,7 +4,7 @@ namespace HITSBlazor.Models.Teams.Entities
 {
     public class TeamProject
     {
-        public string TeamId { get; set; } = string.Empty;
+        public Guid TeamId { get; set; }
         public string TeamName { get; set; } = string.Empty;
         public Project Project { get; set; } = new();
     }

@@ -2,9 +2,9 @@
 {
     public class Rating
     {
-        public string Id { get; set; } = string.Empty;
-        public string IdeaId { get; set; } = string.Empty;
-        public string ExpertId { get; set; } = string.Empty;
+        public Guid Id { get; set; }
+        public Guid IdeaId { get; set; }
+        public Guid ExpertId { get; set; }
         public string ExpertFirstName { get; set; } = string.Empty;
         public string ExpertLastName { get; set; } = string.Empty;
 

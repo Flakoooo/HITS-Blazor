@@ -1,20 +1,20 @@
 ﻿using HITSBlazor.Models.Auth.Requests;
 using HITSBlazor.Models.Auth.Response;
 using HITSBlazor.Models.Users.Entities;
+using HITSBlazor.Services.Service.Interfaces;
 using HITSBlazor.Utils.Mocks.Users;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
+using System.Linq;
 using System.Text.Json;
 
-namespace HITSBlazor.Services
+namespace HITSBlazor.Services.Service.Mock
 {
-    public class AuthService(
-        HttpClient httpClient, IJSRuntime jsRuntime, NavigationManager navigationManager
-    ) : IAuthService
+    public class MockAuthService(IJSRuntime jsRuntime, NavigationManager navigationManager) : IAuthService
     {
-        private readonly HttpClient _httpClient = httpClient;
         private readonly IJSRuntime _jsRuntime = jsRuntime;
         private readonly NavigationManager _navigationManager = navigationManager;
+        private readonly string _mockTokenTemplate = "mock-token-";
 
         public event Action? OnAuthStateChanged;
 
@@ -26,23 +26,17 @@ namespace HITSBlazor.Services
             var token = await GetTokenAsync();
             if (!string.IsNullOrEmpty(token))
             {
-                await LoadMockUserAsync();
+                if (!Guid.TryParse(token.Skip(_mockTokenTemplate.Length).ToString(), out Guid guid))
+                    CurrentUser = null;
+                else
+                    CurrentUser = MockUsers.GetUserById(guid);
             }
             else
             {
                 CurrentUser = null;
-                OnAuthStateChanged?.Invoke();
             }
-        }
 
-        private async Task LoadMockUserAsync()
-        {
-            var mockUser = MockUsers.GetUserById(MockUsers.KirillId);
-            if (mockUser != null)
-            {
-                CurrentUser = mockUser;
-                OnAuthStateChanged?.Invoke();
-            }
+            OnAuthStateChanged?.Invoke();
         }
 
         public async Task<LoginResponse> LoginAsync(LoginRequest request)
@@ -55,7 +49,7 @@ namespace HITSBlazor.Services
                 if (user == null)
                     return LoginResponse.Failure("Неверный логин или пароль");
 
-                var mockToken = $"mock-token-{user.Id}";
+                var mockToken = _mockTokenTemplate + user.Id;
 
                 await SaveTokenAsync(mockToken);
 
@@ -73,11 +67,36 @@ namespace HITSBlazor.Services
             }
         }
 
+        public async Task LogoutAsync()
+        {
+            await RemoveTokenAsync();
+            await RemoveUserInfoAsync();
+            CurrentUser = null;
+            OnAuthStateChanged?.Invoke();
+            _navigationManager.NavigateTo("/login", true);
+        }
+
+        public async Task<RegisterResponse> RegisterAsync(RegisterRequest request, string? invitationCode = null)
+        {
+            try
+            {
+                if (!MockUsers.GetAllUsers().Select(u => u.Email).Contains(request.Email))
+                    return RegisterResponse.Failure("Пользователь с таким email уже существует");
+
+                return RegisterResponse.Success("Регистрация успешна");
+            }
+            catch (Exception ex)
+            {
+                return RegisterResponse.Failure($"Ошибка: {ex.Message}");
+            }
+        }
+
         public async Task<RecoveryResponse> RequestPasswordRecoveryAsync(string email)
         {
             try
             {
-                await Task.Delay(1000);
+                if (!MockUsers.GetAllUsers().Select(u => u.Email).Contains(email))
+                    return RecoveryResponse.Failure("Пользователь с таким email не найден");
 
                 return RecoveryResponse.Success("Инструкции по восстановлению отправлены на email");
             }
@@ -100,30 +119,6 @@ namespace HITSBlazor.Services
             {
                 return ResetPasswordResponse.Failure($"Ошибка: {ex.Message}");
             }
-        }
-
-        public async Task<RegisterResponse> RegisterAsync(RegisterRequest request, string? invitationCode = null)
-        {
-            try
-            {
-                if (!MockUsers.GetAllUsers().Select(u => u.Email).Contains(request.Email))
-                    return RegisterResponse.Failure("Пользователь с таким email уже существует");
-
-                return RegisterResponse.Success("Регистрация успешна");
-            }
-            catch (Exception ex)
-            {
-                return RegisterResponse.Failure($"Ошибка: {ex.Message}");
-            }
-        }
-
-        public async Task LogoutAsync()
-        {
-            await RemoveTokenAsync();
-            await RemoveUserInfoAsync();
-            CurrentUser = null;
-            OnAuthStateChanged?.Invoke();
-            _navigationManager.NavigateTo("/login", true);
         }
 
         private async Task SaveTokenAsync(string token)

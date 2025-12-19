@@ -15,7 +15,7 @@ namespace HITSBlazor.Utils.Mocks.Tests
             string testName, string questionName, string questionModule, string question
         ) => new()
         {
-            Id = Guid.NewGuid().ToString(),
+            Id = Guid.NewGuid(),
             TestName = testName,
             QuestionNumber = questionNumber,
             QuestionName = questionName,

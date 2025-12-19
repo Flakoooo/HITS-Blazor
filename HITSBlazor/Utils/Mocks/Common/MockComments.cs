@@ -8,8 +8,8 @@ namespace HITSBlazor.Utils.Mocks.Common
     {
         private static readonly List<Comment> _comments = CreateComments();
 
-        public static string Comment1Id { get; } = Guid.NewGuid().ToString();
-        public static string Comment2Id { get; } = Guid.NewGuid().ToString();
+        public static Guid Comment1Id { get; } = Guid.NewGuid();
+        public static Guid Comment2Id { get; } = Guid.NewGuid();
 
         private static List<Comment> CreateComments()
         {

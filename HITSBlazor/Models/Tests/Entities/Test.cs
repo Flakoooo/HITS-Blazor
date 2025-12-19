@@ -5,7 +5,7 @@ namespace HITSBlazor.Models.Tests.Entities
     public class Test
     {
         [JsonPropertyName("id")]
-        public string Id { get; set; } = string.Empty;
+        public Guid Id { get; set; }
 
         [JsonPropertyName("test_name")]
         public string TestName { get; set; } = string.Empty;

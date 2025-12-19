@@ -18,15 +18,15 @@ namespace HITSBlazor.Utils.Mocks.Ideas
                     IdeaId = MockIdeas.MyNewIdeaId, 
                     Skills =
                     [
-                        MockSkills.GetSkillById(MockSkills.JavaScriptId),
-                        MockSkills.GetSkillById(MockSkills.CSharpId)
+                        MockSkills.GetSkillById(MockSkills.JavaScriptId)!,
+                        MockSkills.GetSkillById(MockSkills.CSharpId)!
                     ]
                 },
                 new IdeaSkills { IdeaId = MockIdeas.Strawberry1Id,  Skills = [.. skillsMocks] }
             ];
         }
 
-        public static IdeaSkills? GetIdeaSkillsByIdeaId(string ideaId)
+        public static IdeaSkills? GetIdeaSkillsByIdeaId(Guid ideaId)
             => _ideaSkills.FirstOrDefault(isk => isk.IdeaId == ideaId);
     }
 }

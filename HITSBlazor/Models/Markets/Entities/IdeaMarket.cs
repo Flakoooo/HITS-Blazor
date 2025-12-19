@@ -7,9 +7,9 @@ namespace HITSBlazor.Models.Markets.Entities
 {
     public class IdeaMarket
     {
-        public string Id { get; set; } = string.Empty;
-        public string MarketId { get; set; } = string.Empty;
-        public string IdeaId { get; set; } = string.Empty;
+        public Guid Id { get; set; }
+        public Guid MarketId { get; set; }
+        public Guid IdeaId { get; set; }
         public User Initiator { get; set; } = new();
         public string Name { get; set; } = string.Empty;
         public string Problem { get; set; } = string.Empty;

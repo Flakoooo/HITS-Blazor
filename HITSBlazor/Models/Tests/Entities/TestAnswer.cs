@@ -4,7 +4,7 @@ namespace HITSBlazor.Models.Tests.Entities
 {
     public class TestAnswer
     {
-        public string Id { get; set; } = string.Empty;
+        public Guid Id { get; set; }
         public string TestName { get; set; } = string.Empty;
         public User User { get; set; } = new();
         public string QuestionName { get; set; } = string.Empty;

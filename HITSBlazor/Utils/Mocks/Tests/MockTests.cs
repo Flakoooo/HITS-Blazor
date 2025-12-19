@@ -6,9 +6,9 @@ namespace HITSBlazor.Utils.Mocks.Tests
     {
         private static readonly List<Test> _tests = CreateTests();
 
-        public static string BelbinId { get; } = Guid.NewGuid().ToString();
-        public static string TemperId { get; } = Guid.NewGuid().ToString();
-        public static string MindId { get; } = Guid.NewGuid().ToString();
+        public static Guid BelbinId { get; } = Guid.NewGuid();
+        public static Guid TemperId { get; } = Guid.NewGuid();
+        public static Guid MindId { get; } = Guid.NewGuid();
 
         private static List<Test> CreateTests() =>
         [
@@ -37,7 +37,7 @@ namespace HITSBlazor.Utils.Mocks.Tests
 
         public static List<Test> GetAllTests() => _tests;
 
-        public static Test? GetTestById(string id)
+        public static Test? GetTestById(Guid id)
             => _tests.FirstOrDefault(t => t.Id == id);
 
         public static Test? GetTestByName(string testName)

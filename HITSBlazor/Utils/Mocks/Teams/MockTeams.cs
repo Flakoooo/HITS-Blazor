@@ -13,11 +13,11 @@ namespace HITSBlazor.Utils.Mocks.Teams
         
         private static readonly string _lorem = "Lorem ipsum dolor sit amet consectetur adipisicing elit. Eius aperiam delectus possimus, voluptates quo accusamus? Consequatur, quasi rem temporibus blanditiis delectus aliquid officia aut, totam incidunt reiciendis eaque laborum fugiat!";
 
-        public static string CardId { get; } = Guid.NewGuid().ToString();
-        public static string CactusId { get; } = Guid.NewGuid().ToString();
-        public static string CarpId { get; } = Guid.NewGuid().ToString();
+        public static Guid CardId { get; } = Guid.NewGuid();
+        public static Guid CactusId { get; } = Guid.NewGuid();
+        public static Guid CarpId { get; } = Guid.NewGuid();
 
-        private static List<TeamMember> CreateTeamMembers(string teamId, params User[] users)
+        private static List<TeamMember> CreateTeamMembers(Guid teamId, params User[] users)
         {
             var members = new List<TeamMember>();
 
@@ -25,7 +25,7 @@ namespace HITSBlazor.Utils.Mocks.Teams
             {
                 members.Add(new TeamMember
                 {
-                    Id = Guid.NewGuid().ToString(),
+                    Id = Guid.NewGuid(),
                     TeamId = teamId,
                     UserId = user.Id,
                     Email = user.Email,
@@ -132,7 +132,7 @@ namespace HITSBlazor.Utils.Mocks.Teams
             ];
         }
 
-        public static Team? GetTeamById(string id) 
+        public static Team? GetTeamById(Guid id) 
             => _teams.FirstOrDefault(t => t.Id == id);
 
         public static List<Team> GetAllTeams() => _teams;

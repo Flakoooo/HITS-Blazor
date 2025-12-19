@@ -4,6 +4,6 @@
     {
         public string Environment { get; set; } = "Development";
         public bool UseMockData { get; set; } = true;
-        public string ApiBaseUrl { get; set; } = "https://localhost:5001";
+        public string ApiBaseUrl { get; set; } = "http://localhost:8080/api";
     }
 }

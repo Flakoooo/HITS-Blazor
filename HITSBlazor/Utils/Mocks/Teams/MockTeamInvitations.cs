@@ -8,10 +8,10 @@ namespace HITSBlazor.Utils.Mocks.Teams
     {
         private static readonly List<TeamInvitation> _teamInvitations = CreateTeamInvitations();
 
-        public static string MagaInvitationId { get; } = Guid.NewGuid().ToString();
-        public static string KirillInvitationId { get; } = Guid.NewGuid().ToString();
-        public static string TimurInvitationId { get; } = Guid.NewGuid().ToString();
-        public static string AdminInvitationId { get; } = Guid.NewGuid().ToString();
+        public static Guid MagaInvitationId { get; } = Guid.NewGuid();
+        public static Guid KirillInvitationId { get; } = Guid.NewGuid();
+        public static Guid TimurInvitationId { get; } = Guid.NewGuid();
+        public static Guid AdminInvitationId { get; } = Guid.NewGuid();
 
         private static List<TeamInvitation> CreateTeamInvitations()
         {

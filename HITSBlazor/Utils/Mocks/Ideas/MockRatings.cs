@@ -7,9 +7,9 @@ namespace HITSBlazor.Utils.Mocks.Ideas
     {
         private static readonly List<Rating> _ratings = CreateRatings();
 
-        public static string Idea1Id { get; } = Guid.NewGuid().ToString();
-        public static string Idea2Id { get; } = Guid.NewGuid().ToString();
-        public static string Idea3Id { get; } = Guid.NewGuid().ToString();
+        public static Guid Idea1Id { get; } = Guid.NewGuid();
+        public static Guid Idea2Id { get; } = Guid.NewGuid();
+        public static Guid Idea3Id { get; } = Guid.NewGuid();
 
         private static List<Rating> CreateRatings()
         {

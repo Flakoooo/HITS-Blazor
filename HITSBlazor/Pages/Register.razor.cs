@@ -1,5 +1,6 @@
 ﻿using HITSBlazor.Models.Auth.Requests;
-using HITSBlazor.Services;
+using HITSBlazor.Services.Service.Class;
+using HITSBlazor.Services.Service.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
 using System.Text.RegularExpressions;
