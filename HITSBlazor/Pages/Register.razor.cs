@@ -2,7 +2,6 @@
 using HITSBlazor.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
-using System.Text;
 using System.Text.RegularExpressions;
 
 namespace HITSBlazor.Pages
@@ -16,6 +15,9 @@ namespace HITSBlazor.Pages
 
         private readonly string telephonePattern = @"^\+7\s\(\d{3}\)\s\d{3}-\d{2}-\d{2}$";
         private readonly string namePattern = @"^[А-ЯЁA-Z][а-яёa-z]+(-[А-ЯЁA-Z][а-яёa-z]+)?$";
+
+        private string phoneInput = "";
+        private string rawDigits = "";
 
         [Parameter]
         [SupplyParameterFromQuery(Name = "email")]
@@ -42,16 +44,39 @@ namespace HITSBlazor.Pages
                 registerRequest.Email = Email;
         }
 
-        private void HandleEmailInput(ChangeEventArgs e)
+        private async Task HandlePhoneInput(string value)
         {
-            if (!IsEmailDisabled)
-                registerRequest.Email = e.Value?.ToString() ?? "";
-        }
+            if (value.Length < phoneInput.Length && phoneInput.Last() != '(')
+            {
+                rawDigits = rawDigits[..^1];
+                var newValue = phoneInput[..^1];
 
-        private void HandlePhoneInput(ChangeEventArgs e)
-        {
-            var value = e.Value?.ToString() ?? "";
-            registerRequest.Telephone = value;
+                if (newValue.Last() == '-')
+                    registerRequest.Telephone = phoneInput = newValue[..^1];
+                else if (newValue.Last() == ' ')
+                    registerRequest.Telephone = phoneInput = newValue[..^2];
+                else
+                    registerRequest.Telephone = phoneInput = newValue;
+            }
+            else if (value.Length > phoneInput.Length)
+            {
+                var digits = new string([.. value.Where(char.IsDigit)]);
+
+                var result = "+";
+                for (int i = 0; i < digits.Length; ++i)
+                {
+                    _ = i switch
+                    {
+                        0 => result += "7 (",
+                        4 => result += $") {digits[i]}",
+                        7 or 9 => result += $"-{digits[i]}",
+                        _ => result += digits[i]
+                    };
+                }
+
+                rawDigits = digits;
+                registerRequest.Telephone = phoneInput = result;
+            }
         }
 
         private async Task HandleRegister()
@@ -62,7 +87,6 @@ namespace HITSBlazor.Pages
 
             try
             {
-                // 1. Проверка заполнения обязательных полей
                 var validationErrors = new List<string>();
 
                 if (string.IsNullOrWhiteSpace(registerRequest.Email))
@@ -82,13 +106,17 @@ namespace HITSBlazor.Pages
 
                 if (validationErrors.Count > 0)
                 {
-                    var errorMessage = "Заполните " + string.Join(", ", validationErrors);
+                    var errorMessage = string.Empty;
+                    if (validationErrors.Count > 2)
+                        errorMessage = "Заполните все поля";
+                    else
+                        errorMessage = $"Заполните {validationErrors[0]}" + (validationErrors.Count == 2 ? $" и {validationErrors[1]}" : string.Empty);
+
                     NotificationService.ShowError(errorMessage);
                     isLoading = false;
                     return;
                 }
 
-                // 2. Валидация email
                 var email = registerRequest.Email.Trim();
                 var atIndex = email.IndexOf('@');
 
@@ -99,7 +127,6 @@ namespace HITSBlazor.Pages
                     return;
                 }
 
-                // 3. Валидация имени и фамилии
                 if (!Regex.IsMatch(registerRequest.FirstName, namePattern))
                 {
                     NotificationService.ShowError("Имя должно начинаться с заглавной буквы и содержать только буквы (и дефис для двойных имён)");
@@ -114,7 +141,6 @@ namespace HITSBlazor.Pages
                     return;
                 }
 
-                // 4. Валидация телефона (формат +7 (XXX) XXX-XX-XX)
                 if (!Regex.IsMatch(registerRequest.Telephone, telephonePattern))
                 {
                     NotificationService.ShowError("Неверный формат телефона. Введите номер в формате: +7 (XXX) XXX-XX-XX");
@@ -122,7 +148,6 @@ namespace HITSBlazor.Pages
                     return;
                 }
 
-                // 5. Валидация пароля
                 if (registerRequest.Password.Length < 8)
                 {
                     NotificationService.ShowError("Длина пароля не может быть меньше 8 символов");
@@ -130,7 +155,6 @@ namespace HITSBlazor.Pages
                     return;
                 }
 
-                // 6. Отправка запроса
                 var result = await AuthService.RegisterAsync(registerRequest);
 
                 if (result.IsSuccess)
