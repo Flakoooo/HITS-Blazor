@@ -3,16 +3,14 @@ using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using HITSBlazor.Services.Service.Interfaces;
 using HITSBlazor.Services.Service.Class;
-using Blazored.LocalStorage;
 using System.Net.Http.Headers;
-
+using System.Net.Mime;
 
 #if DEBUG
 using HITSBlazor.Services.Service.Mock;
 #else
 using HITSBlazor.Services.Api;
 #endif
-using HITSBlazor.Utils;
 
 namespace HITSBlazor
 {
@@ -21,42 +19,36 @@ namespace HITSBlazor
         public static async Task Main(string[] args)
         {
 #if DEBUG
-            const string API_BASE_URL = "http://localhost:8080/api";
+            const string API_BASE_URL = "http://localhost:8080";
 #else
-            const string API_BASE_URL = "http://localhost:8080/api";
+            const string API_BASE_URL = "http://localhost:8080";
 #endif
 
             var builder = WebAssemblyHostBuilder.CreateDefault(args);
             builder.RootComponents.Add<App>("#app");
             builder.RootComponents.Add<HeadOutlet>("head::after");
 
-            builder.Services.AddBlazoredLocalStorage();
-
-            builder.Services.AddScoped<AuthHeaderHandler>();
-
-            builder.Services.AddHttpClient("ApiClient", client =>
+            builder.Services.AddHttpClient("HITSClient", client =>
             {
                 client.BaseAddress = new Uri(API_BASE_URL);
                 client.DefaultRequestHeaders.Accept.Add(
-                    new MediaTypeWithQualityHeaderValue("application/json"));
-            })
-            .AddHttpMessageHandler<AuthHeaderHandler>();
-            builder.Services.AddScoped(sp =>
-            {
-                var factory = sp.GetRequiredService<IHttpClientFactory>();
-                return factory.CreateClient("ApiClient");
+                    new MediaTypeWithQualityHeaderValue(MediaTypeNames.Application.Json));
             });
+
+            builder.Services.AddScoped(sp => 
+                sp.GetRequiredService<IHttpClientFactory>().CreateClient("HITSClient")
+            );
+
+            // Utils
+            builder.Services.AddScoped<NotificationService>();
 
             // Auth
 #if DEBUG
             builder.Services.AddScoped<IAuthService, MockAuthService>();
 #else
-            builder.Services.AddScoped<IAuthService, AuthService>();
             builder.Services.AddScoped<AuthApi>();
+            builder.Services.AddScoped<IAuthService, AuthService>();
 #endif
-            // Utils
-            builder.Services.AddScoped<ICookieService, CookieService>();
-            builder.Services.AddScoped<NotificationService>();
 
 
             builder.Services.AddScoped<CustomAuthenticationStateProvider>();

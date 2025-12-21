@@ -1,10 +1,8 @@
 ﻿using HITSBlazor.Models.Auth.Requests;
 using HITSBlazor.Services.Service.Class;
 using HITSBlazor.Services.Service.Interfaces;
-using HITSBlazor.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
-using System.Net;
 
 namespace HITSBlazor.Pages
 {
@@ -27,7 +25,7 @@ namespace HITSBlazor.Pages
         protected override void OnInitialized()
         {
             if (AuthService.IsAuthenticated)
-                Navigation.NavigateTo("/", true);
+                Navigation.NavigateTo("/");
         }
 
         private async Task HandleLogin()
@@ -79,7 +77,7 @@ namespace HITSBlazor.Pages
                 if (result.IsSuccess)
                 {
                     loginRequest = new LoginRequest();
-                    Navigation.NavigateTo("/", true);
+                    Navigation.NavigateTo("/");
                 }
                 else
                 {

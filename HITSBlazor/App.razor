@@ -11,7 +11,7 @@
                 <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
                     <NotAuthorized>
                         @{
-                            Navigation.NavigateTo($"login?returnUrl={Navigation.ToBaseRelativePath(Navigation.Uri)}", true);
+                            Navigation.NavigateTo($"login?returnUrl={Navigation.ToBaseRelativePath(Navigation.Uri)}");
                         }
                     </NotAuthorized>
                     <Authorizing>

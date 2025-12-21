@@ -17,23 +17,13 @@ namespace HITSBlazor.Services.Service.Mock
 
         public event Action? OnAuthStateChanged;
 
-        public User? CurrentUser { get; private set; }
-        public bool IsAuthenticated => CurrentUser != null;
+        public bool IsAuthenticated { get; private set; }
 
         public async Task InitializeAsync()
         {
             var token = await GetTokenAsync();
-            if (!string.IsNullOrEmpty(token))
-            {
-                if (!Guid.TryParse(token.Skip(_mockTokenTemplate.Length).ToString(), out Guid guid))
-                    CurrentUser = null;
-                else
-                    CurrentUser = MockUsers.GetUserById(guid);
-            }
-            else
-            {
-                CurrentUser = null;
-            }
+            IsAuthenticated = !string.IsNullOrEmpty(token) 
+                && Guid.TryParse(token.Skip(_mockTokenTemplate.Length).ToString(), out var _);
 
             OnAuthStateChanged?.Invoke();
         }
@@ -52,13 +42,13 @@ namespace HITSBlazor.Services.Service.Mock
 
                 await SaveTokenAsync(mockToken);
 
-                CurrentUser = user;
+                IsAuthenticated = true;
 
                 await SaveUserInfoAsync(user);
 
                 OnAuthStateChanged?.Invoke();
 
-                return LoginResponse.Success(mockToken, user);
+                return LoginResponse.Success();
             }
             catch (Exception ex)
             {
@@ -70,9 +60,9 @@ namespace HITSBlazor.Services.Service.Mock
         {
             await RemoveTokenAsync();
             await RemoveUserInfoAsync();
-            CurrentUser = null;
+            IsAuthenticated = false;
             OnAuthStateChanged?.Invoke();
-            _navigationManager.NavigateTo("/login", true);
+            _navigationManager.NavigateTo("/login");
         }
 
         public async Task<RegisterResponse> RegisterAsync(RegisterRequest request, string? invitationCode = null)
@@ -144,11 +134,6 @@ namespace HITSBlazor.Services.Service.Mock
         private async Task RemoveUserInfoAsync()
         {
             await _jsRuntime.InvokeVoidAsync("localStorage.removeItem", "userInfo");
-        }
-
-        public Task<string?> GetAccessTokenAsync(bool forceRefresh = false)
-        {
-            throw new NotImplementedException();
         }
     }
 }

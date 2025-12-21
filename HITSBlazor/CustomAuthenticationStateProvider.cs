@@ -14,32 +14,23 @@ namespace HITSBlazor
             _authService.OnAuthStateChanged += AuthStateChanged;
         }
 
-        public override async Task<AuthenticationState> GetAuthenticationStateAsync()
+        public override Task<AuthenticationState> GetAuthenticationStateAsync()
         {
-            await Task.Yield();
-
-            var user = _authService.CurrentUser;
-            if (user != null)
+            if (_authService.IsAuthenticated)
             {
-                var claims = new List<Claim>
+                var claims = new[]
                 {
-                    new(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                    new(ClaimTypes.Name, $"{user.FirstName} {user.LastName}"),
-                    new(ClaimTypes.Email, user.Email)
+                    new Claim(ClaimTypes.Name, "Authenticated User"),
+                    new Claim(ClaimTypes.Role, "User")
                 };
 
-                foreach (var role in user.Roles)
-                {
-                    claims.Add(new Claim(ClaimTypes.Role, role.ToString()));
-                }
-
-                var identity = new ClaimsIdentity(claims, "CustomAuth");
+                var identity = new ClaimsIdentity(claims, "CookieAuth");
                 var principal = new ClaimsPrincipal(identity);
 
-                return new AuthenticationState(principal);
+                return Task.FromResult(new AuthenticationState(principal));
             }
 
-            return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
+            return Task.FromResult(new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity())));
         }
 
         private void AuthStateChanged()
