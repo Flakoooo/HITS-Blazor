@@ -1,117 +1,84 @@
 ﻿using HITSBlazor.Models.Auth.Requests;
-using HITSBlazor.Models.Users.Entities;
 using HITSBlazor.Utils;
 using System.Net;
 using System.Net.Http.Json;
-using System.Text.Json;
 
 namespace HITSBlazor.Services.Api
 {
-    public class AuthApi
+    public class AuthApi(
+        IHttpClientFactory httpClientFactory,
+        ICookieService cookieService,
+        ILogger<AuthApi> logger)
     {
-        private readonly HttpClient _httpClient;
-        private readonly ICookieService _cookieService;
-        private readonly ILogger<AuthApi> _logger;
-        private readonly string _authPath;
+        private readonly HttpClient _httpClient = httpClientFactory.CreateClient("ApiClient");
+        private readonly ICookieService _cookieService = cookieService;
+        private readonly ILogger<AuthApi> _logger = logger;
+        private readonly string _authPath = "/auth";
 
-        public AuthApi(
-            HttpClient httpClient,
-            AppSettings settings,
-            ICookieService cookieService,
-            ILogger<AuthApi> logger)
-        {
-            _httpClient = httpClient;
-            _cookieService = cookieService;
-            _logger = logger;
-            _authPath = $"{settings.ApiBaseUrl}/auth";
-
-            //_httpClient.DefaultRequestHeaders.Add("X-Requested-With", "XMLHttpRequest");
-        }
-
-        public async Task<ApiResponse<User>> LoginAsync(LoginRequest request)
+        public async Task<ApiResponse<string>> LoginAsync(LoginRequest request)
         {
             try
             {
                 _logger.LogInformation("Sending login request to {Path}/login", _authPath);
 
-                var response = await _httpClient.PostAsJsonAsync($"{_authPath}/login", request);
+                await _cookieService.DeleteCookie("refresh_token");
 
+                var response = await _httpClient.PostAsJsonAsync($"{_authPath}/login", request);
                 if (response.IsSuccessStatusCode)
                 {
-                    bool hasCookies = response.Headers.TryGetValues("Set-Cookie", out var _);
-                    if (!hasCookies)
-                    {
-                        _logger.LogWarning("No Set-Cookie header in response");
-                        return ApiResponse<User>.Failure(
-                            "Не удалось установить токен аутентификации",
-                            HttpStatusCode.Unauthorized
-                        );
-                    }
-
-                    var token = await _cookieService.GetCookieAsync("access_token");
-                    if (string.IsNullOrEmpty(token))
+                    var refreshToken = await _cookieService.GetCookieAsync("refresh_token");
+                    if (string.IsNullOrEmpty(refreshToken))
                     {
                         await Task.Delay(100);
-                        token = await _cookieService.GetCookieAsync("access_token");
+                        refreshToken = await _cookieService.GetCookieAsync("refresh_token");
                     }
 
-                    if (string.IsNullOrEmpty(token))
+                    if (string.IsNullOrEmpty(refreshToken))
                     {
-                        _logger.LogWarning("Access token cookie not found after login");
-                        return ApiResponse<User>.Failure(
-                            "Токен аутентификации не найден",
+                        _logger.LogWarning("Refresh token cookie not found after login");
+                        return ApiResponse<string>.Failure(
+                            "Токен обновления не найден",
                             HttpStatusCode.Unauthorized
                         );
                     }
 
-                    var user = JwtHelper.DecodeJwtPayload(token);
-                    if (user == null)
+                    string? accessToken = null;
+                    if (response.Headers.TryGetValues("Authorization", out var authHeaders))
                     {
-                        _logger.LogWarning("Failed to decode JWT token");
-                        return ApiResponse<User>.Failure(
-                            "Неверный формат токена",
+                        var authHeader = authHeaders.FirstOrDefault();
+                        if (!string.IsNullOrEmpty(authHeader) && authHeader.StartsWith("Bearer "))
+                            accessToken = authHeader["Bearer ".Length..];
+                    }
+
+                    if (string.IsNullOrEmpty(accessToken))
+                    {
+                        _logger.LogWarning("Access token not found in response");
+                        return ApiResponse<string>.Failure(
+                            "Токен доступа не найден",
                             HttpStatusCode.Unauthorized
                         );
                     }
 
-                    _logger.LogInformation("Login successful for user {Email}", user.Email);
-                    return ApiResponse<User>.Success(user);
+                    _logger.LogInformation("Login successful for user {Email}", request.Email);
+                    return ApiResponse<string>.Success(accessToken);
                 }
 
-                var content = await response.Content.ReadAsStringAsync();
-                string errorMessage;
-
-                try
+                string errorMessage = response.StatusCode switch
                 {
-                    var json = JsonDocument.Parse(content);
-                    if (json.RootElement.TryGetProperty("message", out var message))
-                    {
-                        errorMessage = message.GetString() ?? "Ошибка при входе";
-                    }
-                    else if (json.RootElement.TryGetProperty("error", out var error))
-                    {
-                        errorMessage = error.GetString() ?? "Ошибка при входе";
-                    }
-                    else
-                    {
-                        errorMessage = content.Length > 100 ? string.Concat(content.AsSpan(0, 100), "...") : content;
-                    }
-                }
-                catch
-                {
-                    errorMessage = response.StatusCode switch
-                    {
-                        HttpStatusCode.Unauthorized => "Неверный email или пароль",
-                        HttpStatusCode.BadRequest => "Неверный формат запроса",
-                        HttpStatusCode.NotFound => "Сервис авторизации недоступен",
-                        _ => $"Ошибка сервера: {response.StatusCode}"
-                    };
-                }
+                    HttpStatusCode.Unauthorized => "Неверный email или пароль",
+                    HttpStatusCode.UnprocessableContent => "Некорректный email или пароль",
+                    HttpStatusCode.BadRequest => "Неверный формат запроса",
+                    HttpStatusCode.NotFound => "Сервис авторизации недоступен",
+                    HttpStatusCode.InternalServerError => "Произошла ошибка сервера, попробуйте позже",
+                    _ => $"Ошибка сервера: {response.StatusCode}"
+                };
 
-                _logger.LogWarning("Login failed with status {StatusCode}: {Error}",
-                    response.StatusCode, errorMessage);
+                _logger.LogWarning(
+                    "Login failed with status {StatusCode}: {Error}",
+                    response.StatusCode, errorMessage
+                );
 
-                return ApiResponse<User>.Failure(
+                return ApiResponse<string>.Failure(
                     errorMessage,
                     response.StatusCode
                 );
@@ -119,7 +86,7 @@ namespace HITSBlazor.Services.Api
             catch (HttpRequestException ex)
             {
                 _logger.LogError(ex, "Network error during login");
-                return ApiResponse<User>.Failure(
+                return ApiResponse<string>.Failure(
                     $"Ошибка сети: {ex.Message}",
                     HttpStatusCode.ServiceUnavailable
                 );
@@ -127,51 +94,60 @@ namespace HITSBlazor.Services.Api
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Unexpected error during login");
-                return ApiResponse<User>.Failure(
+                return ApiResponse<string>.Failure(
                     $"Произошла ошибка: {ex.Message}",
                     HttpStatusCode.InternalServerError
                 );
             }
         }
 
-        public async Task<ApiResponse<User>> RefreshTokenAsync()
+        public async Task<ApiResponse<string>> RefreshTokenAsync()
         {
             try
             {
                 _logger.LogInformation("Refreshing token...");
 
                 var response = await _httpClient.PostAsync($"{_authPath}/refresh", null);
-
                 if (response.IsSuccessStatusCode)
                 {
                     _logger.LogInformation("Token refresh successful");
 
-                    await Task.Delay(100);
-
-                    var token = await _cookieService.GetCookieAsync("access_token");
-                    if (!string.IsNullOrEmpty(token))
+                    string? newAccessToken = null;
+                    if (response.Headers.TryGetValues("Authorization", out var authHeaders))
                     {
-                        var user = JwtHelper.DecodeJwtPayload(token);
-                        return user != null
-                            ? ApiResponse<User>.Success(user)
-                            : ApiResponse<User>.Failure("Не удалось декодировать токен");
+                        var authHeader = authHeaders.FirstOrDefault();
+                        if (!string.IsNullOrEmpty(authHeader) && authHeader.StartsWith("Bearer "))
+                            newAccessToken = authHeader["Bearer ".Length..];
                     }
 
-                    return ApiResponse<User>.Failure("Токен не найден после обновления");
+                    if (string.IsNullOrEmpty(newAccessToken))
+                        return ApiResponse<string>.Failure("Новый токен доступа не найден в ответе");
+
+                    return ApiResponse<string>.Success(newAccessToken);
                 }
 
-                var error = await response.Content.ReadAsStringAsync();
-                _logger.LogWarning("Token refresh failed: {Error}", error);
+                string errorMessage = response.StatusCode switch
+                {
+                    HttpStatusCode.Unauthorized => "Не удалось обновить токен. Требуется повторный вход",
+                    _ => $"Ошибка сервера: {response.StatusCode}"
+                };
 
-                return ApiResponse<User>.Failure(
-                    "Не удалось обновить токен",
+                _logger.LogWarning(
+                    "Token refresh failed with status {StatusCode}: {Error}",
+                    response.StatusCode, errorMessage
+                );
+
+                await _cookieService.DeleteCookie("refresh_token");
+
+                return ApiResponse<string>.Failure(
+                    "Не удалось обновить токен. Требуется повторный вход",
                     response.StatusCode
                 );
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error during token refresh");
-                return ApiResponse<User>.Failure($"Ошибка: {ex.Message}");
+                return ApiResponse<string>.Failure($"Ошибка: {ex.Message}");
             }
         }
     }

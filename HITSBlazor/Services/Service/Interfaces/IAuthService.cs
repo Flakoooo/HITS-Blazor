@@ -12,9 +12,10 @@ namespace HITSBlazor.Services.Service.Interfaces
 
         Task InitializeAsync();
         Task<LoginResponse> LoginAsync(LoginRequest request);
+        Task LogoutAsync();
+        Task<string?> GetAccessTokenAsync(bool forceRefresh = false);
         Task<RecoveryResponse> RequestPasswordRecoveryAsync(string email);
         Task<ResetPasswordResponse> ResetPasswordAsync(ResetPasswordRequest resetPassword);
         Task<RegisterResponse> RegisterAsync(RegisterRequest request, string? invitationCode = null);
-        Task LogoutAsync();
     }
 }

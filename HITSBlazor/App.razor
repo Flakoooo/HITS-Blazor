@@ -1,27 +1,58 @@
 ﻿@using Microsoft.AspNetCore.Components.Authorization
+@using HITSBlazor.Services.Service.Interfaces
 @inject NavigationManager Navigation
+@inject IAuthService AuthService
 
 <CascadingAuthenticationState>
-    <Router AppAssembly="@typeof(App).Assembly">
-        <Found Context="routeData">
-            <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
-                <NotAuthorized>
-                    @{
-                        Navigation.NavigateTo($"login?returnUrl={Navigation.ToBaseRelativePath(Navigation.Uri)}", true);
-                    }
-                </NotAuthorized>
-                <Authorizing>
-                    <div>Проверка авторизации...</div>
-                </Authorizing>
-            </AuthorizeRouteView>
-        </Found>
-        <NotFound>
-            <LayoutView Layout="@typeof(MainLayout)">
-                <div class="text-center p-5">
-                    <h1>404</h1>
-                    <p>Страница не найдена</p>
-                </div>
-            </LayoutView>
-        </NotFound>
-    </Router>
+    @if (_isInitialized)
+    {
+        <Router AppAssembly="@typeof(App).Assembly">
+            <Found Context="routeData">
+                <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
+                    <NotAuthorized>
+                        @{
+                            Navigation.NavigateTo($"login?returnUrl={Navigation.ToBaseRelativePath(Navigation.Uri)}", true);
+                        }
+                    </NotAuthorized>
+                    <Authorizing>
+                        <div class="loading-container">
+                            <p>Проверка авторизации...</p>
+                        </div>
+                    </Authorizing>
+                </AuthorizeRouteView>
+            </Found>
+            <NotFound>
+                <LayoutView Layout="@typeof(MainLayout)">
+                    <div class="text-center p-5">
+                        <h1>404</h1>
+                        <p>Страница не найдена</p>
+                    </div>
+                </LayoutView>
+            </NotFound>
+        </Router>
+    }
+    else
+    {
+        <div class="loading-container">
+            <p>Инициализация приложения...</p>
+        </div>
+    }
 </CascadingAuthenticationState>
+
+@code {
+    private bool _isInitialized = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            await AuthService.InitializeAsync();
+            _isInitialized = true;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Ошибка инициализации: {ex.Message}");
+            _isInitialized = true;
+        }
+    }
+}

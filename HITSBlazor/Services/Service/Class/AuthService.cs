@@ -1,14 +1,11 @@
-﻿using HITSBlazor.Models.Auth.Requests;
+﻿using Blazored.LocalStorage;
+using HITSBlazor.Models.Auth.Requests;
 using HITSBlazor.Models.Auth.Response;
 using HITSBlazor.Models.Users.Entities;
-using HITSBlazor.Models.Users.Enums;
 using HITSBlazor.Services.Api;
 using HITSBlazor.Services.Service.Interfaces;
 using HITSBlazor.Utils;
 using Microsoft.AspNetCore.Components;
-using Microsoft.IdentityModel.JsonWebTokens;
-using Microsoft.JSInterop;
-using System.Text.Json;
 
 namespace HITSBlazor.Services.Service.Class
 {
@@ -16,18 +13,21 @@ namespace HITSBlazor.Services.Service.Class
         ILogger<AuthService> logger,
         ICookieService cookieService,
         AuthApi authApi, 
-        NavigationManager navigationManager
+        NavigationManager navigationManager,
+        ILocalStorageService localStorage
     ) : IAuthService
     {
         private readonly ILogger<AuthService> _logger = logger;
         private readonly AuthApi _authApi = authApi;
         private readonly ICookieService _cookieService = cookieService;
         private readonly NavigationManager _navigationManager = navigationManager;
+        private readonly ILocalStorageService _localStorage = localStorage;
 
         public event Action? OnAuthStateChanged;
         public User? CurrentUser { get; private set; }
         public bool IsAuthenticated => CurrentUser != null;
-
+        private string? _accessToken;
+        private readonly SemaphoreSlim _refreshLock = new(1, 1);
 
         public async Task InitializeAsync()
         {
@@ -35,56 +35,30 @@ namespace HITSBlazor.Services.Service.Class
             {
                 _logger.LogInformation("Initializing auth service...");
 
-                // Проверяем наличие access токена
-                var accessToken = await _cookieService.GetCookieAsync("access_token");
-                if (string.IsNullOrEmpty(accessToken))
+                _accessToken = await _localStorage.GetItemAsStringAsync("access_token");
+                if (string.IsNullOrEmpty(_accessToken))
                 {
                     _logger.LogInformation("No access token found");
                     await SetCurrentUserAsync(null);
                     return;
                 }
 
-                _logger.LogInformation("Access token found, checking expiration...");
-
-                // Проверяем, не истек ли токен
-                if (JwtHelper.IsTokenExpired(accessToken))
+                if (JwtHelper.IsTokenExpired(_accessToken))
                 {
-                    _logger.LogInformation("Access token expired, attempting refresh...");
+                    _logger.LogInformation("Access token expired on initialization");
 
-                    // Пытаемся обновить токен
-                    var refreshResult = await _authApi.RefreshTokenAsync();
-
-                    if (!refreshResult.IsSuccess)
-                    {
-                        _logger.LogWarning("Token refresh failed: {Error}", refreshResult.Message);
-                        await SetCurrentUserAsync(null);
-                        return;
-                    }
-
-                    _logger.LogInformation("Token refreshed successfully");
-
-                    // Получаем новый токен из куки
-                    accessToken = await _cookieService.GetCookieAsync("access_token");
+                    var newToken = await GetAccessTokenAsync(forceRefresh: true);
+                    if (string.IsNullOrEmpty(newToken)) await SetCurrentUserAsync(null);
+                    return;
                 }
 
-                if (!string.IsNullOrEmpty(accessToken))
+                var user = JwtHelper.DecodeJwtPayload(_accessToken);
+                await SetCurrentUserAsync(user);
+
+                if (user != null)
                 {
-                    _logger.LogInformation("Decoding JWT token...");
-                    CurrentUser = JwtHelper.DecodeJwtPayload(accessToken);
-
-                    if (CurrentUser != null)
-                    {
-                        _logger.LogInformation("User initialized: {Email}", CurrentUser.Email);
-                        OnAuthStateChanged?.Invoke();
-                        return;
-                    }
-                    else
-                    {
-                        _logger.LogWarning("Failed to decode JWT token");
-                    }
+                    _logger.LogInformation("User initialized: {Email}", user.Email);
                 }
-
-                await SetCurrentUserAsync(null);
             }
             catch (Exception ex)
             {
@@ -100,25 +74,18 @@ namespace HITSBlazor.Services.Service.Class
                 _logger.LogInformation("Attempting login for email: {Email}", request.Email);
 
                 var result = await _authApi.LoginAsync(request);
-
-                if (result.IsSuccess)
+                if (result.IsSuccess && !string.IsNullOrWhiteSpace(result.Response))
                 {
-                    var token = await _cookieService.GetCookieAsync("access_token");
+                    _accessToken = result.Response;
+                    await _localStorage.SetItemAsStringAsync("access_token", _accessToken);
 
-                    if (!string.IsNullOrEmpty(token))
+                    CurrentUser = JwtHelper.DecodeJwtPayload(_accessToken);
+                    if (CurrentUser != null)
                     {
-                        CurrentUser = JwtHelper.DecodeJwtPayload(token);
-
-                        if (CurrentUser != null)
-                        {
-                            _logger.LogInformation("Login successful for user: {Email}", CurrentUser.Email);
-                            OnAuthStateChanged?.Invoke();
-                            return LoginResponse.Success("Успешный вход", CurrentUser);
-                        }
+                        _logger.LogInformation("Login successful for user: {Email}", CurrentUser.Email);
+                        OnAuthStateChanged?.Invoke();
+                        return LoginResponse.Success("Успешный вход", CurrentUser);
                     }
-
-                    _logger.LogWarning("Token not found in cookies after login");
-                    return LoginResponse.Failure("Не удалось получить токен аутентификации");
                 }
 
                 _logger.LogWarning("Login failed: {Error}", result.Message);
@@ -140,37 +107,83 @@ namespace HITSBlazor.Services.Service.Class
         {
             try
             {
-                _logger.LogInformation("Logging out user");
+                _logger.LogInformation("Logging out user...");
 
-                await _cookieService.DeleteCookie("access_token");
+                await _localStorage.RemoveItemAsync("access_token");
                 await _cookieService.DeleteCookie("refresh_token");
+
+                await SetCurrentUserAsync(null);
+
+                _navigationManager.NavigateTo("/login", true);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error during logout");
-            }
-            finally
-            {
-                await SetCurrentUserAsync(null);
-                _navigationManager.NavigateTo("/login", true);
             }
         }
 
         private async Task SetCurrentUserAsync(User? user)
         {
             CurrentUser = user;
+            _accessToken = null;
             OnAuthStateChanged?.Invoke();
 
             if (user == null)
             {
-                await _cookieService.DeleteCookie("access_token");
+                await _localStorage.RemoveItemAsync("access_token");
                 await _cookieService.DeleteCookie("refresh_token");
             }
         }
 
-        public async Task<string?> GetAccessTokenAsync()
+        public async Task<string?> GetAccessTokenAsync(bool forceRefresh = false)
         {
-            return await _cookieService.GetCookieAsync("access_token");
+            try
+            {
+                if (!forceRefresh && !string.IsNullOrEmpty(_accessToken) &&
+                    !JwtHelper.IsTokenExpired(_accessToken)) return _accessToken;
+
+                await _refreshLock.WaitAsync();
+
+                try
+                {
+                    if (!forceRefresh && !string.IsNullOrEmpty(_accessToken) &&
+                        !JwtHelper.IsTokenExpired(_accessToken)) return _accessToken;
+
+                    _logger.LogInformation("Attempting to refresh access token...");
+
+                    var refreshResult = await _authApi.RefreshTokenAsync();
+                    if (refreshResult.IsSuccess && !string.IsNullOrEmpty(refreshResult.Response))
+                    {
+                        _accessToken = refreshResult.Response;
+                        await _localStorage.SetItemAsStringAsync("access_token", _accessToken);
+
+                        var user = JwtHelper.DecodeJwtPayload(_accessToken);
+                        if (user != null)
+                        {
+                            CurrentUser = user;
+                            OnAuthStateChanged?.Invoke();
+                        }
+
+                        return _accessToken;
+                    }
+                    else
+                    {
+                        _logger.LogWarning("Refresh token failed: {Error}", refreshResult.Message);
+
+                        await LogoutAsync();
+                        return null;
+                    }
+                }
+                finally
+                {
+                    _refreshLock.Release();
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting access token");
+                return null;
+            }
         }
 
         public Task<RecoveryResponse> RequestPasswordRecoveryAsync(string email)

@@ -88,10 +88,6 @@ namespace HITSBlazor.Pages
                     );
                 }
             }
-            catch (HttpRequestException ex)
-            {
-                NotificationService.ShowError($"Ошибка сети: {ex.Message}");
-            }
             catch (Exception ex)
             {
                 NotificationService.ShowError($"Произошла ошибка: {ex.Message}");

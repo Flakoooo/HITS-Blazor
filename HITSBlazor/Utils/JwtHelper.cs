@@ -65,5 +65,25 @@ namespace HITSBlazor.Utils
                 return true;
             }
         }
+
+        public static DateTime GetTokenExpiration(string jwt)
+        {
+            if (string.IsNullOrEmpty(jwt))
+                return DateTime.MinValue;
+
+            try
+            {
+                var handler = new JsonWebTokenHandler();
+                if (!handler.CanReadToken(jwt))
+                    return DateTime.MinValue;
+
+                var token = handler.ReadJsonWebToken(jwt);
+                return token.ValidTo;
+            }
+            catch
+            {
+                return DateTime.MinValue;
+            }
+        }
     }
 }

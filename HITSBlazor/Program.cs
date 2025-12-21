@@ -3,6 +3,10 @@ using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using HITSBlazor.Services.Service.Interfaces;
 using HITSBlazor.Services.Service.Class;
+using Blazored.LocalStorage;
+using System.Net.Http.Headers;
+
+
 #if DEBUG
 using HITSBlazor.Services.Service.Mock;
 #else
@@ -17,26 +21,30 @@ namespace HITSBlazor
         public static async Task Main(string[] args)
         {
 #if DEBUG
-            const bool USE_MOCK_DATA = true;
-            const string API_BASE_URL = "https://localhost:5001";
+            const string API_BASE_URL = "http://localhost:8080/api";
 #else
-            const bool USE_MOCK_DATA = false; 
-            const string API_BASE_URL = "https://api.yourserver.com";
+            const string API_BASE_URL = "http://localhost:8080/api";
 #endif
 
             var builder = WebAssemblyHostBuilder.CreateDefault(args);
             builder.RootComponents.Add<App>("#app");
             builder.RootComponents.Add<HeadOutlet>("head::after");
 
-            builder.Services.AddSingleton(new AppSettings
-            {
-                UseMockData = USE_MOCK_DATA,
-                ApiBaseUrl = API_BASE_URL,
-                Environment = USE_MOCK_DATA ? "Development" : "Production"
-            });
+            builder.Services.AddBlazoredLocalStorage();
 
-            builder.Services.AddScoped(sp => new HttpClient { 
-                BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) 
+            builder.Services.AddScoped<AuthHeaderHandler>();
+
+            builder.Services.AddHttpClient("ApiClient", client =>
+            {
+                client.BaseAddress = new Uri(API_BASE_URL);
+                client.DefaultRequestHeaders.Accept.Add(
+                    new MediaTypeWithQualityHeaderValue("application/json"));
+            })
+            .AddHttpMessageHandler<AuthHeaderHandler>();
+            builder.Services.AddScoped(sp =>
+            {
+                var factory = sp.GetRequiredService<IHttpClientFactory>();
+                return factory.CreateClient("ApiClient");
             });
 
             // Auth

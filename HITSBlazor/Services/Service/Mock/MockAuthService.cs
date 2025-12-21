@@ -5,7 +5,6 @@ using HITSBlazor.Services.Service.Interfaces;
 using HITSBlazor.Utils.Mocks.Users;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
-using System.Linq;
 using System.Text.Json;
 
 namespace HITSBlazor.Services.Service.Mock
@@ -145,6 +144,11 @@ namespace HITSBlazor.Services.Service.Mock
         private async Task RemoveUserInfoAsync()
         {
             await _jsRuntime.InvokeVoidAsync("localStorage.removeItem", "userInfo");
+        }
+
+        public Task<string?> GetAccessTokenAsync(bool forceRefresh = false)
+        {
+            throw new NotImplementedException();
         }
     }
 }

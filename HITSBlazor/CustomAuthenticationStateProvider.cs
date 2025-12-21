@@ -16,17 +16,22 @@ namespace HITSBlazor
 
         public override async Task<AuthenticationState> GetAuthenticationStateAsync()
         {
-            var user = _authService.CurrentUser;
+            await Task.Yield();
 
+            var user = _authService.CurrentUser;
             if (user != null)
             {
-                var claims = new[]
+                var claims = new List<Claim>
                 {
-                    new Claim(ClaimTypes.NameIdentifier, $"{user.Id}"),
-                    new Claim(ClaimTypes.Name, $"{user.FirstName} {user.LastName}"),
-                    new Claim(ClaimTypes.Email, user.Email),
-                    new Claim(ClaimTypes.Role, $"{user.Role}")
+                    new(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                    new(ClaimTypes.Name, $"{user.FirstName} {user.LastName}"),
+                    new(ClaimTypes.Email, user.Email)
                 };
+
+                foreach (var role in user.Roles)
+                {
+                    claims.Add(new Claim(ClaimTypes.Role, role.ToString()));
+                }
 
                 var identity = new ClaimsIdentity(claims, "CustomAuth");
                 var principal = new ClaimsPrincipal(identity);
