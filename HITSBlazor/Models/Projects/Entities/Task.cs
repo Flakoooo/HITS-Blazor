@@ -6,7 +6,7 @@ namespace HITSBlazor.Models.Projects.Entities
     public class Task
     {
         public Guid Id { get; set; }
-        public Guid SprintId { get; set; } // nullable
+        public Guid? SprintId { get; set; }
         public Guid ProjectId { get; set; }
         public int? Position { get; set; }
         public string Name { get; set; } = string.Empty;

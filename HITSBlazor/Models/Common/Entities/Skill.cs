@@ -8,8 +8,8 @@ namespace HITSBlazor.Models.Common.Entities
         public string Name { get; set; } = string.Empty;
         public SkillType Type { get; set; }
         public bool Confirmed { get; set; }
-        public Guid CreatorId { get; set; } //nullable
-        public Guid UpdaterId { get; set; } //nullable
-        public Guid DeleterId { get; set; } //nullable
+        public Guid? CreatorId { get; set; }
+        public Guid? UpdaterId { get; set; }
+        public Guid? DeleterId { get; set; }
     }
 }

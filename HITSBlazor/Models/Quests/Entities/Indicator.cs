@@ -12,6 +12,6 @@ namespace HITSBlazor.Models.Quests.Entities
         public bool Visible { get; set; }
         public string CategoryName { get; set; } = string.Empty;
         public Guid IdCategory { get; set; }
-        public Guid IdToUser { get; set; } //nullable
+        public Guid? IdToUser { get; set; }
     }
 }

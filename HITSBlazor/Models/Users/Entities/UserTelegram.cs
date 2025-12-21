@@ -4,7 +4,7 @@
     {
         public Guid UserId { get; set; }
         public string UserTag { get; set; } = string.Empty;
-        public Guid ChatId { get; set; } //nullable
+        public Guid? ChatId { get; set; }
         public bool IsVisible { get; set; }
     }
 }
