@@ -5,6 +5,8 @@ using HITSBlazor.Services.Service.Interfaces;
 using HITSBlazor.Services.Service.Class;
 using System.Net.Http.Headers;
 using System.Net.Mime;
+using Microsoft.AspNetCore.Components.WebAssembly.Http;
+
 
 #if DEBUG
 using HITSBlazor.Services.Service.Mock;
@@ -14,6 +16,17 @@ using HITSBlazor.Services.Api;
 
 namespace HITSBlazor
 {
+    public class CookieHandler : DelegatingHandler
+    {
+        protected override Task<HttpResponseMessage> SendAsync(
+            HttpRequestMessage request,
+            CancellationToken cancellationToken)
+        {
+            request.SetBrowserRequestCredentials(BrowserRequestCredentials.Include);
+            return base.SendAsync(request, cancellationToken);
+        }
+    }
+
     public class Program
     {
         public static async Task Main(string[] args)
@@ -28,12 +41,13 @@ namespace HITSBlazor
             builder.RootComponents.Add<App>("#app");
             builder.RootComponents.Add<HeadOutlet>("head::after");
 
+            builder.Services.AddScoped<CookieHandler>();
             builder.Services.AddHttpClient("HITSClient", client =>
             {
                 client.BaseAddress = new Uri(API_BASE_URL);
                 client.DefaultRequestHeaders.Accept.Add(
                     new MediaTypeWithQualityHeaderValue(MediaTypeNames.Application.Json));
-            });
+            }).AddHttpMessageHandler<CookieHandler>();
 
             builder.Services.AddScoped(sp => 
                 sp.GetRequiredService<IHttpClientFactory>().CreateClient("HITSClient")
