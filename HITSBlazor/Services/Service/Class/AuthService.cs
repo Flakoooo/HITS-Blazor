@@ -31,7 +31,8 @@ namespace HITSBlazor.Services.Service.Class
 
         public async Task<LoginResponse> LoginAsync(LoginRequest request)
         {
-            _logger.LogInformation("Attempting login for email: {Email}", request.Email);
+            if (_logger.IsEnabled(LogLevel.Information))
+                _logger.LogInformation("Attempting login for email: {Email}", request.Email);
 
             var result = await _authApi.LoginAsync(request);
             if (result.IsSuccess)
@@ -41,7 +42,9 @@ namespace HITSBlazor.Services.Service.Class
                 return LoginResponse.Success();
             }
 
-            _logger.LogWarning("Login failed: {Error}", result.Message);
+            if (_logger.IsEnabled(LogLevel.Warning))
+                _logger.LogWarning("Login failed: {Error}", result.Message);
+
             return LoginResponse.Failure(result.Message ?? "Ошибка входа");
         }
 

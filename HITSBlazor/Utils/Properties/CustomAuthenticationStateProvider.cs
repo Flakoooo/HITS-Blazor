@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Components.Authorization;
 using System.Security.Claims;
 
-namespace HITSBlazor
+namespace HITSBlazor.Utils.Properties
 {
     public class CustomAuthenticationStateProvider : AuthenticationStateProvider
     {
