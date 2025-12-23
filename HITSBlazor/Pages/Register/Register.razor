@@ -9,7 +9,7 @@
                 <div class="input-group">
                     <span class="input-group-text fs-6">&#64;</span>
                     <input type="text"
-                           @bind="@registerRequest.Email"
+                           @bind="@registerModel.Email"
                            @bind:event="oninput"
                            class="form-control"
                            placeholder="Введите email"
@@ -21,7 +21,7 @@
                         <i class="bi bi-fonts"></i>
                     </span>
                     <input type="text"
-                           @bind="registerRequest.FirstName"
+                           @bind="registerModel.FirstName"
                            @bind:event="oninput"
                            class="form-control"
                            placeholder="Введите имя" />
@@ -32,7 +32,7 @@
                         <i class="bi bi-fonts"></i>
                     </span>
                     <input type="text"
-                           @bind="registerRequest.LastName"
+                           @bind="registerModel.LastName"
                            @bind:event="oninput"
                            class="form-control"
                            placeholder="Введите фамилию" />
@@ -57,7 +57,7 @@
                         <i class="bi bi-people"></i>
                     </span>
                     <input type="text"
-                           @bind="registerRequest.StudyGroup"
+                           @bind="registerModel.StudyGroup"
                            @bind:event="oninput"
                            class="form-control"
                            placeholder="Введите номер группы" />
@@ -68,7 +68,7 @@
                         <i class="bi bi-key"></i>
                     </span>
                     <input type="password"
-                           @bind="registerRequest.Password"
+                           @bind="registerModel.Password"
                            @bind:event="oninput"
                            class="form-control"
                            placeholder="Введите пароль" />

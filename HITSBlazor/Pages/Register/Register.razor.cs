@@ -1,17 +1,18 @@
-﻿using HITSBlazor.Models.Auth.Requests;
-using HITSBlazor.Services.Service.Class;
-using HITSBlazor.Services.Service.Interfaces;
+﻿using HITSBlazor.Services;
+using HITSBlazor.Services.Auth;
+using HITSBlazor.Services.Invitation;
+using HITSBlazor.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
 using System.Text.RegularExpressions;
 
-namespace HITSBlazor.Pages
+namespace HITSBlazor.Pages.Register
 {
     [AllowAnonymous]
-    [Route("/register")]
+    [Route("/register/{invitationId}")]
     public partial class Register : ComponentBase
     {
-        private RegisterRequest registerRequest = new();
+        private RegisterModel registerModel = new();
         private bool isLoading;
 
         private readonly string telephonePattern = @"^\+7\s\(\d{3}\)\s\d{3}-\d{2}-\d{2}$";
@@ -21,14 +22,9 @@ namespace HITSBlazor.Pages
         private string rawDigits = "";
 
         [Parameter]
-        [SupplyParameterFromQuery(Name = "email")]
-        public string? Email { get; set; }
+        public string InvitationId { get; set; } = string.Empty;
 
-        private bool IsEmailDisabled => !string.IsNullOrEmpty(Email);
-
-        [Parameter]
-        [SupplyParameterFromQuery(Name = "code")]
-        public string? Code { get; set; }
+        private bool IsEmailDisabled { get; set; } = true;
 
         [Inject]
         private NavigationManager Navigation { get; set; } = null!;
@@ -37,12 +33,24 @@ namespace HITSBlazor.Pages
         private IAuthService AuthService { get; set; } = null!;
 
         [Inject]
+        private InvitationApi InvitationApi { get; set; } = null!;
+
+        [Inject]
         private NotificationService NotificationService { get; set; } = null!;
 
-        protected override void OnInitialized()
+        protected override async Task OnInitializedAsync()
         {
-            if (!string.IsNullOrEmpty(Email))
-                registerRequest.Email = Email;
+            if (Guid.TryParse(InvitationId, out Guid guid))
+            {
+                ServiceResponse<string> response = await InvitationApi.GetEmailByInvitationId(guid);
+                if (response.IsSuccess && response.Response is not null)
+                {
+                    registerModel.Email = response.Response;
+                    IsEmailDisabled = true;
+                }
+                else IsEmailDisabled = false;
+            }
+            else IsEmailDisabled = false;
         }
 
         private async Task HandlePhoneInput(string value)
@@ -53,11 +61,11 @@ namespace HITSBlazor.Pages
                 var newValue = phoneInput[..^1];
 
                 if (newValue.Last() == '-')
-                    registerRequest.Telephone = phoneInput = newValue[..^1];
+                    registerModel.Telephone = phoneInput = newValue[..^1];
                 else if (newValue.Last() == ' ')
-                    registerRequest.Telephone = phoneInput = newValue[..^2];
+                    registerModel.Telephone = phoneInput = newValue[..^2];
                 else
-                    registerRequest.Telephone = phoneInput = newValue;
+                    registerModel.Telephone = phoneInput = newValue;
             }
             else if (value.Length > phoneInput.Length)
             {
@@ -76,7 +84,7 @@ namespace HITSBlazor.Pages
                 }
 
                 rawDigits = digits;
-                registerRequest.Telephone = phoneInput = result;
+                registerModel.Telephone = phoneInput = result;
             }
         }
 
@@ -90,19 +98,16 @@ namespace HITSBlazor.Pages
             {
                 var validationErrors = new List<string>();
 
-                if (string.IsNullOrWhiteSpace(registerRequest.Email))
+                if (string.IsNullOrWhiteSpace(registerModel.Email))
                     validationErrors.Add("почту");
 
-                if (string.IsNullOrWhiteSpace(registerRequest.FirstName))
+                if (string.IsNullOrWhiteSpace(registerModel.FirstName))
                     validationErrors.Add("имя");
 
-                if (string.IsNullOrWhiteSpace(registerRequest.LastName))
+                if (string.IsNullOrWhiteSpace(registerModel.LastName))
                     validationErrors.Add("фамилию");
 
-                if (string.IsNullOrWhiteSpace(registerRequest.Telephone))
-                    validationErrors.Add("телефон");
-
-                if (string.IsNullOrWhiteSpace(registerRequest.Password))
+                if (string.IsNullOrWhiteSpace(registerModel.Password))
                     validationErrors.Add("пароль");
 
                 if (validationErrors.Count > 0)
@@ -118,7 +123,7 @@ namespace HITSBlazor.Pages
                     return;
                 }
 
-                var email = registerRequest.Email.Trim();
+                var email = registerModel.Email.Trim();
                 var atIndex = email.IndexOf('@');
 
                 if (atIndex <= 0 || atIndex == email.Length - 1 || email.Count(c => c == '@') != 1)
@@ -128,41 +133,40 @@ namespace HITSBlazor.Pages
                     return;
                 }
 
-                if (!Regex.IsMatch(registerRequest.FirstName, namePattern))
+                if (!Regex.IsMatch(registerModel.FirstName, namePattern))
                 {
                     NotificationService.ShowError("Имя должно начинаться с заглавной буквы и содержать только буквы (и дефис для двойных имён)");
                     isLoading = false;
                     return;
                 }
 
-                if (!Regex.IsMatch(registerRequest.LastName, namePattern))
+                if (!Regex.IsMatch(registerModel.LastName, namePattern))
                 {
                     NotificationService.ShowError("Фамилия должна начинаться с заглавной буквы и содержать только буквы (и дефис для двойных фамилий)");
                     isLoading = false;
                     return;
                 }
 
-                if (!Regex.IsMatch(registerRequest.Telephone, telephonePattern))
+                if (!string.IsNullOrWhiteSpace(registerModel.Telephone) && !Regex.IsMatch(registerModel.Telephone, telephonePattern))
                 {
                     NotificationService.ShowError("Неверный формат телефона. Введите номер в формате: +7 (XXX) XXX-XX-XX");
                     isLoading = false;
                     return;
                 }
 
-                if (registerRequest.Password.Length < 8)
+                if (registerModel.Password.Length < 8)
                 {
                     NotificationService.ShowError("Длина пароля не может быть меньше 8 символов");
                     isLoading = false;
                     return;
                 }
 
-                var result = await AuthService.RegisterAsync(registerRequest);
-
+                var result = await AuthService.RegisterAsync(registerModel);
                 if (result.IsSuccess)
                 {
-                    registerRequest = new RegisterRequest();
+                    registerModel = new RegisterModel();
                     NotificationService.ShowSuccess(result.Message);
-                    Navigation.NavigateTo("/login", true);
+                    Navigation.NavigateTo("/", true);
                 }
                 else
                 {

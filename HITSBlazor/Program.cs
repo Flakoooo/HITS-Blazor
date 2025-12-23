@@ -1,15 +1,15 @@
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
-using HITSBlazor.Services.Service.Interfaces;
-using HITSBlazor.Services.Service.Class;
 using HITSBlazor.Utils.Properties;
+using HITSBlazor.Services.Auth;
+using HITSBlazor.Services;
 
 #if DEBUG && !DEBUGAPI
 using HITSBlazor.Services.Service.Mock;
 #else
+using HITSBlazor.Utils;
 using System.Net.Http.Headers;
-using HITSBlazor.Services.Api;
 using System.Net.Mime;
 #endif
 
@@ -29,7 +29,7 @@ namespace HITSBlazor
             builder.RootComponents.Add<HeadOutlet>("head::after");
 #if DEBUGAPI || RELEASE
             builder.Services.AddScoped<CookieHandler>();
-            builder.Services.AddHttpClient("HITSClient", client =>
+            builder.Services.AddHttpClient(Settings.HttpClientName, client =>
             {
                 client.BaseAddress = new Uri(API_BASE_URL);
                 client.DefaultRequestHeaders.Accept.Add(
@@ -37,7 +37,7 @@ namespace HITSBlazor
             }).AddHttpMessageHandler<CookieHandler>();
 
             builder.Services.AddScoped(sp => 
-                sp.GetRequiredService<IHttpClientFactory>().CreateClient("HITSClient")
+                sp.GetRequiredService<IHttpClientFactory>().CreateClient(Settings.HttpClientName)
             );
 #endif
 

@@ -1,4 +1,4 @@
-﻿namespace HITSBlazor.Services.Service.Class
+﻿namespace HITSBlazor.Services
 {
     public class NotificationService
     {

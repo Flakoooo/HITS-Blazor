@@ -1,7 +1,7 @@
 ﻿using HITSBlazor.Utils;
 using System.Net;
 
-namespace HITSBlazor.Services.Api
+namespace HITSBlazor.Services
 {
     public class BaseApiService
     {
@@ -13,9 +13,9 @@ namespace HITSBlazor.Services.Api
             _httpClient = httpClient;
             _logger = logger;
         }
-        protected async Task<ApiResponse<T>> ExecuteApiCallAsync<T>(
+        protected async Task<ServiceResponse<T>> ExecuteApiCallAsync<T>(
             Func<Task<HttpResponseMessage>> apiCall,
-            Func<HttpResponseMessage, Task<ApiResponse<T>>> successHandler,
+            Func<HttpResponseMessage, Task<ServiceResponse<T>>> successHandler,
             string operationName)
         {
             try
@@ -44,7 +44,7 @@ namespace HITSBlazor.Services.Api
             }
         }
 
-        private async Task<ApiResponse<T>> HandleErrorResponse<T>(
+        private async Task<ServiceResponse<T>> HandleErrorResponse<T>(
             HttpResponseMessage response, string operationName)
         {
             var statusCode = response.StatusCode;
@@ -56,37 +56,37 @@ namespace HITSBlazor.Services.Api
                     operationName, statusCode, errorMessage
                 );
 
-            return ApiResponse<T>.Failure(errorMessage, statusCode);
+            return ServiceResponse<T>.Failure(errorMessage, statusCode);
         }
 
-        private ApiResponse<T> HandleNetworkError<T>(HttpRequestException ex, string operationName)
+        private ServiceResponse<T> HandleNetworkError<T>(HttpRequestException ex, string operationName)
         {
             if (AppEnvironment.IsLogEnabled && _logger.IsEnabled(LogLevel.Error))
                 _logger.LogError(ex, "Network error during {Operation}", operationName);
 
-            return ApiResponse<T>.Failure(
+            return ServiceResponse<T>.Failure(
                 "Нет соединения с сервером. Проверьте интернет.",
                 HttpStatusCode.ServiceUnavailable
             );
         }
 
-        private ApiResponse<T> HandleTimeoutError<T>(TaskCanceledException ex, string operationName)
+        private ServiceResponse<T> HandleTimeoutError<T>(TaskCanceledException ex, string operationName)
         {
             if (_logger.IsEnabled(LogLevel.Warning))
                 _logger.LogWarning(ex, "{Operation} request timeout", operationName);
 
-            return ApiResponse<T>.Failure(
+            return ServiceResponse<T>.Failure(
                 "Превышено время ожидания ответа",
                 HttpStatusCode.RequestTimeout
             );
         }
 
-        private ApiResponse<T> HandleUnexpectedError<T>(Exception ex, string operationName)
+        private ServiceResponse<T> HandleUnexpectedError<T>(Exception ex, string operationName)
         {
             if (AppEnvironment.IsLogEnabled && _logger.IsEnabled(LogLevel.Error))
                 _logger.LogError(ex, "Unexpected error in {Operation}", operationName);
 
-            return ApiResponse<T>.Failure(
+            return ServiceResponse<T>.Failure(
                 "Внутренняя ошибка приложения",
                 HttpStatusCode.InternalServerError
             );

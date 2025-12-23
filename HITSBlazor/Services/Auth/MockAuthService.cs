@@ -1,13 +1,15 @@
-﻿using HITSBlazor.Models.Auth.Requests;
-using HITSBlazor.Models.Auth.Response;
+﻿using HITSBlazor.Models.Auth.Response;
 using HITSBlazor.Models.Users.Entities;
-using HITSBlazor.Services.Service.Interfaces;
+using HITSBlazor.Pages.Login;
+using HITSBlazor.Pages.NewPassword;
+using HITSBlazor.Pages.Register;
+using HITSBlazor.Utils;
 using HITSBlazor.Utils.Mocks.Users;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using System.Text.Json;
 
-namespace HITSBlazor.Services.Service.Mock
+namespace HITSBlazor.Services.Auth
 {
     public class MockAuthService(IJSRuntime jsRuntime, NavigationManager navigationManager) : IAuthService
     {
@@ -28,7 +30,7 @@ namespace HITSBlazor.Services.Service.Mock
             OnAuthStateChanged?.Invoke();
         }
 
-        public async Task<LoginResponse> LoginAsync(LoginRequest request)
+        public async Task<ServiceResponse<bool>> LoginAsync(LoginModel request)
         {
             try
             {
@@ -36,7 +38,7 @@ namespace HITSBlazor.Services.Service.Mock
                     .FirstOrDefault(u => u.Email == request.Email);
 
                 if (user == null)
-                    return LoginResponse.Failure("Неверный логин или пароль");
+                    return ServiceResponse<bool>.Failure("Неверный логин или пароль");
 
                 var mockToken = _mockTokenTemplate + user.Id;
 
@@ -48,11 +50,11 @@ namespace HITSBlazor.Services.Service.Mock
 
                 OnAuthStateChanged?.Invoke();
 
-                return LoginResponse.Success();
+                return ServiceResponse<bool>.Success(true);
             }
             catch (Exception ex)
             {
-                return LoginResponse.Failure($"Ошибка при авторизации: {ex.Message}");
+                return ServiceResponse<bool>.Failure($"Ошибка при авторизации: {ex.Message}");
             }
         }
 
@@ -65,7 +67,7 @@ namespace HITSBlazor.Services.Service.Mock
             _navigationManager.NavigateTo("/login");
         }
 
-        public async Task<RegisterResponse> RegisterAsync(RegisterRequest request, string? invitationCode = null)
+        public async Task<RegisterResponse> RegisterAsync(RegisterModel request, string? invitationCode = null)
         {
             try
             {
@@ -80,33 +82,33 @@ namespace HITSBlazor.Services.Service.Mock
             }
         }
 
-        public async Task<RecoveryResponse> RequestPasswordRecoveryAsync(string email)
+        public async Task<ServiceResponse<Guid>> RequestPasswordRecoveryAsync(string email)
         {
             try
             {
                 if (!MockUsers.GetAllUsers().Select(u => u.Email).Contains(email))
-                    return RecoveryResponse.Failure("Пользователь с таким email не найден");
+                    return ServiceResponse<Guid>.Failure("Пользователь с таким email не найден");
 
-                return RecoveryResponse.Success("Инструкции по восстановлению отправлены на email");
+                return ServiceResponse<Guid>.Success(Guid.NewGuid(), "Инструкции по восстановлению отправлены на email");
             }
             catch (Exception ex)
             {
-                return RecoveryResponse.Failure($"Ошибка: {ex.Message}");
+                return ServiceResponse<Guid>.Failure($"Ошибка: {ex.Message}");
             }
         }
 
-        public async Task<ResetPasswordResponse> ResetPasswordAsync(ResetPasswordRequest resetPassword)
+        public async Task<ServiceResponse<bool>> ResetPasswordAsync(NewPasswordModel newPasswordModel)
         {
             try
             {
                 if (resetPassword.Code != "123456")
-                    return ResetPasswordResponse.Failure("Указан неверный код");
+                    return ServiceResponse<bool>.Failure("Указан неверный код");
 
-                return ResetPasswordResponse.Success("Пароль успешно изменен!");
+                return ServiceResponse<bool>.Success(true, "Пароль успешно изменен!");
             }
             catch (Exception ex)
             {
-                return ResetPasswordResponse.Failure($"Ошибка: {ex.Message}");
+                return ServiceResponse<bool>.Failure($"Ошибка: {ex.Message}");
             }
         }
 

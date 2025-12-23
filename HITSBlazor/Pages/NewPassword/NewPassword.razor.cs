@@ -1,17 +1,20 @@
-﻿using HITSBlazor.Models.Auth.Requests;
-using HITSBlazor.Services.Service.Class;
-using HITSBlazor.Services.Service.Interfaces;
+﻿using HITSBlazor.Services;
+using HITSBlazor.Services.Auth;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
 
-namespace HITSBlazor.Pages
+namespace HITSBlazor.Pages.NewPassword
 {
     [AllowAnonymous]
     [Route("/new-password")]
     public partial class NewPassword
     {
-        private ResetPasswordRequest resetRequest = new();
+        private NewPasswordModel newPasswordModel = new();
         private bool isLoading;
+
+        [Parameter]
+        [SupplyParameterFromQuery(Name = "verification-code")]
+        public string? VerificationCode { get; set; }
 
         [Inject]
         private NavigationManager Navigation { get; set; } = null!;
@@ -22,6 +25,13 @@ namespace HITSBlazor.Pages
         [Inject]
         private NotificationService NotificationService { get; set; } = null!;
 
+        protected override void OnInitialized()
+        {
+            if (!string.IsNullOrWhiteSpace(VerificationCode) 
+                && Guid.TryParse(VerificationCode, out Guid guid)
+            ) newPasswordModel.Id = guid;
+        }
+
         private async Task HandleResetPassword()
         {
             if (isLoading) return;
@@ -30,8 +40,8 @@ namespace HITSBlazor.Pages
 
             try
             {
-                bool codeIsEmpty = string.IsNullOrWhiteSpace(resetRequest.Code);
-                bool passwordIsEmpty = string.IsNullOrWhiteSpace(resetRequest.Password);
+                bool codeIsEmpty = string.IsNullOrWhiteSpace(newPasswordModel.Code);
+                bool passwordIsEmpty = string.IsNullOrWhiteSpace(newPasswordModel.Password);
 
                 if (codeIsEmpty || passwordIsEmpty)
                 {
@@ -49,25 +59,26 @@ namespace HITSBlazor.Pages
                     return;
                 }
 
-                if (resetRequest.Password.Length < 8)
+                if (newPasswordModel.Password.Length < 8)
                 {
                     NotificationService.ShowError("Длина пароля не может быть меньше 8 символов");
                     isLoading = false;
                     return;
                 }
 
-                var result = await AuthService.ResetPasswordAsync(resetRequest);
+                var result = await AuthService.ResetPasswordAsync(newPasswordModel);
 
                 if (result.IsSuccess)
                 {
-                    resetRequest = new ResetPasswordRequest();
-                    NotificationService.ShowSuccess(result.Message);
+                    if (result.Message is not null) NotificationService.ShowSuccess(result.Message);
+
+                    newPasswordModel = new NewPasswordModel();
                     Navigation.NavigateTo("/login", true);
                 }
                 else
                 {
                     NotificationService.ShowError(
-                        result.Message ?? "Вы указали неверные данные для входа. Попробуйте снова."
+                        result.Message ?? "Вы указали неверные данные для сброса. Попробуйте снова."
                     );
                 }
             }

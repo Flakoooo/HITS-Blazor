@@ -1,16 +1,15 @@
-﻿using HITSBlazor.Models.Auth.Requests;
-using HITSBlazor.Services.Service.Class;
-using HITSBlazor.Services.Service.Interfaces;
+﻿using HITSBlazor.Services;
+using HITSBlazor.Services.Auth;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
 
-namespace HITSBlazor.Pages
+namespace HITSBlazor.Pages.Login
 {
     [AllowAnonymous]
     [Route("/login")]
     public partial class Login
     {
-        private LoginRequest loginRequest = new();
+        private LoginModel loginModel = new();
         private bool isLoading;
 
         [Inject]
@@ -36,8 +35,8 @@ namespace HITSBlazor.Pages
 
             try
             {
-                bool emailIsEmpty = string.IsNullOrWhiteSpace(loginRequest.Email);
-                bool passwordIsEmpty = string.IsNullOrWhiteSpace(loginRequest.Password);
+                bool emailIsEmpty = string.IsNullOrWhiteSpace(loginModel.Email);
+                bool passwordIsEmpty = string.IsNullOrWhiteSpace(loginModel.Password);
 
                 if (emailIsEmpty || passwordIsEmpty)
                 {
@@ -55,7 +54,7 @@ namespace HITSBlazor.Pages
                     return;
                 }
 
-                var email = loginRequest.Email.Trim();
+                var email = loginModel.Email.Trim();
                 var atIndex = email.IndexOf('@');
 
                 if (atIndex <= 0 || atIndex == email.Length - 1 || email.Count(c => c == '@') != 1)
@@ -65,24 +64,23 @@ namespace HITSBlazor.Pages
                     return;
                 }
 
-                if (loginRequest.Password.Length < 8)
+                if (loginModel.Password.Length < 8)
                 {
                     NotificationService.ShowError("Длина пароля не может быть меньше 8 символов");
                     isLoading = false;
                     return;
                 }
 
-                var result = await AuthService.LoginAsync(loginRequest);
-
+                var result = await AuthService.LoginAsync(loginModel);
                 if (result.IsSuccess)
                 {
-                    loginRequest = new LoginRequest();
+                    loginModel = new LoginModel();
                     Navigation.NavigateTo("/");
                 }
                 else
                 {
                     NotificationService.ShowError(
-                        result.ErrorMessage ?? "Вы указали неверные данные для входа. Попробуйте снова."
+                        result.Message ?? "Вы указали неверные данные для входа. Попробуйте снова."
                     );
                 }
             }

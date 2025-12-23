@@ -1,16 +1,15 @@
-﻿using HITSBlazor.Models.Auth.Requests;
-using HITSBlazor.Services.Service.Class;
-using HITSBlazor.Services.Service.Interfaces;
+﻿using HITSBlazor.Services;
+using HITSBlazor.Services.Auth;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
 
-namespace HITSBlazor.Pages
+namespace HITSBlazor.Pages.RecoveryPassword
 {
     [AllowAnonymous]
     [Route("/recovery-password")]
     public partial class RecoveryPassword
     {
-        private RecoveryRequest recoveryRequest = new();
+        private RecoveryModel recoveryModel = new();
         private bool isLoading;
 
         [Inject]
@@ -30,14 +29,14 @@ namespace HITSBlazor.Pages
 
             try
             {
-                if (string.IsNullOrWhiteSpace(recoveryRequest.Email))
+                if (string.IsNullOrWhiteSpace(recoveryModel.Email))
                 {
                     NotificationService.ShowError("Пожалуйста, укажите почту");
                     isLoading = false;
                     return;
                 }
 
-                var email = recoveryRequest.Email.Trim();
+                var email = recoveryModel.Email.Trim();
                 var atIndex = email.IndexOf('@');
 
                 if (atIndex <= 0 || atIndex == email.Length - 1 || email.Count(c => c == '@') != 1)
@@ -47,14 +46,13 @@ namespace HITSBlazor.Pages
                     return;
                 }
 
-                var result = await AuthService.RequestPasswordRecoveryAsync(recoveryRequest.Email);
-
+                var result = await AuthService.RequestPasswordRecoveryAsync(recoveryModel.Email);
                 if (result.IsSuccess)
                 {
-                    NotificationService.ShowSuccess(result.Message);
+                    if (result.Message is not null) NotificationService.ShowSuccess(result.Message);
 
-                    recoveryRequest = new RecoveryRequest();
-                    Navigation.NavigateTo("/new-password");
+                    recoveryModel = new RecoveryModel();
+                    Navigation.NavigateTo($"/new-password?verification-code={result.Response}");
                 }
                 else
                 {

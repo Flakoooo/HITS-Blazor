@@ -1,8 +1,8 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace HITSBlazor.Models.Auth.Requests
+namespace HITSBlazor.Pages.Login
 {
-    public class LoginRequest
+    public class LoginModel
     {
         [JsonPropertyName("email")]
         public string Email { get; set; } = string.Empty;
