@@ -4,6 +4,7 @@ using HITSBlazor.Services.Invitation;
 using HITSBlazor.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
+using System;
 using System.Text.RegularExpressions;
 
 namespace HITSBlazor.Pages.Register
@@ -22,7 +23,7 @@ namespace HITSBlazor.Pages.Register
         private string rawDigits = "";
 
         [Parameter]
-        public string InvitationId { get; set; } = string.Empty;
+        public Guid InvitationId { get; set; }
 
         private bool IsEmailDisabled { get; set; } = true;
 
@@ -40,15 +41,11 @@ namespace HITSBlazor.Pages.Register
 
         protected override async Task OnInitializedAsync()
         {
-            if (Guid.TryParse(InvitationId, out Guid guid))
+            ServiceResponse<string> response = await InvitationApi.GetEmailByInvitationId(InvitationId);
+            if (response.IsSuccess && response.Response is not null)
             {
-                ServiceResponse<string> response = await InvitationApi.GetEmailByInvitationId(guid);
-                if (response.IsSuccess && response.Response is not null)
-                {
-                    registerModel.Email = response.Response;
-                    IsEmailDisabled = true;
-                }
-                else IsEmailDisabled = false;
+                registerModel.Email = response.Response;
+                IsEmailDisabled = true;
             }
             else IsEmailDisabled = false;
         }
@@ -161,11 +158,12 @@ namespace HITSBlazor.Pages.Register
                     return;
                 }
 
-                var result = await AuthService.RegisterAsync(registerModel);
+                var result = await AuthService.RegistrationAsync(registerModel, InvitationId);
                 if (result.IsSuccess)
                 {
+                    if (result.Message is not null) NotificationService.ShowSuccess(result.Message);
+
                     registerModel = new RegisterModel();
-                    NotificationService.ShowSuccess(result.Message);
                     Navigation.NavigateTo("/", true);
                 }
                 else

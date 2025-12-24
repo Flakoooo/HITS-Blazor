@@ -1,4 +1,5 @@
-﻿using HITSBlazor.Pages.Login;
+﻿using HITSBlazor.Models.Quests.Entities;
+using HITSBlazor.Pages.Login;
 using HITSBlazor.Pages.NewPassword;
 using HITSBlazor.Pages.Register;
 using HITSBlazor.Utils;
@@ -16,6 +17,7 @@ namespace HITSBlazor.Services.Auth
         private readonly string _authPath = "/api/auth";
 
         private const string LOGIN_OPERATION = "Login";
+        private const string LOGOUT_OPERATION = "Logout";
         private const string REFRESH_TOKEN_OPERATION = "RefreshToken";
         private const string PASSWORD_VERIFICATION_OPERATION = "PasswordVerification";
         private const string PASSWORD_NEW_OPERATION = "PasswordNew";
@@ -31,6 +33,18 @@ namespace HITSBlazor.Services.Auth
                 return ServiceResponse<bool>.Success(true);
             },
             operationName: LOGIN_OPERATION
+        );
+
+        public Task<ServiceResponse<bool>> LogoutAsync() => ExecuteApiCallAsync(
+            apiCall: () => _httpClient.PostAsync($"{_authPath}/logout", null),
+            successHandler: async response =>
+            {
+                if (AppEnvironment.IsLogEnabled && _logger.IsEnabled(LogLevel.Information))
+                    _logger.LogInformation("Logout successful for user ");
+
+                return ServiceResponse<bool>.Success(true);
+            },
+            operationName: LOGOUT_OPERATION
         );
 
         public Task<ServiceResponse<bool>> RefreshTokenAsync() => ExecuteApiCallAsync(
@@ -85,14 +99,14 @@ namespace HITSBlazor.Services.Auth
             operationName: PASSWORD_NEW_OPERATION
         );
 
-        public Task<ServiceResponse<bool>> RegistrationUserAsync(RegisterModel request, string invitationId) => ExecuteApiCallAsync(
+        public Task<ServiceResponse<bool>> RegistrationUserAsync(RegisterModel request, Guid invitationId) => ExecuteApiCallAsync(
             apiCall: () => _httpClient.PostAsJsonAsync($"{_authPath}/registration/{invitationId}", request),
             successHandler: async response =>
             {
                 if (AppEnvironment.IsLogEnabled && _logger.IsEnabled(LogLevel.Information))
                     _logger.LogInformation("Registration successful for user {Email}", request.Email);
 
-                return ServiceResponse<bool>.Success(true);
+                return ServiceResponse<bool>.Success(true, "Успешная регистрация");
             },
             operationName: REGISTRATION_OPERATION
         );
@@ -106,6 +120,11 @@ namespace HITSBlazor.Services.Auth
                     HttpStatusCode.Unauthorized => "Неверная почта или пароль",
                     HttpStatusCode.UnprocessableEntity => "Некорректная почта или пароль",
                     HttpStatusCode.InternalServerError => "Произошла ошибка сервера, попробуйте позже",
+                    _ => base.GetErrorMessage(statusCode, operationName)
+                },
+                LOGOUT_OPERATION => statusCode switch
+                {
+                    HttpStatusCode.Unauthorized => "Выход из аккаунта невозможен",
                     _ => base.GetErrorMessage(statusCode, operationName)
                 },
                 REFRESH_TOKEN_OPERATION => statusCode switch

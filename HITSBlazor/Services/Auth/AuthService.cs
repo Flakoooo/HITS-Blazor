@@ -1,5 +1,4 @@
-﻿using HITSBlazor.Models.Auth.Response;
-using HITSBlazor.Pages.Login;
+﻿using HITSBlazor.Pages.Login;
 using HITSBlazor.Pages.NewPassword;
 using HITSBlazor.Pages.Register;
 using HITSBlazor.Utils;
@@ -48,16 +47,22 @@ namespace HITSBlazor.Services.Auth
             return result;
         }
 
-        public async Task LogoutAsync()
+        public async Task<ServiceResponse<bool>> LogoutAsync()
         {
             if (AppEnvironment.IsLogEnabled)
                 _logger.LogInformation("Logging out user...");
 
-            //TODO: Сделать Logout с бэка
+            var result = await _authApi.LogoutAsync();
+            if (result.IsSuccess)
+            {
+                IsAuthenticated = false;
+                OnAuthStateChanged?.Invoke();
+                _navigationManager.NavigateTo("/login");
+            }
+            else if (_logger.IsEnabled(LogLevel.Warning))
+                _logger.LogWarning("Login failed: {Error}", result.Message);
 
-            IsAuthenticated = false;
-
-            _navigationManager.NavigateTo("/login");
+            return result;
         }
 
         public async Task<ServiceResponse<Guid>> RequestPasswordRecoveryAsync(string email)
@@ -84,10 +89,21 @@ namespace HITSBlazor.Services.Auth
             return result;
         }
 
-        public Task<ServiceResponse<bool>> RegistrationAsync(RegisterModel request, Guid invitationId)
+        public async Task<ServiceResponse<bool>> RegistrationAsync(RegisterModel request, Guid invitationId)
         {
-            IsAuthenticated = true;
-            OnAuthStateChanged?.Invoke();
+            if (AppEnvironment.IsLogEnabled)
+                _logger.LogInformation("Attempting user registration");
+
+            var result = await _authApi.RegistrationUserAsync(request, invitationId);
+            if (result.IsSuccess)
+            {
+                IsAuthenticated = true;
+                OnAuthStateChanged?.Invoke();
+            }
+            else if (_logger.IsEnabled(LogLevel.Warning))
+                _logger.LogWarning("Registration failed: {Error}", result.Message);
+
+            return result;
         }
     }
 }

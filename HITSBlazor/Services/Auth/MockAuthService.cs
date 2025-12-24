@@ -1,5 +1,4 @@
-﻿using HITSBlazor.Models.Auth.Response;
-using HITSBlazor.Models.Users.Entities;
+﻿using HITSBlazor.Models.Users.Entities;
 using HITSBlazor.Pages.Login;
 using HITSBlazor.Pages.NewPassword;
 using HITSBlazor.Pages.Register;
@@ -58,27 +57,28 @@ namespace HITSBlazor.Services.Auth
             }
         }
 
-        public async Task LogoutAsync()
+        public async Task<ServiceResponse<bool>> LogoutAsync()
         {
             await RemoveTokenAsync();
             await RemoveUserInfoAsync();
             IsAuthenticated = false;
             OnAuthStateChanged?.Invoke();
             _navigationManager.NavigateTo("/login");
+            return ServiceResponse<bool>.Success(true);
         }
 
-        public async Task<RegisterResponse> RegisterAsync(RegisterModel request, string? invitationCode = null)
+        public async Task<ServiceResponse<bool>> RegistrationAsync(RegisterModel request, Guid invitationId)
         {
             try
             {
                 if (!MockUsers.GetAllUsers().Select(u => u.Email).Contains(request.Email))
-                    return RegisterResponse.Failure("Пользователь с таким email уже существует");
+                    return ServiceResponse<bool>.Failure("Пользователь с таким email уже существует");
 
-                return RegisterResponse.Success("Регистрация успешна");
+                return ServiceResponse<bool>.Success(true, "Регистрация успешна");
             }
             catch (Exception ex)
             {
-                return RegisterResponse.Failure($"Ошибка: {ex.Message}");
+                return ServiceResponse<bool>.Failure($"Ошибка: {ex.Message}");
             }
         }
 
@@ -101,7 +101,7 @@ namespace HITSBlazor.Services.Auth
         {
             try
             {
-                if (resetPassword.Code != "123456")
+                if (newPasswordModel.Code != "123456")
                     return ServiceResponse<bool>.Failure("Указан неверный код");
 
                 return ServiceResponse<bool>.Success(true, "Пароль успешно изменен!");
