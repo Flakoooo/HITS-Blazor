@@ -4,6 +4,10 @@ using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using HITSBlazor.Utils.Properties;
 using HITSBlazor.Services.Auth;
 using HITSBlazor.Services;
+using HITSBlazor.Services.Users;
+using HITSBlazor.Services.Invitation;
+
+
 
 #if DEBUG && !DEBUGAPI
 using HITSBlazor.Services.Service.Mock;
@@ -49,6 +53,8 @@ namespace HITSBlazor
             builder.Services.AddScoped<IAuthService, MockAuthService>();
 #else
             builder.Services.AddScoped<AuthApi>();
+            builder.Services.AddScoped<UserApi>();
+            builder.Services.AddScoped<InvitationApi>();
             builder.Services.AddScoped<IAuthService, AuthService>();
 #endif
             builder.Services.AddScoped<CustomAuthenticationStateProvider>();

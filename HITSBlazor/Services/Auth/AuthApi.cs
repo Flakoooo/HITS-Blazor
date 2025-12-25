@@ -22,7 +22,7 @@ namespace HITSBlazor.Services.Auth
         private const string PASSWORD_NEW_OPERATION = "PasswordNew";
         private const string REGISTRATION_OPERATION = "Registration";
 
-        public Task<ServiceResponse<bool>> LoginAsync(LoginModel request) => ExecuteApiCallAsync(
+        public async Task<ServiceResponse<bool>> LoginAsync(LoginModel request) => await ExecuteApiCallAsync(
             apiCall: () => _httpClient.PostAsJsonAsync($"{_authPath}/login", request),
             successHandler: async response =>
             {
@@ -34,7 +34,7 @@ namespace HITSBlazor.Services.Auth
             operationName: LOGIN_OPERATION
         );
 
-        public Task<ServiceResponse<bool>> LogoutAsync() => ExecuteApiCallAsync(
+        public async Task<ServiceResponse<bool>> LogoutAsync() =>await ExecuteApiCallAsync(
             apiCall: () => _httpClient.PostAsync($"{_authPath}/logout", null),
             successHandler: async response =>
             {
@@ -46,7 +46,7 @@ namespace HITSBlazor.Services.Auth
             operationName: LOGOUT_OPERATION
         );
 
-        public Task<ServiceResponse<bool>> RefreshTokenAsync() => ExecuteApiCallAsync(
+        public async Task<ServiceResponse<bool>> RefreshTokenAsync() => await ExecuteApiCallAsync(
             apiCall: () => _httpClient.PostAsync($"{_authPath}/refresh", null),
             successHandler: async response =>
             {
@@ -58,7 +58,7 @@ namespace HITSBlazor.Services.Auth
             operationName: REFRESH_TOKEN_OPERATION
         );
 
-        public Task<ServiceResponse<Guid>> PasswordVerificationAsync(string email) => ExecuteApiCallAsync(
+        public async Task<ServiceResponse<Guid>> PasswordVerificationAsync(string email) => await ExecuteApiCallAsync(
             apiCall: () => _httpClient.PostAsync($"{_authPath}/password/verification/{email}", null),
             successHandler: async response =>
             {
@@ -83,7 +83,7 @@ namespace HITSBlazor.Services.Auth
             operationName: PASSWORD_VERIFICATION_OPERATION
         );
 
-        public Task<ServiceResponse<bool>> PasswordNewAsync(NewPasswordModel newPasswordModel) => ExecuteApiCallAsync(
+        public async Task<ServiceResponse<bool>> PasswordNewAsync(NewPasswordModel newPasswordModel) => await ExecuteApiCallAsync(
             apiCall: () => _httpClient.PutAsJsonAsync($"{_authPath}/password", newPasswordModel),
             successHandler: async response =>
             {
@@ -98,7 +98,7 @@ namespace HITSBlazor.Services.Auth
             operationName: PASSWORD_NEW_OPERATION
         );
 
-        public Task<ServiceResponse<bool>> RegistrationUserAsync(RegisterModel request, Guid invitationId) => ExecuteApiCallAsync(
+        public async Task<ServiceResponse<bool>> RegistrationUserAsync(RegisterModel request, Guid invitationId) => await ExecuteApiCallAsync(
             apiCall: () => _httpClient.PostAsJsonAsync($"{_authPath}/registration/{invitationId}", request),
             successHandler: async response =>
             {

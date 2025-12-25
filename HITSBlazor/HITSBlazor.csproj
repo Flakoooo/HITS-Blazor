@@ -22,7 +22,6 @@
 
   <ItemGroup>
     <Folder Include="Components\LeftSideBar\" />
-    <Folder Include="Services\Users\" />
   </ItemGroup>
 
 </Project>

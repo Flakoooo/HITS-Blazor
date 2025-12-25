@@ -23,7 +23,7 @@ namespace HITSBlazor.Services.Auth
         public event Action? OnAuthStateChanged;
 
         public bool IsAuthenticated { get; private set; }
-        public User CurrentUser { get; private set; } = new();
+        public User? CurrentUser { get; private set; } = null;
 
         public async Task InitializeAsync()
         {

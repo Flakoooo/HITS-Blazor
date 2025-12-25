@@ -3,6 +3,7 @@ using HITSBlazor.Models.Users.Enums;
 using HITSBlazor.Pages.Login;
 using HITSBlazor.Pages.NewPassword;
 using HITSBlazor.Pages.Register;
+using HITSBlazor.Services.Users;
 using HITSBlazor.Utils;
 using Microsoft.AspNetCore.Components;
 
@@ -10,17 +11,26 @@ namespace HITSBlazor.Services.Auth
 {
     public class AuthService(
         ILogger<AuthService> logger,
-        AuthApi authApi, 
+        AuthApi authApi,
+        UserApi userApi,
         NavigationManager navigationManager
     ) : IAuthService
     {
         private readonly ILogger<AuthService> _logger = logger;
         private readonly AuthApi _authApi = authApi;
+        private readonly UserApi _userApi = userApi;
         private readonly NavigationManager _navigationManager = navigationManager;
 
         public event Action? OnAuthStateChanged;
         public bool IsAuthenticated { get; private set; } = false;
-        public User CurrentUser { get; private set; } = new();
+        public User? CurrentUser { get; private set; } = null;
+
+        private async Task GetCurrentUser()
+        {
+            ServiceResponse<User> userResponse = await _userApi.GetUserAsync();
+            if (userResponse.IsSuccess && userResponse.Response is not null)
+                CurrentUser = userResponse.Response;
+        }
 
         public async Task InitializeAsync()
         {
@@ -28,6 +38,7 @@ namespace HITSBlazor.Services.Auth
                 _logger.LogInformation("Initializing auth service...");
 
             IsAuthenticated = (await _authApi.RefreshTokenAsync()).IsSuccess;
+            if (IsAuthenticated) await GetCurrentUser();
 
             OnAuthStateChanged?.Invoke();
             return;
@@ -42,6 +53,7 @@ namespace HITSBlazor.Services.Auth
             if (result.IsSuccess)
             {
                 IsAuthenticated = true;
+                await GetCurrentUser();
                 OnAuthStateChanged?.Invoke();
             }
             else if (_logger.IsEnabled(LogLevel.Warning))
@@ -59,6 +71,7 @@ namespace HITSBlazor.Services.Auth
             if (result.IsSuccess)
             {
                 IsAuthenticated = false;
+                CurrentUser = null;
                 OnAuthStateChanged?.Invoke();
                 _navigationManager.NavigateTo("/login");
             }
@@ -101,6 +114,7 @@ namespace HITSBlazor.Services.Auth
             if (result.IsSuccess)
             {
                 IsAuthenticated = true;
+                await GetCurrentUser();
                 OnAuthStateChanged?.Invoke();
             }
             else if (_logger.IsEnabled(LogLevel.Warning))

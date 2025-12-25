@@ -11,7 +11,7 @@ namespace HITSBlazor.Services.Auth
     {
         event Action? OnAuthStateChanged;
         bool IsAuthenticated { get; }
-        public User CurrentUser { get; }
+        public User? CurrentUser { get; }
 
         Task InitializeAsync();
         Task<ServiceResponse<bool>> LoginAsync(LoginModel request);

@@ -9,7 +9,7 @@ namespace HITSBlazor.Services.Invitation
         ILogger<InvitationApi> logger
     ) : BaseApiService(httpClientFactory.CreateClient(Settings.HttpClientName), logger)
     {
-        private readonly string _invitationPath = "/invitation";
+        private readonly string _invitationPath = "/api/invitation";
 
         private const string GET_EMAIL = "GetInvitation";
 
