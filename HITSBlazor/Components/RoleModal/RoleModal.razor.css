@@ -1,0 +1,17 @@
+﻿.role-modal {
+    width: 400px;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    gap: 12px;
+    align-self: center;
+    justify-self: center;
+    transition: all 0.3s ease;
+}
+
+/* Анимация для модального окна */
+.modal-layout-enter .role-modal,
+.modal-layout-leave-to .role-modal {
+    transform: scale(0.9);
+}

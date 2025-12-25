@@ -1,4 +1,6 @@
-﻿using HITSBlazor.Pages.Login;
+﻿using HITSBlazor.Models.Users.Entities;
+using HITSBlazor.Models.Users.Enums;
+using HITSBlazor.Pages.Login;
 using HITSBlazor.Pages.NewPassword;
 using HITSBlazor.Pages.Register;
 using HITSBlazor.Utils;
@@ -18,6 +20,7 @@ namespace HITSBlazor.Services.Auth
 
         public event Action? OnAuthStateChanged;
         public bool IsAuthenticated { get; private set; } = false;
+        public User CurrentUser { get; private set; } = new();
 
         public async Task InitializeAsync()
         {
@@ -104,6 +107,18 @@ namespace HITSBlazor.Services.Auth
                 _logger.LogWarning("Registration failed: {Error}", result.Message);
 
             return result;
+        }
+
+        public bool SetUserRoleAsync(RoleType roleType)
+        {
+            if (CurrentUser == null || !CurrentUser.Roles.Contains(roleType))
+                return false;
+
+            CurrentUser.Role = roleType;
+
+            OnAuthStateChanged?.Invoke();
+
+            return true;
         }
     }
 }

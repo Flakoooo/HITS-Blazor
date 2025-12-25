@@ -32,7 +32,6 @@ namespace HITSBlazor.Utils.Mocks.Users
             return new Profile
             {
                 Id = user.Id,
-                Token = user.Token,
                 Email = user.Email,
                 FirstName = user.FirstName,
                 LastName = user.LastName,

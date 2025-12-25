@@ -1,5 +1,4 @@
-﻿using HITSBlazor.Models.Quests.Entities;
-using HITSBlazor.Pages.Login;
+﻿using HITSBlazor.Pages.Login;
 using HITSBlazor.Pages.NewPassword;
 using HITSBlazor.Pages.Register;
 using HITSBlazor.Utils;

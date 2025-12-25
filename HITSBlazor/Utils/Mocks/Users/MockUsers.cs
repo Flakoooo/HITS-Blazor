@@ -29,7 +29,6 @@ namespace HITSBlazor.Utils.Mocks.Users
             new User
             {
                 Id = KirillId,
-                Token = "10296538",
                 Email = "kirill.vlasov.05@inbox.ru",
                 FirstName = "Кирилл",
                 LastName = "Власов",
@@ -50,7 +49,6 @@ namespace HITSBlazor.Utils.Mocks.Users
             new User
             {
                 Id = IvanId,
-                Token = "1",
                 Email = "1@mail.com",
                 FirstName = "Иван",
                 LastName = "Иванович",
@@ -70,7 +68,6 @@ namespace HITSBlazor.Utils.Mocks.Users
             new User
             {
                 Id = ManagerId,
-                Token = "059182",
                 Email = "2@mail.com",
                 FirstName = "Менеджер",
                 LastName = "Менеджер",
@@ -90,7 +87,6 @@ namespace HITSBlazor.Utils.Mocks.Users
             new User
             {
                 Id = OwnerId,
-                Token = "163097",
                 Email = "3@mail.com",
                 FirstName = "Владелец",
                 LastName = "Владелец",
@@ -110,7 +106,6 @@ namespace HITSBlazor.Utils.Mocks.Users
             new User
             {
                 Id = WinritId,
-                Token = "8755764",
                 Email = "4@mail.com",
                 FirstName = "Винрит",
                 LastName = "Загрев",
@@ -129,7 +124,6 @@ namespace HITSBlazor.Utils.Mocks.Users
             new User
             {
                 Id = VersalId,
-                Token = "836444",
                 Email = "5@mail.com",
                 FirstName = "Версаль",
                 LastName = "Кустерман",
@@ -148,7 +142,6 @@ namespace HITSBlazor.Utils.Mocks.Users
             new User
             {
                 Id = AntonId,
-                Token = "861478",
                 Email = "warkingzar@gmail.com",
                 FirstName = "Антон",
                 LastName = "Зайко",
@@ -167,7 +160,6 @@ namespace HITSBlazor.Utils.Mocks.Users
             new User
             {
                 Id = LubovId,
-                Token = "890578",
                 Email = "l.a.nikiforova@tmn3.etagi.com",
                 FirstName = "Любовь",
                 LastName = "Никифорова",
@@ -186,7 +178,6 @@ namespace HITSBlazor.Utils.Mocks.Users
             new User
             {
                 Id = DmitryId,
-                Token = "890954",
                 Email = "d.shirokov@unlim.group",
                 FirstName = "Дмитрий",
                 LastName = "Широков",
@@ -205,7 +196,6 @@ namespace HITSBlazor.Utils.Mocks.Users
             new User
             {
                 Id = TimurId,
-                Token = "890923",
                 Email = "timyr@mail.com",
                 FirstName = "Тимур",
                 LastName = "Минязев",
@@ -224,7 +214,6 @@ namespace HITSBlazor.Utils.Mocks.Users
             new User
             {
                 Id = AdminId,
-                Token = "864923",
                 Email = "admin@mail.com",
                 FirstName = "Админ",
                 LastName = "Иванов",
@@ -243,7 +232,6 @@ namespace HITSBlazor.Utils.Mocks.Users
             new User
             {
                 Id = DenisId,
-                Token = "864103",
                 Email = "deins@mail.com",
                 FirstName = "Денис",
                 LastName = "Денисович",
@@ -262,7 +250,6 @@ namespace HITSBlazor.Utils.Mocks.Users
             new User
             {
                 Id = MagaId,
-                Token = "704103",
                 Email = "maga@mail.com",
                 FirstName = "Мамедага",
                 LastName = "Байрамов",
@@ -281,7 +268,6 @@ namespace HITSBlazor.Utils.Mocks.Users
             new User
             {
                 Id = AlexId,
-                Token = "709803",
                 Email = "alex@inbox.ru",
                 FirstName = "Алексей",
                 LastName = "Князев",

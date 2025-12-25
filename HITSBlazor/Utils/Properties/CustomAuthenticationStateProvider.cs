@@ -1,4 +1,5 @@
-﻿using HITSBlazor.Services.Auth;
+﻿using HITSBlazor.Models.Users.Entities;
+using HITSBlazor.Services.Auth;
 using Microsoft.AspNetCore.Components.Authorization;
 using System.Security.Claims;
 
@@ -14,23 +15,42 @@ namespace HITSBlazor.Utils.Properties
             _authService.OnAuthStateChanged += AuthStateChanged;
         }
 
-        public override Task<AuthenticationState> GetAuthenticationStateAsync()
+        public override async Task<AuthenticationState> GetAuthenticationStateAsync()
         {
-            if (_authService.IsAuthenticated)
+            var user = _authService.CurrentUser;
+            if (_authService.IsAuthenticated && user is not null)
             {
-                var claims = new[]
-                {
-                    new Claim(ClaimTypes.Name, "Authenticated User"),
-                    new Claim(ClaimTypes.Role, "User")
-                };
 
-                var identity = new ClaimsIdentity(claims, "CookieAuth");
+                var identity = new ClaimsIdentity(BuildClaims(user), "CookieAuth");
                 var principal = new ClaimsPrincipal(identity);
 
-                return Task.FromResult(new AuthenticationState(principal));
+                return new AuthenticationState(principal);
             }
 
-            return Task.FromResult(new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity())));
+            return new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
+        }
+
+        private static List<Claim> BuildClaims(User user)
+        {
+            var claims = new List<Claim>
+            {
+                new(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                new(ClaimTypes.Email, user.Email),
+                new(ClaimTypes.GivenName, user.FirstName),
+                new(ClaimTypes.Surname, user.LastName),
+                new("Telephone", user.Telephone ?? string.Empty),
+                new("StudyGroup", user.StudyGroup ?? string.Empty)
+            };
+
+            // важное для проверки ролей в авторизации
+            foreach (var role in user.Roles)
+                claims.Add(new Claim(ClaimTypes.Role, role.ToString()));
+
+            // просто для проверки активной роли, активная роль уже есть в Roles
+            if (user.Role.HasValue)
+                claims.Add(new Claim("CurrentRole", user.Role.Value.ToString()));
+
+            return claims;
         }
 
         private void AuthStateChanged()

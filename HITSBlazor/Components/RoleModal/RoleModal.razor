@@ -1,0 +1,91 @@
+﻿@namespace HITSBlazor.Components.RoleModal
+@using HITSBlazor.Components.Button
+@using HITSBlazor.Components.Typography
+@using HITSBlazor.Models.Users.Enums
+@using HITSBlazor.Services.Auth
+@using HITSBlazor.Models.Users.Entities
+@inject IAuthService AuthService
+@inject NavigationManager NavigationManager
+
+<ModalLayout IsOpened="IsOpened"
+             AllowOutsideClose="true"
+             OnOutsideClose="CloseModal">
+    <div class="role-modal p-3 rounded bg-white">
+        <Typography ClassName="fs-3 text-primary text-center">
+            Доступные роли
+        </Typography>
+
+        @if (User?.Roles != null)
+        {
+            @foreach (var role in User.Roles)
+            {
+                <Button Type="button"
+                        Variant="primary"
+                        ClassName="w-100 mb-2"
+                        OnClick="() => HandleChooseRole(role)">
+                    @GetTranslatedRole(role)
+                </Button>
+            }
+        }
+        else
+        {
+            <p class="text-center">Нет доступных ролей</p>
+        }
+    </div>
+</ModalLayout>
+
+@code {
+    [Parameter] public bool IsOpened { get; set; }
+    [Parameter] public EventCallback OnClose { get; set; }
+
+    private User? User => AuthService.CurrentUser;
+
+    private Dictionary<RoleType, string> RoleTranslations { get; set; } = new()
+    {
+        { RoleType.INITIATOR, "Инициатор" },
+        { RoleType.PROJECT_OFFICE, "Проектный офис" },
+        { RoleType.EXPERT, "Эксперт" },
+        { RoleType.TEACHER, "Учитель" },
+        { RoleType.ADMIN, "Администратор" }
+    };
+
+    private object GetTranslatedRole(RoleType role)
+    {
+        return RoleTranslations.TryGetValue(role, out var translation)
+            ? translation
+            : role;
+    }
+
+    private async Task HandleChooseRole(RoleType role)
+    {
+        if (User == null) return;
+
+        try
+        {
+            // Устанавливаем роль пользователю
+            AuthService.SetUserRoleAsync(role);
+
+            // Получаем текущий путь
+            var currentPath = NavigationManager.Uri;
+
+            // наверно понадобится forceload для смены Claims
+
+            await CloseModal();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Ошибка при выборе роли: {ex.Message}");
+        }
+    }
+
+    private async Task CloseModal()
+    {
+        IsOpened = false;
+        if (OnClose.HasDelegate)
+            await OnClose.InvokeAsync();
+    }
+
+    // Методы для управления модальным окном извне
+    public void Open() => IsOpened = true;
+    public void Close() => IsOpened = false;
+}

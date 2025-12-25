@@ -1,4 +1,5 @@
 ﻿using HITSBlazor.Models.Users.Entities;
+using HITSBlazor.Models.Users.Enums;
 using HITSBlazor.Pages.Login;
 using HITSBlazor.Pages.NewPassword;
 using HITSBlazor.Pages.Register;
@@ -10,7 +11,10 @@ using System.Text.Json;
 
 namespace HITSBlazor.Services.Auth
 {
-    public class MockAuthService(IJSRuntime jsRuntime, NavigationManager navigationManager) : IAuthService
+    public class MockAuthService(
+        IJSRuntime jsRuntime, 
+        NavigationManager navigationManager
+    ) : IAuthService
     {
         private readonly IJSRuntime _jsRuntime = jsRuntime;
         private readonly NavigationManager _navigationManager = navigationManager;
@@ -19,6 +23,7 @@ namespace HITSBlazor.Services.Auth
         public event Action? OnAuthStateChanged;
 
         public bool IsAuthenticated { get; private set; }
+        public User CurrentUser { get; private set; } = new();
 
         public async Task InitializeAsync()
         {
@@ -44,6 +49,7 @@ namespace HITSBlazor.Services.Auth
                 await SaveTokenAsync(mockToken);
 
                 IsAuthenticated = true;
+                CurrentUser = user;
 
                 await SaveUserInfoAsync(user);
 
@@ -110,6 +116,18 @@ namespace HITSBlazor.Services.Auth
             {
                 return ServiceResponse<bool>.Failure($"Ошибка: {ex.Message}");
             }
+        }
+
+        public bool SetUserRoleAsync(RoleType roleType)
+        {
+            if (CurrentUser == null || !CurrentUser.Roles.Contains(roleType))
+                return false;
+
+            CurrentUser.Role = roleType;
+
+            OnAuthStateChanged?.Invoke();
+
+            return true;
         }
 
         private async Task SaveTokenAsync(string token)
