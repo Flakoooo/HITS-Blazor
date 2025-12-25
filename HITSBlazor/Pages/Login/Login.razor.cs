@@ -23,6 +23,10 @@ namespace HITSBlazor.Pages.Login
 
         protected override void OnInitialized()
         {
+            //TODO: УБРАТЬ ПОСЛЕ РАЗРАБОТКИ
+            loginModel.Email = "lexunok@gmail.com";
+            loginModel.Password = "lexunok2505";
+
             if (AuthService.IsAuthenticated)
                 Navigation.NavigateTo("/");
         }

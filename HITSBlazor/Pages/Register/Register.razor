@@ -1,4 +1,5 @@
-﻿<PageTitle>Регистрация</PageTitle>
+﻿@using HITSBlazor.Components.Button
+<PageTitle>Регистрация</PageTitle>
 
 <div class="page-layout">
     <div class="page-layout__content-wrapper w-100 overflow-y-scroll">
@@ -74,17 +75,12 @@
                            placeholder="Введите пароль" />
                 </div>
 
-                <button type="submit" class="btn btn-primary w-100" disabled="@isLoading">
-                    @if (isLoading)
-                    {
-                        <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                        <span>Регистрация...</span>
-                    }
-                    else
-                    {
-                        <span>Зарегистрироваться</span>
-                    }
-                </button>
+                <Button Type="submit" 
+                        Text="@(isLoading ? "Регистрация..." : "Зарегистрироваться")" 
+                        Variant="primary" 
+                        ClassName="w-100"
+                        IsLoading="@isLoading"
+                        Disabled="@isLoading" />
             </form>
         </div>
     </div>

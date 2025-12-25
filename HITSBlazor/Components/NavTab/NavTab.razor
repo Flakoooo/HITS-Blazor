@@ -1,0 +1,61 @@
+﻿@namespace HITSBlazor.Components.NavTab
+@using HITSBlazor.Components.Icon
+@using HITSBlazor.Components.Typography
+@using HITSBlazor.Components.Collapse
+
+<div class="@GetWrapperClass()">
+    @if (Routes == null || !Routes.Any())
+    {
+        <NavLink class="@GetNavTabClass(false)" href="@To" ActiveClass="active" Match="NavLinkMatch.All">
+            @if (!string.IsNullOrEmpty(IconName))
+            {
+                <Icon ClassName="@($"{IconName} fs-5")" />
+            }
+
+            @if (!string.IsNullOrEmpty(Label))
+            {
+                <Typography ClassName="ms-2">
+                    @Label
+                </Typography>
+            }
+        </NavLink>
+    }
+    else
+    {
+        <button class="@GetNavTabClass(true)" @onclick="ToggleCollapse">
+            @if (!string.IsNullOrEmpty(IconName))
+            {
+                <Icon ClassName="@($"{IconName} fs-5")" />
+            }
+
+            @if (!string.IsNullOrEmpty(Label))
+            {
+                <Typography ClassName="ms-2">
+                    @Label
+                </Typography>
+            }
+        </button>
+
+        <Collapse Id="@To" ClassName="@GetCollapseClass()">
+            <div class="pt-2 rounded">
+                @foreach (var route in GetFilteredRoutes())
+                {
+                    <NavLink class="nav-route list-group-item list-group-item-light"
+                             href="@route.To"
+                             ActiveClass="active"
+                             Match="NavLinkMatch.Prefix">
+                        @if (!string.IsNullOrEmpty(route.IconName))
+                        {
+                            <Icon ClassName="@route.IconName" />
+                        }
+
+                        @if (!string.IsNullOrEmpty(route.Text))
+                        {
+                            <span class="nav-route__span">@route.Text</span>
+                        }
+                    </NavLink>
+                }
+            </div>
+        </Collapse>
+    }
+</div>

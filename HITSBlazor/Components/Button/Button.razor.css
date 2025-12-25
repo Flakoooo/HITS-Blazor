@@ -1,0 +1,79 @@
+﻿.btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+}
+
+.btn-maxWidth {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 100%;
+}
+
+/* Дополнительные стили для кнопок в состоянии загрузки */
+.btn:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+}
+
+/* Гарантируем что кнопка всегда имеет правильные цвета */
+.btn-primary {
+    background-color: #0d6efd !important;
+    border-color: #0d6efd !important;
+}
+
+    .btn-primary:hover:not(:disabled) {
+        background-color: #0b5ed7 !important;
+        border-color: #0a58ca !important;
+    }
+
+    .btn-primary:active:not(:disabled) {
+        background-color: #0a58ca !important;
+        border-color: #0a53be !important;
+    }
+
+/* Другие варианты кнопок */
+.btn-secondary {
+    background-color: #6c757d !important;
+    border-color: #6c757d !important;
+}
+
+.btn-success {
+    background-color: #198754 !important;
+    border-color: #198754 !important;
+}
+
+.btn-danger {
+    background-color: #dc3545 !important;
+    border-color: #dc3545 !important;
+}
+
+.btn-warning {
+    background-color: #ffc107 !important;
+    border-color: #ffc107 !important;
+    color: #000 !important;
+}
+
+.btn-info {
+    background-color: #0dcaf0 !important;
+    border-color: #0dcaf0 !important;
+}
+
+.btn-light {
+    background-color: #f8f9fa !important;
+    border-color: #f8f9fa !important;
+    color: #000 !important;
+}
+
+.btn-dark {
+    background-color: #212529 !important;
+    border-color: #212529 !important;
+}
+
+.btn-link {
+    background-color: transparent !important;
+    border-color: transparent !important;
+    color: #0d6efd !important;
+}

@@ -1,7 +1,26 @@
 ﻿@page "/"
+@using HITSBlazor.Components.Button
+@using HITSBlazor.Services
+@using HITSBlazor.Services.Auth
+@inject IAuthService AuthService
+@inject NotificationService NotificationService
 
 <PageTitle>Home</PageTitle>
 
 <h1>Hello, world!</h1>
 
 Welcome to your new app.
+
+<Button Type="button"
+        Text="Выйти" 
+        Variant="primary" 
+        ClassName="w-100"
+        OnClick="Logout"/>
+
+@code {
+    private async Task Logout()
+    {
+        var temp = await AuthService.LogoutAsync();
+        NotificationService.ShowError(temp.Error);
+    }
+}

@@ -1,0 +1,34 @@
+﻿@namespace HITSBlazor.Components.Button
+@using HITSBlazor.Components.Icon
+@using HITSBlazor.Components.LoadingSpinner
+
+<button type="@Type" 
+        class="@GetButtonClass()" 
+        disabled="@IsDisabled"
+        @onclick="OnClickHandler"
+        @attributes="AdditionalAttributes">
+    
+    @if (!string.IsNullOrEmpty(PrependIconName))
+    {
+        <Icon ClassName="@($"{PrependIconName} fs-5")" />
+    }
+    
+    @if (IsLoading)
+    {
+        <LoadingSpinner IsLoading="true" Size="sm" Variant="light" />
+    }
+    
+    @if (ChildContent != null)
+    {
+        @ChildContent
+    }
+    else if (!string.IsNullOrEmpty(Text))
+    {
+        <span>@Text</span>
+    }
+    
+    @if (!string.IsNullOrEmpty(AppendIconName))
+    {
+        <Icon ClassName="@($"{AppendIconName} fs-5")" />
+    }
+</button>

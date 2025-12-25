@@ -1,10 +1,13 @@
-﻿@using HITSBlazor.Components.Icon
+﻿@namespace HITSBlazor.Components.Typography
+@using HITSBlazor.Components.Icon
 
-<span class="@GetTypographyClass()">@ChildContent</span>
+<span class="@GetTypographyClass()">
+    @ChildContent
+</span>
 
 @if (!string.IsNullOrEmpty(Hint))
 {
-    <Icon Id="hint-icon" ClassName="bi bi-patch-question hint" OnClick="ShowHint" />
+    <Icon ClassName="bi bi-patch-question hint" OnClick="ShowHint" />
 }
 
 @code {
@@ -34,6 +37,7 @@
 
     private void ShowHint()
     {
+        //TODO: реализовать отображение подсказки
         Console.WriteLine($"Hint: {Hint}");
     }
 }
