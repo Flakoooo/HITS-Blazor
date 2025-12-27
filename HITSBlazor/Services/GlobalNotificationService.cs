@@ -1,6 +1,6 @@
 ﻿namespace HITSBlazor.Services
 {
-    public class NotificationService
+    public class GlobalNotificationService
     {
         public event Action<string>? OnErrorNotification;
         public event Action<string>? OnSuccessNotification;

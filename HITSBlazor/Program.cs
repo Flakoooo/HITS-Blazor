@@ -6,9 +6,7 @@ using HITSBlazor.Services.Auth;
 using HITSBlazor.Services;
 using HITSBlazor.Services.Users;
 using HITSBlazor.Services.Invitation;
-
-
-
+using HITSBlazor.Services.Notifications;
 #if DEBUG && !DEBUGAPI
 using HITSBlazor.Services.Service.Mock;
 #else
@@ -46,7 +44,7 @@ namespace HITSBlazor
 #endif
 
             // Utils
-            builder.Services.AddScoped<NotificationService>();
+            builder.Services.AddScoped<GlobalNotificationService>();
 
             // Auth
 #if DEBUG && !DEBUGAPI
@@ -63,6 +61,9 @@ namespace HITSBlazor
             );
             builder.Services.AddCascadingAuthenticationState();
             builder.Services.AddAuthorizationCore();
+
+            // Notification
+            builder.Services.AddScoped<INotificationService, MockNotificationService>();
 
             await builder.Build().RunAsync();
         }

@@ -1,0 +1,35 @@
+﻿.notification-window-modal {
+    width: 50%;
+    border-top-left-radius: 8px;
+    border-bottom-left-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    align-self: stretch;
+    justify-self: flex-end;
+    transition: all 0.3s ease-out;
+    position: fixed;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    overflow-y: auto;
+}
+
+/* Анимация как в Vue версии */
+.modal-layout-enter .notification-window-modal {
+    transform: translateX(100%);
+}
+
+.modal-layout-enter-active .notification-window-modal {
+    transform: translateX(0);
+    transition: transform 0.3s ease-out;
+}
+
+.modal-layout-leave .notification-window-modal {
+    transform: translateX(0);
+}
+
+.modal-layout-leave-active .notification-window-modal {
+    transform: translateX(100%);
+    transition: transform 0.3s ease-out;
+}

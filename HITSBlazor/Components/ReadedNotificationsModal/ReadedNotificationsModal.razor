@@ -1,0 +1,32 @@
+﻿@namespace HITSBlazor.Components.ReadedNotificationsModal
+@using HITSBlazor.Components.NotificationTab
+@using HITSBlazor.Components.Typography
+@using HITSBlazor.Models.Common.Entities
+
+<div class="w-100 d-flex flex-column gap-3">
+    <Typography ClassName="fs-5 text-primary text-wrap">
+        Прочитано (@ReadedNotifications?.Count ?? 0)
+    </Typography>
+
+    @if (ReadedNotifications == null || !ReadedNotifications.Any())
+    {
+        <Typography ClassName="w-100 text-center text-secondary">
+            У вас нет прочитанных уведомлений
+        </Typography>
+    }
+    else
+    {
+        @foreach (var notification in ReadedNotifications)
+        {
+            <NotificationTab Notification="notification"
+                            OnAddFavorite="OnAddFavorite"
+                            OnRemoveFavorite="OnRemoveFavorite" />
+        }
+    }
+</div>
+
+@code {
+    [Parameter] public List<Notification>? ReadedNotifications { get; set; }
+    [Parameter] public EventCallback<Notification> OnAddFavorite { get; set; }
+    [Parameter] public EventCallback<Notification> OnRemoveFavorite { get; set; }
+}

@@ -15,8 +15,13 @@
                         }
                     </NotAuthorized>
                     <Authorizing>
-                        <div class="loading-container">
-                            <p>Проверка авторизации...</p>
+                        <div class="auth-loading d-flex justify-content-center align-items-center vh-100">
+                            <div class="text-center">
+                                <div class="spinner-border text-primary mb-3" style="width: 3rem; height: 3rem;" role="status">
+                                    <span class="visually-hidden">Проверка авторизации...</span>
+                                </div>
+                                <p class="text-muted">Проверка авторизации...</p>
+                            </div>
                         </div>
                     </Authorizing>
                 </AuthorizeRouteView>
@@ -30,10 +35,6 @@
                 </LayoutView>
             </NotFound>
         </Router>
-    }
-    else
-    {
-        <div></div>
     }
 </CascadingAuthenticationState>
 

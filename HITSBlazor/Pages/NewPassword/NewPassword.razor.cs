@@ -23,7 +23,7 @@ namespace HITSBlazor.Pages.NewPassword
         private IAuthService AuthService { get; set; } = null!;
 
         [Inject]
-        private NotificationService NotificationService { get; set; } = null!;
+        private GlobalNotificationService NotificationService { get; set; } = null!;
 
         protected override void OnInitialized()
         {

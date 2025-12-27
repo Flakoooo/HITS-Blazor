@@ -1,6 +1,69 @@
 ﻿@using HITSBlazor.Components
+@using HITSBlazor.Components.LeftSideBar
+@using HITSBlazor.Services.Auth
 @inherits LayoutComponentBase
+@inject IAuthService AuthService
 
-<GlobalNotification />
+@if (isInitialized)
+{
+    @if (AuthService.IsAuthenticated)
+    {
+        <div class="d-flex h-100">
+            <LeftSideBar />
+            <main class="flex-grow-1 overflow-auto">
+                @Body
+            </main>
+        </div>
+    }
+    else
+    {
+        @Body
+    }
 
-@Body
+    <GlobalNotification />
+}
+else
+{
+    <div class="loading-container d-flex justify-content-center align-items-center h-100">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Загрузка...</span>
+        </div>
+    </div>
+}
+
+@code {
+    private bool isInitialized = false;
+
+    private bool IsAuthenticated { get; set; } = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            await AuthService.InitializeAsync();
+            IsAuthenticated = AuthService.IsAuthenticated;
+            AuthService.OnAuthStateChanged += AuthStateChanged;
+            isInitialized = true;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Ошибка инициализации MainLayout: {ex.Message}");
+            isInitialized = true;
+        }
+    }
+
+    public void AuthStateChanged()
+    {
+        var newValue = AuthService.IsAuthenticated;
+        if (IsAuthenticated != newValue)
+        {
+            IsAuthenticated = newValue;
+            InvokeAsync(StateHasChanged);
+        }
+    }
+
+    public void Dispose()
+    {
+        AuthService.OnAuthStateChanged -= AuthStateChanged;
+    }
+}

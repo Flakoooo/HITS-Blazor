@@ -9,7 +9,7 @@
         public string? Link { get; set; }
         public bool IsShowed { get; set; }
         public bool IsReaded { get; set; }
-        public bool IsFavourite { get; set; }
+        public bool IsFavorite { get; set; }
         public string CreatedAt { get; set; } = string.Empty;
     }
 }

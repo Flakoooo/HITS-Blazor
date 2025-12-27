@@ -19,7 +19,7 @@ namespace HITSBlazor.Pages.RecoveryPassword
         private IAuthService AuthService { get; set; } = null!;
 
         [Inject]
-        private NotificationService NotificationService { get; set; } = null!;
+        private GlobalNotificationService NotificationService { get; set; } = null!;
 
         private async Task HandleRecovery()
         {

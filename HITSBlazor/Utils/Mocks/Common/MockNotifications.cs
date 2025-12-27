@@ -24,7 +24,7 @@ namespace HITSBlazor.Utils.Mocks.Common
                     Link = null,
                     IsShowed = true,
                     IsReaded = false,
-                    IsFavourite = false,
+                    IsFavorite = false,
                     CreatedAt = new DateTime(2023, 10, 25, 11, 2, 17, DateTimeKind.Utc).ToString(Settings.DateFormat)
                 },
                 new Notification
@@ -36,7 +36,7 @@ namespace HITSBlazor.Utils.Mocks.Common
                     Link = null,
                     IsShowed = false,
                     IsReaded = false,
-                    IsFavourite = false,
+                    IsFavorite = false,
                     CreatedAt = new DateTime(2023, 10, 28, 11, 2, 17, DateTimeKind.Utc).ToString(Settings.DateFormat)
                 },
                 new Notification
@@ -48,10 +48,22 @@ namespace HITSBlazor.Utils.Mocks.Common
                     Link = null,
                     IsShowed = false,
                     IsReaded = true,
-                    IsFavourite = true,
+                    IsFavorite = true,
                     CreatedAt = new DateTime(2023, 10, 20, 11, 2, 17, DateTimeKind.Utc).ToString(Settings.DateFormat)
                 },
             ];
         }
+
+        public static List<Notification> GetAllNotificationsByUserId(Guid userId)
+            => [.. _notifications.Where(n => n.UserId == userId)];
+
+        public static List<Notification> GetReadedNotificationsByUserId(Guid userId)
+            => [.. _notifications.Where(n => n.UserId == userId && n.IsReaded)];
+
+        public static List<Notification> GetUnreadedNotificationsByUserId(Guid userId)
+            => [.. _notifications.Where(n => n.UserId == userId && !n.IsReaded)];
+
+        public static List<Notification> GetFavoriteNotificationsByUserId(Guid userId)
+            => [.. _notifications.Where(n => n.UserId == userId && n.IsFavorite)];
     }
 }

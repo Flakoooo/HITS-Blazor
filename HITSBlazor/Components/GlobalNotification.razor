@@ -20,7 +20,7 @@
     private string alertClass => isError ? "alert-danger" : "alert-success";
 
     [Inject]
-    private NotificationService NotificationService { get; set; } = null!;
+    private GlobalNotificationService NotificationService { get; set; } = null!;
 
     protected override void OnInitialized()
     {

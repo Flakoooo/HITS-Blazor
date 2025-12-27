@@ -1,0 +1,75 @@
+﻿@namespace HITSBlazor.Components.SwitchTabs
+
+<div class="@GetWrapperClass()">
+    @foreach (var tab in Tabs)
+    {
+        <div class="@GetNavTabClass(tab.Id)"
+             @onclick="@(() => ClickTab(tab))"
+             style="cursor: pointer;">
+            @tab.Label
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter] public List<SwitchTab> Tabs { get; set; } = new();
+    [Parameter] public string? WrapperClassName { get; set; }
+    [Parameter] public string? TabClassName { get; set; }
+
+    private string currentIdTab = string.Empty;
+
+    protected override void OnParametersSet()
+    {
+        if (Tabs.Any() && string.IsNullOrEmpty(currentIdTab))
+        {
+            currentIdTab = Tabs[0].Id;
+        }
+    }
+
+    private string GetWrapperClass()
+    {
+        var classes = new List<string>
+        {
+            "nav",
+            "nav-underline",
+            "w-100",
+            "d-flex",
+            "justify-content-center"
+        };
+
+        if (!string.IsNullOrEmpty(WrapperClassName))
+            classes.Add(WrapperClassName);
+
+        return string.Join(" ", classes);
+    }
+
+    private string GetNavTabClass(string id)
+    {
+        var classes = new List<string>
+        {
+            "nav-link",
+            "fw-normal"
+        };
+
+        if (!string.IsNullOrEmpty(TabClassName))
+            classes.Add(TabClassName);
+
+        if (id == currentIdTab)
+        {
+            classes.Add("active");
+            classes.Add("text-primary");
+        }
+        else
+        {
+            classes.Add("text-dark");
+        }
+
+        return string.Join(" ", classes);
+    }
+
+    private void ClickTab(SwitchTab tab)
+    {
+        currentIdTab = tab.Id;
+        tab.Click?.Invoke();
+    }
+}

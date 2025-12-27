@@ -37,7 +37,7 @@ namespace HITSBlazor.Pages.Register
         private InvitationApi InvitationApi { get; set; } = null!;
 
         [Inject]
-        private NotificationService NotificationService { get; set; } = null!;
+        private GlobalNotificationService NotificationService { get; set; } = null!;
 
         protected override async Task OnInitializedAsync()
         {

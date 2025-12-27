@@ -1,0 +1,188 @@
+﻿@namespace HITSBlazor.Components.NotificationModalWindow
+@using HITSBlazor.Components.FavouriteNotifications
+@using HITSBlazor.Components.NotificationTabsPlaceholder
+@using HITSBlazor.Components.ReadedNotificationsModal
+@using HITSBlazor.Components.UnreadedNotificationsModal
+@using HITSBlazor.Layout
+@using HITSBlazor.Components.Typography
+@using HITSBlazor.Components.Button
+@using HITSBlazor.Components.SwitchTabs
+@using HITSBlazor.Components.Placeholders
+@using HITSBlazor.Models.Common.Entities
+@using HITSBlazor.Services
+@using HITSBlazor.Services.Auth
+@using HITSBlazor.Services.Notifications
+@inject IAuthService AuthService
+@inject INotificationService NotificationService
+
+<ModalLayout IsOpened="IsOpened"
+             OnClose="CloseModal">
+    
+    @if (IsOpened)
+    {
+        <div class="notification-window-modal p-3 bg-white overflow-y-scroll">
+            <div class="w-100 d-flex justify-content-between align-items-center mb-3">
+                <div class="col-2">
+                    <Button Type="button"
+                            Variant="primary"
+                            ClassName="col-12"
+                            PrependIconName="bi bi-backspace-fill"
+                            OnClick="CloseModal">
+                        Назад
+                    </Button>
+                </div>
+                
+                <Typography ClassName="text-center fs-3 text-primary m-0">
+                    Уведомления
+                </Typography>
+                
+                <div class="col-2"></div>
+            </div>
+
+            <SwitchTabs Tabs="tabs" />
+
+            @if (!isLoading)
+            {
+                @if (isAllTab)
+                {
+                    <div class="w-100 d-flex flex-column gap-3 mt-3">
+                        <UnreadedNotificationsModal UnreadedNotifications="UnreadedNotifications"
+                                                    OnReadNotification="HandleReadNotification"
+                                                    OnAddFavorite="HandleAddFavorite"
+                                                    OnRemoveFavorite="HandleRemoveFavorite"
+                                                    OnMarkAllAsRead="HandleMarkAllAsRead" />
+
+                        <hr class="my-0 hr hr-blurry" />
+
+                        <ReadedNotificationsModal ReadedNotifications="ReadedNotifications"
+                                                  OnAddFavorite="HandleAddFavorite"
+                                                  OnRemoveFavorite="HandleRemoveFavorite" />
+                    </div>
+                }
+                else
+                {
+                    <div class="mt-3">
+                        <FavouriteNotifications FavouriteNotifications="FavouriteNotifications"
+                                                OnAddFavorite="HandleAddFavorite"
+                                                OnRemoveFavorite="HandleRemoveFavorite" />
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="mt-3">
+                    <NotificationTabsPlaceholder Count="3" />
+                </div>
+            }
+        </div>
+    }
+</ModalLayout>
+
+@code {
+    [Parameter] public bool IsOpened { get; set; }
+    [Parameter] public EventCallback OnClose { get; set; }
+    
+    private bool isAllTab = true;
+    private bool isLoading = false;
+    private List<SwitchTab> tabs = new();
+    
+    private List<Notification> UnreadedNotifications { get; set; } = new();
+    private List<Notification> ReadedNotifications { get; set; } = new();
+    private List<Notification> FavouriteNotifications { get; set; } = new();
+
+    protected override void OnInitialized()
+    {
+        tabs = new List<SwitchTab>
+        {
+            new SwitchTab
+            {
+                Id = "0",
+                Label = "Все",
+                Click = async () => await SwitchTab(true)
+            },
+            new SwitchTab
+            {
+                Id = "1",
+                Label = "Избранное",
+                Click = async () => await SwitchTab(false)
+            }
+        };
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (IsOpened)
+        {
+            await GetNotifications(true);
+        }
+    }
+
+    private async Task GetNotifications(bool isAllNotifications)
+    {
+        var currentUser = AuthService.CurrentUser;
+        if (currentUser == null) return;
+
+        isLoading = true;
+        
+        try
+        {
+            if (isAllNotifications)
+            {
+                var allNotifications = await NotificationService.GetAllNotificationsAsync();
+                UnreadedNotifications = allNotifications.Where(n => !n.IsReaded).ToList();
+                ReadedNotifications = allNotifications.Where(n => n.IsReaded).ToList();
+            }
+            else
+            {
+                FavouriteNotifications = await NotificationService.GetFavoriteNotificationsAsync();
+            }
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private async Task SwitchTab(bool isAllNotifications)
+    {
+        isAllTab = isAllNotifications;
+        await GetNotifications(isAllNotifications);
+    }
+
+    private async Task CloseModal()
+    {
+        IsOpened = false;
+        if (OnClose.HasDelegate)
+        {
+            await OnClose.InvokeAsync();
+        }
+    }
+
+    private async Task HandleReadNotification(Notification notification)
+    {
+        await NotificationService.MarkAsReadAsync(notification.Id);
+        await GetNotifications(isAllTab);
+    }
+
+    private async Task HandleAddFavorite(Notification notification)
+    {
+        await NotificationService.AddToFavoritesAsync(notification.Id);
+        await GetNotifications(isAllTab);
+    }
+
+    private async Task HandleRemoveFavorite(Notification notification)
+    {
+        await NotificationService.RemoveFromFavoritesAsync(notification.Id);
+        await GetNotifications(isAllTab);
+    }
+
+    private async Task HandleMarkAllAsRead()
+    {
+        await NotificationService.MarkAllAsReadAsync();
+        await GetNotifications(isAllTab);
+    }
+
+    public void Open() => IsOpened = true;
+    public void Close() => IsOpened = false;
+    public void Toggle() => IsOpened = !IsOpened;
+}
