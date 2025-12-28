@@ -15,20 +15,21 @@
 
 @if (User?.Role != null)
 {
-    <div @ref="leftSideBarRef" 
-         class="@GetSideBarClass()" 
-         @onmouseenter="OnMouseEnter" 
+    <div @ref="leftSideBarRef"
+         class="@GetSideBarClass()"
+         @onmouseenter="OnMouseEnter"
          @onmouseleave="OnMouseLeave">
-        
+
         <ul class="left-side-bar__content nav nav-pills w-100 gap-2">
             @foreach (var tab in filteredTabs)
             {
-                <NavTab Label="@(isHovered ? tab.Text : "")"
+                <NavTab Label="@(isHovered? tab.Text: "")"
                         IconName="@tab.IconName"
                         To="@tab.To"
                         Routes="@ConvertToNavRoutes(tab.Routes)"
                         WrapperClassName="@(isHovered ? "left-side-bar__link w-100" : "")"
-                        ClassName="@(isHovered ? "text-white" : "")" />
+                        ClassName="@(isHovered ? "text-white" : "")"
+                        CurrentUser="@User" />
             }
         </ul>
 
@@ -37,7 +38,7 @@
                     ClassName="left-side-bar__button btn-light w-100 text-success"
                     PrependIconName="bi bi-circle-fill fs-6"
                     OnClick="OpenRoleModal"
-                    Disabled="@ChangeRoleDisabled">
+                    Disabled="@UserHaveMoreRoles">
                 @if (isHovered)
                 {
                     @GetTranslatedRole(User.Role.Value)
@@ -69,6 +70,13 @@
             </Button>
         </div>
 
+        @if (isHovered)
+        {
+            <div class="mt-auto pt-2 text-center">
+                <small class="text-white-50">Версия 1.0.0</small>
+            </div>
+        }
+
         <RoleModal @ref="roleModal" />
         <NotificationModalWindow @ref="notificationModal" />
     </div>
@@ -87,24 +95,23 @@ else
     // Состояние
     private bool isHovered = false;
     private bool isAnimating = false;
+    private bool UserHaveMoreRoles => User?.Roles?.Count <= 1;
     private int unreadCount = 0;
     private List<LeftSideBarTab> tabs = new();
     private List<LeftSideBarTab> filteredTabs = new();
-    
-    // Таймеры и таски
+
+    // Таймеры
     private Timer? hoverTimer;
     private Timer? unreadCountTimer;
-    private CancellationTokenSource? cts;
-    
+
     // Сервисы
     [Inject] private IJSRuntime JSRuntime { get; set; } = null!;
-    
+
     // Пользователь
     private User? User => AuthService.CurrentUser;
-    private bool ChangeRoleDisabled => User?.Roles?.Count <= 1;
-    
+
     // Переводы ролей
-    private Dictionary<RoleType, string> roleTranslations = new()
+    private readonly Dictionary<RoleType, string> roleTranslations = new()
     {
         { RoleType.INITIATOR,       "Инициатор"         },
         { RoleType.TEAM_OWNER,      "Владелец команды"  },
@@ -119,12 +126,11 @@ else
     protected override async Task OnInitializedAsync()
     {
         tabs = LeftSideBarTabs.GetTabs();
-        
+
         AuthService.OnAuthStateChanged += OnAuthStateChanged;
         NotificationService.OnNotificationsUpdated += OnNotificationsUpdated;
         NotificationService.OnUnreadCountChanged += OnUnreadCountChanged;
-        
-        // Загружаем начальные данные
+
         await UpdateUnreadCount();
         UpdateFilteredTabs();
     }
@@ -133,13 +139,11 @@ else
     {
         if (firstRender)
         {
-            // Начинаем периодическое обновление счетчика
-            unreadCountTimer = new Timer(async _ => 
+            unreadCountTimer = new Timer(async _ =>
             {
                 await InvokeAsync(async () =>
                 {
                     await UpdateUnreadCount();
-                    StateHasChanged();
                 });
             }, null, TimeSpan.Zero, TimeSpan.FromSeconds(30));
         }
@@ -147,10 +151,9 @@ else
 
     private void OnAuthStateChanged()
     {
-        InvokeAsync(async () =>
+        InvokeAsync(() =>
         {
             UpdateFilteredTabs();
-            await UpdateUnreadCount();
             StateHasChanged();
         });
     }
@@ -160,7 +163,6 @@ else
         InvokeAsync(async () =>
         {
             await UpdateUnreadCount();
-            StateHasChanged();
         });
     }
 
@@ -175,6 +177,7 @@ else
         try
         {
             unreadCount = await NotificationService.GetUnreadCountAsync();
+            StateHasChanged();
         }
         catch
         {
@@ -190,7 +193,9 @@ else
             return;
         }
 
-        filteredTabs = tabs.Where(tab => tab.Roles.Contains(User.Role.Value)).ToList();
+        filteredTabs = tabs
+            .Where(tab => tab.Roles.Contains(User.Role.Value))
+            .ToList();
     }
 
     private List<NavRoute>? ConvertToNavRoutes(List<LeftSideBarTab>? sidebarRoutes)
@@ -200,17 +205,18 @@ else
 
         return sidebarRoutes.Select(r => new NavRoute
         {
+            Name = r.Name,
             To = r.To,
             Text = r.Text,
             IconName = r.IconName,
-            Roles = r.Roles.Select(role => role.ToString()).ToList()
+            Roles = r.Roles
         }).ToList();
     }
 
     private string GetTranslatedRole(RoleType role)
     {
-        return roleTranslations.TryGetValue(role, out var translation) 
-            ? translation 
+        return roleTranslations.TryGetValue(role, out var translation)
+            ? translation
             : role.ToString();
     }
 
@@ -219,29 +225,28 @@ else
         var classes = new List<string>
         {
             "left-side-bar",
-            "p-3",
-            "h-100"
+            "h-100",
+            "d-flex",
+            "flex-column"
         };
 
         if (isAnimating)
         {
-            if (isHovered)
-                classes.Add("left-side-bar--opened");
-            else
-                classes.Add("left-side-bar--closed");
+            classes.Add("left-side-bar--animating");
+            classes.Add(isHovered ? "left-side-bar--opened" : "left-side-bar--closed");
         }
-        else if (isHovered)
+        else
         {
-            classes.Add("left-side-bar--opened");
+            classes.Add(isHovered ? "left-side-bar--opened" : "left-side-bar--closed");
         }
 
         return string.Join(" ", classes);
     }
 
-    private async void OnMouseEnter()
+    private void OnMouseEnter()
     {
         hoverTimer?.Dispose();
-        
+
         hoverTimer = new Timer(_ =>
         {
             InvokeAsync(() =>
@@ -249,8 +254,8 @@ else
                 isHovered = true;
                 isAnimating = true;
                 StateHasChanged();
-                
-                // Сбрасываем анимацию через время анимации
+
+                // Сбрасываем флаг анимации через время анимации
                 Task.Delay(150).ContinueWith(_ =>
                 {
                     InvokeAsync(() =>
@@ -260,13 +265,13 @@ else
                     });
                 });
             });
-        }, null, 400, Timeout.Infinite);
+        }, null, 400, Timeout.Infinite); // Задержка как в Vue (400ms)
     }
 
     private void OnMouseLeave()
     {
         hoverTimer?.Dispose();
-        
+
         hoverTimer = new Timer(_ =>
         {
             InvokeAsync(() =>
@@ -274,7 +279,7 @@ else
                 isHovered = false;
                 isAnimating = true;
                 StateHasChanged();
-                
+
                 Task.Delay(150).ContinueWith(_ =>
                 {
                     InvokeAsync(() =>
@@ -284,7 +289,7 @@ else
                     });
                 });
             });
-        }, null, 100, Timeout.Infinite);
+        }, null, 100, Timeout.Infinite); // Задержка перед скрытием
     }
 
     private void OpenRoleModal()
@@ -300,14 +305,15 @@ else
     private async Task HandleLogout()
     {
         await AuthService.LogoutAsync();
+        Navigation.NavigateTo("/", true);
     }
 
     public void Dispose()
     {
         hoverTimer?.Dispose();
         unreadCountTimer?.Dispose();
-        cts?.Cancel();
-        
+
+        // Отписываемся от событий
         AuthService.OnAuthStateChanged -= OnAuthStateChanged;
         NotificationService.OnNotificationsUpdated -= OnNotificationsUpdated;
         NotificationService.OnUnreadCountChanged -= OnUnreadCountChanged;

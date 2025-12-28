@@ -4,12 +4,12 @@ using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using HITSBlazor.Utils.Properties;
 using HITSBlazor.Services.Auth;
 using HITSBlazor.Services;
+using HITSBlazor.Services.Notifications;
+
+
+#if DEBUGAPI || RELEASE
 using HITSBlazor.Services.Users;
 using HITSBlazor.Services.Invitation;
-using HITSBlazor.Services.Notifications;
-#if DEBUG && !DEBUGAPI
-using HITSBlazor.Services.Service.Mock;
-#else
 using HITSBlazor.Utils;
 using System.Net.Http.Headers;
 using System.Net.Mime;

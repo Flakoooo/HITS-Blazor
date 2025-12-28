@@ -20,6 +20,6 @@ namespace HITSBlazor.Services.Auth
         Task<ServiceResponse<bool>> ResetPasswordAsync(NewPasswordModel newPasswordModel);
         Task<ServiceResponse<bool>> RegistrationAsync(RegisterModel request, Guid invitationId);
 
-        bool SetUserRoleAsync(RoleType roleType);
+        Task<bool> SetUserRoleAsync(RoleType roleType);
     }
 }

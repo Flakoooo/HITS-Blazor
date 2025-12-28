@@ -19,8 +19,6 @@ Welcome to your new app.
         ClassName="w-100"
         OnClick="Logout"/>
 
-<div>@CurrentUser?.Id.ToString()</div>
-
 @code {
     private User? CurrentUser => AuthService.CurrentUser;
 

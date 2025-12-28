@@ -123,7 +123,7 @@ namespace HITSBlazor.Services.Auth
             return result;
         }
 
-        public bool SetUserRoleAsync(RoleType roleType)
+        public async Task<bool> SetUserRoleAsync(RoleType roleType)
         {
             if (CurrentUser == null || !CurrentUser.Roles.Contains(roleType))
                 return false;

@@ -1,14 +1,10 @@
 ﻿@namespace HITSBlazor.Components.Placeholders
 @using HITSBlazor.Components.LoadingPlaceholder
+@using static HITSBlazor.Components.LoadingPlaceholder.LoadingPlaceholder
 
 <div class="p-3 d-flex flex-column gap-2">
-    @for (int i = 0; i < Count; i++)
+    @for (int i = 0; i < 6; i++)
     {
-        <LoadingPlaceholder Height="small" />
+        <LoadingPlaceholder Height="@PlaceholderHeight.Small" />
     }
 </div>
-
-@code {
-    [Parameter] public int Count { get; set; } = 6;
-    [Parameter] public string? ClassName { get; set; }
-}

@@ -22,16 +22,23 @@ namespace HITSBlazor.Services.Auth
 
         public event Action? OnAuthStateChanged;
 
-        public bool IsAuthenticated { get; private set; }
+        public bool IsAuthenticated { get; private set; } = false;
         public User? CurrentUser { get; private set; } = null;
 
         public async Task InitializeAsync()
         {
             var token = await GetTokenAsync();
-            IsAuthenticated = !string.IsNullOrEmpty(token) 
-                && Guid.TryParse(token.Skip(_mockTokenTemplate.Length).ToString(), out var _);
+            if (!string.IsNullOrEmpty(token) && Guid.TryParse(token.Skip(_mockTokenTemplate.Length).ToString(), out Guid guid))
+            {
+                var user = MockUsers.GetUserById(guid);
+                if (user is not null)
+                {
+                    IsAuthenticated = true;
+                    CurrentUser = user;
 
-            OnAuthStateChanged?.Invoke();
+                    OnAuthStateChanged?.Invoke();
+                }
+            }
         }
 
         public async Task<ServiceResponse<bool>> LoginAsync(LoginModel request)
@@ -118,7 +125,7 @@ namespace HITSBlazor.Services.Auth
             }
         }
 
-        public bool SetUserRoleAsync(RoleType roleType)
+        public async Task<bool> SetUserRoleAsync(RoleType roleType)
         {
             if (CurrentUser == null || !CurrentUser.Roles.Contains(roleType))
                 return false;

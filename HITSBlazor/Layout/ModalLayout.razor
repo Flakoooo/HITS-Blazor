@@ -6,7 +6,15 @@
     <div id="@Id"
          class="@GetModalClass()"
          @onclick="HandleBackdropClick"
-         @onclick:stopPropagation="true">
+         style="display: block;">
+        @ChildContent
+    </div>
+}
+else if (isAnimating)
+{
+    <div id="@Id"
+         class="@GetModalClass() fade-out"
+         style="display: block; pointer-events: none;">
         @ChildContent
     </div>
 }
@@ -19,9 +27,46 @@
     [Parameter] public EventCallback OnOutsideClose { get; set; }
     [Parameter] public RenderFragment? ChildContent { get; set; }
 
+    private bool isAnimating = false;
+    private bool wasOpened = false;
+    private Timer? animationTimer;
+
+    protected override void OnParametersSet()
+    {
+        if (IsOpened != wasOpened)
+        {
+            if (IsOpened)
+            {
+                isAnimating = true;
+                wasOpened = true;
+            }
+            else if (wasOpened)
+            {
+                isAnimating = true;
+
+                // Запускаем таймер для завершения анимации
+                animationTimer?.Dispose();
+                animationTimer = new Timer(_ =>
+                {
+                    InvokeAsync(() =>
+                    {
+                        isAnimating = false;
+                        wasOpened = false;
+                        StateHasChanged();
+                    });
+                }, null, 150, Timeout.Infinite);
+            }
+        }
+    }
+
     private string GetModalClass()
     {
         var classes = new List<string> { "modal-layout" };
+
+        if (IsOpened && !isAnimating)
+            classes.Add("fade-in");
+        else if (!IsOpened && isAnimating)
+            classes.Add("fade-out");
 
         if (!string.IsNullOrEmpty(ClassName))
             classes.Add(ClassName);
@@ -31,11 +76,18 @@
 
     private async Task HandleBackdropClick()
     {
-        if (AllowOutsideClose)
+        if (AllowOutsideClose && OnOutsideClose.HasDelegate)
+        {
             await OnOutsideClose.InvokeAsync();
+        }
     }
 
     public void Open() => IsOpened = true;
     public void Close() => IsOpened = false;
     public void Toggle() => IsOpened = !IsOpened;
+
+    public void Dispose()
+    {
+        animationTimer?.Dispose();
+    }
 }

@@ -1,37 +1,40 @@
 ﻿@using HITSBlazor.Components
 @using HITSBlazor.Components.LeftSideBar
+@using HITSBlazor.Components.RoleModal
 @using HITSBlazor.Services.Auth
 @inherits LayoutComponentBase
 @inject IAuthService AuthService
 
-@if (isInitialized)
-{
-    @if (AuthService.IsAuthenticated)
+
+<div class="d-flex h-100">
+    @if (isInitialized)
     {
-        <div class="d-flex h-100">
-            <LeftSideBar />
-            <main class="flex-grow-1 overflow-auto">
-                @Body
-            </main>
-        </div>
+        @if (IsAuthenticated)
+        {
+            <!--<LeftSideBar />-->
+            <!--<RoleModal @ref="roleModal" />-->
+            <LeftSideNavigation />
+        }
+
+        <main class="flex-grow-1 overflow-auto">
+            @Body
+        </main>
+
+        <GlobalNotification />
     }
     else
     {
-        @Body
-    }
-
-    <GlobalNotification />
-}
-else
-{
-    <div class="loading-container d-flex justify-content-center align-items-center h-100">
-        <div class="spinner-border text-primary" role="status">
-            <span class="visually-hidden">Загрузка...</span>
+        <div class="loading-container d-flex justify-content-center align-items-center h-100">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Загрузка...</span>
+            </div>
         </div>
-    </div>
-}
+    }
+</div>
 
 @code {
+    private RoleModal? roleModal;
+
     private bool isInitialized = false;
 
     private bool IsAuthenticated { get; set; } = false;
@@ -40,9 +43,16 @@ else
     {
         try
         {
+            AuthService.OnAuthStateChanged += AuthStateChanged;
             await AuthService.InitializeAsync();
             IsAuthenticated = AuthService.IsAuthenticated;
-            AuthService.OnAuthStateChanged += AuthStateChanged;
+
+            if (IsAuthenticated && AuthService.CurrentUser?.Role == null)
+            {
+                await Task.Delay(100);
+                roleModal?.Open();
+            }
+
             isInitialized = true;
         }
         catch (Exception ex)

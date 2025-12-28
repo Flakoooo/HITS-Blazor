@@ -5,7 +5,7 @@
 </div>
 
 @code {
-    [Parameter] public string? Height { get; set; } = "medium";
+    [Parameter] public PlaceholderHeight Height { get; set; } = PlaceholderHeight.Medium;
     [Parameter] public string? ClassName { get; set; }
 
     private string GetPlaceholderClass()
@@ -15,14 +15,10 @@
             "placeholder",
             "w-100",
             "bg-secondary",
-            "rounded"
+            "rounded",
+            GetHeightClass()
         };
 
-        // Добавляем высоту
-        if (!string.IsNullOrEmpty(Height))
-            classes.Add(GetHeightClass());
-
-        // Добавляем кастомные классы
         if (!string.IsNullOrEmpty(ClassName))
             classes.Add(ClassName);
 
@@ -31,14 +27,15 @@
 
     private string GetHeightClass()
     {
-        return Height?.ToLower() switch
+        return Height switch
         {
-            "small" => "height-small",
-            "medium" => "height-medium",
-            "third" => "height-third",
-            "medium-200" or "second" => "height-medium-200",
-            "large" => "height-large",
-            "large-500" => "height-large-500",
+            PlaceholderHeight.Small => "height-small",
+            PlaceholderHeight.Medium => "height-medium",
+            PlaceholderHeight.Third => "height-third",
+            PlaceholderHeight.Medium200 => "height-medium-200",
+            PlaceholderHeight.Second => "height-second",
+            PlaceholderHeight.Large => "height-large",
+            PlaceholderHeight.Large500 => "height-large-500",
             _ => "height-medium"
         };
     }

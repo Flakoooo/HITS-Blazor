@@ -11,25 +11,32 @@
              AllowOutsideClose="true"
              OnOutsideClose="CloseModal">
     <div class="role-modal p-3 rounded bg-white">
-        <Typography ClassName="fs-3 text-primary text-center">
+        <Typography ClassName="fs-3 text-primary text-center mb-3">
             Доступные роли
         </Typography>
 
-        @if (User?.Roles != null)
+        @if (User?.Roles != null && User.Roles.Any())
         {
-            @foreach (var role in User.Roles)
-            {
-                <Button Type="button"
-                        Variant="primary"
-                        ClassName="w-100 mb-2"
-                        OnClick="() => HandleChooseRole(role)">
-                    @GetTranslatedRole(role)
-                </Button>
-            }
+            <div class="d-flex flex-column gap-2">
+                @foreach (var role in User.Roles)
+                {
+                    <Button Type="button"
+                            Variant="@(User.Role == role ? "success" : "primary")"
+                            ClassName="w-100"
+                            OnClick="() => HandleChooseRole(role)"
+                            Disabled="@IsActiveRole(role)">
+                        @GetTranslatedRole(role)
+                        @if (User.Role == role)
+                        {
+                            <span class="ms-2">(текущая)</span>
+                        }
+                    </Button>
+                }
+            </div>
         }
         else
         {
-            <p class="text-center">Нет доступных ролей</p>
+            <p class="text-center text-muted">Нет доступных ролей</p>
         }
     </div>
 </ModalLayout>
@@ -40,35 +47,37 @@
 
     private User? User => AuthService.CurrentUser;
 
-    private Dictionary<RoleType, string> RoleTranslations { get; set; } = new()
+    private readonly Dictionary<RoleType, string> RoleTranslations = new()
     {
-        { RoleType.INITIATOR, "Инициатор" },
-        { RoleType.PROJECT_OFFICE, "Проектный офис" },
-        { RoleType.EXPERT, "Эксперт" },
-        { RoleType.TEACHER, "Учитель" },
-        { RoleType.ADMIN, "Администратор" }
+        { RoleType.INITIATOR,       "Инициатор"         },
+        { RoleType.TEAM_OWNER,      "Владелец команды"  },
+        { RoleType.TEAM_LEADER,     "Лидер команды"     },
+        { RoleType.MEMBER,          "Участник"          },
+        { RoleType.PROJECT_OFFICE,  "Проектный офис"    },
+        { RoleType.EXPERT,          "Эксперт"           },
+        { RoleType.ADMIN,           "Администратор"     },
+        { RoleType.TEACHER,         "Учитель"           }
     };
 
-    private object GetTranslatedRole(RoleType role)
+    private bool IsActiveRole(RoleType role) => User?.Role == role;
+
+    private string GetTranslatedRole(RoleType role)
     {
         return RoleTranslations.TryGetValue(role, out var translation)
             ? translation
-            : role;
+            : role.ToString();
     }
 
     private async Task HandleChooseRole(RoleType role)
     {
-        if (User == null) return;
+        if (User == null || User.Role == role)
+            return;
 
         try
         {
-            // Устанавливаем роль пользователю
-            AuthService.SetUserRoleAsync(role);
+            await AuthService.SetUserRoleAsync(role);
 
-            // Получаем текущий путь
-            var currentPath = NavigationManager.Uri;
-
-            // наверно понадобится forceload для смены Claims
+            NavigationManager.NavigateTo(NavigationManager.Uri, true);
 
             await CloseModal();
         }
@@ -83,9 +92,18 @@
         IsOpened = false;
         if (OnClose.HasDelegate)
             await OnClose.InvokeAsync();
+        StateHasChanged();
     }
 
-    // Методы для управления модальным окном извне
-    public void Open() => IsOpened = true;
-    public void Close() => IsOpened = false;
+    public void Open()
+    {
+        IsOpened = true;
+        StateHasChanged();
+    }
+
+    public void Close()
+    {
+        IsOpened = false;
+        StateHasChanged();
+    }
 }
