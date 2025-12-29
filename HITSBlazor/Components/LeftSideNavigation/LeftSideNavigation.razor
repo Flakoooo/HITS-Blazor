@@ -1,7 +1,7 @@
 ﻿@namespace HITSBlazor.Components.LeftSideNavigation
 
 <div class="bg-white border-end" 
-     style="height: 100vh; width: 85px; min-width: 85px; max-width: 85px;"
+     style="@navigationLayout"
      @onmouseenter="HandleMouseEnter"
      @onmouseleave="HandleMouseLeave">
     @if (isLoading)
@@ -17,11 +17,11 @@
     }
     else
     {
-        <div class="p-3 h-100 left-side-bar" style="@GetSidebarStyles()">
-            <ul class="left-side-bar-content nav nav-pills w-100 gap-2"
-                style="width: 280px; min-width: 280px; max-width: 280px; display: flex; flex-direction: column; flex-wrap: nowrap; align-items: flex-start; justify-content: flex-start; gap: 8px">
+        <div class="p-3 h-100" style="@navigationStyle @GetSidebarStyles()">
+            <ul class="nav nav-pills w-100 gap-2"
+                style="@navigationContentStyle">
                 <li class="@ulElementClass">
-                    <button class="@ulElementButtonClass @GetActiveItemStyle(0)">
+                    <button class="@ulElementButtonClass @GetActiveItemStyle(0)" style="align-items: center; gap: 4px;">
                         <i class="icon bi bi-lightbulb fs-5"></i>
                         @if (isHovered)
                         {
@@ -30,7 +30,7 @@
                     </button>
                 </li>
                 <li class="@ulElementClass">
-                    <button class="@ulElementButtonClass @GetActiveItemStyle(1)">
+                    <button class="@ulElementButtonClass @GetActiveItemStyle(1)" style="align-items: center; gap: 4px;">
                         <i class="icon bi bi-people fs-5"></i>
                         @if (isHovered)
                         {
@@ -39,7 +39,7 @@
                     </button>
                 </li>
                 <li class="@ulElementClass">
-                    <button class="@ulElementButtonClass @GetActiveItemStyle(2)">
+                    <button class="@ulElementButtonClass @GetActiveItemStyle(2)" style="align-items: center; gap: 4px;">
                         <i class="icon bi bi-shop-window fs-5"></i>
                         @if (isHovered)
                         {
@@ -48,7 +48,7 @@
                     </button>
                 </li>
                 <li class="@ulElementClass">
-                    <button class="@ulElementButtonClass @GetActiveItemStyle(3)">
+                    <button class="@ulElementButtonClass @GetActiveItemStyle(3)" style="align-items: center; gap: 4px;">
                         <i class="icon bi bi-ui-checks-grid fs-5"></i>
                         @if (isHovered)
                         {
@@ -57,7 +57,7 @@
                     </button>
                 </li>
                 <li class="@ulElementClass">
-                    <button class="@ulElementButtonClass @GetActiveItemStyle(4)">
+                    <button class="@ulElementButtonClass @GetActiveItemStyle(4)" style="align-items: center; gap: 4px;">
                         <i class="icon bi bi-briefcase fs-5"></i>
                         @if (isHovered)
                         {
@@ -66,7 +66,7 @@
                     </button>
                 </li>
                 <li class="@ulElementClass">
-                    <button class="@ulElementButtonClass @GetActiveItemStyle(5)">
+                    <button class="@ulElementButtonClass @GetActiveItemStyle(5)" style="align-items: center; gap: 4px;">
                         <i class="icon bi bi-clipboard fs-5"></i>
                         @if (isHovered)
                         {
@@ -76,11 +76,19 @@
                 </li>
             </ul>
             <div class="d-flex flex-column gap-2">
-                <button class="btn d-flex btn-light w-100 text-success" type="button">
+                <button class="btn d-flex btn-light w-100 text-success" style="align-items: center; justify-content: center; gap: 4px;" type="button">
                     <i class="icon bi bi-circle-fill fs-5"></i>
+                    @if (isHovered)
+                    {
+                        <span>ROLE_NAME</span>
+                    }
                 </button>
-                <button class="btn d-flex btn-light w-100" type="button">
+                <button class="btn d-flex btn-light w-100" style="align-items: center; justify-content: center; gap: 4px;" type="button">
                     <i class="icon bi bi-box-arrow-left fs-5"></i>
+                    @if (isHovered)
+                    {
+                        <span>Выйти</span>
+                    }
                 </button>
             </div>
         </div>
@@ -91,29 +99,16 @@
     private bool isLoading = false;
     private bool isHovered = false;
     private int activeItemNum = 0;
-    private Timer? _closeTimer;
+
+    private string navigationLayout = "height: 100vh; width: 85px; min-width: 85px; max-width: 85px;";
+    private string navigationStyle = GetNavigationStyle();
+    private string navigationContentStyle = GetNavigationContentStyle();
 
     private string ulElementClass = "nav-item";
     private string ulElementStyle = "";
     private string ulElementButtonClass = "nav-link d-flex w-100";
 
-    private void HandleMouseEnter()
-    {
-        isHovered = true;
-        ulElementClass = "nav-item w-100";
-        ulElementStyle = "border-radius: 6px; transition: background-color .15s ease-out";
-        StateHasChanged();
-    }
-
-    private void HandleMouseLeave()
-    {
-        isHovered = false;
-        ulElementClass = "nav-item";
-        ulElementButtonClass = "nav-link d-flex w-100";
-        StateHasChanged();
-    }
-
-    private string GetSidebarStyles()
+    private static string GetNavigationStyle()
     {
         var styles = new System.Text.StringBuilder();
 
@@ -130,9 +125,47 @@
         styles.Append("align-items: stretch;");
         styles.Append("justify-content: space-between;");
         styles.Append("gap: 8px;");
-
         styles.Append("transition: all 0.15s ease-out;");
 
+        return styles.ToString();
+    }
+
+    private static string GetNavigationContentStyle()
+    {
+        var styles = new System.Text.StringBuilder();
+
+        styles.Append("width: 280px;");
+        styles.Append("min-width: 280px;");
+        styles.Append("max-width: 280px;");
+        styles.Append("display: flex;");
+        styles.Append("flex-direction: column;");
+        styles.Append("flex-wrap: nowrap;");
+        styles.Append("align-items: flex-start;");
+        styles.Append("justify-content: flex-start;");
+        styles.Append("gap: 8px;");
+
+        return styles.ToString();
+    }
+
+    private void HandleMouseEnter()
+    {
+        isHovered = true;
+        ulElementClass = "nav-item w-100";
+        ulElementStyle = "border-radius: 6px; transition: background-color .15s ease-out;";
+        StateHasChanged();
+    }
+
+    private void HandleMouseLeave()
+    {
+        isHovered = false;
+        ulElementClass = "nav-item";
+        ulElementStyle = "";
+        StateHasChanged();
+    }
+
+    private string GetSidebarStyles()
+    {
+        var styles = new System.Text.StringBuilder();
         if (isHovered)
         {
             styles.Append("width: 312px;");
@@ -150,13 +183,5 @@
     }
 
     private string GetActiveItemStyle(int itemNum)
-    {
-        if (itemNum == activeItemNum) return "bg-primary text-white";
-        else if (isHovered) return "text-white";
-        else return "text-black";
-
-    }
-
-    private string GetActiveItemBGColor(int itemNum) => itemNum == activeItemNum ? "bg-primary" : "";
-    private string GetActiveItemTextColor(int itemNum) => itemNum == activeItemNum ? "text-white" : "text-black";
+        => itemNum == activeItemNum ? "bg-primary text-white" : (isHovered ? "text-white" : "text-black");
 }
