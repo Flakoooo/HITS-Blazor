@@ -1,89 +1,80 @@
 ﻿@namespace HITSBlazor.Components.LeftSideNavigation
 
-<div class="bg-white border-end" 
-     style="@navigationLayout"
+<div class="bg-white border-end"
+     style="@NavigationLayout"
      @onmouseenter="HandleMouseEnter"
      @onmouseleave="HandleMouseLeave">
+
     @if (isLoading)
     {
         <div class="p-3 d-flex flex-column gap-2">
-            @for (int i = 0; i < 6; i++)
+            @for (int l = 0; l < 6; l++)
             {
                 <div class="placeholder-glow w-100">
-                    <span class="placeholder w-100 bg-secondary rounded small" style="height: 50px"></span>
+                    <span class="placeholder w-100 bg-secondary rounded small"
+                          style="height: 50px"></span>
                 </div>
             }
         </div>
     }
     else
     {
-        <div class="p-3 h-100" style="@navigationStyle @GetSidebarStyles()">
-            <ul class="nav nav-pills w-100 gap-2"
-                style="@navigationContentStyle">
-                <li class="@ulElementClass">
-                    <button class="@ulElementButtonClass @GetActiveItemStyle(0)" style="align-items: center; gap: 4px;">
-                        <i class="icon bi bi-lightbulb fs-5"></i>
-                        @if (isHovered)
+        <div class="p-3 h-100" style="@NavigationStyle @GetSidebarStyles()">
+            <ul class="nav nav-pills w-100 gap-2" style="@NavigationContentStyle">
+                @for (int i = 0; i < _menuItems.Count; ++i)
+                {
+                    var item = _menuItems[i];
+                    var isItemActive = item.Id == activeItemId;
+
+                    <li class="@(isHovered ? "nav-item w-100" : "nav-item")"
+                        style="@(isHovered ? "border-radius: 6px; transition: background-color .15s ease-out;" : "")">
+                        <button type="button"
+                                @onclick="() => ToggleMenuItem(item.Id)"
+                                class="@GetItemButtonClass(item.Id)"
+                                style="align-items: center; gap: 4px;">
+                            <i class="icon bi @item.Icon fs-5"></i>
+                            @if (isHovered)
+                            {
+                                <span class="fs-6 ms-2">@item.Title</span>
+                            }
+                        </button>
+                        @if (isHovered && item.SubItems.Any())
                         {
-                            <span class="fs-6 ms-2">Реестр идей</span>
+                            <div style="@GetCollapseStyle(item)">
+                                <div class="list-group">
+                                    <div class="pt-2 rounded">
+                                        @for (int j = 0; j < item.SubItems.Count; j++)
+                                        {
+                                            var subItem = item.SubItems[j];
+
+                                            <a class="@GetSubItemClass(item.Id, subItem.Id)"
+                                               @onclick="() => SelectSubItem(item.Id, subItem.Id)"
+                                               style="cursor: pointer; display: flex; align-items: center; gap: 8px; padding: 8px 12px;">
+                                               <i class="icon bi @subItem.Icon"></i>
+                                               <span>@subItem.Title</span>
+                                            </a>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
                         }
-                    </button>
-                </li>
-                <li class="@ulElementClass">
-                    <button class="@ulElementButtonClass @GetActiveItemStyle(1)" style="align-items: center; gap: 4px;">
-                        <i class="icon bi bi-people fs-5"></i>
-                        @if (isHovered)
-                        {
-                            <span class="fs-6 ms-2">Реестр команд</span>
-                        }
-                    </button>
-                </li>
-                <li class="@ulElementClass">
-                    <button class="@ulElementButtonClass @GetActiveItemStyle(2)" style="align-items: center; gap: 4px;">
-                        <i class="icon bi bi-shop-window fs-5"></i>
-                        @if (isHovered)
-                        {
-                            <span class="fs-6 ms-2">Реестр бирж</span>
-                        }
-                    </button>
-                </li>
-                <li class="@ulElementClass">
-                    <button class="@ulElementButtonClass @GetActiveItemStyle(3)" style="align-items: center; gap: 4px;">
-                        <i class="icon bi bi-ui-checks-grid fs-5"></i>
-                        @if (isHovered)
-                        {
-                            <span class="fs-6 ms-2">Админ панель</span>
-                        }
-                    </button>
-                </li>
-                <li class="@ulElementClass">
-                    <button class="@ulElementButtonClass @GetActiveItemStyle(4)" style="align-items: center; gap: 4px;">
-                        <i class="icon bi bi-briefcase fs-5"></i>
-                        @if (isHovered)
-                        {
-                            <span class="fs-6 ms-2">Реестр проектов</span>
-                        }
-                    </button>
-                </li>
-                <li class="@ulElementClass">
-                    <button class="@ulElementButtonClass @GetActiveItemStyle(5)" style="align-items: center; gap: 4px;">
-                        <i class="icon bi bi-clipboard fs-5"></i>
-                        @if (isHovered)
-                        {
-                            <span class="fs-6 ms-2">Тесты</span>
-                        }
-                    </button>
-                </li>
+                    </li>
+                }
             </ul>
+
             <div class="d-flex flex-column gap-2">
-                <button class="btn d-flex btn-light w-100 text-success" style="align-items: center; justify-content: center; gap: 4px;" type="button">
+                <button class="btn d-flex btn-light w-100 text-success"
+                        style="align-items: center; justify-content: center; gap: 4px;"
+                        type="button">
                     <i class="icon bi bi-circle-fill fs-5"></i>
                     @if (isHovered)
                     {
                         <span>ROLE_NAME</span>
                     }
                 </button>
-                <button class="btn d-flex btn-light w-100" style="align-items: center; justify-content: center; gap: 4px;" type="button">
+                <button class="btn d-flex btn-light w-100"
+                        style="align-items: center; justify-content: center; gap: 4px;"
+                        type="button">
                     <i class="icon bi bi-box-arrow-left fs-5"></i>
                     @if (isHovered)
                     {
@@ -98,90 +89,130 @@
 @code {
     private bool isLoading = false;
     private bool isHovered = false;
-    private int activeItemNum = 0;
+    private int activeItemId = 0;
+    private int? activeSubItemId = 0;
 
-    private string navigationLayout = "height: 100vh; width: 85px; min-width: 85px; max-width: 85px;";
-    private string navigationStyle = GetNavigationStyle();
-    private string navigationContentStyle = GetNavigationContentStyle();
+    private (int ParentId, int SubItemId) activeSubItem = (0, 0);
 
-    private string ulElementClass = "nav-item";
-    private string ulElementStyle = "";
-    private string ulElementButtonClass = "nav-link d-flex w-100";
-
-    private static string GetNavigationStyle()
+    private List<NavigationItem> _menuItems = new()
     {
-        var styles = new System.Text.StringBuilder();
+        new NavigationItem("Реестр идей", "bi-lightbulb", 0, new()
+        {
+            new NavigationSubItem("Список идей", "bi-list", 0),
+            new NavigationSubItem("Создать идею", "bi-plus-lg", 1)
+        }),
+        new NavigationItem("Реестр команд", "bi-people", 1, new()
+        {
+            new NavigationSubItem("Список команд", "bi-list", 0),
+            new NavigationSubItem("Создать команду", "bi-plus-lg", 1)
+        }),
+        new NavigationItem("Реестр бирж", "bi-shop-window", 2, new()
+        {
+            new NavigationSubItem("Список бирж", "bi-list", 0),
+            new NavigationSubItem("ACTIVE_MARKET_NAME", "bi-basket3", 1)
+        }),
+        new NavigationItem("Админ панель", "bi-ui-checks-grid", 3, new()
+        {
+            new NavigationSubItem("Пользователи", "bi-person-gear", 0),
+            new NavigationSubItem("Добавить пользователей", "bi-person-add", 1),
+            new NavigationSubItem("Компании", "bi-building", 2),
+            new NavigationSubItem("Группы пользователей", "bi-people", 3),
+            new NavigationSubItem("Справочник компетенций", "bi-person-badge", 4),
+            new NavigationSubItem("Справочник тегов", "bi-tags", 5)
+        }),
+        new NavigationItem("Реестр проектов", "bi-briefcase", 4, new()
+        {
+            new NavigationSubItem("Список проектов", "bi-list", 0),
+        }),
+        new NavigationItem("Тесты", "bi-clipboard", 5, [])
+    };
 
-        styles.Append("position: relative;");
-        styles.Append("top: auto;");
-        styles.Append("right: auto;");
-        styles.Append("bottom: auto;");
-        styles.Append("left: auto;");
-        styles.Append("z-index: 8;");
-        styles.Append("overflow-x: hidden;");
-        styles.Append("display: flex;");
-        styles.Append("flex-direction: column;");
-        styles.Append("flex-wrap: nowrap;");
-        styles.Append("align-items: stretch;");
-        styles.Append("justify-content: space-between;");
-        styles.Append("gap: 8px;");
-        styles.Append("transition: all 0.15s ease-out;");
+    private string NavigationLayout => NavigationStyles.Layout;
+    private string NavigationStyle => NavigationStyles.GetNavigationStyle();
+    private string NavigationContentStyle => NavigationStyles.GetNavigationContentStyle();
 
-        return styles.ToString();
+    private string GetSidebarStyles() => isHovered
+        ? "width: 312px; background-color: rgba(0, 0, 0, 0.729); color: #fff;"
+        : "width: 80px; background-color: transparent; color: inherit;";
+
+    private string GetItemButtonClass(int itemId)
+    {
+        var baseClass = "nav-link d-flex w-100";
+        var isActive = activeSubItem.ParentId == itemId;
+
+        if (isActive)
+        {
+            return $"{baseClass} bg-primary text-white";
+        }
+
+        return isHovered ? $"{baseClass} text-white" : $"{baseClass} text-black";
     }
 
-    private static string GetNavigationContentStyle()
+    private string GetSubItemClass(int parentId, int subItemId)
     {
-        var styles = new System.Text.StringBuilder();
+        var baseClass = "nav-route list-group-item list-group-item-light";
+        var isActive = activeSubItem.ParentId == parentId && activeSubItem.SubItemId == subItemId;
 
-        styles.Append("width: 280px;");
-        styles.Append("min-width: 280px;");
-        styles.Append("max-width: 280px;");
-        styles.Append("display: flex;");
-        styles.Append("flex-direction: column;");
-        styles.Append("flex-wrap: nowrap;");
-        styles.Append("align-items: flex-start;");
-        styles.Append("justify-content: flex-start;");
-        styles.Append("gap: 8px;");
-
-        return styles.ToString();
+        return isActive ? $"{baseClass} active router-link-exact-active" : baseClass;
     }
 
-    private void HandleMouseEnter()
+    private string GetCollapseStyle(NavigationItem item)
     {
-        isHovered = true;
-        ulElementClass = "nav-item w-100";
-        ulElementStyle = "border-radius: 6px; transition: background-color .15s ease-out;";
+        if (!item.IsExpanded)
+            return "height: 0px; overflow: hidden; transition: height 0.35s ease;";
+
+        var height = 8 + (item.SubItems.Count * 40);
+        return $"height: {height}px; overflow: hidden; transition: height 0.35s ease;";
+    }
+
+    private void HandleMouseEnter() => isHovered = true;
+    private void HandleMouseLeave() => isHovered = false;
+
+    private void ToggleMenuItem(int itemId)
+    {
+        var item = _menuItems.FirstOrDefault(n => n.Id == itemId);
+        if (item == null) return;
+
+        foreach (var menuItem in _menuItems)
+        {
+            if (menuItem.Id != itemId && menuItem.IsExpanded)
+            {
+                menuItem.IsExpanded = false;
+            }
+        }
+
+        item.IsExpanded = !item.IsExpanded;
+
+        if (item.SubItems.Count == 0)
+        {
+            activeSubItem = (itemId, -1);
+        }
+
         StateHasChanged();
     }
 
-    private void HandleMouseLeave()
+    private void SelectSubItem(int parentId, int subItemId)
     {
-        isHovered = false;
-        ulElementClass = "nav-item";
-        ulElementStyle = "";
+        var parentItem = _menuItems.FirstOrDefault(n => n.Id == parentId);
+        var subItem = parentItem?.SubItems.FirstOrDefault(n => n.Id == subItemId);
+
+        if (parentItem == null || subItem == null) return;
+
+        activeSubItem = (parentId, subItemId);
+
+        if (!parentItem.IsExpanded)
+        {
+            parentItem.IsExpanded = true;
+
+            foreach (var menuItem in _menuItems)
+            {
+                if (menuItem.Id != parentId)
+                {
+                    menuItem.IsExpanded = false;
+                }
+            }
+        }
+
         StateHasChanged();
     }
-
-    private string GetSidebarStyles()
-    {
-        var styles = new System.Text.StringBuilder();
-        if (isHovered)
-        {
-            styles.Append("width: 312px;");
-            styles.Append("background-color: rgba(0, 0, 0, 0.729);");
-            styles.Append("color: #fff;");
-        }
-        else
-        {
-            styles.Append("width: 80px;");
-            styles.Append("background-color: transparent;");
-            styles.Append("color: inherit;");
-        }
-
-        return styles.ToString();
-    }
-
-    private string GetActiveItemStyle(int itemNum)
-        => itemNum == activeItemNum ? "bg-primary text-white" : (isHovered ? "text-white" : "text-black");
 }
