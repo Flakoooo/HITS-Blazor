@@ -1,6 +1,5 @@
 ﻿@using HITSBlazor.Components
-@using HITSBlazor.Components.LeftSideBar
-@using HITSBlazor.Components.RoleModal
+@using HITSBlazor.Components.LeftSideNavigation
 @using HITSBlazor.Services.Auth
 @inherits LayoutComponentBase
 @inject IAuthService AuthService
@@ -33,8 +32,6 @@
 </div>
 
 @code {
-    private RoleModal? roleModal;
-
     private bool isInitialized = false;
 
     private bool IsAuthenticated { get; set; } = false;
@@ -46,13 +43,6 @@
             AuthService.OnAuthStateChanged += AuthStateChanged;
             await AuthService.InitializeAsync();
             IsAuthenticated = AuthService.IsAuthenticated;
-
-            if (IsAuthenticated && AuthService.CurrentUser?.Role == null)
-            {
-                await Task.Delay(100);
-                roleModal?.Open();
-            }
-
             isInitialized = true;
         }
         catch (Exception ex)

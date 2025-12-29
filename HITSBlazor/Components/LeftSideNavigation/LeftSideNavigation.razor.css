@@ -1,0 +1,47 @@
+﻿.left-side-bar__link {
+    border-radius: 6px;
+    transition: background-color .15s ease-out
+}
+
+.left-side-bar__link:hover {
+    background-color: rgba(0,0,0,.424)
+}
+
+.left-side-bar__button {
+    height: 40px;
+    min-height: 40px;
+    max-height: 40px
+}
+
+@keyframes openLeftSideBar {
+    0% {
+        width: 80px;
+        background-color: transparent
+    }
+
+    to {
+        width: 312px;
+        background-color: rgba(0,0,0,.729)
+    }
+}
+
+@keyframes closeLeftSideBar {
+    0% {
+        width: 312px;
+        background-color: rgba(0,0,0,.502)
+    }
+
+    to {
+        width: 80px;
+        background-color: transparent
+    }
+}
+
+.left-side-bar-opened {
+    color: #fff;
+    animation: openLeftSideBar .15s ease-out forwards
+}
+
+.left-side-bar-closed {
+    animation: closeLeftSideBar .15s ease-out forwards
+}
