@@ -1,23 +1,23 @@
 ﻿.height-small {
-    height: 50px !important;
+    height: 50px;
 }
 
 .height-medium {
-    height: 100px !important;
+    height: 100px;
 }
 
 .height-third {
-    height: 300px !important;
+    height: 300px;
 }
 
 .height-medium-200 {
-    height: 200px !important;
+    height: 200px;
 }
 
 .height-large {
-    height: 100% !important;
+    height: 100%;
 }
 
 .height-large-500 {
-    height: 500px !important;
+    height: 500px;
 }

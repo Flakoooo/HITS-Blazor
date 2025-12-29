@@ -5,20 +5,20 @@
 @inherits LayoutComponentBase
 @inject IAuthService AuthService
 
-
-<div class="d-flex h-100">
+<div style="display: flex; flex-direction: row; flex-wrap: nowrap; align-items: flex-start; justify-content: flex-start;">
     @if (isInitialized)
     {
         @if (IsAuthenticated)
         {
-            <!--<LeftSideBar />-->
-            <!--<RoleModal @ref="roleModal" />-->
             <LeftSideNavigation />
+            <main class="w-100 overflow-y-scroll bg-white" style="height: 100vh; display: grid; grid-template-rows: min-content auto;">
+                @Body
+            </main>
         }
-
-        <main class="flex-grow-1 overflow-auto">
+        else
+        {
             @Body
-        </main>
+        }
 
         <GlobalNotification />
     }

@@ -1,24 +1,23 @@
 ﻿@namespace HITSBlazor.Components
-@using HITSBlazor.Components.Placeholders
 
-<div class="page-layout__leftsidebar bg-white">
-    <LeftSideBarPlaceholder />
+<div class="bg-white border-end" style="height: 100vh; width: 85px; min-width: 85px; max-width: 85px;">
+    @if (isLoading)
+    {
+        <div class="p-3 d-flex flex-column gap-2">
+            @for (int i = 0; i < 6; i++)
+            {
+                <div class="placeholder-glow w-100">
+                    <span class="placeholder w-100 bg-secondary rounded small" style="height: 50px"></span>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        
+    }
 </div>
 
-<style>
-    .page-layout__leftsidebar {
-        height: 100vh;
-        width: 85px;
-        min-width: 85px;
-        max-width: 85px;
-    }
-
-    .bg-white {
-        opacity: 1;
-        background-color: rgba(255,255,255,1) !important;
-    }
-
-    .border-end {
-        border-right: 1px solid #dee2e6 !important;
-    }
-</style>
+@code {
+    private bool isLoading = true;
+}

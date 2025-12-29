@@ -1,10 +1,6 @@
 ﻿/* UTILITY CLASSES */
 
 /* Ширина */
-.w-100 {
-    width: 100% !important;
-}
-
 .w-50 {
     width: 50% !important;
 }
@@ -24,10 +20,6 @@
 
 .p-2 {
     padding: 0.5rem !important;
-}
-
-.p-3 {
-    padding: 1rem !important;
 }
 
 .p-4 {
@@ -184,10 +176,6 @@
     margin-right: 0.25rem !important;
 }
 
-.me-2 {
-    margin-right: 0.5rem !important;
-}
-
 .me-3 {
     margin-right: 1rem !important;
 }
@@ -226,9 +214,6 @@
 }
 
 /* Flexbox */
-.d-flex {
-    display: flex !important;
-}
 
 .d-inline-flex {
     display: inline-flex !important;
@@ -248,10 +233,6 @@
 
 .flex-row {
     flex-direction: row !important;
-}
-
-.flex-column {
-    flex-direction: column !important;
 }
 
 .flex-row-reverse {
@@ -346,10 +327,6 @@
     flex-grow: 0 !important;
 }
 
-.flex-grow-1 {
-    flex-grow: 1 !important;
-}
-
 .flex-shrink-0 {
     flex-shrink: 0 !important;
 }
@@ -365,11 +342,6 @@
 .gap-1 {
     gap: 0.25rem !important;
 }
-
-.gap-2 {
-    gap: 0.5rem !important;
-}
-
 .gap-3 {
     gap: 1rem !important;
 }
@@ -391,16 +363,8 @@
     text-align: right !important;
 }
 
-.text-center {
-    text-align: center !important;
-}
-
 .text-decoration-none {
     text-decoration: none !important;
-}
-
-.text-decoration-underline {
-    text-decoration: underline !important;
 }
 
 .text-decoration-line-through {
@@ -433,10 +397,6 @@
 }
 
 /* Цвета текста */
-.text-primary {
-    color: var(--primary-color) !important;
-}
-
 .text-secondary {
     color: var(--secondary-color) !important;
 }
@@ -486,10 +446,6 @@
     background-color: var(--primary-color) !important;
 }
 
-.bg-secondary {
-    background-color: var(--secondary-color) !important;
-}
-
 .bg-success {
     background-color: var(--success-color) !important;
 }
@@ -514,18 +470,11 @@
     background-color: var(--black-color) !important;
 }
 
-.bg-white {
-    background-color: #fff !important;
-}
-
 .bg-transparent {
     background-color: transparent !important;
 }
 
 /* Границы */
-.rounded {
-    border-radius: var(--bs-border-radius) !important;
-}
 
 .rounded-0 {
     border-radius: 0 !important;
@@ -537,10 +486,6 @@
 
 .rounded-2 {
     border-radius: var(--bs-border-radius) !important;
-}
-
-.rounded-3 {
-    border-radius: var(--bs-border-radius-lg) !important;
 }
 
 .rounded-circle {
@@ -572,10 +517,6 @@
 }
 
 /* Тени */
-.shadow {
-    box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .15) !important;
-}
-
 .shadow-sm {
     box-shadow: 0 .125rem .25rem rgba(0, 0, 0, .075) !important;
 }
@@ -595,10 +536,6 @@
 
 .fs-2 {
     font-size: 2rem !important;
-}
-
-.fs-3 {
-    font-size: 1.75rem !important;
 }
 
 .fs-4 {
@@ -703,9 +640,6 @@
 }
 
 /* Overflow */
-.overflow-auto {
-    overflow: auto !important;
-}
 
 .overflow-hidden {
     overflow: hidden !important;
