@@ -45,6 +45,7 @@ namespace HITSBlazor
 
             // Utils
             builder.Services.AddScoped<GlobalNotificationService>();
+            builder.Services.AddScoped<NavigationService>();
 
             // Auth
 #if DEBUG && !DEBUGAPI

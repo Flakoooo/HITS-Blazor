@@ -84,7 +84,7 @@ namespace HITSBlazor.Pages.Login
                 if (result.IsSuccess)
                 {
                     loginModel = new LoginModel();
-                    Navigation.NavigateTo("/");
+                    Navigation.NavigateTo("/redirect");
                 }
                 else
                 {
