@@ -66,7 +66,7 @@
                 <button class="btn d-flex btn-light w-100 text-success"
                         style="align-items: center; justify-content: center; gap: 4px;"
                         type="button">
-                    <i class="icon bi bi-circle-fill fs-5"></i>
+                    <i class="icon bi bi-circle-fill fs-6 fs-5"></i>
                     @if (isHovered)
                     {
                         <span>ROLE_NAME</span>
@@ -141,9 +141,7 @@
         var isActive = activeSubItem.ParentId == itemId;
 
         if (isActive)
-        {
             return $"{baseClass} bg-primary text-white";
-        }
 
         return isHovered ? $"{baseClass} text-white" : $"{baseClass} text-black";
     }
@@ -174,21 +172,13 @@
         if (item == null) return;
 
         foreach (var menuItem in _menuItems)
-        {
             if (menuItem.Id != itemId && menuItem.IsExpanded)
-            {
                 menuItem.IsExpanded = false;
-            }
-        }
 
         item.IsExpanded = !item.IsExpanded;
 
         if (item.SubItems.Count == 0)
-        {
             activeSubItem = (itemId, -1);
-        }
-
-        StateHasChanged();
     }
 
     private void SelectSubItem(int parentId, int subItemId)
@@ -205,14 +195,8 @@
             parentItem.IsExpanded = true;
 
             foreach (var menuItem in _menuItems)
-            {
                 if (menuItem.Id != parentId)
-                {
                     menuItem.IsExpanded = false;
-                }
-            }
         }
-
-        StateHasChanged();
     }
 }

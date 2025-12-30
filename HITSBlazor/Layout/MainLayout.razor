@@ -1,5 +1,6 @@
 ﻿@using HITSBlazor.Components
 @using HITSBlazor.Components.LeftSideNavigation
+@using HITSBlazor.Components.PageHeader
 @using HITSBlazor.Services.Auth
 @inherits LayoutComponentBase
 @inject IAuthService AuthService
@@ -11,6 +12,7 @@
         {
             <LeftSideNavigation />
             <main class="w-100 overflow-y-scroll bg-white" style="height: 100vh; display: grid; grid-template-rows: min-content auto;">
+                <PageHeader />
                 @Body
             </main>
         }

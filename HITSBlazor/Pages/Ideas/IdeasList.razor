@@ -1,0 +1,41 @@
+﻿@namespace HITSBlazor.Pages.IdeasList
+
+<PageTitle>Портал ВШЦТ</PageTitle>
+
+<div class="bg-white" style="height: auto; display: flex; flex-direction: column; flex-wrap: nowrap; justify-content: flex-start; overflow-y: scroll; align-items: stretch;">
+    <div class="w-100 bg-white p-3">
+        <div class="w-100" style="display: flex; flex-direction: row; flex-wrap: nowrap; align-items: center; justify-content: space-between; gap: 16px;">
+            <span class="fs-2 text-primary">Список идей: IDEAS_COUNT</span>
+            <div class="d-flex gap-3">
+                @if (showCreateIdeaButton)
+                {
+                    <button class="btn d-flex btn-primary">
+                        <i class="icon bi bi-plus-lg fs-5"></i>
+                        Создать идею
+                    </button>
+                }
+            </div>
+        </div>
+        <div class="py-2 d-flex justify-content-between">
+            <div class="w-50">
+                <div class="w-100">
+                    <div class="input-group">
+                        <span class="input-group-text fs-6">
+                            <i class="icon bi bi-search"></i>
+                        </span>
+                        <input type="text" placeholder="Поиск" class="form-control rounded-end" />
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="w-100 d-flex">
+
+        </div>
+    </div>
+</div>
+
+@code {
+    private bool showCreateIdeaButton = true;
+}
+
+
