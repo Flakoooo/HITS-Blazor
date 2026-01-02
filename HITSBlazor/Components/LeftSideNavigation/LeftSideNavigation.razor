@@ -29,13 +29,14 @@
                     var item = _menuItems[i];
                     var isItemActive = item.Id == activeItemId;
 
-                    <li class="@(isHovered ? "nav-item w-100" : "nav-item")"
+                    <div class="@(isHovered ? "nav-item w-100" : "nav-item")"
                         style="@(isHovered ? "border-radius: 6px; transition: background-color .15s ease-out;" : "")">
                         <button type="button"
                                 @onclick="() => SelectMenuItem(item.Id)"
                                 class="@GetItemButtonClass(item.Id)"
-                                style="align-items: center; gap: 4px;">
-                            <i class="icon bi @item.Icon fs-5"></i>
+                                style="height: 40px; min-height: 40px; max-height: 40px; flex-direction: row; flex-wrap: nowrap; align-items: center; justify-content: flex-start; gap: 4px;">
+                            <i class="@item.Icon fs-5" style="@Styles.Bi">
+                            </i>
                             @if (isHovered)
                             {
                                 <span class="fs-6 ms-2">@item.Title</span>
@@ -53,7 +54,7 @@
                                             <a class="@GetSubItemClass(item.Id, subItem.Id)"
                                                @onclick="() => SelectSubItem(item.Id, subItem.Id)"
                                                style="cursor: pointer; display: flex; align-items: center; gap: 8px; padding: 8px 12px;">
-                                               <i class="icon bi @subItem.Icon"></i>
+                                               <i class="@subItem.Icon" style="@Styles.Bi"></i>
                                                <span>@subItem.Title</span>
                                             </a>
                                         }
@@ -61,24 +62,26 @@
                                 </div>
                             </div>
                         }
-                    </li>
+                    </div>
                 }
             </ul>
 
             <div class="d-flex flex-column gap-2">
                 <button class="btn d-flex btn-light w-100 text-success"
-                        style="align-items: center; justify-content: center; gap: 4px;"
+                        style="height: 40px; min-height: 40px; max-height: 40px; @Styles.Btn"
                         type="button">
-                    <i class="icon bi bi-circle-fill fs-6 fs-5"></i>
+                    <i class="bi-circle-fill fs-6" style="@Styles.Bi">
+                    </i>
                     @if (isHovered)
                     {
                         <span>ACTIVE_ROLE_NAME</span>
                     }
                 </button>
                 <button class="btn d-flex btn-light w-100"
-                        style="align-items: center; justify-content: center; gap: 4px;"
+                        style="height: 40px; min-height: 40px; max-height: 40px; @Styles.Btn"
                         type="button">
-                    <i class="icon bi bi-box-arrow-left fs-5"></i>
+                    <i class="bi-box-arrow-left fs-5" style="@Styles.Bi">
+                    </i>
                     @if (isHovered)
                     {
                         <span>Выйти</span>
@@ -107,10 +110,7 @@
         UpdateActiveState();
     }
 
-    private void HandleNavigationChanged()
-    {
-        UpdateActiveState();
-    }
+    private void HandleNavigationChanged() => UpdateActiveState();
 
     private void UpdateActiveState()
     {
@@ -119,22 +119,13 @@
 
         if (currentMenuItem != null)
         {
-            if (currentSubItem != null)
-            {
-                activeSubItem = (currentMenuItem.Id, currentSubItem.Id);
-            }
-            else
-            {
-                // Если нет активного подпункта, но есть активный пункт меню
-                activeSubItem = (currentMenuItem.Id, -1);
-            }
+            activeSubItem = currentSubItem != null 
+                ? (currentMenuItem.Id, currentSubItem.Id) 
+                : (currentMenuItem.Id, -1);
 
-            // Раскрываем текущий пункт меню, если он имеет подпункты
             foreach (var menuItem in _menuItems)
-            {
                 menuItem.IsExpanded = menuItem.Id == currentMenuItem.Id &&
-                                      (currentSubItem != null || menuItem.SubItems.Any());
-            }
+                                          (currentSubItem != null || menuItem.SubItems.Any());
         }
     }
 
@@ -200,13 +191,9 @@
                 activeSubItem = (itemId, -1);
         }
         else if (!string.IsNullOrEmpty(item.BaseUrl))
-        {
             await NavigationService.NavigateToAsync(item.BaseUrl);
-        }
     }
 
-    public void Dispose()
-    {
+    public void Dispose() => 
         NavigationService.OnNavigationChanged -= HandleNavigationChanged;
-    }
 }
