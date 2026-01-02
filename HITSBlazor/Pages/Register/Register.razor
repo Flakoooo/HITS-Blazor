@@ -1,4 +1,5 @@
 ﻿@using HITSBlazor.Components.Button
+@using HITSBlazor.Services
 <PageTitle>Регистрация</PageTitle>
 
 <div class="page-layout">
@@ -19,7 +20,7 @@
 
                 <div class="input-group">
                     <span class="input-group-text fs-6">
-                        <i class="bi bi-fonts"></i>
+                        <i class="bi-fonts" style="@Styles.Bi"></i>
                     </span>
                     <input type="text"
                            @bind="registerModel.FirstName"
@@ -30,7 +31,7 @@
 
                 <div class="input-group">
                     <span class="input-group-text fs-6">
-                        <i class="bi bi-fonts"></i>
+                        <i class="bi-fonts" style="@Styles.Bi"></i>
                     </span>
                     <input type="text"
                            @bind="registerModel.LastName"
@@ -41,7 +42,7 @@
 
                 <div class="input-group">
                     <span class="input-group-text fs-6">
-                        <i class="bi bi-telephone"></i>
+                        <i class="bi-telephone" style="@Styles.Bi"></i>
                     </span>
                     <input type="tel"
                            @bind:get="phoneInput"
@@ -55,7 +56,7 @@
 
                 <div class="input-group">
                     <span class="input-group-text fs-6">
-                        <i class="bi bi-people"></i>
+                        <i class="bi-people" style="@Styles.Bi"></i>
                     </span>
                     <input type="text"
                            @bind="registerModel.StudyGroup"
@@ -66,7 +67,7 @@
 
                 <div class="input-group">
                     <span class="input-group-text fs-6">
-                        <i class="bi bi-key"></i>
+                        <i class="bi-key" style="@Styles.Bi"></i>
                     </span>
                     <input type="password"
                            @bind="registerModel.Password"
@@ -74,13 +75,18 @@
                            class="form-control"
                            placeholder="Введите пароль" />
                 </div>
-
-                <Button Type="submit" 
-                        Text="@(isLoading ? "Регистрация..." : "Зарегистрироваться")" 
-                        Variant="primary" 
-                        ClassName="w-100"
-                        IsLoading="@isLoading"
-                        Disabled="@isLoading" />
+                <button type="submit" disabled="@isLoading"
+                        class="btn d-flex btn-primary" style="@Styles.Btn">
+                    @if (isLoading)
+                    {
+                        <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                        <span>Регистрация...</span>
+                    }
+                    else
+                    {
+                        <span>Зарегистрироваться</span>
+                    }
+                </button>
             </form>
         </div>
     </div>
