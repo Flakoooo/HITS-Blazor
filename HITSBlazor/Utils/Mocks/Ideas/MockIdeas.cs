@@ -7,8 +7,6 @@ namespace HITSBlazor.Utils.Mocks.Ideas
 {
     public static class MockIdeas
     {
-        private static readonly List<Idea> _ideas = CreateIdeas();
-
         private static readonly string _lorem = "Lorem ipsum dolor sit amet consectetur adipisicing elit. Eius aperiam delectus possimus, voluptates quo accusamus? Consequatur, quasi rem temporibus blanditiis delectus aliquid officia aut, totam incidunt reiciendis eaque laborum fugiat!";
 
         public static Guid RefactorId { get; } = Guid.NewGuid();
@@ -22,6 +20,8 @@ namespace HITSBlazor.Utils.Mocks.Ideas
         public static Guid CalculatorId { get; } = Guid.NewGuid();
         public static Guid ChatBotId { get; } = Guid.NewGuid();
         public static Guid ArmatureId { get; } = Guid.NewGuid();
+
+        private static readonly List<Idea> _ideas = CreateIdeas();
 
         private static List<Idea> CreateIdeas()
         {
@@ -340,6 +340,8 @@ namespace HITSBlazor.Utils.Mocks.Ideas
                 }
             ];
         }
+
+        public static List<Idea> GetAllIdeas() => _ideas;
 
         public static Idea? GetIdeaById(Guid id)
             => _ideas.FirstOrDefault(i => i.Id == id);

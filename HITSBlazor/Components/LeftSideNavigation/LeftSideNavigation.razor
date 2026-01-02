@@ -1,6 +1,9 @@
 ﻿@namespace HITSBlazor.Components.LeftSideNavigation
+@using HITSBlazor.Models.Users.Entities
 @using HITSBlazor.Services
+@using HITSBlazor.Services.Auth
 @inject NavigationService NavigationService
+@inject IAuthService AuthService
 @implements IDisposable
 
 <div class="bg-white border-end"
@@ -75,7 +78,7 @@
                     </i>
                     @if (isHovered)
                     {
-                        <span>ACTIVE_ROLE_NAME</span>
+                        <span>@CurrentUser?.Role</span>
                     }
                 </button>
                 <button class="btn d-flex btn-light w-100"
@@ -94,6 +97,8 @@
 </div>
 
 @code {
+    private User? CurrentUser => AuthService.CurrentUser;
+
     private bool isLoading = false;
     private bool isHovered = false;
     private int activeItemId = 0;

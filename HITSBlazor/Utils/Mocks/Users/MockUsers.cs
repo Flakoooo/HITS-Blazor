@@ -5,11 +5,6 @@ namespace HITSBlazor.Utils.Mocks.Users
 {
     public static class MockUsers
     {
-        private static List<string>? _cachedEmails;
-        private static readonly List<User> _users = CreateUsers();
-
-        public static List<string> CachedUserEmails => _cachedEmails ??= GetUserEmails();
-
         public static Guid KirillId { get; } = Guid.NewGuid();
         public static Guid IvanId { get; } = Guid.NewGuid();
         public static Guid ManagerId { get; } = Guid.NewGuid();
@@ -24,6 +19,11 @@ namespace HITSBlazor.Utils.Mocks.Users
         public static Guid DenisId { get; } = Guid.NewGuid();
         public static Guid MagaId { get; } = Guid.NewGuid();
         public static Guid AlexId { get; } = Guid.NewGuid();
+
+        private static List<string>? _cachedEmails;
+        private static readonly List<User> _users = CreateUsers();
+
+        public static List<string> CachedUserEmails => _cachedEmails ??= GetUserEmails();
 
         private static List<User> CreateUsers() => [ 
             new User

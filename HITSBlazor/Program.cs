@@ -5,6 +5,7 @@ using HITSBlazor.Utils.Properties;
 using HITSBlazor.Services.Auth;
 using HITSBlazor.Services;
 using HITSBlazor.Services.Notifications;
+using HITSBlazor.Services.Ideas;
 
 
 #if DEBUGAPI || RELEASE
@@ -62,6 +63,9 @@ namespace HITSBlazor
             );
             builder.Services.AddCascadingAuthenticationState();
             builder.Services.AddAuthorizationCore();
+
+            //Ideas
+            builder.Services.AddScoped<IIdeasService, MockIdeasService>();
 
             // Notification
             builder.Services.AddScoped<INotificationService, MockNotificationService>();

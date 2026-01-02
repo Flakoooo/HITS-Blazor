@@ -5,11 +5,11 @@ namespace HITSBlazor.Utils.Mocks.Common
 {
     public static class MockCompanies
     {
-        private static readonly List<Company> _companies = CreateCompanies();
-
         public static Guid HITSId { get; } = Guid.NewGuid();
         public static Guid GazpromId { get; } = Guid.NewGuid();
         public static Guid RosneftId { get; } = Guid.NewGuid();
+
+        private static readonly List<Company> _companies = CreateCompanies();
 
         private static List<Company> CreateCompanies()
         {

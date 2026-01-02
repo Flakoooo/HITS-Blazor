@@ -28,7 +28,7 @@ namespace HITSBlazor.Models.Ideas.Entities
         public int Suitability { get; set; }
         public int Budget { get; set; }
         public int PreAssessment { get; set; }
-        public int? Rating { get; set; }
+        public double? Rating { get; set; }
 
         public bool IsChecked { get; set; }
         public bool IsActive { get; set; }
