@@ -2,11 +2,11 @@
 {
     public enum IdeaStatusType
     {
-        NEW,
-        ON_EDITING,
-        ON_APPROVAL,
-        ON_CONFIRMATION,
-        CONFIRMED,
-        ON_MARKET
+        New = 0,
+        OnEditing = 1,
+        OnApproval = 2,
+        OnConfirmation = 3,
+        Confirmed = 4,
+        OnMarket = 5
     }
 }

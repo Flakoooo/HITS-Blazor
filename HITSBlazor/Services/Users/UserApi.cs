@@ -24,10 +24,7 @@ namespace HITSBlazor.Services.Users
                 apiCall: () => _httpClient.GetAsync(path),
                 successHandler: async response =>
                 {
-                    var jsonOptions = Settings.UserJsonOptions;
-                    jsonOptions.Converters.Add(new RoleTypeJsonConverter());
-
-                    User? user = await response.Content.ReadFromJsonAsync<User>(jsonOptions);
+                    User? user = await response.Content.ReadFromJsonAsync<User>(Settings.UserJsonOptions);
                     if (user is null)
                     {
                         if (_logger.IsEnabled(LogLevel.Warning))

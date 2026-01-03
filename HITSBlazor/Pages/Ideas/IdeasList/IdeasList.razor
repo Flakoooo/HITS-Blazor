@@ -1,4 +1,4 @@
-﻿@namespace HITSBlazor.Pages.IdeasList
+﻿@namespace HITSBlazor.Pages.Ideas.IdeasList
 @using HITSBlazor.Services
 
 <PageTitle>Портал ВШЦТ</PageTitle>
@@ -64,14 +64,14 @@
                                 <td class="@tableDataClass">
                                     <div class="@tableDataContentCenterClass">
                                         <div class="">
-                                            <div>@idea.CreatedAt</div>
+                                            <div>@idea.CreatedAt.ToString("dd.MM.yyyy")</div>
                                         </div>
                                     </div>
                                 </td>
                                 <td class="@tableDataClass">
                                     <div class="@tableDataContentCenterClass">
                                         <div class="">
-                                            <div>@idea.ModifiedAt</div>
+                                            <div>@idea.ModifiedAt.ToString("dd.MM.yyyy")</div>
                                         </div>
                                     </div>
                                 </td>
@@ -124,52 +124,22 @@
                  <div class="w-100">
                      <span class="fs-6 fw-semibold">Статус</span>
                     <div style="max-height: 192px; overflow-y: scroll;">
-                        <div class="px-2 py-1 rounded-1"
-                             style="@filterChoiceStyle">
-                             <div class="d-flex">
-                                 <input type="checkbox" name="Статус" value="NEW" class="form-check-input" />
-                                 <span class="form-check-label ms-2">Новая</span>
-                             </div>
-                        </div>
-                        <div class="px-2 py-1 rounded-1"
-                             style="@filterChoiceStyle">
-                            <div class="d-flex">
-                                <input type="checkbox" name="Статус" value="ON_EDITING" class="form-check-input" />
-                                <span class="form-check-label ms-2">На редактировании</span>
+                        @foreach (var status in AllStatuses)
+                        {
+                            <div class="px-2 py-1 rounded-1" style="@filterChoiceStyle">
+                                <div class="d-flex">
+                                    <input type="checkbox"
+                                           checked="@IsStatusSelected(status.Value)"
+                                           @onchange="@(e => OnStatusChanged(status.Value, (bool)e.Value!))"
+                                           class="form-check-input" />
+                                    <span class="form-check-label ms-2">@status.Text</span>
+                                </div>
                             </div>
-                        </div>
-                        <div class="px-2 py-1 rounded-1"
-                             style="@filterChoiceStyle">
-                            <div class="d-flex">
-                                <input type="checkbox" name="Статус" value="ON_APPROVAL" class="form-check-input" />
-                                <span class="form-check-label ms-2">На согласовании</span>
-                            </div>
-                        </div>
-                        <div class="px-2 py-1 rounded-1"
-                             style="@filterChoiceStyle">
-                            <div class="d-flex">
-                                <input type="checkbox" name="Статус" value="ON_CONFIRMATION" class="form-check-input" />
-                                <span class="form-check-label ms-2">На утверждении</span>
-                            </div>
-                        </div>
-                        <div class="px-2 py-1 rounded-1"
-                             style="@filterChoiceStyle">
-                            <div class="d-flex">
-                                <input type="checkbox" name="Статус" value="CONFIRMED" class="form-check-input" />
-                                <span class="form-check-label ms-2">Утверждена</span>
-                            </div>
-                        </div>
-                        <div class="px-2 py-1 rounded-1"
-                             style="@filterChoiceStyle">
-                            <div class="d-flex">
-                                <input type="checkbox" name="Статус" value="ON_MARKET" class="form-check-input" />
-                                <span class="form-check-label ms-2">Опубликована</span>
-                            </div>
-                        </div>
+                        }
                      </div>
                  </div>
                  <div class="w-100 d-flex justify-content-center">
-                    <button type="button" class="btn d-flex btn-danger" style="@Styles.Btn">
+                    <button type="button" onclick="@ResetFilters" class="btn d-flex btn-danger" style="@Styles.Btn">
                         <i class="bi-x-lg fs-5" style="@Styles.Bi"></i>
                          Сбросить фильтры
                      </button>

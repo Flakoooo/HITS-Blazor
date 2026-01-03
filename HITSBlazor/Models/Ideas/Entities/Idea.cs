@@ -8,8 +8,8 @@ namespace HITSBlazor.Models.Ideas.Entities
     {
         public Guid Id { get; set; }
         public User Initiator { get; set; } = new();
-        public string CreatedAt { get; set; } = string.Empty;
-        public string ModifiedAt { get; set; } = string.Empty;
+        public DateTime CreatedAt { get; set; }
+        public DateTime ModifiedAt { get; set; }
 
         public string Name { get; set; } = string.Empty;
         public string Problem { get; set; } = string.Empty;

@@ -1,4 +1,5 @@
 ﻿using HITSBlazor.Models.Ideas.Entities;
+using HITSBlazor.Models.Ideas.Enums;
 using HITSBlazor.Utils;
 using HITSBlazor.Utils.Mocks.Ideas;
 
@@ -10,10 +11,12 @@ namespace HITSBlazor.Services.Ideas
 
         public async Task<ServiceResponse<List<Idea>>> GetAllIdeasAsync()
         {
-            if (_ideas.Count == 0)
-                _ideas = MockIdeas.GetAllIdeas();
+            _ideas = MockIdeas.GetAllIdeas();
 
             return ServiceResponse<List<Idea>>.Success(_ideas);
         }
+
+        public async Task<List<Idea>> GetIdeasByStatusAsync(params IdeaStatusType[] statusTypes)
+            => [.. _ideas.Where(i => statusTypes.Contains(i.Status))];
     }
 }
