@@ -1,0 +1,74 @@
+﻿@page "/ideas/create"
+@using HITSBlazor.Services
+
+<PageTitle>Портал ВШЦТ</PageTitle>
+
+<div style="height: auto; display: flex; flex-direction: row; flex-wrap: nowrap; align-items: center; justify-content: center;">
+    <form class="p-3 bg-white w-100 h-100 overflow-auto"
+          style="align-items: center; gap: 12px; display: flex; flex-direction: column; flex-wrap: nowrap; justify-content: flex-start;">
+          <span class="fs-2 text-primary">Создание идеи</span>
+          <div class="w-75 d-flex flex-column gap-3">
+              <div class="d-flex flex-column gap-3">
+                  <div class="w-100">
+                      <label class="form-label text-primary">
+                          Название идеи*
+                        <i class="bi-patch-question" 
+                           style="@Styles.Bi cursor: pointer; display: inline-block; vertical-align: middle; color: #007bff;"></i>
+                      </label>
+                      <div class="input-group">
+                          <input type="text" placeholder="Введите название идеи" class="form-control rounded-end" />
+                      </div>
+                  </div>
+                  <div class="d-flex flex-column w-100 h-100">
+                      <label class="form-label text-primary">
+                          Проблема*
+                          <i class="bi-patch-question"
+                             style="@Styles.Bi cursor: pointer; display: inline-block; vertical-align: middle; color: #007bff;"></i>
+                      </label>
+                      <div class="input-group h-100">
+                          <textarea placeholder="Опишите проблему, которую решает ваша идея" class="form-control rounded-end"></textarea>
+                      </div>
+                  </div>
+                  <div class="d-flex flex-column w-100 h-100">
+                      <label class="form-label text-primary">
+                          Предлагаемое решение*
+                          <i class="bi-patch-question"
+                             style="@Styles.Bi cursor: pointer; display: inline-block; vertical-align: middle; color: #007bff;"></i>
+                      </label>
+                      <div class="input-group h-100">
+                          <textarea placeholder="Опишите, что вы предлагаете для решения проблемы" class="form-control rounded-end"></textarea>
+                      </div>
+                  </div>
+                  <div class="d-flex flex-column w-100 h-100">
+                      <label class="form-label text-primary">
+                          Ожидаемый результат*
+                          <i class="bi-patch-question"
+                             style="@Styles.Bi cursor: pointer; display: inline-block; vertical-align: middle; color: #007bff;"></i>
+                      </label>
+                      <div class="input-group h-100">
+                          <textarea placeholder="Опишите ожидаемый результат" class="form-control rounded-end"></textarea>
+                      </div>
+                  </div>
+                  <div class="d-flex flex-column w-100 h-100">
+                      <label class="form-label text-primary">
+                          Описание необходимых ресурсов для реализации*
+                          <i class="bi-patch-question"
+                             style="@Styles.Bi cursor: pointer; display: inline-block; vertical-align: middle; color: #007bff;"></i>
+                      </label>
+                      <div class="input-group h-100">
+                          <textarea placeholder="Укажите список требуемых для выполнения проекта ресурсов" class="form-control rounded-end"></textarea>
+                      </div>
+                  </div>
+                  <div></div>
+              </div>
+              <div></div>
+              <div class="w-100"></div>
+              <div class="row"></div>
+              <div class="col"></div>
+              <div style="display: flex; flex-direction: row; flex-wrap: nowrap; align-items: center; justify-content: center; gap: 16px;">
+
+              </div>
+          </div>
+    </form>
+</div>
+
