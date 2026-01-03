@@ -7,6 +7,8 @@ namespace HITSBlazor.Utils.Mocks.Ideas
 {
     public static class MockIdeas
     {
+        //TODO: сделать форматирование даты по типу dd.MM.yyyy
+
         private static readonly string _lorem = "Lorem ipsum dolor sit amet consectetur adipisicing elit. Eius aperiam delectus possimus, voluptates quo accusamus? Consequatur, quasi rem temporibus blanditiis delectus aliquid officia aut, totam incidunt reiciendis eaque laborum fugiat!";
 
         public static Guid RefactorId { get; } = Guid.NewGuid();

@@ -34,15 +34,15 @@ namespace HITSBlazor.Utils.Mocks.Users
                 LastName = "Власов",
                 Roles =
                 [
-                    RoleType.INITIATOR,
-                    RoleType.PROJECT_OFFICE,
-                    RoleType.EXPERT,
-                    RoleType.ADMIN,
-                    RoleType.MEMBER,
-                    RoleType.TEAM_LEADER,
-                    RoleType.TEACHER
+                    RoleType.Initiator,
+                    RoleType.ProjectOffice,
+                    RoleType.Expert,
+                    RoleType.Admin,
+                    RoleType.Member,
+                    RoleType.TeamLeader,
+                    RoleType.Teacher
                 ],
-                CreatedAt = new DateTime(2023, 10, 20, 11, 2, 17, DateTimeKind.Utc).ToString(Settings.DateFormat),
+                CreatedAt = new DateTime(2023, 10, 20, 11, 2, 17, DateTimeKind.Utc),
                 Telephone = "1111111111",
                 StudyGroup = "AAAA-22-1"
             },
@@ -54,14 +54,14 @@ namespace HITSBlazor.Utils.Mocks.Users
                 LastName = "Иванович",
                 Roles =
                 [
-                    RoleType.INITIATOR,
-                    RoleType.PROJECT_OFFICE,
-                    RoleType.EXPERT,
-                    RoleType.ADMIN,
-                    RoleType.MEMBER,
-                    RoleType.TEACHER
+                    RoleType.Initiator,
+                    RoleType.ProjectOffice,
+                    RoleType.Expert,
+                    RoleType.Admin,
+                    RoleType.Member,
+                    RoleType.Teacher
                 ],
-                CreatedAt = new DateTime(2023, 10, 20, 11, 2, 17, DateTimeKind.Utc).ToString(Settings.DateFormat),
+                CreatedAt = new DateTime(2023, 10, 20, 11, 2, 17, DateTimeKind.Utc),
                 Telephone = "22222222222",
                 StudyGroup = "BBBB-22-1"
             },
@@ -73,14 +73,14 @@ namespace HITSBlazor.Utils.Mocks.Users
                 LastName = "Менеджер",
                 Roles =
                 [
-                    RoleType.INITIATOR,
-                    RoleType.PROJECT_OFFICE,
-                    RoleType.EXPERT,
-                    RoleType.ADMIN,
-                    RoleType.MEMBER,
-                    RoleType.TEACHER
+                    RoleType.Initiator,
+                    RoleType.ProjectOffice,
+                    RoleType.Expert,
+                    RoleType.Admin,
+                    RoleType.Member,
+                    RoleType.Teacher
                 ],
-                CreatedAt = new DateTime(2023, 10, 20, 11, 2, 17, DateTimeKind.Utc).ToString(Settings.DateFormat),
+                CreatedAt = new DateTime(2023, 10, 20, 11, 2, 17, DateTimeKind.Utc),
                 Telephone = "33333333333",
                 StudyGroup = "CCCC-22-1"
             },
@@ -92,14 +92,14 @@ namespace HITSBlazor.Utils.Mocks.Users
                 LastName = "Владелец",
                 Roles =
                 [
-                    RoleType.INITIATOR,
-                    RoleType.PROJECT_OFFICE,
-                    RoleType.EXPERT,
-                    RoleType.ADMIN,
-                    RoleType.MEMBER,
-                    RoleType.TEACHER
+                    RoleType.Initiator,
+                    RoleType.ProjectOffice,
+                    RoleType.Expert,
+                    RoleType.Admin,
+                    RoleType.Member,
+                    RoleType.Teacher
                 ],
-                CreatedAt = new DateTime(2023, 10, 20, 11, 2, 17, DateTimeKind.Utc).ToString(Settings.DateFormat),
+                CreatedAt = new DateTime(2023, 10, 20, 11, 2, 17, DateTimeKind.Utc),
                 Telephone = "44444444444",
                 StudyGroup = "DDDD-22-1"
             },
@@ -111,13 +111,13 @@ namespace HITSBlazor.Utils.Mocks.Users
                 LastName = "Загрев",
                 Roles =
                 [
-                    RoleType.INITIATOR,
-                    RoleType.PROJECT_OFFICE,
-                    RoleType.EXPERT,
-                    RoleType.ADMIN,
-                    RoleType.MEMBER
+                    RoleType.Initiator,
+                    RoleType.ProjectOffice,
+                    RoleType.Expert,
+                    RoleType.Admin,
+                    RoleType.Member
                 ],
-                CreatedAt = new DateTime(2023, 10, 20, 11, 2, 17, DateTimeKind.Utc).ToString(Settings.DateFormat),
+                CreatedAt = new DateTime(2023, 10, 20, 11, 2, 17, DateTimeKind.Utc),
                 Telephone = "55555555555",
                 StudyGroup = "EEEE-22-1"
             },
@@ -129,13 +129,13 @@ namespace HITSBlazor.Utils.Mocks.Users
                 LastName = "Кустерман",
                 Roles =
                 [
-                    RoleType.INITIATOR,
-                    RoleType.PROJECT_OFFICE,
-                    RoleType.EXPERT,
-                    RoleType.ADMIN,
-                    RoleType.MEMBER
+                    RoleType.Initiator,
+                    RoleType.ProjectOffice,
+                    RoleType.Expert,
+                    RoleType.Admin,
+                    RoleType.Member
                 ],
-                CreatedAt = new DateTime(2023, 10, 20, 11, 2, 17, DateTimeKind.Utc).ToString(Settings.DateFormat),
+                CreatedAt = new DateTime(2023, 10, 20, 11, 2, 17, DateTimeKind.Utc),
                 Telephone = "66666666666",
                 StudyGroup = "FFFF-22-1"
             },
@@ -147,13 +147,13 @@ namespace HITSBlazor.Utils.Mocks.Users
                 LastName = "Зайко",
                 Roles =
                 [
-                    RoleType.INITIATOR,
-                    RoleType.PROJECT_OFFICE,
-                    RoleType.EXPERT,
-                    RoleType.ADMIN,
-                    RoleType.MEMBER
+                    RoleType.Initiator,
+                    RoleType.ProjectOffice,
+                    RoleType.Expert,
+                    RoleType.Admin,
+                    RoleType.Member
                 ],
-                CreatedAt = new DateTime(2023, 10, 20, 11, 2, 17, DateTimeKind.Utc).ToString(Settings.DateFormat),
+                CreatedAt = new DateTime(2023, 10, 20, 11, 2, 17, DateTimeKind.Utc),
                 Telephone = "66667776666",
                 StudyGroup = "GGGG-22-1"
             },
@@ -165,13 +165,13 @@ namespace HITSBlazor.Utils.Mocks.Users
                 LastName = "Никифорова",
                 Roles =
                 [
-                    RoleType.INITIATOR,
-                    RoleType.PROJECT_OFFICE,
-                    RoleType.EXPERT,
-                    RoleType.ADMIN,
-                    RoleType.MEMBER
+                    RoleType.Initiator,
+                    RoleType.ProjectOffice,
+                    RoleType.Expert,
+                    RoleType.Admin,
+                    RoleType.Member
                 ],
-                CreatedAt = new DateTime(2023, 10, 20, 11, 2, 17, DateTimeKind.Utc).ToString(Settings.DateFormat),
+                CreatedAt = new DateTime(2023, 10, 20, 11, 2, 17, DateTimeKind.Utc),
                 Telephone = "66933776666",
                 StudyGroup = "HHHH-22-1"
             },
@@ -183,13 +183,13 @@ namespace HITSBlazor.Utils.Mocks.Users
                 LastName = "Широков",
                 Roles =
                 [
-                    RoleType.INITIATOR,
-                    RoleType.PROJECT_OFFICE,
-                    RoleType.EXPERT,
-                    RoleType.ADMIN,
-                    RoleType.MEMBER
+                    RoleType.Initiator,
+                    RoleType.ProjectOffice,
+                    RoleType.Expert,
+                    RoleType.Admin,
+                    RoleType.Member
                 ],
-                CreatedAt = new DateTime(2023, 10, 20, 11, 2, 17, DateTimeKind.Utc).ToString(Settings.DateFormat),
+                CreatedAt = new DateTime(2023, 10, 20, 11, 2, 17, DateTimeKind.Utc),
                 Telephone = "6699856666",
                 StudyGroup = "IIII-22-1"
             },
@@ -201,13 +201,13 @@ namespace HITSBlazor.Utils.Mocks.Users
                 LastName = "Минязев",
                 Roles =
                 [
-                    RoleType.INITIATOR,
-                    RoleType.PROJECT_OFFICE,
-                    RoleType.EXPERT,
-                    RoleType.ADMIN,
-                    RoleType.MEMBER
+                    RoleType.Initiator,
+                    RoleType.ProjectOffice,
+                    RoleType.Expert,
+                    RoleType.Admin,
+                    RoleType.Member
                 ],
-                CreatedAt = new DateTime(2023, 10, 20, 11, 2, 17, DateTimeKind.Utc).ToString(Settings.DateFormat),
+                CreatedAt = new DateTime(2023, 10, 20, 11, 2, 17, DateTimeKind.Utc),
                 Telephone = "6699856666",
                 StudyGroup = "AAAA-22-1"
             },
@@ -219,13 +219,13 @@ namespace HITSBlazor.Utils.Mocks.Users
                 LastName = "Иванов",
                 Roles =
                 [
-                    RoleType.INITIATOR,
-                    RoleType.PROJECT_OFFICE,
-                    RoleType.EXPERT,
-                    RoleType.ADMIN,
-                    RoleType.MEMBER
+                    RoleType.Initiator,
+                    RoleType.ProjectOffice,
+                    RoleType.Expert,
+                    RoleType.Admin,
+                    RoleType.Member
                 ],
-                CreatedAt = new DateTime(2023, 10, 20, 11, 2, 17, DateTimeKind.Utc).ToString(Settings.DateFormat),
+                CreatedAt = new DateTime(2023, 10, 20, 11, 2, 17, DateTimeKind.Utc),
                 Telephone = "6699986666",
                 StudyGroup = "JJJJ-22-1"
             },
@@ -237,13 +237,13 @@ namespace HITSBlazor.Utils.Mocks.Users
                 LastName = "Денисович",
                 Roles =
                 [
-                    RoleType.INITIATOR,
-                    RoleType.PROJECT_OFFICE,
-                    RoleType.EXPERT,
-                    RoleType.ADMIN,
-                    RoleType.MEMBER
+                    RoleType.Initiator,
+                    RoleType.ProjectOffice,
+                    RoleType.Expert,
+                    RoleType.Admin,
+                    RoleType.Member
                 ],
-                CreatedAt = new DateTime(2023, 10, 20, 11, 2, 17, DateTimeKind.Utc).ToString(Settings.DateFormat),
+                CreatedAt = new DateTime(2023, 10, 20, 11, 2, 17, DateTimeKind.Utc),
                 Telephone = "6699986726",
                 StudyGroup = "KKKK-22-1"
             },
@@ -255,13 +255,13 @@ namespace HITSBlazor.Utils.Mocks.Users
                 LastName = "Байрамов",
                 Roles =
                 [
-                    RoleType.INITIATOR,
-                    RoleType.PROJECT_OFFICE,
-                    RoleType.EXPERT,
-                    RoleType.ADMIN,
-                    RoleType.MEMBER
+                    RoleType.Initiator,
+                    RoleType.ProjectOffice,
+                    RoleType.Expert,
+                    RoleType.Admin,
+                    RoleType.Member
                 ],
-                CreatedAt = new DateTime(2023, 10, 20, 11, 2, 17, DateTimeKind.Utc).ToString(Settings.DateFormat),
+                CreatedAt = new DateTime(2023, 10, 20, 11, 2, 17, DateTimeKind.Utc),
                 Telephone = "6699986789",
                 StudyGroup = "AAAA-22-1"
             },
@@ -273,13 +273,13 @@ namespace HITSBlazor.Utils.Mocks.Users
                 LastName = "Князев",
                 Roles =
                 [
-                    RoleType.INITIATOR,
-                    RoleType.PROJECT_OFFICE,
-                    RoleType.EXPERT,
-                    RoleType.ADMIN,
-                    RoleType.MEMBER
+                    RoleType.Initiator,
+                    RoleType.ProjectOffice,
+                    RoleType.Expert,
+                    RoleType.Admin,
+                    RoleType.Member
                 ],
-                CreatedAt = new DateTime(2023, 10, 20, 11, 2, 17, DateTimeKind.Utc).ToString(Settings.DateFormat),
+                CreatedAt = new DateTime(2023, 10, 20, 11, 2, 17, DateTimeKind.Utc),
                 Telephone = "6699986789",
                 StudyGroup = "LLLL-22-1"
             }

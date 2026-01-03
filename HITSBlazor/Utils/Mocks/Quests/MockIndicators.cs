@@ -21,7 +21,7 @@ namespace HITSBlazor.Utils.Mocks.Quests
                     Name = "Как вам отношения в команде?",
                     Answers = answers,
                     Type = IndicatorType.TEAM,
-                    Role = IndicatorRoleType.MEMBER,
+                    Role = IndicatorRoleType.Member,
                     IdCategory = softCategory.IdCategory,
                     CategoryName = softCategory.Name,
                     Visible = true
@@ -32,7 +32,7 @@ namespace HITSBlazor.Utils.Mocks.Quests
                     Name = "Как вам профессионализм команды?",
                     Answers = answers,
                     Type = IndicatorType.TEAM,
-                    Role = IndicatorRoleType.TEAM_LEADER,
+                    Role = IndicatorRoleType.TeamLeader,
                     IdCategory = softCategory.IdCategory,
                     CategoryName = softCategory.Name,
                     Visible = true
@@ -43,7 +43,7 @@ namespace HITSBlazor.Utils.Mocks.Quests
                     Name = "Каков ваш взгляд на коммуникацию с этим членом команды?",
                     Answers = answers,
                     Type = IndicatorType.MEMBER,
-                    Role = IndicatorRoleType.MEMBER,
+                    Role = IndicatorRoleType.Member,
                     IdCategory = softCategory.IdCategory,
                     CategoryName = softCategory.Name,
                     Visible = true
@@ -54,7 +54,7 @@ namespace HITSBlazor.Utils.Mocks.Quests
                     Name = "Как оцениваете общение в команде?",
                     Answers = answers,
                     Type = IndicatorType.TEAM,
-                    Role = IndicatorRoleType.TEAM_LEADER,
+                    Role = IndicatorRoleType.TeamLeader,
                     IdCategory = softCategory.IdCategory,
                     CategoryName = softCategory.Name,
                     Visible = true
@@ -65,7 +65,7 @@ namespace HITSBlazor.Utils.Mocks.Quests
                     Name = "Какие ваши мысли о навыках команды?",
                     Answers = answers,
                     Type = IndicatorType.TEAM,
-                    Role = IndicatorRoleType.MEMBER,
+                    Role = IndicatorRoleType.Member,
                     IdCategory = softCategory.IdCategory,
                     CategoryName = softCategory.Name,
                     Visible = true
@@ -76,7 +76,7 @@ namespace HITSBlazor.Utils.Mocks.Quests
                     Name = "Как оцените атмосферу в коллективе?",
                     Answers = answers,
                     Type = IndicatorType.TEAM,
-                    Role = IndicatorRoleType.INITIATOR,
+                    Role = IndicatorRoleType.Initiator,
                     IdCategory = softCategory.IdCategory,
                     CategoryName = softCategory.Name,
                     Visible = true
@@ -87,7 +87,7 @@ namespace HITSBlazor.Utils.Mocks.Quests
                     Name = "Что вы думаете о взаимодействии с этим коллегой?",
                     Answers = answers,
                     Type = IndicatorType.MEMBER,
-                    Role = IndicatorRoleType.TEACHER,
+                    Role = IndicatorRoleType.Teacher,
                     IdCategory = softCategory.IdCategory,
                     CategoryName = softCategory.Name,
                     Visible = true
@@ -98,7 +98,7 @@ namespace HITSBlazor.Utils.Mocks.Quests
                     Name = "Ваше мнение о компетентности команды?",
                     Answers = answers,
                     Type = IndicatorType.TEAM,
-                    Role = IndicatorRoleType.MEMBER,
+                    Role = IndicatorRoleType.Member,
                     IdCategory = softCategory.IdCategory,
                     CategoryName = softCategory.Name,
                     Visible = true
@@ -109,7 +109,7 @@ namespace HITSBlazor.Utils.Mocks.Quests
                     Name = "Что вы думаете о взаимодействии внутри группы?",
                     Answers = answers,
                     Type = IndicatorType.MEMBER,
-                    Role = IndicatorRoleType.MEMBER,
+                    Role = IndicatorRoleType.Member,
                     IdCategory = softCategory.IdCategory,
                     CategoryName = softCategory.Name,
                     Visible = true
@@ -120,7 +120,7 @@ namespace HITSBlazor.Utils.Mocks.Quests
                     Name = "Как воспринимаете атмосферу в команде?",
                     Answers = answers,
                     Type = IndicatorType.TEAM,
-                    Role = IndicatorRoleType.MEMBER,
+                    Role = IndicatorRoleType.Member,
                     IdCategory = softCategory.IdCategory,
                     CategoryName = softCategory.Name,
                     Visible = true
@@ -131,7 +131,7 @@ namespace HITSBlazor.Utils.Mocks.Quests
                     Name = "Как вы оцениваете профессионализм коллег?",
                     Answers = answers,
                     Type = IndicatorType.TEAM,
-                    Role = IndicatorRoleType.MEMBER,
+                    Role = IndicatorRoleType.Member,
                     IdCategory = softCategory.IdCategory,
                     CategoryName = softCategory.Name,
                     Visible = true
@@ -142,7 +142,7 @@ namespace HITSBlazor.Utils.Mocks.Quests
                     Name = "Ваш взгляд на взаимодействие с коллегами?",
                     Answers = answers,
                     Type = IndicatorType.MEMBER,
-                    Role = IndicatorRoleType.MEMBER,
+                    Role = IndicatorRoleType.Member,
                     IdCategory = softCategory.IdCategory,
                     CategoryName = softCategory.Name,
                     Visible = true
@@ -153,7 +153,7 @@ namespace HITSBlazor.Utils.Mocks.Quests
                     Name = "Что вы думаете о внутренних отношениях в команде?",
                     Answers = answers,
                     Type = IndicatorType.TEAM,
-                    Role = IndicatorRoleType.MEMBER,
+                    Role = IndicatorRoleType.Member,
                     IdCategory = softCategory.IdCategory,
                     CategoryName = softCategory.Name,
                     Visible = true
@@ -164,7 +164,7 @@ namespace HITSBlazor.Utils.Mocks.Quests
                     Name = "Как вы оцениваете профессиональные навыки команды?",
                     Answers = answers,
                     Type = IndicatorType.TEAM,
-                    Role = IndicatorRoleType.MEMBER,
+                    Role = IndicatorRoleType.Member,
                     IdCategory = softCategory.IdCategory,
                     CategoryName = softCategory.Name,
                     Visible = true
@@ -175,7 +175,7 @@ namespace HITSBlazor.Utils.Mocks.Quests
                     Name = "Ваше мнение о взаимодействии с коллегами?",
                     Answers = answers,
                     Type = IndicatorType.MEMBER,
-                    Role = IndicatorRoleType.MEMBER,
+                    Role = IndicatorRoleType.Member,
                     IdCategory = softCategory.IdCategory,
                     CategoryName = softCategory.Name,
                     Visible = true
@@ -186,7 +186,7 @@ namespace HITSBlazor.Utils.Mocks.Quests
                     Name = "Что вы думаете о взаимодействии в команде?",
                     Answers = answers,
                     Type = IndicatorType.MEMBER,
-                    Role = IndicatorRoleType.MEMBER,
+                    Role = IndicatorRoleType.Member,
                     IdCategory = softCategory.IdCategory,
                     CategoryName = softCategory.Name,
                     Visible = true
@@ -197,7 +197,7 @@ namespace HITSBlazor.Utils.Mocks.Quests
                     Name = "Как вы оцениваете атмосферу в команде?",
                     Answers = answers,
                     Type = IndicatorType.TEAM,
-                    Role = IndicatorRoleType.MEMBER,
+                    Role = IndicatorRoleType.Member,
                     IdCategory = softCategory.IdCategory,
                     CategoryName = softCategory.Name,
                     Visible = true
@@ -208,7 +208,7 @@ namespace HITSBlazor.Utils.Mocks.Quests
                     Name = "Что вы думаете о профессионализме команды?",
                     Answers = answers,
                     Type = IndicatorType.TEAM,
-                    Role = IndicatorRoleType.MEMBER,
+                    Role = IndicatorRoleType.Member,
                     IdCategory = softCategory.IdCategory,
                     CategoryName = softCategory.Name,
                     Visible = true
@@ -219,7 +219,7 @@ namespace HITSBlazor.Utils.Mocks.Quests
                     Name = "Ваш взгляд на взаимодействие с коллегой?",
                     Answers = answers,
                     Type = IndicatorType.MEMBER,
-                    Role = IndicatorRoleType.MEMBER,
+                    Role = IndicatorRoleType.Member,
                     IdCategory = softCategory.IdCategory,
                     CategoryName = softCategory.Name,
                     Visible = true

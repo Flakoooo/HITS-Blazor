@@ -3,6 +3,7 @@
 @using HITSBlazor.Services
 @using HITSBlazor.Services.Auth
 @inject IAuthService AuthService
+@implements IDisposable
 
 <div class="bg-white border-bottom w-100" 
      style="position: sticky; top: 0; right: 0; bottom: auto; left: 0; z-index: 6; height: min-content;">
@@ -40,5 +41,33 @@
 </div>
 
 @code {
-    private User? CurrentUser => AuthService.CurrentUser;
+    private bool isInitialized = false;
+
+    private User? CurrentUser { get; set; } = null;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            AuthService.OnAuthStateChanged += AuthStateChanged;
+            CurrentUser = AuthService.CurrentUser;
+            isInitialized = true;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Ошибка инициализации MainLayout: {ex.Message}");
+            isInitialized = true;
+        }
+    }
+
+    public void AuthStateChanged()
+    {
+        CurrentUser = AuthService.IsAuthenticated ? AuthService.CurrentUser : null;
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        AuthService.OnAuthStateChanged -= AuthStateChanged;
+    }
 }

@@ -2,13 +2,13 @@
 {
     public enum RoleType
     {
-        INITIATOR,
-        TEAM_OWNER,
-        TEAM_LEADER,
-        MEMBER,
-        PROJECT_OFFICE,
-        EXPERT,
-        ADMIN,
-        TEACHER
+        Initiator,
+        TeamOwner,
+        TeamLeader,
+        Member,
+        ProjectOffice,
+        Expert,
+        Admin,
+        Teacher
     }
 }

@@ -2,9 +2,9 @@
 {
     public enum IndicatorRoleType
     {
-        MEMBER,
-        INITIATOR,
-        TEAM_LEADER,
-        TEACHER
+        Member,
+        Initiator,
+        TeamLeader,
+        Teacher
     }
 }

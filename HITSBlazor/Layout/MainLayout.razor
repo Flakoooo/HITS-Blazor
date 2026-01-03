@@ -43,7 +43,6 @@
         try
         {
             AuthService.OnAuthStateChanged += AuthStateChanged;
-            await AuthService.InitializeAsync();
             IsAuthenticated = AuthService.IsAuthenticated;
             isInitialized = true;
         }

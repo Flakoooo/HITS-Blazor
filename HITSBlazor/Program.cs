@@ -6,6 +6,10 @@ using HITSBlazor.Services.Auth;
 using HITSBlazor.Services;
 using HITSBlazor.Services.Notifications;
 using HITSBlazor.Services.Ideas;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+
+
 
 
 #if DEBUGAPI || RELEASE
@@ -43,7 +47,6 @@ namespace HITSBlazor
                 sp.GetRequiredService<IHttpClientFactory>().CreateClient(Settings.HttpClientName)
             );
 #endif
-
             // Utils
             builder.Services.AddScoped<GlobalNotificationService>();
             builder.Services.AddScoped<NavigationService>();

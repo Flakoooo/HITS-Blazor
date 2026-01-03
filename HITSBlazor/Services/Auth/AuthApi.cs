@@ -23,7 +23,7 @@ namespace HITSBlazor.Services.Auth
         private const string REGISTRATION_OPERATION = "Registration";
 
         public async Task<ServiceResponse<bool>> LoginAsync(LoginModel request) => await ExecuteApiCallAsync(
-            apiCall: () => _httpClient.PostAsJsonAsync($"{_authPath}/login", request),
+            apiCall: () => _httpClient.PostAsJsonAsync($"{_authPath}/login", request, Settings.BaseJsonOptions),
             successHandler: async response =>
             {
                 if (AppEnvironment.IsLogEnabled && _logger.IsEnabled(LogLevel.Information))
@@ -84,7 +84,7 @@ namespace HITSBlazor.Services.Auth
         );
 
         public async Task<ServiceResponse<bool>> PasswordNewAsync(NewPasswordModel newPasswordModel) => await ExecuteApiCallAsync(
-            apiCall: () => _httpClient.PutAsJsonAsync($"{_authPath}/password", newPasswordModel),
+            apiCall: () => _httpClient.PutAsJsonAsync($"{_authPath}/password", newPasswordModel, Settings.BaseJsonOptions),
             successHandler: async response =>
             {
                 string content = await response.Content.ReadAsStringAsync();
@@ -99,7 +99,7 @@ namespace HITSBlazor.Services.Auth
         );
 
         public async Task<ServiceResponse<bool>> RegistrationUserAsync(RegisterModel request, Guid invitationId) => await ExecuteApiCallAsync(
-            apiCall: () => _httpClient.PostAsJsonAsync($"{_authPath}/registration/{invitationId}", request),
+            apiCall: () => _httpClient.PostAsJsonAsync($"{_authPath}/registration/{invitationId}", request, Settings.BaseJsonOptions),
             successHandler: async response =>
             {
                 if (AppEnvironment.IsLogEnabled && _logger.IsEnabled(LogLevel.Information))

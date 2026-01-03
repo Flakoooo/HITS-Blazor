@@ -13,12 +13,12 @@ namespace HITSBlazor.Components.LeftSideBar
                 IconName = "bi bi-lightbulb",
                 Roles =
                 [
-                    RoleType.INITIATOR,
-                    RoleType.MEMBER,
-                    RoleType.PROJECT_OFFICE,
-                    RoleType.EXPERT,
-                    RoleType.ADMIN,
-                    RoleType.TEACHER
+                    RoleType.Initiator,
+                    RoleType.Member,
+                    RoleType.ProjectOffice,
+                    RoleType.Expert,
+                    RoleType.Admin,
+                    RoleType.Teacher
                 ],
                 Routes =
                 [
@@ -30,12 +30,12 @@ namespace HITSBlazor.Components.LeftSideBar
                         IconName = "bi bi-list",
                         Roles =
                         [
-                            RoleType.INITIATOR,
-                            RoleType.MEMBER,
-                            RoleType.PROJECT_OFFICE,
-                            RoleType.EXPERT,
-                            RoleType.ADMIN,
-                            RoleType.TEACHER
+                            RoleType.Initiator,
+                            RoleType.Member,
+                            RoleType.ProjectOffice,
+                            RoleType.Expert,
+                            RoleType.Admin,
+                            RoleType.Teacher
                         ]
                     },
                     new()
@@ -44,7 +44,7 @@ namespace HITSBlazor.Components.LeftSideBar
                         Text = "Создать идею",
                         To = "/ideas/create",
                         IconName = "bi bi-plus-lg",
-                        Roles = [RoleType.INITIATOR, RoleType.ADMIN]
+                        Roles = [RoleType.Initiator, RoleType.Admin]
                     }
                 ]
             },
@@ -56,13 +56,13 @@ namespace HITSBlazor.Components.LeftSideBar
                 IconName = "bi bi-people",
                 Roles =
                 [
-                    RoleType.INITIATOR,
-                    RoleType.TEAM_OWNER,
-                    RoleType.MEMBER,
-                    RoleType.ADMIN,
-                    RoleType.PROJECT_OFFICE,
-                    RoleType.TEACHER,
-                    RoleType.TEAM_LEADER
+                    RoleType.Initiator,
+                    RoleType.TeamOwner,
+                    RoleType.Member,
+                    RoleType.Admin,
+                    RoleType.ProjectOffice,
+                    RoleType.Teacher,
+                    RoleType.TeamLeader
                 ],
                 Routes =
                 [
@@ -74,13 +74,13 @@ namespace HITSBlazor.Components.LeftSideBar
                         IconName = "bi bi-list",
                         Roles =
                         [
-                            RoleType.INITIATOR,
-                            RoleType.TEAM_OWNER,
-                            RoleType.MEMBER,
-                            RoleType.ADMIN,
-                            RoleType.PROJECT_OFFICE,
-                            RoleType.TEACHER,
-                            RoleType.TEAM_LEADER
+                            RoleType.Initiator,
+                            RoleType.TeamOwner,
+                            RoleType.Member,
+                            RoleType.Admin,
+                            RoleType.ProjectOffice,
+                            RoleType.Teacher,
+                            RoleType.TeamLeader
                         ]
                     },
                     new()
@@ -89,7 +89,7 @@ namespace HITSBlazor.Components.LeftSideBar
                         Text = "Создать команду",
                         To = "/teams/create",
                         IconName = "bi bi-plus-lg",
-                        Roles = [RoleType.TEAM_OWNER, RoleType.ADMIN]
+                        Roles = [RoleType.TeamOwner, RoleType.Admin]
                     }
                 ]
             },
@@ -101,13 +101,13 @@ namespace HITSBlazor.Components.LeftSideBar
                 IconName = "bi bi-shop-window",
                 Roles =
                 [
-                    RoleType.INITIATOR,
-                    RoleType.MEMBER,
-                    RoleType.TEAM_OWNER,
-                    RoleType.TEAM_LEADER,
-                    RoleType.PROJECT_OFFICE,
-                    RoleType.ADMIN,
-                    RoleType.TEACHER
+                    RoleType.Initiator,
+                    RoleType.Member,
+                    RoleType.TeamOwner,
+                    RoleType.TeamLeader,
+                    RoleType.ProjectOffice,
+                    RoleType.Admin,
+                    RoleType.Teacher
                 ],
                 Routes =
                 [
@@ -119,9 +119,9 @@ namespace HITSBlazor.Components.LeftSideBar
                         IconName = "bi bi-list",
                         Roles =
                         [
-                            RoleType.PROJECT_OFFICE,
-                            RoleType.ADMIN,
-                            RoleType.INITIATOR
+                            RoleType.ProjectOffice,
+                            RoleType.Admin,
+                            RoleType.Initiator
                         ]
                     }
                 ]
@@ -132,7 +132,7 @@ namespace HITSBlazor.Components.LeftSideBar
                 Text = "Админ панель",
                 To = "/admin",
                 IconName = "bi bi-ui-checks-grid",
-                Roles = [RoleType.ADMIN, RoleType.TEACHER],
+                Roles = [RoleType.Admin, RoleType.Teacher],
                 Routes =
                 [
                     new()
@@ -141,7 +141,7 @@ namespace HITSBlazor.Components.LeftSideBar
                         To = "/admin/users",
                         Text = "Пользователи",
                         IconName = "bi bi-person-gear",
-                        Roles = [RoleType.ADMIN, RoleType.TEACHER]
+                        Roles = [RoleType.Admin, RoleType.Teacher]
                     },
                     new()
                     {
@@ -149,7 +149,7 @@ namespace HITSBlazor.Components.LeftSideBar
                         To = "/admin/add-users",
                         Text = "Добавить пользователей",
                         IconName = "bi bi-person-add",
-                        Roles = [RoleType.ADMIN]
+                        Roles = [RoleType.Admin]
                     },
                     new()
                     {
@@ -157,7 +157,7 @@ namespace HITSBlazor.Components.LeftSideBar
                         To = "/admin/companies",
                         Text = "Компании",
                         IconName = "bi bi-building",
-                        Roles = [RoleType.ADMIN]
+                        Roles = [RoleType.Admin]
                     },
                     new()
                     {
@@ -165,7 +165,7 @@ namespace HITSBlazor.Components.LeftSideBar
                         To = "/admin/users-groups",
                         Text = "Группы пользователей",
                         IconName = "bi bi-people",
-                        Roles = [RoleType.ADMIN]
+                        Roles = [RoleType.Admin]
                     },
                     new()
                     {
@@ -173,7 +173,7 @@ namespace HITSBlazor.Components.LeftSideBar
                         To = "/admin/skills",
                         Text = "Справочник компетенций",
                         IconName = "bi bi-person-badge",
-                        Roles = [RoleType.ADMIN]
+                        Roles = [RoleType.Admin]
                     },
                     new()
                     {
@@ -181,7 +181,7 @@ namespace HITSBlazor.Components.LeftSideBar
                         To = "/admin/tags",
                         Text = "Справочник тегов",
                         IconName = "bi bi-tags",
-                        Roles = [RoleType.ADMIN]
+                        Roles = [RoleType.Admin]
                     }
                 ]
             },
@@ -193,13 +193,13 @@ namespace HITSBlazor.Components.LeftSideBar
                 IconName = "bi bi-briefcase",
                 Roles =
                 [
-                    RoleType.INITIATOR,
-                    RoleType.MEMBER,
-                    RoleType.TEAM_OWNER,
-                    RoleType.PROJECT_OFFICE,
-                    RoleType.ADMIN,
-                    RoleType.TEAM_LEADER,
-                    RoleType.TEACHER
+                    RoleType.Initiator,
+                    RoleType.Member,
+                    RoleType.TeamOwner,
+                    RoleType.ProjectOffice,
+                    RoleType.Admin,
+                    RoleType.TeamLeader,
+                    RoleType.Teacher
                 ],
                 Routes =
                 [
@@ -211,9 +211,9 @@ namespace HITSBlazor.Components.LeftSideBar
                         IconName = "bi bi-list",
                         Roles =
                         [
-                            RoleType.PROJECT_OFFICE,
-                            RoleType.ADMIN,
-                            RoleType.TEACHER
+                            RoleType.ProjectOffice,
+                            RoleType.Admin,
+                            RoleType.Teacher
                         ]
                     }
                 ]
@@ -226,11 +226,11 @@ namespace HITSBlazor.Components.LeftSideBar
                 IconName = "bi bi-patch-question",
                 Roles =
                 [
-                    RoleType.PROJECT_OFFICE,
-                    RoleType.INITIATOR,
-                    RoleType.TEAM_LEADER,
-                    RoleType.MEMBER,
-                    RoleType.TEACHER
+                    RoleType.ProjectOffice,
+                    RoleType.Initiator,
+                    RoleType.TeamLeader,
+                    RoleType.Member,
+                    RoleType.Teacher
                 ]
             },
             new()
@@ -241,10 +241,10 @@ namespace HITSBlazor.Components.LeftSideBar
                 IconName = "bi bi-clipboard",
                 Roles =
                 [
-                    RoleType.ADMIN,
-                    RoleType.MEMBER,
-                    RoleType.TEAM_LEADER,
-                    RoleType.PROJECT_OFFICE
+                    RoleType.Admin,
+                    RoleType.Member,
+                    RoleType.TeamLeader,
+                    RoleType.ProjectOffice
                 ]
             }
         ];

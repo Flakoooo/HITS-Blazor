@@ -1,7 +1,7 @@
 ﻿using HITSBlazor.Models.Quests.Entities;
 using HITSBlazor.Models.Users.Entities;
 using HITSBlazor.Utils;
-using Newtonsoft.Json;
+using System.Net.Http.Json;
 
 namespace HITSBlazor.Services.Users
 {
@@ -24,8 +24,10 @@ namespace HITSBlazor.Services.Users
                 apiCall: () => _httpClient.GetAsync(path),
                 successHandler: async response =>
                 {
-                    string content = await response.Content.ReadAsStringAsync();
-                    User? user = JsonConvert.DeserializeObject<User>(content);
+                    var jsonOptions = Settings.UserJsonOptions;
+                    jsonOptions.Converters.Add(new RoleTypeJsonConverter());
+
+                    User? user = await response.Content.ReadFromJsonAsync<User>(jsonOptions);
                     if (user is null)
                     {
                         if (_logger.IsEnabled(LogLevel.Warning))
@@ -36,8 +38,6 @@ namespace HITSBlazor.Services.Users
 
                         return ServiceResponse<User>.Failure("Не удалось получить пользователя", response.StatusCode);
                     }
-
-
 
                     if (id is not null && id.HasValue)
                         _logger.LogInformation("Get current user successful for user");

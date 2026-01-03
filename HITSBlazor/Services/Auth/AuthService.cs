@@ -37,10 +37,18 @@ namespace HITSBlazor.Services.Auth
             if (AppEnvironment.IsLogEnabled)
                 _logger.LogInformation("Initializing auth service...");
 
-            IsAuthenticated = (await _authApi.RefreshTokenAsync()).IsSuccess;
-            if (IsAuthenticated) await GetCurrentUser();
+            if (IsAuthenticated)
+            {
+                if (CurrentUser is null) await GetCurrentUser();
+            }
+            else
+            {
+                IsAuthenticated = (await _authApi.RefreshTokenAsync()).IsSuccess;
+                if (IsAuthenticated) await GetCurrentUser();
+            }
 
             OnAuthStateChanged?.Invoke();
+
             return;
         }
 

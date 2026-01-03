@@ -17,14 +17,14 @@ namespace HITSBlazor.Utils.Mocks.Common
                 Id = DevelopersId,
                 Name = "Группа разработчиков",
                 Users = [.. MockUsers.GetAllUsers()],
-                Roles = [RoleType.INITIATOR]
+                Roles = [RoleType.Initiator]
             },
             new UsersGroup
             {
                 Id = ExpertsId,
                 Name = "Группа экспертов",
                 Users = [],
-                Roles = [RoleType.ADMIN, RoleType.EXPERT]
+                Roles = [RoleType.Admin, RoleType.Expert]
             }
         ];
 
