@@ -1,4 +1,5 @@
-﻿@using HITSBlazor.Models.Common.Enums
+﻿@using HITSBlazor.Components.SkillDropdown
+@using HITSBlazor.Models.Common.Enums
 @using HITSBlazor.Services
 
 <PageTitle>Портал ВШЦТ</PageTitle>
@@ -83,58 +84,38 @@
                   <span class="fs-6 text-primary">Стек технологий*</span>
                   <i class="bi-patch-question"
                      style="@Styles.Bi cursor: pointer; display: inline-block; vertical-align: middle; color: #007bff;"></i>
-                  <div class="mt-2 w-100" style="display: flex; flex-direction: row; flex-wrap: nowrap; align-items: flex-start; justify-content: stretch; gap: 16px;">
-                      <div class="w-25">
-                          <div class="w-100">
-                              <div style="position: relative;">
-                                  <div class="w-100">
-                                      <div class="input-group">
-                                          <input type="text" 
-                                                 @oninput="@(e => SearchNameSkill(e, SkillType.Language))"
-                                                 onfocus="@(async () => await ShowSkills(SkillType.Language))"
-                                                 placeholder="Языки разработки@(SelectedLanguageSkills.Count > 0 ? $" ({SelectedLanguageSkills.Count})" : "")"
-                                                 class="form-control" style="color: #000 !important;" />
-                                      </div>
-                                  </div>
-                                  @if (showLanguageSkills)
-                                  {
-                                      <div class="list-group w-100" style="top: 42px; right: auto; z-index: 6; max-height: 173px; overflow-y: scroll; position: absolute; bottom: auto; left: auto;">
-                                          @foreach (var skill in LanguageSkills)
-                                          {
-                                              <div class="d-flex list-group-item list-group-item-action" style="padding: 8px 12px; cursor: pointer; flex-direction: row; flex-wrap: nowrap; align-items: center; justify-content: flex-start;">
-                                                  <div class="d-flex">
-                                                      <input type="checkbox"
-                                                             checked="@SelectedLanguageSkills.Contains(skill)"
-                                                             @onchange="@(e => OnSkillSelected(skill, (bool)e.Value!))"
-                                                             class="form-check-input" />
-                                                      <span class="form-check-label ms-2">@skill.Name</span>
-                                                  </div>
-                                              </div>
-                                        }
-                                      </div>
-                                  }
-                                  else
-                                  {
-                                      <i class="bi-chevron-down" style="@Styles.Bi position: absolute; bottom: auto; left: auto; top: 11px; right: 12px; z-index: 5; cursor: pointer;"></i>
-                                  }
+                  @if (isLoading)
+                  {
+                      <div class="mt-2 w-100 d-flex gap-3">
+                          @for (int p = 0; p < 4; ++p)
+                          {
+                              <div class="placeholder-glow w-100">
+                                  <span class="placeholder w-100 bg-secondary rounded" style="height: 50px;"></span>
                               </div>
-                          </div>
+                          }
                       </div>
-                      @if (SelectedLanguageSkills.Any())
-                      {
-                        <div class="mt-2">
-                            <div class="d-flex flex-wrap gap-1">
-                                @foreach (var skill in SelectedLanguageSkills)
-                                {
-                                    <div class="px-2 py-1 rounded d-flex gap-1 bg-success-subtle text-success">
-                                        <span class="fs-6">@skill.Name</span>
-                                        <i class="bi-x-lg" style="@Styles.Bi cursor: pointer;"></i>
-                                    </div>
-                                }
-                            </div>
-                        </div>
-                      }
-                  </div>
+                  }
+                  else 
+                  {
+                      <div class="mt-2 w-100" style="display: flex; flex-direction: row; flex-wrap: nowrap; align-items: flex-start; justify-content: stretch; gap: 16px;">
+                          <SkillDropdown SkillType="SkillType.Language" 
+                                         AllSkills="@LanguageSkills"
+                                         @bind-SelectedSkills="@SelectedLanguageSkills"
+                                         SearchFunction="@SearchSkillsAsync" />
+                          <SkillDropdown SkillType="SkillType.Framework" 
+                                         AllSkills="@FrameworkSkills"
+                                         @bind-SelectedSkills="@SelectedFrameworkSkills"
+                                         SearchFunction="@SearchSkillsAsync" />
+                          <SkillDropdown SkillType="SkillType.Database" 
+                                         AllSkills="@DatabaseSkills"
+                                         @bind-SelectedSkills="@SelectedDatabaseSkills"
+                                         SearchFunction="@SearchSkillsAsync" />
+                          <SkillDropdown SkillType="SkillType.Devops" 
+                                         AllSkills="@DevopsSkills"
+                                         @bind-SelectedSkills="@SelectedDevopsSkills"
+                                         SearchFunction="@SearchSkillsAsync" />
+                      </div>
+                  }
               </div>
               <div class="w-100"></div>
               <div class="row"></div>

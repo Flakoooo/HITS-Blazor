@@ -1,0 +1,70 @@
+﻿@namespace HITSBlazor.Components.SkillDropdown
+@using HITSBlazor.Models.Common.Entities
+@using HITSBlazor.Models.Common.Enums
+@using HITSBlazor.Services
+
+<div class="w-25" tabindex="-1">
+    <div class="w-100">
+        <div style="position: relative;">
+            <div class="w-100">
+                <div class="input-group">
+                    <input type="text"
+                           @ref="inputRef"
+                           @oninput="@(async e => await OnSearch(e))"
+                           placeholder="@GetPlaceholder()"
+                           class="form-control"
+                           style="color: #000 !important;"
+                           @onclick="OpenDropdown"
+                           @onfocus="OpenDropdown"
+                           @onkeydown="OnInputKeyDown" />
+                </div>
+            </div>
+
+            <i class="@(IsOpen ? "bi-chevron-up" : "bi-chevron-down")"
+               style="@Styles.Bi position: absolute; bottom: auto; left: auto; top: 11px; right: 12px; z-index: 10000; cursor: pointer;"
+               @onclick="ToggleDropdown"></i>
+
+            @if (IsOpen)
+            {
+                <div class="list-group w-100 dropdown-list"
+                     style="top: 42px; right: auto; z-index: 10000; max-height: 173px; overflow-y: scroll; position: absolute; bottom: auto; left: auto;"
+                     @onclick:stopPropagation>
+
+                    @foreach (var skill in FilteredSkills)
+                    {
+                        <div @onclick="@(() => OnItemClick(skill))"
+                             class="d-flex list-group-item list-group-item-action focusable-item"
+                             style="padding: 8px 12px; cursor: pointer;"
+                             tabindex="-1">
+                            <div class="d-flex align-items-center" @onclick:stopPropagation>
+                                <input type="checkbox"
+                                       @onchange="@(e => OnCheckboxChange(skill, (bool)e.Value!))"
+                                       checked="@IsSkillSelected(skill)"
+                                       @onclick:stopPropagation
+                                       class="form-check-input" />
+                                <span class="form-check-label ms-2" @onclick="@(() => OnItemClick(skill))">@skill.Name</span>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+
+    @if (SelectedSkills.Any())
+    {
+        <div class="mt-2">
+            <div class="d-flex flex-wrap gap-1">
+                @foreach (var skill in SelectedSkills)
+                {
+                    <div class="px-2 py-1 rounded d-flex gap-1 @SkillTheme align-items-center">
+                        <span class="fs-6">@skill.Name</span>
+                        <i @onclick="@(() => RemoveSkill(skill))"
+                           class="bi-x-lg"
+                           style="@Styles.Bi cursor: pointer;"></i>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+</div>

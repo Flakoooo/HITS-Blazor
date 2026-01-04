@@ -77,3 +77,8 @@ body {
 .validation-message {
     display: none !important;
 }
+
+input[type="checkbox"] {
+    cursor: pointer;
+    transform: scale(1.2);
+}

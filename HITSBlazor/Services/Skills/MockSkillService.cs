@@ -16,10 +16,18 @@ namespace HITSBlazor.Services.Skills
             return ServiceResponse<List<Skill>>.Success(_skills);
         }
 
-        public async Task<List<Skill>> GetSkillsByTypeAsync(SkillType skillType) 
-            => [.. _skills.Where(s => s.Type == skillType)];
+        public async Task<List<Skill>> GetSkillsByTypeAsync(SkillType skillType)
+        {
+            if (_skills.Count == 0) await GetSkillsAsync();
+
+            return [.. _skills.Where(s => s.Type == skillType)];
+        }
 
         public async Task<List<Skill>> GetSkillByTypeAndByNameAsync(SkillType skillType, string name)
-            => [.. _skills.Where(s => s.Type == skillType && s.Name.Contains(name))];
+        {
+            if (_skills.Count == 0) await GetSkillsAsync();
+
+            return [.. _skills.Where(s => s.Type == skillType && s.Name.Contains(name, StringComparison.CurrentCultureIgnoreCase))]; ;
+        }
     }
 }
