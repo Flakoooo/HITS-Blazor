@@ -2,9 +2,9 @@
 {
     public enum SkillType
     {
-        LANGUAGE,
-        FRAMEWORK,
-        DATABASE,
-        DEVOPS
+        Language = 0,
+        Framework = 1,
+        Database = 2,
+        Devops = 3
     }
 }

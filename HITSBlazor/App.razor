@@ -11,7 +11,7 @@
                 <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
                     <NotAuthorized>
                         @{
-                            Navigation.NavigateTo($"login?returnUrl={Navigation.ToBaseRelativePath(Navigation.Uri)}");
+                            Navigation.NavigateTo($"/login");
                         }
                     </NotAuthorized>
                     <Authorizing>
@@ -36,7 +36,19 @@
             </NotFound>
         </Router>
     }
-</CascadingAuthenticationState>
+    else
+    {
+        <div class="preloader">
+                <div class="content">
+                    <div class="e-loadholder">
+                        <div class="m-loader">
+                            <span class="e-text">Загрузка</span>
+                        </div>
+                    </div>
+                </div>
+            </div>        
+    }
+    </CascadingAuthenticationState>
 
 @code {
     private bool _isInitialized = false;
@@ -46,6 +58,30 @@
         try
         {
             await AuthService.InitializeAsync();
+
+            await Task.Delay(100);
+
+            var currentPath = Navigation.ToBaseRelativePath(Navigation.Uri);
+            var isPublicRoute = currentPath.StartsWith("login") ||
+                               currentPath.StartsWith("register") ||
+                               currentPath.Equals("recovery-password") ||
+                               currentPath.Equals("new-password");
+
+            if (AuthService.IsAuthenticated)
+            {
+                if (!isPublicRoute && !currentPath.Equals("redirect", StringComparison.OrdinalIgnoreCase))
+                {
+                    Navigation.NavigateTo("/redirect", replace: true);
+                }
+            }
+            else
+            {
+                if (!currentPath.StartsWith("login", StringComparison.OrdinalIgnoreCase))
+                {
+                    Navigation.NavigateTo("/login", replace: true);
+                }
+            }
+
             _isInitialized = true;
         }
         catch (Exception ex)

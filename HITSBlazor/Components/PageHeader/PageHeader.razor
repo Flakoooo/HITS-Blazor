@@ -41,8 +41,6 @@
 </div>
 
 @code {
-    private bool isInitialized = false;
-
     private User? CurrentUser { get; set; } = null;
 
     protected override async Task OnInitializedAsync()
@@ -51,12 +49,10 @@
         {
             AuthService.OnAuthStateChanged += AuthStateChanged;
             CurrentUser = AuthService.CurrentUser;
-            isInitialized = true;
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Ошибка инициализации MainLayout: {ex.Message}");
-            isInitialized = true;
         }
     }
 

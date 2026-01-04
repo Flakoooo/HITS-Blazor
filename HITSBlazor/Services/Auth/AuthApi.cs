@@ -34,7 +34,7 @@ namespace HITSBlazor.Services.Auth
             operationName: LOGIN_OPERATION
         );
 
-        public async Task<ServiceResponse<bool>> LogoutAsync() =>await ExecuteApiCallAsync(
+        public async Task<ServiceResponse<bool>> LogoutAsync() => await ExecuteApiCallAsync(
             apiCall: () => _httpClient.PostAsync($"{_authPath}/logout", null),
             successHandler: async response =>
             {

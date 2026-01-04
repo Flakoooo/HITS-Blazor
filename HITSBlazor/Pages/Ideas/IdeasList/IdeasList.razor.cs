@@ -87,9 +87,16 @@ namespace HITSBlazor.Pages.Ideas.IdeasList
             else
                 SelectedStatuses.Remove(status);
 
-            _ideas = await IdeasService.GetIdeasByStatusAsync([.. SelectedStatuses]);
+            if (SelectedStatuses.Count > 0)
+                _ideas = await IdeasService.GetIdeasByStatusAsync([.. SelectedStatuses]);
+            else
+                _ideas = await GetAllIdeasAsync();
         }
 
-        private void ResetFilters() => SelectedStatuses.Clear();
+        private async void ResetFilters()
+        {
+            SelectedStatuses.Clear();
+            _ideas = await GetAllIdeasAsync();
+        }
     }
 }

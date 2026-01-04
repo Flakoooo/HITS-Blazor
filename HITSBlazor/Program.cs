@@ -8,6 +8,8 @@ using HITSBlazor.Services.Notifications;
 using HITSBlazor.Services.Ideas;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using HITSBlazor.Services.Skills;
+
 
 
 
@@ -66,6 +68,9 @@ namespace HITSBlazor
             );
             builder.Services.AddCascadingAuthenticationState();
             builder.Services.AddAuthorizationCore();
+
+            //Skills
+            builder.Services.AddScoped<ISkillService, MockSkillService>();
 
             //Ideas
             builder.Services.AddScoped<IIdeasService, MockIdeasService>();

@@ -129,7 +129,7 @@
                             <div class="px-2 py-1 rounded-1" style="@filterChoiceStyle">
                                 <div class="d-flex">
                                     <input type="checkbox"
-                                           checked="@IsStatusSelected(status.Value)"
+                                           checked="@SelectedStatuses.Contains(status.Value)"
                                            @onchange="@(e => OnStatusChanged(status.Value, (bool)e.Value!))"
                                            class="form-check-input" />
                                     <span class="form-check-label ms-2">@status.Text</span>
