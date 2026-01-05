@@ -1,0 +1,58 @@
+﻿@namespace HITSBlazor.Components.InputDropdowns.CompanyDropdown
+@using HITSBlazor.Services
+
+<div class="w-100" tabindex="-1">
+    <div class="w-100">
+        <label class="form-label mb-2 text-primary">
+            Заказчик*
+            <i class="bi-patch-question"
+               style="@Styles.Bi cursor: pointer; display: inline-block; vertical-align: middle; color: #007bff;"></i>
+        </label>
+        <div style="position: relative;">
+            <div class="w-100">
+                <div class="input-group">
+                    <input type="text"
+                           @ref="inputRef"
+                           @oninput="@(async e => await OnSearch(e))"
+                           value="@SelectedCompanyName"
+                           placeholder="@Placeholder"
+                           class="form-control rounded-end"
+                           style="color: #000 !important;"
+                           @onclick="OpenDropdown"
+                           @onfocus="OpenDropdown"
+                           @onkeydown="OnInputKeyDown" />
+                </div>
+            </div>
+
+            <i class="@(IsOpen ? "bi-chevron-up" : "bi-chevron-down")"
+               style="@Styles.Bi position: absolute; bottom: auto; left: auto; top: 11px; right: 12px; z-index: 10000; cursor: pointer;"
+               @onclick="ToggleDropdown"></i>
+
+            @if (IsOpen)
+            {
+                <div class="list-group w-100 dropdown-list"
+                     style="top: 42px; right: auto; z-index: 6; max-height: 173px; overflow-y: scroll; position: absolute; bottom: auto; left: auto;"
+                     @onclick:stopPropagation>
+
+                    @foreach (var company in FilteredCompanies)
+                    {
+                        <div @onclick="@(() => OnElementChange(company))"
+                             class="d-flex list-group-item list-group-item-action"
+                             style="padding: 8px 12px; cursor: pointer; flex-direction: row; flex-wrap: nowrap; align-items: center; justify-content: flex-start;"
+                             tabindex="-1">
+                            <div class="d-flex">
+                                <input type="radio"
+                                       @onchange="@(() => OnElementChange(company))"
+                                       checked="@IsCompanySelected(company)"
+                                       @onclick:stopPropagation
+                                       name="@RadioGroupName"
+                                       class="form-check-input" />
+                                <span class="form-check-label ms-2">@company.Name</span>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+</div>

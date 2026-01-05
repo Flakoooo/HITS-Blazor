@@ -1,9 +1,9 @@
-﻿window.skillDropdown = {
+﻿window.dropdownManager = {
     registerClickOutside: function (element, dotNetHelper) {
         element._dotNetHelper = dotNetHelper;
 
         function isInsideDropdown(target) {
-            const componentRoot = element.closest('.w-25') || element;
+            const componentRoot = element.closest('[tabindex="-1"]') || element;
             return componentRoot.contains(target);
         }
 

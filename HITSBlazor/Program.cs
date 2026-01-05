@@ -9,6 +9,8 @@ using HITSBlazor.Services.Ideas;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using HITSBlazor.Services.Skills;
+using HITSBlazor.Services.Companies;
+
 
 
 
@@ -71,6 +73,9 @@ namespace HITSBlazor
 
             //Skills
             builder.Services.AddScoped<ISkillService, MockSkillService>();
+
+            //Companies
+            builder.Services.AddScoped<ICompanyService, MockCompanyService>();
 
             //Ideas
             builder.Services.AddScoped<IIdeasService, MockIdeasService>();

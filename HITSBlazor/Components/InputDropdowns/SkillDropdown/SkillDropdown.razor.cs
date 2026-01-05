@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
 
-namespace HITSBlazor.Components.SkillDropdown
+namespace HITSBlazor.Components.InputDropdowns.SkillDropdown
 {
     public partial class SkillDropdown : IAsyncDisposable
     {
@@ -36,7 +36,7 @@ namespace HITSBlazor.Components.SkillDropdown
             if (firstRender)
             {
                 dotNetHelper = DotNetObjectReference.Create(this);
-                await JSRuntime.InvokeVoidAsync("skillDropdown.registerClickOutside",
+                await JSRuntime.InvokeVoidAsync("dropdownManager.registerClickOutside",
                     inputRef, dotNetHelper);
 
                 FilteredSkills = [.. AllSkills];
@@ -60,15 +60,10 @@ namespace HITSBlazor.Components.SkillDropdown
         private async Task OpenDropdown()
         {
             if (!IsOpen)
-            {
                 IsOpen = true;
-            }
         }
 
-        private void ToggleDropdown()
-        {
-            IsOpen = !IsOpen;
-        }
+        private void ToggleDropdown() => IsOpen = !IsOpen;
 
         [JSInvokable]
         public void CloseDropdown()
@@ -77,28 +72,12 @@ namespace HITSBlazor.Components.SkillDropdown
             InvokeAsync(StateHasChanged);
         }
 
-        private void FilterSkills()
-        {
-            if (string.IsNullOrWhiteSpace(searchText))
-            {
-                FilteredSkills = AllSkills.Where(s => s.Type == SkillType).ToList();
-            }
-            else
-            {
-                FilteredSkills = [.. AllSkills
-                .Where(s => s.Type == SkillType &&
-                           s.Name.Contains(searchText, StringComparison.OrdinalIgnoreCase))];
-            }
-        }
-
         private async Task OnSearch(ChangeEventArgs e)
         {
             searchText = (e.Value?.ToString() ?? "").Trim();
 
             if (SearchFunction != null)
                 FilteredSkills = await SearchFunction(SkillType, searchText);
-            else
-                FilterSkills();
         }
 
         private void OnInputKeyDown(KeyboardEventArgs e)
@@ -137,7 +116,7 @@ namespace HITSBlazor.Components.SkillDropdown
         {
             if (dotNetHelper != null)
             {
-                await JSRuntime.InvokeVoidAsync("skillDropdown.unregisterClickOutside", inputRef);
+                await JSRuntime.InvokeVoidAsync("dropdownManager.unregisterClickOutside", inputRef);
                 dotNetHelper.Dispose();
             }
         }

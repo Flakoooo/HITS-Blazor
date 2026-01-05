@@ -24,6 +24,8 @@ namespace HITSBlazor.Utils.Mocks.Common
             ];
         }
 
+        public static List<Company> GetAllCompanies() => [.. _companies];
+
         public static Company? GetCompanyById(Guid id)
             => _companies.FirstOrDefault(c => c.Id == id);
     }

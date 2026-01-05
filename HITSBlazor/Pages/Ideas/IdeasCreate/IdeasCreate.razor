@@ -1,4 +1,7 @@
-﻿@using HITSBlazor.Components.SkillDropdown
+﻿@using HITSBlazor.Components.InputDropdowns.CompanyDropdown
+@using HITSBlazor.Components.InputDropdowns.ContactPersonDropdown
+@using HITSBlazor.Components.InputDropdowns.SkillDropdown
+@using HITSBlazor.Models.Common.Entities
 @using HITSBlazor.Models.Common.Enums
 @using HITSBlazor.Services
 
@@ -7,123 +10,132 @@
 <div style="height: auto; display: flex; flex-direction: row; flex-wrap: nowrap; align-items: center; justify-content: center;">
     <form class="p-3 bg-white w-100 h-100 overflow-auto"
           style="align-items: center; gap: 12px; display: flex; flex-direction: column; flex-wrap: nowrap; justify-content: flex-start;">
-          <span class="fs-2 text-primary">Создание идеи</span>
-          <div class="w-75 d-flex flex-column gap-3">
-              <div class="d-flex flex-column gap-3">
-                  <div class="w-100">
-                      <label class="form-label text-primary">
-                          Название идеи*
-                          <i class="bi-patch-question" 
-                             style="@Styles.Bi cursor: pointer; display: inline-block; vertical-align: middle; color: #007bff;"></i>
-                      </label>
-                      <div class="input-group">
-                          <input type="text" placeholder="Введите название идеи" class="form-control rounded-end" />
-                      </div>
-                  </div>
-                  <div class="d-flex flex-column w-100 h-100">
-                      <label class="form-label text-primary">
-                          Проблема*
-                          <i class="bi-patch-question"
-                             style="@Styles.Bi cursor: pointer; display: inline-block; vertical-align: middle; color: #007bff;"></i>
-                      </label>
-                      <div class="input-group h-100">
-                          <textarea placeholder="Опишите проблему, которую решает ваша идея" class="form-control rounded-end"></textarea>
-                      </div>
-                  </div>
-                  <div class="d-flex flex-column w-100 h-100">
-                      <label class="form-label text-primary">
-                          Предлагаемое решение*
-                          <i class="bi-patch-question"
-                             style="@Styles.Bi cursor: pointer; display: inline-block; vertical-align: middle; color: #007bff;"></i>
-                      </label>
-                      <div class="input-group h-100">
-                          <textarea placeholder="Опишите, что вы предлагаете для решения проблемы" class="form-control rounded-end"></textarea>
-                      </div>
-                  </div>
-                  <div class="d-flex flex-column w-100 h-100">
-                      <label class="form-label text-primary">
-                          Ожидаемый результат*
-                          <i class="bi-patch-question"
-                             style="@Styles.Bi cursor: pointer; display: inline-block; vertical-align: middle; color: #007bff;"></i>
-                      </label>
-                      <div class="input-group h-100">
-                          <textarea placeholder="Опишите ожидаемый результат" class="form-control rounded-end"></textarea>
-                      </div>
-                  </div>
-                  <div class="d-flex flex-column w-100 h-100">
-                      <label class="form-label text-primary">
-                          Описание необходимых ресурсов для реализации*
-                          <i class="bi-patch-question"
-                             style="@Styles.Bi cursor: pointer; display: inline-block; vertical-align: middle; color: #007bff;"></i>
-                      </label>
-                      <div class="input-group h-100">
-                          <textarea placeholder="Укажите список требуемых для выполнения проекта ресурсов" class="form-control rounded-end"></textarea>
-                      </div>
-                  </div>
-                  <div>
-                      <span class="fs-6 text-primary">
-                          Желаемое количество участников в команде*
-                      </span>
-                    <i class="bi-patch-question"
-                       style="@Styles.Bi cursor: pointer; display: inline-block; vertical-align: middle; color: #007bff;"></i>
-                    <div class="mt-2 d-flex gap-3">
-                        <div class="w-100">
-                            <div class="input-group">
-                                <input type="number" max="30" min="2" placeholder="Минимальное количество: 2" class="form-control rounded-end" />
-                            </div>
-                        </div>
-                        <div class="w-100">
-                            <div class="input-group">
-                                <input type="number" max="30" min="2" placeholder="Максимальное количество: 30" class="form-control rounded-end" />
-                            </div>
+        <span class="fs-2 text-primary">Создание идеи</span>
+        <div class="w-75 d-flex flex-column gap-3">
+            <div class="d-flex flex-column gap-3">
+                <div class="w-100">
+                    <label class="form-label text-primary">
+                        Название идеи*
+                        <i class="bi-patch-question" 
+                            style="@Styles.Bi cursor: pointer; display: inline-block; vertical-align: middle; color: #007bff;"></i>
+                    </label>
+                    <div class="input-group">
+                        <input type="text" placeholder="Введите название идеи" class="form-control rounded-end" />
+                    </div>
+                </div>
+                <div class="d-flex flex-column w-100 h-100">
+                    <label class="form-label text-primary">
+                        Проблема*
+                        <i class="bi-patch-question"
+                            style="@Styles.Bi cursor: pointer; display: inline-block; vertical-align: middle; color: #007bff;"></i>
+                    </label>
+                    <div class="input-group h-100">
+                        <textarea placeholder="Опишите проблему, которую решает ваша идея" class="form-control rounded-end"></textarea>
+                    </div>
+                </div>
+                <div class="d-flex flex-column w-100 h-100">
+                    <label class="form-label text-primary">
+                        Предлагаемое решение*
+                        <i class="bi-patch-question"
+                            style="@Styles.Bi cursor: pointer; display: inline-block; vertical-align: middle; color: #007bff;"></i>
+                    </label>
+                    <div class="input-group h-100">
+                        <textarea placeholder="Опишите, что вы предлагаете для решения проблемы" class="form-control rounded-end"></textarea>
+                    </div>
+                </div>
+                <div class="d-flex flex-column w-100 h-100">
+                    <label class="form-label text-primary">
+                        Ожидаемый результат*
+                        <i class="bi-patch-question"
+                            style="@Styles.Bi cursor: pointer; display: inline-block; vertical-align: middle; color: #007bff;"></i>
+                    </label>
+                    <div class="input-group h-100">
+                        <textarea placeholder="Опишите ожидаемый результат" class="form-control rounded-end"></textarea>
+                    </div>
+                </div>
+                <div class="d-flex flex-column w-100 h-100">
+                    <label class="form-label text-primary">
+                        Описание необходимых ресурсов для реализации*
+                        <i class="bi-patch-question"
+                            style="@Styles.Bi cursor: pointer; display: inline-block; vertical-align: middle; color: #007bff;"></i>
+                    </label>
+                    <div class="input-group h-100">
+                        <textarea placeholder="Укажите список требуемых для выполнения проекта ресурсов" class="form-control rounded-end"></textarea>
+                    </div>
+                </div>
+                <div>
+                    <span class="fs-6 text-primary">
+                        Желаемое количество участников в команде*
+                    </span>
+                <i class="bi-patch-question"
+                    style="@Styles.Bi cursor: pointer; display: inline-block; vertical-align: middle; color: #007bff;"></i>
+                <div class="mt-2 d-flex gap-3">
+                    <div class="w-100">
+                        <div class="input-group">
+                            <input type="number" max="30" min="2" placeholder="Минимальное количество: 2" class="form-control rounded-end" />
                         </div>
                     </div>
-                  </div>
-              </div>
-              <div>
-                  <span class="fs-6 text-primary">Стек технологий*</span>
-                  <i class="bi-patch-question"
-                     style="@Styles.Bi cursor: pointer; display: inline-block; vertical-align: middle; color: #007bff;"></i>
-                  @if (isLoading)
-                  {
-                      <div class="mt-2 w-100 d-flex gap-3">
-                          @for (int p = 0; p < 4; ++p)
-                          {
-                              <div class="placeholder-glow w-100">
-                                  <span class="placeholder w-100 bg-secondary rounded" style="height: 50px;"></span>
-                              </div>
-                          }
-                      </div>
-                  }
-                  else 
-                  {
-                      <div class="mt-2 w-100" style="display: flex; flex-direction: row; flex-wrap: nowrap; align-items: flex-start; justify-content: stretch; gap: 16px;">
-                          <SkillDropdown SkillType="SkillType.Language" 
-                                         AllSkills="@LanguageSkills"
-                                         @bind-SelectedSkills="@SelectedLanguageSkills"
-                                         SearchFunction="@SearchSkillsAsync" />
-                          <SkillDropdown SkillType="SkillType.Framework" 
-                                         AllSkills="@FrameworkSkills"
-                                         @bind-SelectedSkills="@SelectedFrameworkSkills"
-                                         SearchFunction="@SearchSkillsAsync" />
-                          <SkillDropdown SkillType="SkillType.Database" 
-                                         AllSkills="@DatabaseSkills"
-                                         @bind-SelectedSkills="@SelectedDatabaseSkills"
-                                         SearchFunction="@SearchSkillsAsync" />
-                          <SkillDropdown SkillType="SkillType.Devops" 
-                                         AllSkills="@DevopsSkills"
-                                         @bind-SelectedSkills="@SelectedDevopsSkills"
-                                         SearchFunction="@SearchSkillsAsync" />
-                      </div>
-                  }
-              </div>
-              <div class="w-100"></div>
-              <div class="row"></div>
-              <div class="col"></div>
-              <div style="display: flex; flex-direction: row; flex-wrap: nowrap; align-items: center; justify-content: center; gap: 16px;">
+                    <div class="w-100">
+                        <div class="input-group">
+                            <input type="number" max="30" min="2" placeholder="Максимальное количество: 30" class="form-control rounded-end" />
+                        </div>
+                    </div>
+                </div>
+                </div>
+            </div>
+            <div>
+                <span class="fs-6 text-primary">Стек технологий*</span>
+                <i class="bi-patch-question"
+                    style="@Styles.Bi cursor: pointer; display: inline-block; vertical-align: middle; color: #007bff;"></i>
+                @if (isLoading)
+                {
+                    <div class="mt-2 w-100 d-flex gap-3">
+                        @for (int p = 0; p < 4; ++p)
+                        {
+                            <div class="placeholder-glow w-100">
+                                <span class="placeholder w-100 bg-secondary rounded" style="height: 50px;"></span>
+                            </div>
+                        }
+                    </div>
+                }
+                else 
+                {
+                    <div class="mt-2 w-100" style="display: flex; flex-direction: row; flex-wrap: nowrap; align-items: flex-start; justify-content: stretch; gap: 16px;">
+                        <SkillDropdown SkillType="SkillType.Language" 
+                                        AllSkills="@LanguageSkills"
+                                        @bind-SelectedSkills="@SelectedLanguageSkills"
+                                        SearchFunction="@SearchSkillsAsync" />
+                        <SkillDropdown SkillType="SkillType.Framework" 
+                                        AllSkills="@FrameworkSkills"
+                                        @bind-SelectedSkills="@SelectedFrameworkSkills"
+                                        SearchFunction="@SearchSkillsAsync" />
+                        <SkillDropdown SkillType="SkillType.Database" 
+                                        AllSkills="@DatabaseSkills"
+                                        @bind-SelectedSkills="@SelectedDatabaseSkills"
+                                        SearchFunction="@SearchSkillsAsync" />
+                        <SkillDropdown SkillType="SkillType.Devops" 
+                                        AllSkills="@DevopsSkills"
+                                        @bind-SelectedSkills="@SelectedDevopsSkills"
+                                        SearchFunction="@SearchSkillsAsync" />
+                    </div>
+                }
+            </div>
+            <CompanyDropdown AllCompanies="@Companies"
+                            @bind-SelectedCompany="@SelectedCompany"
+                            SearchFunction="@SearchCompaniesAsync" />
+            @if (SelectedCompany is not null)
+            {
+                <ContactPersonDropdown  CompanyId="@SelectedCompany.Id"
+                                        AllContactPersons="@SelectedCompany.Users"
+                                        @bind-SelectedContactPerson="@SelectedContactPerson"
+                                        SearchFunction="@SearchContactPersonsAsync" />
+            }
+            <div class="row"></div>
+            <div class="col"></div>
+            <div style="display: flex; flex-direction: row; flex-wrap: nowrap; align-items: center; justify-content: center; gap: 16px;">
 
-              </div>
-          </div>
+            </div>
+        </div>
     </form>
 </div>
 
