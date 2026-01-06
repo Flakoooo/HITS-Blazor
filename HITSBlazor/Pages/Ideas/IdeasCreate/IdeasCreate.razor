@@ -20,7 +20,11 @@
                             style="@Styles.Bi cursor: pointer; display: inline-block; vertical-align: middle; color: #007bff;"></i>
                     </label>
                     <div class="input-group">
-                        <input type="text" placeholder="Введите название идеи" class="form-control rounded-end" />
+                        <input type="text" 
+                               placeholder="Введите название идеи" 
+                               @bind="ideasCreateModel.Name"
+                               @bind:event="oninput"
+                               class="form-control rounded-end" />
                     </div>
                 </div>
                 <div class="d-flex flex-column w-100 h-100">
@@ -30,7 +34,11 @@
                             style="@Styles.Bi cursor: pointer; display: inline-block; vertical-align: middle; color: #007bff;"></i>
                     </label>
                     <div class="input-group h-100">
-                        <textarea placeholder="Опишите проблему, которую решает ваша идея" class="form-control rounded-end"></textarea>
+                        <textarea placeholder="Опишите проблему, которую решает ваша идея" 
+                                  @bind="ideasCreateModel.Problem"
+                                  @bind:event="oninput"
+                                  class="form-control rounded-end">
+                        </textarea>
                     </div>
                 </div>
                 <div class="d-flex flex-column w-100 h-100">
@@ -40,7 +48,11 @@
                             style="@Styles.Bi cursor: pointer; display: inline-block; vertical-align: middle; color: #007bff;"></i>
                     </label>
                     <div class="input-group h-100">
-                        <textarea placeholder="Опишите, что вы предлагаете для решения проблемы" class="form-control rounded-end"></textarea>
+                        <textarea placeholder="Опишите, что вы предлагаете для решения проблемы" 
+                                  @bind="ideasCreateModel.Solution"
+                                  @bind:event="oninput"
+                                  class="form-control rounded-end">
+                        </textarea>
                     </div>
                 </div>
                 <div class="d-flex flex-column w-100 h-100">
@@ -50,7 +62,11 @@
                             style="@Styles.Bi cursor: pointer; display: inline-block; vertical-align: middle; color: #007bff;"></i>
                     </label>
                     <div class="input-group h-100">
-                        <textarea placeholder="Опишите ожидаемый результат" class="form-control rounded-end"></textarea>
+                        <textarea placeholder="Опишите ожидаемый результат" 
+                                  @bind="ideasCreateModel.Result"
+                                  @bind:event="oninput"
+                                  class="form-control rounded-end">
+                        </textarea>
                     </div>
                 </div>
                 <div class="d-flex flex-column w-100 h-100">
@@ -60,7 +76,11 @@
                             style="@Styles.Bi cursor: pointer; display: inline-block; vertical-align: middle; color: #007bff;"></i>
                     </label>
                     <div class="input-group h-100">
-                        <textarea placeholder="Укажите список требуемых для выполнения проекта ресурсов" class="form-control rounded-end"></textarea>
+                        <textarea placeholder="Укажите список требуемых для выполнения проекта ресурсов" 
+                                  @bind="ideasCreateModel.Description"
+                                  @bind:event="oninput"
+                                  class="form-control rounded-end">
+                        </textarea>
                     </div>
                 </div>
                 <div>
@@ -72,12 +92,24 @@
                 <div class="mt-2 d-flex gap-3">
                     <div class="w-100">
                         <div class="input-group">
-                            <input type="number" max="30" min="2" placeholder="Минимальное количество: 2" class="form-control rounded-end" />
+                            <input type="number" 
+                                   max="30" 
+                                   min="2" 
+                                   placeholder="Минимальное количество: 2" 
+                                   @bind="ideasCreateModel.MinTeamSize"
+                                   @bind:event="oninput"
+                                   class="form-control rounded-end" />
                         </div>
                     </div>
                     <div class="w-100">
                         <div class="input-group">
-                            <input type="number" max="30" min="2" placeholder="Максимальное количество: 30" class="form-control rounded-end" />
+                            <input type="number" 
+                                   max="30" 
+                                   min="2" 
+                                   placeholder="Максимальное количество: 30" 
+                                   @bind="ideasCreateModel.MaxTeamSize"
+                                   @bind:event="oninput"
+                                   class="form-control rounded-end" />
                         </div>
                     </div>
                 </div>

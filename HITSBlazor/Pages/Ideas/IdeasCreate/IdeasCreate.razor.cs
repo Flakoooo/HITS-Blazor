@@ -21,6 +21,8 @@ namespace HITSBlazor.Pages.Ideas.IdeasCreate
 
         private bool isLoading = true;
 
+        private IdeasCreateModel ideasCreateModel = new();
+
         private List<Skill> LanguageSkills { get; set; } = [];
         private List<Skill> FrameworkSkills { get; set; } = [];
         private List<Skill> DatabaseSkills { get; set; } = [];
@@ -131,6 +133,10 @@ namespace HITSBlazor.Pages.Ideas.IdeasCreate
             if (int.TryParse(SuitabilityScore, out int suitability) && int.TryParse(BudgetScore, out int budget))
             {
                 PreAssessmentScore = Math.Round((suitability + budget) / 2.0, 2);
+
+                ideasCreateModel.Suitability = suitability;
+                ideasCreateModel.Budget = budget;
+
                 preAssessmentText = $"Предварительная оценка: {PreAssessmentScore}";
                 preAssessmentStyle = $"width: {PreAssessmentScore * 20}%; " + PreAssessmentScore switch
                 {
@@ -142,6 +148,14 @@ namespace HITSBlazor.Pages.Ideas.IdeasCreate
                 };
                 if (animationTimer != null) StopAnimation();
             }
+        }
+
+        private void CreateIdea()
+        {
+            ideasCreateModel.Customer = SelectedCompany;
+            ideasCreateModel.ContactPerson = SelectedContactPerson;
+
+
         }
 
         private void StartDotAnimation()

@@ -3,7 +3,7 @@
 
 @if (!string.IsNullOrEmpty(currentMessage))
 {
-    <div class="alert @alertClass alert-dismissible fade show position-fixed top-0 end-0 m-3 @animationClass"
+    <div class="alert @alertClass alert-dismissible fade position-fixed top-0 end-0 m-3 @animationClass"
          role="alert">
         @currentMessage
         <button type="button" class="btn-close" @onclick="Hide"></button>
@@ -11,6 +11,7 @@
 }
 
 @code {
+    //TODO: Поправить кривую анимацию
     private string? currentMessage;
     private bool isError = true;
     private System.Threading.Timer? autoHideTimer;

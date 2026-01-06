@@ -14,7 +14,7 @@ namespace HITSBlazor.Services.Auth
         public User? CurrentUser { get; }
 
         Task InitializeAsync();
-        Task<ServiceResponse<bool>> LoginAsync(LoginModel request);
+        Task<bool> LoginAsync(LoginModel request);
         Task<ServiceResponse<bool>> LogoutAsync();
         Task<ServiceResponse<Guid>> RequestPasswordRecoveryAsync(string email);
         Task<ServiceResponse<bool>> ResetPasswordAsync(NewPasswordModel newPasswordModel);

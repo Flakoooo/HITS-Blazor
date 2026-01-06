@@ -18,9 +18,6 @@ namespace HITSBlazor.Pages.Login
         [Inject]
         private NavigationManager Navigation { get; set; } = null!;
 
-        [Inject]
-        private GlobalNotificationService NotificationService { get; set; } = null!;
-
         protected override void OnInitialized()
         {
             //TODO: УБРАТЬ ПОСЛЕ РАЗРАБОТКИ
@@ -42,65 +39,13 @@ namespace HITSBlazor.Pages.Login
 
             isLoading = true;
 
-            try
+            if (await AuthService.LoginAsync(loginModel))
             {
-                bool emailIsEmpty = string.IsNullOrWhiteSpace(loginModel.Email);
-                bool passwordIsEmpty = string.IsNullOrWhiteSpace(loginModel.Password);
-
-                if (emailIsEmpty || passwordIsEmpty)
-                {
-                    var errorMessage = "";
-
-                    if (emailIsEmpty && passwordIsEmpty)
-                        errorMessage = "Пожалуйста, заполните логин и пароль";
-                    else if (emailIsEmpty)
-                        errorMessage = "Пожалуйста, заполните логин";
-                    else
-                        errorMessage = "Пожалуйста, заполните пароль";
-
-                    NotificationService.ShowError(errorMessage);
-                    isLoading = false;
-                    return;
-                }
-
-                var email = loginModel.Email.Trim();
-                var atIndex = email.IndexOf('@');
-
-                if (atIndex <= 0 || atIndex == email.Length - 1 || email.Count(c => c == '@') != 1)
-                {
-                    NotificationService.ShowError("Неверный формат почты");
-                    isLoading = false;
-                    return;
-                }
-
-                if (loginModel.Password.Length < 8)
-                {
-                    NotificationService.ShowError("Длина пароля не может быть меньше 8 символов");
-                    isLoading = false;
-                    return;
-                }
-
-                var result = await AuthService.LoginAsync(loginModel);
-                if (result.IsSuccess)
-                {
-                    loginModel = new LoginModel();
-                    Navigation.NavigateTo("/redirect");
-                }
-                else
-                {
-                    NotificationService.ShowError(
-                        result.Message ?? "Вы указали неверные данные для входа. Попробуйте снова."
-                    );
-                }
+                loginModel = new LoginModel();
+                Navigation.NavigateTo("/redirect");
             }
-            catch (Exception ex)
-            {
-                NotificationService.ShowError($"Произошла ошибка: {ex.Message}");
-            }
-            finally
-            {
-                isLoading = false;
-            }
+
+            isLoading = false;
         }
     }
 }

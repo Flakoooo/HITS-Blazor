@@ -13,13 +13,17 @@ namespace HITSBlazor.Services.Auth
         ILogger<AuthService> logger,
         AuthApi authApi,
         UserApi userApi,
-        NavigationManager navigationManager
+        NavigationManager navigationManager,
+        GlobalNotificationService globalNotificationService
     ) : IAuthService
     {
         private readonly ILogger<AuthService> _logger = logger;
         private readonly AuthApi _authApi = authApi;
         private readonly UserApi _userApi = userApi;
         private readonly NavigationManager _navigationManager = navigationManager;
+        private readonly GlobalNotificationService _globalNotificationService = globalNotificationService;
+
+        private readonly CommonAuthLogic _commonAuthLogic = new(globalNotificationService);
 
         public event Action? OnAuthStateChanged;
         public bool IsAuthenticated { get; private set; } = false;
@@ -52,10 +56,13 @@ namespace HITSBlazor.Services.Auth
             return;
         }
 
-        public async Task<ServiceResponse<bool>> LoginAsync(LoginModel request)
+        public async Task<bool> LoginAsync(LoginModel request)
         {
             if (AppEnvironment.IsLogEnabled && _logger.IsEnabled(LogLevel.Information))
                 _logger.LogInformation("Attempting login for email: {Email}", request.Email);
+
+            if (!_commonAuthLogic.ValidateLoginModel(request))
+                return false;
 
             var result = await _authApi.LoginAsync(request);
             if (result.IsSuccess)
@@ -64,10 +71,14 @@ namespace HITSBlazor.Services.Auth
                 await GetCurrentUser();
                 OnAuthStateChanged?.Invoke();
             }
-            else if (_logger.IsEnabled(LogLevel.Warning))
-                _logger.LogWarning("Login failed: {Error}", result.Message);
+            else
+            {
+                _globalNotificationService.ShowError(result.Message ?? "Вы указали неверные данные для входа. Попробуйте снова.");
+                if (_logger.IsEnabled(LogLevel.Warning))
+                    _logger.LogWarning("Login failed: {Error}", result.Message);
+            }
 
-            return result;
+            return result.IsSuccess;
         }
 
         public async Task<ServiceResponse<bool>> LogoutAsync()

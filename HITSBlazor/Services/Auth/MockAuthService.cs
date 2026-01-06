@@ -13,11 +13,16 @@ namespace HITSBlazor.Services.Auth
 {
     public class MockAuthService(
         IJSRuntime jsRuntime, 
-        NavigationManager navigationManager
+        NavigationManager navigationManager,
+        GlobalNotificationService globalNotificationService
     ) : IAuthService
     {
         private readonly IJSRuntime _jsRuntime = jsRuntime;
         private readonly NavigationManager _navigationManager = navigationManager;
+        private readonly GlobalNotificationService _globalNotificationService = globalNotificationService;
+
+        private readonly CommonAuthLogic _commonAuthLogic = new(globalNotificationService);
+
         private readonly string _mockTokenTemplate = "mock-token-";
 
         public event Action? OnAuthStateChanged;
@@ -41,15 +46,21 @@ namespace HITSBlazor.Services.Auth
             }
         }
 
-        public async Task<ServiceResponse<bool>> LoginAsync(LoginModel request)
+        public async Task<bool> LoginAsync(LoginModel request)
         {
             try
             {
+                if (!_commonAuthLogic.ValidateLoginModel(request))
+                    return false;
+
                 var user = MockUsers.GetAllUsers()
                     .FirstOrDefault(u => u.Email == request.Email);
 
                 if (user == null)
-                    return ServiceResponse<bool>.Failure("Неверный логин или пароль");
+                {
+                    _globalNotificationService.ShowError("Неверный логин или пароль");
+                    return false;
+                }
 
                 var mockToken = _mockTokenTemplate + user.Id;
 
@@ -62,11 +73,13 @@ namespace HITSBlazor.Services.Auth
 
                 OnAuthStateChanged?.Invoke();
 
-                return ServiceResponse<bool>.Success(true);
+                return true;
             }
             catch (Exception ex)
             {
-                return ServiceResponse<bool>.Failure($"Ошибка при авторизации: {ex.Message}");
+                string error = $"Ошибка при авторизации: {ex.Message}";
+                _globalNotificationService.ShowError(error);
+                return false;
             }
         }
 
