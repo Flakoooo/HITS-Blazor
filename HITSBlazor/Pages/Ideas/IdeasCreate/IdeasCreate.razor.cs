@@ -1,11 +1,14 @@
 ﻿using HITSBlazor.Models.Common.Entities;
 using HITSBlazor.Models.Common.Enums;
+using HITSBlazor.Models.Ideas.Enums;
 using HITSBlazor.Models.Users.Entities;
 using HITSBlazor.Services.Companies;
+using HITSBlazor.Services.Ideas;
 using HITSBlazor.Services.Skills;
 using HITSBlazor.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
+using System.Threading.Tasks;
 
 namespace HITSBlazor.Pages.Ideas.IdeasCreate
 {
@@ -18,6 +21,9 @@ namespace HITSBlazor.Pages.Ideas.IdeasCreate
 
         [Inject]
         private ICompanyService CompanyService { get; set; } = null!;
+
+        [Inject]
+        private IIdeasService IdeasService { get; set; } = null!;
 
         private bool isLoading = true;
 
@@ -150,12 +156,15 @@ namespace HITSBlazor.Pages.Ideas.IdeasCreate
             }
         }
 
-        private void CreateIdea()
+        private async Task CreateIdea(IdeaStatusType ideaStatusType)
         {
-            ideasCreateModel.Customer = SelectedCompany;
-            ideasCreateModel.ContactPerson = SelectedContactPerson;
-
-
+            if (SelectedCompany is not null && SelectedContactPerson is not null)
+            {
+                ideasCreateModel.Status = ideaStatusType;
+                ideasCreateModel.Customer = SelectedCompany.Name;
+                ideasCreateModel.ContactPerson = $"{SelectedContactPerson.FirstName} {SelectedContactPerson.LastName}";
+                await IdeasService.CreateNewIdea(ideasCreateModel);
+            }
         }
 
         private void StartDotAnimation()

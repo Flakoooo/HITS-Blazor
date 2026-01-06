@@ -1,6 +1,4 @@
-﻿using System.Text.Json.Serialization;
-
-namespace HITSBlazor.Pages.Login
+﻿namespace HITSBlazor.Pages.Login
 {
     public class LoginModel
     {

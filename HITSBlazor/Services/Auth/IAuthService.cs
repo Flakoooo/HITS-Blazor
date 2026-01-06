@@ -2,8 +2,8 @@
 using HITSBlazor.Models.Users.Enums;
 using HITSBlazor.Pages.Login;
 using HITSBlazor.Pages.NewPassword;
+using HITSBlazor.Pages.RecoveryPassword;
 using HITSBlazor.Pages.Register;
-using HITSBlazor.Utils;
 
 namespace HITSBlazor.Services.Auth
 {
@@ -15,10 +15,10 @@ namespace HITSBlazor.Services.Auth
 
         Task InitializeAsync();
         Task<bool> LoginAsync(LoginModel request);
-        Task<ServiceResponse<bool>> LogoutAsync();
-        Task<ServiceResponse<Guid>> RequestPasswordRecoveryAsync(string email);
-        Task<ServiceResponse<bool>> ResetPasswordAsync(NewPasswordModel newPasswordModel);
-        Task<ServiceResponse<bool>> RegistrationAsync(RegisterModel request, Guid invitationId);
+        Task LogoutAsync();
+        Task<Guid?> RequestPasswordRecoveryAsync(RecoveryModel recoveryModel);
+        Task<bool> ResetPasswordAsync(NewPasswordModel newPasswordModel);
+        Task<bool> RegistrationAsync(RegisterModel request, Guid invitationId);
 
         Task<bool> SetUserRoleAsync(RoleType roleType);
     }

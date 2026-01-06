@@ -4,8 +4,6 @@ using HITSBlazor.Services.Invitation;
 using HITSBlazor.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
-using System;
-using System.Text.RegularExpressions;
 
 namespace HITSBlazor.Pages.Register
 {
@@ -15,9 +13,6 @@ namespace HITSBlazor.Pages.Register
     {
         private RegisterModel registerModel = new();
         private bool isLoading;
-
-        private readonly string telephonePattern = @"^\+7\s\(\d{3}\)\s\d{3}-\d{2}-\d{2}$";
-        private readonly string namePattern = @"^[А-ЯЁA-Z][а-яёa-z]+(-[А-ЯЁA-Z][а-яёa-z]+)?$";
 
         private string phoneInput = "";
         private string rawDigits = "";
@@ -91,96 +86,13 @@ namespace HITSBlazor.Pages.Register
 
             isLoading = true;
 
-            try
+            if (await AuthService.RegistrationAsync(registerModel, InvitationId))
             {
-                var validationErrors = new List<string>();
-
-                if (string.IsNullOrWhiteSpace(registerModel.Email))
-                    validationErrors.Add("почту");
-
-                if (string.IsNullOrWhiteSpace(registerModel.FirstName))
-                    validationErrors.Add("имя");
-
-                if (string.IsNullOrWhiteSpace(registerModel.LastName))
-                    validationErrors.Add("фамилию");
-
-                if (string.IsNullOrWhiteSpace(registerModel.Password))
-                    validationErrors.Add("пароль");
-
-                if (validationErrors.Count > 0)
-                {
-                    var errorMessage = string.Empty;
-                    if (validationErrors.Count > 2)
-                        errorMessage = "Заполните все поля";
-                    else
-                        errorMessage = $"Заполните {validationErrors[0]}" + (validationErrors.Count == 2 ? $" и {validationErrors[1]}" : string.Empty);
-
-                    NotificationService.ShowError(errorMessage);
-                    isLoading = false;
-                    return;
-                }
-
-                var email = registerModel.Email.Trim();
-                var atIndex = email.IndexOf('@');
-
-                if (atIndex <= 0 || atIndex == email.Length - 1 || email.Count(c => c == '@') != 1)
-                {
-                    NotificationService.ShowError("Неверный формат почты");
-                    isLoading = false;
-                    return;
-                }
-
-                if (!Regex.IsMatch(registerModel.FirstName, namePattern))
-                {
-                    NotificationService.ShowError("Имя должно начинаться с заглавной буквы и содержать только буквы (и дефис для двойных имён)");
-                    isLoading = false;
-                    return;
-                }
-
-                if (!Regex.IsMatch(registerModel.LastName, namePattern))
-                {
-                    NotificationService.ShowError("Фамилия должна начинаться с заглавной буквы и содержать только буквы (и дефис для двойных фамилий)");
-                    isLoading = false;
-                    return;
-                }
-
-                if (!string.IsNullOrWhiteSpace(registerModel.Telephone) && !Regex.IsMatch(registerModel.Telephone, telephonePattern))
-                {
-                    NotificationService.ShowError("Неверный формат телефона. Введите номер в формате: +7 (XXX) XXX-XX-XX");
-                    isLoading = false;
-                    return;
-                }
-
-                if (registerModel.Password.Length < 8)
-                {
-                    NotificationService.ShowError("Длина пароля не может быть меньше 8 символов");
-                    isLoading = false;
-                    return;
-                }
-
-                var result = await AuthService.RegistrationAsync(registerModel, InvitationId);
-                if (result.IsSuccess)
-                {
-                    if (result.Message is not null) NotificationService.ShowSuccess(result.Message);
-
-                    registerModel = new RegisterModel();
-                    Navigation.NavigateTo("/", true);
-                }
-                else
-                {
-                    NotificationService.ShowError(
-                        result.Message ?? "Вы указали неверные данные для регистрации. Попробуйте снова."
-                    );
-                }
+                registerModel = new RegisterModel();
+                Navigation.NavigateTo("/redirect");
             }
-            catch (Exception ex)
-            {
-                NotificationService.ShowError($"Произошла ошибка: {ex.Message}");
-            }
-            finally
-            {
-                isLoading = false;
-            }
+
+            isLoading = false;
         }
     }
 }

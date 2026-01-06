@@ -32,8 +32,6 @@ namespace HITSBlazor.Services.Ideas
                 return ServiceResponse<bool>.Failure("Пользователь не найден");
             }
 
-            ideasCreateModel.Initiator = _authService.CurrentUser;
-
             return ServiceResponse<bool>.Success(true);
         }
     }

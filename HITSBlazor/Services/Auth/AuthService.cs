@@ -2,6 +2,7 @@
 using HITSBlazor.Models.Users.Enums;
 using HITSBlazor.Pages.Login;
 using HITSBlazor.Pages.NewPassword;
+using HITSBlazor.Pages.RecoveryPassword;
 using HITSBlazor.Pages.Register;
 using HITSBlazor.Services.Users;
 using HITSBlazor.Utils;
@@ -81,7 +82,7 @@ namespace HITSBlazor.Services.Auth
             return result.IsSuccess;
         }
 
-        public async Task<ServiceResponse<bool>> LogoutAsync()
+        public async Task LogoutAsync()
         {
             if (AppEnvironment.IsLogEnabled)
                 _logger.LogInformation("Logging out user...");
@@ -94,40 +95,68 @@ namespace HITSBlazor.Services.Auth
                 OnAuthStateChanged?.Invoke();
                 _navigationManager.NavigateTo("/login");
             }
-            else if (_logger.IsEnabled(LogLevel.Warning))
-                _logger.LogWarning("Login failed: {Error}", result.Message);
-
-            return result;
+            else
+            {
+                if (result.Message is not null) 
+                    _globalNotificationService.ShowError(result.Message);
+                if (_logger.IsEnabled(LogLevel.Warning))
+                    _logger.LogWarning("Login failed: {Error}", result.Message);
+            }
         }
 
-        public async Task<ServiceResponse<Guid>> RequestPasswordRecoveryAsync(string email)
+        public async Task<Guid?> RequestPasswordRecoveryAsync(RecoveryModel recoveryModel)
         {
             if (AppEnvironment.IsLogEnabled && _logger.IsEnabled(LogLevel.Information))
-                _logger.LogInformation("Attempting password recovery for email: {Email}", email);
+                _logger.LogInformation("Attempting password recovery for email: {Email}", recoveryModel.Email);
 
-            var result = await _authApi.PasswordVerificationAsync(email);
-            if (!result.IsSuccess && _logger.IsEnabled(LogLevel.Warning))
-                _logger.LogWarning("REcovery password failed: {Error}", result.Message);
+            if (!_commonAuthLogic.ValidateRecoveryModel(recoveryModel))
+                return null;
 
-            return result;
+            var result = await _authApi.PasswordVerificationAsync(recoveryModel.Email);
+            if (result.IsSuccess)
+            {
+                _globalNotificationService.ShowSuccess("Инструкции по восстановлению отправлены на email");
+            }
+            else
+            {
+                _globalNotificationService.ShowError(result.Message ?? "Не удалось отправить инструкцию по восстановлению на почту");
+                if (_logger.IsEnabled(LogLevel.Warning))
+                    _logger.LogWarning("Recovery password failed: {Error}", result.Message);
+            }
+
+            return result.Response;
         }
 
-        public async Task<ServiceResponse<bool>> ResetPasswordAsync(NewPasswordModel newPasswordModel)
+        public async Task<bool> ResetPasswordAsync(NewPasswordModel newPasswordModel)
         {
             if (AppEnvironment.IsLogEnabled)
                 _logger.LogInformation("Attempting update password");
 
-            var result = await _authApi.PasswordNewAsync(newPasswordModel);
-            if (!result.IsSuccess && _logger.IsEnabled(LogLevel.Warning))
-                _logger.LogWarning("Reset password failed: {Error}", result.Message);
+            if (!_commonAuthLogic.ValidateNewPasswordModel(newPasswordModel))
+                return false;
 
-            return result;
+            var result = await _authApi.PasswordNewAsync(newPasswordModel);
+            if (result.IsSuccess)
+            {
+                _globalNotificationService.ShowSuccess("Пароль успешно изменен!");
+            }
+            else
+            {
+                _globalNotificationService.ShowError(result.Message ?? "Не удалось изменить пароль");
+                if (_logger.IsEnabled(LogLevel.Warning))
+                    _logger.LogWarning("Reset password failed: {Error}", result.Message);
+            }
+
+            return result.IsSuccess;
         }
 
-        public async Task<ServiceResponse<bool>> RegistrationAsync(RegisterModel request, Guid invitationId)
+        public async Task<bool> RegistrationAsync(RegisterModel request, Guid invitationId)
         {
             if (AppEnvironment.IsLogEnabled)
                 _logger.LogInformation("Attempting user registration");
+
+            if (!_commonAuthLogic.ValidateRegisterModel(request))
+                return false;
 
             var result = await _authApi.RegistrationUserAsync(request, invitationId);
             if (result.IsSuccess)
@@ -136,10 +165,14 @@ namespace HITSBlazor.Services.Auth
                 await GetCurrentUser();
                 OnAuthStateChanged?.Invoke();
             }
-            else if (_logger.IsEnabled(LogLevel.Warning))
-                _logger.LogWarning("Registration failed: {Error}", result.Message);
+            else
+            {
+                _globalNotificationService.ShowError(result.Message ?? "Вы указали неверные данные для регистрации. Попробуйте снова.");
+                if (_logger.IsEnabled(LogLevel.Warning))
+                    _logger.LogWarning("Registration failed: {Error}", result.Message);
+            }
 
-            return result;
+            return result.IsSuccess;
         }
 
         public async Task<bool> SetUserRoleAsync(RoleType roleType)

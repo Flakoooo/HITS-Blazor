@@ -1,5 +1,4 @@
-﻿using HITSBlazor.Services;
-using HITSBlazor.Services.Auth;
+﻿using HITSBlazor.Services.Auth;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
 
@@ -22,9 +21,6 @@ namespace HITSBlazor.Pages.NewPassword
         [Inject]
         private IAuthService AuthService { get; set; } = null!;
 
-        [Inject]
-        private GlobalNotificationService NotificationService { get; set; } = null!;
-
         protected override void OnInitialized()
         {
             if (!string.IsNullOrWhiteSpace(VerificationCode) 
@@ -38,58 +34,13 @@ namespace HITSBlazor.Pages.NewPassword
 
             isLoading = true;
 
-            try
+            if (await AuthService.ResetPasswordAsync(newPasswordModel))
             {
-                bool codeIsEmpty = string.IsNullOrWhiteSpace(newPasswordModel.Code);
-                bool passwordIsEmpty = string.IsNullOrWhiteSpace(newPasswordModel.Password);
-
-                if (codeIsEmpty || passwordIsEmpty)
-                {
-                    var errorMessage = "";
-
-                    if (codeIsEmpty && passwordIsEmpty)
-                        errorMessage = "Пожалуйста, введите код и новый пароль";
-                    else if (codeIsEmpty)
-                        errorMessage = "Пожалуйста, введите код";
-                    else
-                        errorMessage = "Пожалуйста, введите новый пароль";
-
-                    NotificationService.ShowError(errorMessage);
-                    isLoading = false;
-                    return;
-                }
-
-                if (newPasswordModel.Password.Length < 8)
-                {
-                    NotificationService.ShowError("Длина пароля не может быть меньше 8 символов");
-                    isLoading = false;
-                    return;
-                }
-
-                var result = await AuthService.ResetPasswordAsync(newPasswordModel);
-
-                if (result.IsSuccess)
-                {
-                    if (result.Message is not null) NotificationService.ShowSuccess(result.Message);
-
-                    newPasswordModel = new NewPasswordModel();
-                    Navigation.NavigateTo("/login", true);
-                }
-                else
-                {
-                    NotificationService.ShowError(
-                        result.Message ?? "Вы указали неверные данные для сброса. Попробуйте снова."
-                    );
-                }
+                newPasswordModel = new NewPasswordModel();
+                Navigation.NavigateTo("/login");
             }
-            catch (Exception ex)
-            {
-                NotificationService.ShowError($"Произошла ошибка: {ex.Message}");
-            }
-            finally
-            {
-                isLoading = false;
-            }
+
+            isLoading = false;
         }
     }
 }

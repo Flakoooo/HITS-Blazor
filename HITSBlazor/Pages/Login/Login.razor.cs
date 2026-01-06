@@ -1,5 +1,4 @@
-﻿using HITSBlazor.Services;
-using HITSBlazor.Services.Auth;
+﻿using HITSBlazor.Services.Auth;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
 
@@ -30,7 +29,7 @@ namespace HITSBlazor.Pages.Login
 #endif
 
             if (AuthService.IsAuthenticated)
-                Navigation.NavigateTo("/");
+                Navigation.NavigateTo("/redirect");
         }
 
         private async Task HandleLogin()

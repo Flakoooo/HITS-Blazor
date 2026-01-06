@@ -2,6 +2,7 @@
 using HITSBlazor.Models.Users.Enums;
 using HITSBlazor.Pages.Login;
 using HITSBlazor.Pages.NewPassword;
+using HITSBlazor.Pages.RecoveryPassword;
 using HITSBlazor.Pages.Register;
 using HITSBlazor.Utils;
 using HITSBlazor.Utils.Mocks.Users;
@@ -83,58 +84,80 @@ namespace HITSBlazor.Services.Auth
             }
         }
 
-        public async Task<ServiceResponse<bool>> LogoutAsync()
+        public async Task LogoutAsync()
         {
             await RemoveTokenAsync();
             await RemoveUserInfoAsync();
             IsAuthenticated = false;
             OnAuthStateChanged?.Invoke();
             _navigationManager.NavigateTo("/login");
-            return ServiceResponse<bool>.Success(true);
         }
 
-        public async Task<ServiceResponse<bool>> RegistrationAsync(RegisterModel request, Guid invitationId)
+        public async Task<bool> RegistrationAsync(RegisterModel request, Guid invitationId)
         {
             try
             {
+                if (!_commonAuthLogic.ValidateRegisterModel(request))
+                    return false;
+
                 if (!MockUsers.GetAllUsers().Select(u => u.Email).Contains(request.Email))
-                    return ServiceResponse<bool>.Failure("Пользователь с таким email уже существует");
+                {
+                    _globalNotificationService.ShowError("Пользователь с таким email уже существует");
+                    return false;
+                }
 
-                return ServiceResponse<bool>.Success(true, "Регистрация успешна");
+                return true;
             }
             catch (Exception ex)
             {
-                return ServiceResponse<bool>.Failure($"Ошибка: {ex.Message}");
+                _globalNotificationService.ShowError($"Ошибка: {ex.Message}");
+                return false;
             }
         }
 
-        public async Task<ServiceResponse<Guid>> RequestPasswordRecoveryAsync(string email)
+        public async Task<Guid?> RequestPasswordRecoveryAsync(RecoveryModel recoveryModel)
         {
             try
             {
-                if (!MockUsers.GetAllUsers().Select(u => u.Email).Contains(email))
-                    return ServiceResponse<Guid>.Failure("Пользователь с таким email не найден");
+                if (!_commonAuthLogic.ValidateRecoveryModel(recoveryModel))
+                    return null;
 
-                return ServiceResponse<Guid>.Success(Guid.NewGuid(), "Инструкции по восстановлению отправлены на email");
+                if (!MockUsers.GetAllUsers().Select(u => u.Email).Contains(recoveryModel.Email))
+                {
+                    _globalNotificationService.ShowError("Пользователь с таким email не найден");
+                    return null;
+                }
+
+                _globalNotificationService.ShowSuccess("Инструкции по восстановлению отправлены на email");
+                return Guid.NewGuid();
             }
             catch (Exception ex)
             {
-                return ServiceResponse<Guid>.Failure($"Ошибка: {ex.Message}");
+                _globalNotificationService.ShowSuccess($"Ошибка: {ex.Message}");
+                return null;
             }
         }
 
-        public async Task<ServiceResponse<bool>> ResetPasswordAsync(NewPasswordModel newPasswordModel)
+        public async Task<bool> ResetPasswordAsync(NewPasswordModel newPasswordModel)
         {
             try
             {
+                if (!_commonAuthLogic.ValidateNewPasswordModel(newPasswordModel))
+                    return false;
+
                 if (newPasswordModel.Code != "123456")
-                    return ServiceResponse<bool>.Failure("Указан неверный код");
+                {
+                    _globalNotificationService.ShowError("Указан неверный код");
+                    return false;
+                }
 
-                return ServiceResponse<bool>.Success(true, "Пароль успешно изменен!");
+                _globalNotificationService.ShowSuccess("Пароль успешно изменен!");
+                return true;
             }
             catch (Exception ex)
             {
-                return ServiceResponse<bool>.Failure($"Ошибка: {ex.Message}");
+                _globalNotificationService.ShowError($"Ошибка: {ex.Message}");
+                return false;
             }
         }
 
