@@ -11,7 +11,7 @@ namespace HITSBlazor.Pages.Ideas.IdeasCreate
 {
     [Authorize]
     [Route("/ideas/create")]
-    public partial class IdeasCreate
+    public partial class IdeasCreate : IDisposable
     {
         [Inject]
         private ISkillService SkillService { get; set; } = null!;
@@ -36,9 +36,21 @@ namespace HITSBlazor.Pages.Ideas.IdeasCreate
         private Company? SelectedCompany { get; set; } = null;
         private User? SelectedContactPerson { get; set; } = null;
 
+        private string? SuitabilityScore { get; set; }
+        private string? BudgetScore { get; set; }
+        private double PreAssessmentScore { get; set; } = 0.0;
+
+        private string preAssessmentText = "Предварительная оценка:";
+        private Timer? animationTimer;
+        private int dotCount = 0;
+        private string preAssessmentStyle = "";
+
+
         protected override async Task OnInitializedAsync()
         {
             isLoading = true;
+
+            StartDotAnimation();
 
             LanguageSkills = await SkillService.GetSkillsByTypeAsync(SkillType.Language);
             FrameworkSkills = await SkillService.GetSkillsByTypeAsync(SkillType.Framework);
@@ -84,12 +96,76 @@ namespace HITSBlazor.Pages.Ideas.IdeasCreate
                 if (string.IsNullOrWhiteSpace(searchText))
                     return SelectedCompany.Users;
 
-                // Реализуйте поиск контактных лиц
                 return [.. SelectedCompany.Users.Where(u => 
                     $"{u.FirstName} {u.LastName}".Contains(searchText, StringComparison.CurrentCultureIgnoreCase))
                 ];
             }
             return [];
+        }
+
+        private void OnSuitabilityChanged(ChangeEventArgs e)
+        {
+            string selectedValue = e.Value?.ToString() ?? "";
+            Console.WriteLine($"Выбрано: {selectedValue}");
+
+            SuitabilityScore = selectedValue;
+
+            CalculatePreAssessmentScore();
+        }
+
+        private void OnBudgetChanged(ChangeEventArgs e)
+        {
+            string selectedValue = e.Value?.ToString() ?? "";
+            Console.WriteLine($"Выбрано: {selectedValue}");
+
+            BudgetScore = selectedValue;
+
+            CalculatePreAssessmentScore();
+        }
+
+        private void CalculatePreAssessmentScore()
+        {
+            if (string.IsNullOrEmpty(SuitabilityScore) && string.IsNullOrEmpty(BudgetScore))
+                return;
+
+            if (int.TryParse(SuitabilityScore, out int suitability) && int.TryParse(BudgetScore, out int budget))
+            {
+                PreAssessmentScore = Math.Round((suitability + budget) / 2.0, 2);
+                preAssessmentText = $"Предварительная оценка: {PreAssessmentScore}";
+                preAssessmentStyle = $"width: {PreAssessmentScore * 20}%; " + PreAssessmentScore switch
+                {
+                    <= 3.0 => "background-color: rgb(220, 53, 69);",
+                    < 4.0 => "background-color: rgb(253, 126, 20);",
+                    < 5.0 => "background-color: rgb(255, 193, 7);",
+                    >= 5.0 => "background-color: rgb(25, 135, 84);",
+                    _ => "background-color: rgb(220, 53, 69);"
+                };
+                if (animationTimer != null) StopAnimation();
+            }
+        }
+
+        private void StartDotAnimation()
+        {
+            animationTimer?.Dispose();
+
+            animationTimer = new Timer(_ =>
+            {
+                dotCount = (dotCount + 1) % 4;
+                preAssessmentText = $"Предварительная оценка: вычисление{new string('.', dotCount)}";
+
+                InvokeAsync(StateHasChanged);
+            }, null, 0, 300);
+        }
+
+        private void StopAnimation()
+        {
+            animationTimer?.Dispose();
+            animationTimer = null;
+        }
+
+        public void Dispose()
+        {
+            StopAnimation();
         }
     }
 }

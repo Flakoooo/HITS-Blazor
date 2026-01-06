@@ -102,36 +102,82 @@
                 {
                     <div class="mt-2 w-100" style="display: flex; flex-direction: row; flex-wrap: nowrap; align-items: flex-start; justify-content: stretch; gap: 16px;">
                         <SkillDropdown SkillType="SkillType.Language" 
-                                        AllSkills="@LanguageSkills"
-                                        @bind-SelectedSkills="@SelectedLanguageSkills"
-                                        SearchFunction="@SearchSkillsAsync" />
-                        <SkillDropdown SkillType="SkillType.Framework" 
-                                        AllSkills="@FrameworkSkills"
-                                        @bind-SelectedSkills="@SelectedFrameworkSkills"
-                                        SearchFunction="@SearchSkillsAsync" />
+                                       AllSkills="@LanguageSkills"
+                                       @bind-SelectedSkills="@SelectedLanguageSkills"
+                                       SearchFunction="@SearchSkillsAsync" />
+                        <SkillDropdown SkillType="SkillType.Framework"
+                                       AllSkills="@FrameworkSkills"
+                                       @bind-SelectedSkills="@SelectedFrameworkSkills"
+                                       SearchFunction="@SearchSkillsAsync" />
                         <SkillDropdown SkillType="SkillType.Database" 
-                                        AllSkills="@DatabaseSkills"
-                                        @bind-SelectedSkills="@SelectedDatabaseSkills"
-                                        SearchFunction="@SearchSkillsAsync" />
+                                       AllSkills="@DatabaseSkills"
+                                       @bind-SelectedSkills="@SelectedDatabaseSkills"
+                                       SearchFunction="@SearchSkillsAsync" />
                         <SkillDropdown SkillType="SkillType.Devops" 
-                                        AllSkills="@DevopsSkills"
-                                        @bind-SelectedSkills="@SelectedDevopsSkills"
-                                        SearchFunction="@SearchSkillsAsync" />
+                                       AllSkills="@DevopsSkills"
+                                       @bind-SelectedSkills="@SelectedDevopsSkills"
+                                       SearchFunction="@SearchSkillsAsync" />
                     </div>
                 }
             </div>
             <CompanyDropdown AllCompanies="@Companies"
-                            @bind-SelectedCompany="@SelectedCompany"
-                            SearchFunction="@SearchCompaniesAsync" />
+                             @bind-SelectedCompany="@SelectedCompany"
+                             SearchFunction="@SearchCompaniesAsync" />
             @if (SelectedCompany is not null)
             {
-                <ContactPersonDropdown  CompanyId="@SelectedCompany.Id"
-                                        AllContactPersons="@SelectedCompany.Users"
-                                        @bind-SelectedContactPerson="@SelectedContactPerson"
-                                        SearchFunction="@SearchContactPersonsAsync" />
+                <ContactPersonDropdown CompanyId="@SelectedCompany.Id"
+                                       AllContactPersons="@SelectedCompany.Users"
+                                       @bind-SelectedContactPerson="@SelectedContactPerson"
+                                       SearchFunction="@SearchContactPersonsAsync" />
             }
-            <div class="row"></div>
-            <div class="col"></div>
+            <div class="row">
+                <div class="col">
+                    <div class="w-100">
+                        <label class="form-label text-primary">
+                            Пригодность*
+                        </label>
+                        <select @onchange="OnSuitabilityChanged" class="form-select">
+                            <option disabled selected value="">Выберите значение</option>
+                            <option value="5">Есть заказчик, инвестор и эксперт в предметной области</option>
+                            <option value="4">Есть заказчик, инвестор, но нет эксперта</option>
+                            <option value="3">Есть инвестор, но нет заказчика и эксперта</option>
+                            <option value="2">Есть заказчик, но нет инвестора и эксперта</option>
+                            <option value="1">Нет ни заказчика, ни инвестора, ни эксперта</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="w-100">
+                        <label class="form-label text-primary">
+                            Бюджет*
+                        </label>
+                        <select @onchange="OnBudgetChanged" class="form-select">
+                            <option disabled selected value="">Выберите значение</option>
+                            <option value="5">Не требуется</option>
+                            <option value="4">До 30.000 руб</option>
+                            <option value="3">30.000 - 50.000 руб</option>
+                            <option value="2">50.000 - 100.000 руб</option>
+                            <option value="1">Свыше 100.000 руб</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <span class="fs-6 text-primary">@preAssessmentText</span>
+                @if (animationTimer is not null)
+                {
+                    <div class="placeholder-glow w-100">
+                        <span class="placeholder w-100 bg-secondary rounded"></span>
+                    </div>
+                }
+                else
+                {
+                    <div class="progress w-100 mt-2">
+                        <div class="progress-bar progress-bar-animated" style="@preAssessmentStyle">
+                        </div>
+                    </div>
+                }
+            </div>
             <div style="display: flex; flex-direction: row; flex-wrap: nowrap; align-items: center; justify-content: center; gap: 16px;">
 
             </div>
