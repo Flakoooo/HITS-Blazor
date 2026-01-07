@@ -27,6 +27,8 @@ namespace HITSBlazor.Services.Auth
         private readonly CommonAuthLogic _commonAuthLogic = new(globalNotificationService);
 
         public event Action? OnAuthStateChanged;
+        public event Action<RoleType?>? OnActiveRoleChanged;
+
         public bool IsAuthenticated { get; private set; } = false;
         public User? CurrentUser { get; private set; } = null;
 
@@ -34,7 +36,11 @@ namespace HITSBlazor.Services.Auth
         {
             ServiceResponse<User> userResponse = await _userApi.GetUserAsync();
             if (userResponse.IsSuccess && userResponse.Response is not null)
+            {
                 CurrentUser = userResponse.Response;
+                if (CurrentUser.Roles.Count == 1)
+                    CurrentUser.Role = CurrentUser.Roles[0];
+            }
         }
 
         public async Task InitializeAsync()
@@ -182,7 +188,7 @@ namespace HITSBlazor.Services.Auth
 
             CurrentUser.Role = roleType;
 
-            OnAuthStateChanged?.Invoke();
+            OnActiveRoleChanged?.Invoke(roleType);
 
             return true;
         }

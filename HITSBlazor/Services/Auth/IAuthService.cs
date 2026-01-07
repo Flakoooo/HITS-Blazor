@@ -10,6 +10,7 @@ namespace HITSBlazor.Services.Auth
     public interface IAuthService
     {
         event Action? OnAuthStateChanged;
+        event Action<RoleType?>? OnActiveRoleChanged;
         bool IsAuthenticated { get; }
         public User? CurrentUser { get; }
 

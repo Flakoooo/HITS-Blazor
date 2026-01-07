@@ -71,7 +71,7 @@
                     <i class="bi-circle-fill fs-6" style="@Styles.Bi"></i>
                     @if (isHovered)
                     {
-                        <span>@CurrentUser?.Role</span>
+                        <span>@CurrentRole</span>
                     }
                 </button>
                 <button @onclick="@(async () => await AuthService.LogoutAsync())"

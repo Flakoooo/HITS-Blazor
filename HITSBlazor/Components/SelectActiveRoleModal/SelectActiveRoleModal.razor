@@ -2,27 +2,34 @@
 @using HITSBlazor.Models.Users.Enums
 @using HITSBlazor.Services
 @using HITSBlazor.Services.Auth
+@using HITSBlazor.Services.Modal
 @using HITSBlazor.Utils.EnumTranslators
 @inject IAuthService AuthService
+@inject ModalService ModalService
 
-<div style="position: fixed; top: 0; right: 0; bottom: 0; left: 0; z-index: 10; background-color: rgba(0,0,0,.365); display: grid; transition: opacity .15s ease-out;">
-    <div class="p-3 rounded bg-white"
-         style="width: 400px; display: flex; flex-direction: column; flex-wrap: nowrap; align-items: stretch; justify-content: stretch; gap: 12px; align-self: center; justify-self: center; transition: all .15s ease-out;">
-        <span class="fs-6 text-primary text-center"></span>
-        @foreach (var role in roles)
-        {
-            <button type="button" class="d-flex btn-primary" style="@Styles.Btn">
-                @role.GetTranslation()
-            </button>
-        }
-    </div>
+<div @onclick:stopPropagation="true"
+     class="p-3 rounded bg-white"
+     style="width: 400px; display: flex; flex-direction: column; flex-wrap: nowrap; align-items: stretch; justify-content: stretch; gap: 12px; align-self: center; justify-self: center; transition: all .15s ease-out;">
+    <span class="fs-3 text-primary text-center">Доступные роли</span>
+    @foreach (var role in roles)
+    {
+        <button type="button" @onclick="() => SetUserRole(role)" class="btn d-flex btn-primary" style="@Styles.Btn">
+            @role.GetTranslation()
+        </button>
+    }
 </div>
 
 @code {
-    private List<RoleType> roles = [];
+    public List<RoleType> roles { get; set; } = [];
 
     protected override async Task OnInitializedAsync()
     {
-        roles = AuthService?.CurrentUser?.Roles!;
+        roles = AuthService.CurrentUser?.Roles ?? [];
+    }
+
+    private async void SetUserRole(RoleType role)
+    {
+        await AuthService.SetUserRoleAsync(role);
+        ModalService.Close();
     }
 }

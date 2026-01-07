@@ -1,5 +1,6 @@
 ﻿@namespace HITSBlazor.Components.PageHeader
 @using HITSBlazor.Models.Users.Entities
+@using HITSBlazor.Models.Users.Enums
 @using HITSBlazor.Services
 @using HITSBlazor.Services.Auth
 @inject IAuthService AuthService
@@ -23,7 +24,7 @@
                 <button type="button" 
                         class="btn d-flex btn-outline-success btn-sm rounded-4 py-1" style="width: fit-content; @Styles.Btn">
                     <i class="bi-circle-fill fs-6" style="@Styles.Bi"></i>
-                    @CurrentUser?.Role
+                    @CurrentRole
                 </button>
             </div>
         </div>
@@ -42,12 +43,14 @@
 
 @code {
     private User? CurrentUser { get; set; } = null;
+    private RoleType? CurrentRole { get; set; } = null;
 
     protected override async Task OnInitializedAsync()
     {
         try
         {
             AuthService.OnAuthStateChanged += AuthStateChanged;
+            AuthService.OnActiveRoleChanged += RoleStateChanged;
             CurrentUser = AuthService.CurrentUser;
         }
         catch (Exception ex)
@@ -56,14 +59,17 @@
         }
     }
 
-    public void AuthStateChanged()
+    public void AuthStateChanged() => CurrentUser = AuthService.CurrentUser;
+
+    public void RoleStateChanged(RoleType? role)
     {
-        CurrentUser = AuthService.IsAuthenticated ? AuthService.CurrentUser : null;
-        InvokeAsync(StateHasChanged);
+        CurrentRole = role;
+        StateHasChanged();
     }
 
     public void Dispose()
     {
         AuthService.OnAuthStateChanged -= AuthStateChanged;
+        AuthService.OnActiveRoleChanged -= RoleStateChanged;
     }
 }

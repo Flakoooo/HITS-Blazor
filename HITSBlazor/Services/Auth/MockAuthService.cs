@@ -4,7 +4,6 @@ using HITSBlazor.Pages.Login;
 using HITSBlazor.Pages.NewPassword;
 using HITSBlazor.Pages.RecoveryPassword;
 using HITSBlazor.Pages.Register;
-using HITSBlazor.Utils;
 using HITSBlazor.Utils.Mocks.Users;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
@@ -27,6 +26,7 @@ namespace HITSBlazor.Services.Auth
         private readonly string _mockTokenTemplate = "mock-token-";
 
         public event Action? OnAuthStateChanged;
+        public event Action<RoleType?>? OnActiveRoleChanged;
 
         public bool IsAuthenticated { get; private set; } = false;
         public User? CurrentUser { get; private set; } = null;
@@ -41,6 +41,8 @@ namespace HITSBlazor.Services.Auth
                 {
                     IsAuthenticated = true;
                     CurrentUser = user;
+                    if (CurrentUser.Roles.Count == 1)
+                        CurrentUser.Role = CurrentUser.Roles[0];
 
                     OnAuthStateChanged?.Invoke();
                 }
@@ -168,7 +170,7 @@ namespace HITSBlazor.Services.Auth
 
             CurrentUser.Role = roleType;
 
-            OnAuthStateChanged?.Invoke();
+            OnActiveRoleChanged?.Invoke(roleType);
 
             return true;
         }

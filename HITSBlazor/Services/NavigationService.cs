@@ -1,18 +1,37 @@
 ﻿using HITSBlazor.Components.LeftSideNavigation;
+using HITSBlazor.Components.SelectActiveRoleModal;
+using HITSBlazor.Models.Users.Enums;
+using HITSBlazor.Services.Auth;
+using HITSBlazor.Services.Modal;
 using Microsoft.AspNetCore.Components;
 
 namespace HITSBlazor.Services
 {
-    public class NavigationService(
-        NavigationManager navigationManager,
-        ILogger<NavigationService> logger)
+    public class NavigationService
     {
-        private readonly NavigationManager _navigationManager = navigationManager;
-        private readonly ILogger<NavigationService> _logger = logger;
+        private readonly NavigationManager _navigationManager;
+        private readonly IAuthService _authService;
+        private readonly ModalService _modalService;
+        private readonly ILogger<NavigationService> _logger;
+
+        public NavigationService(
+            NavigationManager navigationManager,
+            IAuthService authService,
+            ModalService modalService,
+            ILogger<NavigationService> logger
+        )
+        {
+            _navigationManager = navigationManager;
+            _authService = authService;
+            _modalService = modalService;
+            _logger = logger;
+
+            _authService.OnActiveRoleChanged += OnActiveRoleChanged;
+        }
 
         private const string DEFAULT_URL = "/ideas/list";
 
-        public event Action OnNavigationChanged;
+        public event Action? OnNavigationChanged;
 
         public async Task NavigateToAsync(string url, bool forceLoad = false)
         {
@@ -24,15 +43,26 @@ namespace HITSBlazor.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Ошибка при навигации на {Url}", url);
+                if (AppEnvironment.IsLogEnabled && _logger.IsEnabled(LogLevel.Error))
+                    _logger.LogError(ex, "Ошибка при навигации на {Url}", url);
                 throw;
             }
         }
 
         public async Task NavigateToDefaultAsync()
         {
-            //TODO: Добавить реализацию запоминания последнего URL
+            if (_authService.CurrentUser?.Role == null)
+            {
+                _modalService.Show<SelectActiveRoleModal>();
+            }
+            else
+            {
+                await NavigateToAsync(DEFAULT_URL);
+            }
+        }
 
+        private async void OnActiveRoleChanged(RoleType? role)
+        {
             await NavigateToAsync(DEFAULT_URL);
         }
 
@@ -99,5 +129,11 @@ namespace HITSBlazor.Services
 
             return null;
         }
+
+        public void Dispose()
+        {
+            _authService.OnActiveRoleChanged -= OnActiveRoleChanged;
+        }
+
     }
 }

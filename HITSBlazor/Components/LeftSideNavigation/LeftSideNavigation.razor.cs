@@ -1,4 +1,4 @@
-﻿using HITSBlazor.Models.Users.Entities;
+﻿using HITSBlazor.Models.Users.Enums;
 using HITSBlazor.Services;
 using HITSBlazor.Services.Auth;
 using Microsoft.AspNetCore.Components;
@@ -13,7 +13,7 @@ namespace HITSBlazor.Components.LeftSideNavigation
         [Inject]
         private NavigationService NavigationService { get; set; } = null!;
 
-        private User? CurrentUser => AuthService.CurrentUser;
+        private RoleType? CurrentRole { get; set; } = null;
 
         private bool isLoading = false;
         private bool isHovered = false;
@@ -27,13 +27,19 @@ namespace HITSBlazor.Components.LeftSideNavigation
         protected override async Task OnInitializedAsync()
         {
             isLoading = true;
+            AuthService.OnActiveRoleChanged += RoleStateChanged;
             NavigationService.OnNavigationChanged += HandleNavigationChanged;
             _menuItems = NavigationService.GetMenuItems();
             UpdateActiveState();
             isLoading = false;
         }
 
-        private void HandleNavigationChanged() => UpdateActiveState();
+        private void RoleStateChanged(RoleType? role) => CurrentRole = role;
+
+        private void HandleNavigationChanged()
+        {
+            UpdateActiveState();
+        }
 
         private void UpdateActiveState()
         {
@@ -119,6 +125,7 @@ namespace HITSBlazor.Components.LeftSideNavigation
 
         public void Dispose()
         {
+            AuthService.OnActiveRoleChanged -= RoleStateChanged;
             NavigationService.OnNavigationChanged -= HandleNavigationChanged;
         }
     }
