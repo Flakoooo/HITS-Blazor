@@ -1,23 +1,19 @@
-﻿/* Контейнер для уведомлений */
-.notification-container {
+﻿.notification-container {
     position: fixed;
     top: 1rem;
     right: 1rem;
-    z-index: 1050; /* Поверх всего */
+    z-index: 1050;
     display: flex;
     flex-direction: column;
-    gap: 0.75rem; /* Отступ между уведомлениями */
-    max-width: 400px; /* Максимальная ширина */
-    min-width: 300px; /* Минимальная ширина */
+    gap: 0.75rem;
+    max-width: 400px;
+    min-width: 300px;
 }
-
-    /* Каждое уведомление */
     .notification-container .alert {
-        margin: 0 !important; /* Убираем стандартные отступы */
+        margin: 0 !important;
         box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.15);
     }
 
-/* Анимация появления */
 @keyframes slideIn {
     from {
         transform: translateX(100%);
@@ -40,7 +36,6 @@
     }
 }
 
-/* Классы для анимаций */
 .alert-slide-in {
     animation: slideIn 0.3s ease-out forwards;
 }
