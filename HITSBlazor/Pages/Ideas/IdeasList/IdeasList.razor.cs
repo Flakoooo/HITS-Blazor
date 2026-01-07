@@ -78,8 +78,6 @@ namespace HITSBlazor.Pages.Ideas.IdeasList
             _ => ""
         };
 
-        private bool IsStatusSelected(IdeaStatusType status) => SelectedStatuses.Contains(status);
-
         private async Task OnStatusChanged(IdeaStatusType status, bool isChecked)
         {
             if (isChecked)
