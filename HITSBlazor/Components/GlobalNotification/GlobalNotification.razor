@@ -10,7 +10,9 @@
             <div class="alert @notification.AlertClass alert-dismissible show fade @notification.AlertAnimation"
                  style="--notification-index: @notification.Index;"
                  role="alert">
-                @notification.Message
+                <div class="notification-content">
+                    @notification.Message
+                </div>
                 <button type="button" class="btn-close" @onclick="() => HideNotification(notification.Id)"></button>
             </div>
         }

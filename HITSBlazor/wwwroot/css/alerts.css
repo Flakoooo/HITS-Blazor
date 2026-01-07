@@ -1,24 +1,52 @@
-﻿.notification-container {
+﻿/* Контейнер для уведомлений */
+.notification-container {
     position: fixed;
     top: 1rem;
     right: 1rem;
-    z-index: 1050;
+    z-index: 1050; /* Поверх всего */
     display: flex;
     flex-direction: column;
-    gap: 0.75rem;
-    max-width: 400px;
-    min-width: 300px;
+    align-items: flex-end; /* Важно! Выравниваем по правому краю */
+    gap: 0.75rem; /* Отступ между уведомлениями */
 }
+
+    /* Каждое уведомление - независимая ширина */
     .notification-container .alert {
-        margin: 0 !important;
+        margin: 0 !important; /* Убираем стандартные отступы */
         box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.15);
+        width: auto !important; /* Автоматическая ширина по содержимому */
+        max-width: 400px; /* Максимальная ширина, но можно убрать */
+        min-width: 300px; /* Минимальная ширина, но можно убрать */
+        /* Для красивого отображения длинного текста */
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        white-space: normal;
+        /* Flex для внутреннего расположения */
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 1rem;
     }
 
+        /* Контент уведомления */
+        .notification-container .alert .notification-content {
+            flex: 1;
+            min-width: 0; /* Важно для правильного переноса текста */
+        }
+
+        /* Кнопка закрытия */
+        .notification-container .alert .btn-close {
+            flex-shrink: 0; /* Не сжимается */
+            margin-top: 0.125rem; /* Легкое выравнивание */
+        }
+
+/* Анимация появления */
 @keyframes slideIn {
     from {
         transform: translateX(100%);
         opacity: 0;
     }
+
     to {
         transform: translateX(0);
         opacity: 1;
@@ -30,12 +58,14 @@
         transform: translateX(0);
         opacity: 1;
     }
+
     to {
         transform: translateX(100%);
         opacity: 0;
     }
 }
 
+/* Классы для анимаций */
 .alert-slide-in {
     animation: slideIn 0.3s ease-out forwards;
 }
