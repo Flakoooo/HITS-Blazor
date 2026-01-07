@@ -1,4 +1,23 @@
-﻿/* Анимация появления */
+﻿/* Контейнер для уведомлений */
+.notification-container {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    z-index: 1050; /* Поверх всего */
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem; /* Отступ между уведомлениями */
+    max-width: 400px; /* Максимальная ширина */
+    min-width: 300px; /* Минимальная ширина */
+}
+
+    /* Каждое уведомление */
+    .notification-container .alert {
+        margin: 0 !important; /* Убираем стандартные отступы */
+        box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.15);
+    }
+
+/* Анимация появления */
 @keyframes slideIn {
     from {
         transform: translateX(100%);

@@ -1,0 +1,124 @@
+﻿@namespace HITSBlazor.Components.GlobalNotification
+@using HITSBlazor.Services
+@implements IDisposable
+
+@if (_notifications.Count > 0)
+{
+    <div class="notification-container">
+        @foreach (var notification in _notifications)
+        {
+            <div class="alert @notification.AlertClass alert-dismissible show fade @notification.AlertAnimation"
+                 style="--notification-index: @notification.Index;"
+                 role="alert">
+                @notification.Message
+                <button type="button" class="btn-close" @onclick="() => HideNotification(notification.Id)"></button>
+            </div>
+        }
+    </div>
+}
+
+@code {
+    //TODO: Поправить кривую анимацию
+    //TODO: Уведомления могут быть одинаковыми, поэтому нужно будет сравнивать по Message
+    //Или сделать реест ошибок, и сравнивать по ним? (Enum типа)
+    //TODO:Ошибки должны самоликвидироваться, но как это сделать без влияния не производительность?
+    //TODO:Или сделать какой то метод, который будет работать с не пустой очередью, 
+    // и который каждые 5 секунд очищает первый вошедший элемент?
+
+    private List<GlobalNotificationItem> _notifications = [];
+    private System.Threading.Timer? _cleanupTimer;
+    private bool _isDisposed;
+
+    [Inject]
+    private GlobalNotificationService NotificationService { get; set; } = null!;
+
+    protected override void OnInitialized()
+    {
+        NotificationService.OnErrorNotification += ShowError;
+        NotificationService.OnSuccessNotification += ShowSuccess;
+        NotificationService.OnClearNotification += ClearAll;
+    }
+
+    private void ShowError(string errorMessage) => ShowNotification(errorMessage, true);
+
+    private void ShowSuccess(string successMessage) => ShowNotification(successMessage, false);
+
+    private async void ShowNotification(string message, bool error)
+    {
+        var existNtf = _notifications.FirstOrDefault(n => n.Message == message);
+        if (existNtf is not null)
+        {
+            var index = _notifications.IndexOf(existNtf);
+            if (index > 0)
+            {
+                existNtf.AlertAnimation = "alert-slide-out";
+                StateHasChanged();
+                await Task.Delay(300);
+                _notifications.RemoveAt(index);
+                StateHasChanged();
+                existNtf.AlertAnimation = "alert-slide-in";
+                _notifications.Insert(0, existNtf);
+                StateHasChanged();
+                await Task.Delay(300);
+                existNtf.AlertAnimation = "";
+                StateHasChanged();
+                UpdateNotificationIndices();
+                StateHasChanged();
+            }
+            return;
+        }
+
+        var notification = new GlobalNotificationItem
+        {
+            Id = Guid.NewGuid(),
+            Message = message,
+            IsError = error,
+            Index = _notifications.Count
+        };
+        _notifications.Insert(0, notification);
+        StateHasChanged();
+        await Task.Delay(300);
+        _notifications.ElementAt(0).AlertAnimation = "";
+        StateHasChanged();
+        UpdateNotificationIndices();
+        StateHasChanged();
+    }
+
+    private async void HideNotification(Guid id)
+    {
+        if (_notifications.Count > 0)
+        {
+            var ntf = _notifications.FirstOrDefault(n => n.Id == id);
+            if (ntf is null) return;
+            
+            ntf.AlertAnimation = "alert-slide-out";
+            StateHasChanged();
+            await Task.Delay(300);
+            _notifications.RemoveAll(n => n.Id == id);
+            StateHasChanged();
+            UpdateNotificationIndices();
+            StateHasChanged();
+        }
+    }
+
+    private void UpdateNotificationIndices()
+    {
+        for (int i = 0; i < _notifications.Count; i++)
+        {
+            _notifications[i].Index = i;
+        }
+    }
+
+    private void ClearAll()
+    {
+        _notifications.Clear();
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        NotificationService.OnErrorNotification -= ShowError;
+        NotificationService.OnSuccessNotification -= ShowSuccess;
+        NotificationService.OnClearNotification -= ClearAll;
+    }
+}
