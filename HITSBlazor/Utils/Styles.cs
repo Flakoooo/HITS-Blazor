@@ -1,4 +1,4 @@
-﻿namespace HITSBlazor.Services
+﻿namespace HITSBlazor.Utils
 {
     public static class Styles
     {

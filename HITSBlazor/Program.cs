@@ -6,17 +6,9 @@ using HITSBlazor.Services.Auth;
 using HITSBlazor.Services;
 using HITSBlazor.Services.Notifications;
 using HITSBlazor.Services.Ideas;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using HITSBlazor.Services.Skills;
 using HITSBlazor.Services.Companies;
 using HITSBlazor.Services.Modal;
-
-
-
-
-
-
 
 #if DEBUGAPI || RELEASE
 using HITSBlazor.Services.Users;
@@ -55,8 +47,8 @@ namespace HITSBlazor
 #endif
             // Utils
             builder.Services.AddScoped<GlobalNotificationService>();
-            builder.Services.AddScoped<NavigationService>();
             builder.Services.AddScoped<ModalService>();
+            builder.Services.AddScoped<NavigationService>();
 
             // Auth
 #if DEBUG && !DEBUGAPI
