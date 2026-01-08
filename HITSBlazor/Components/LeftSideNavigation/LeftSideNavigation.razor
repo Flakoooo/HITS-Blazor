@@ -28,18 +28,18 @@
                     var item = _menuItems[i];
 
                     <div class="@(isHovered ? "nav-item w-100" : "nav-item")"
-                        style="@(isHovered ? "border-radius: 6px; transition: background-color .15s ease-out;" : "")">
+                         style="@(isHovered ? "border-radius: 6px; transition: background-color .15s ease-out;" : string.Empty)">
                         <button type="button"
                                 @onclick="() => SelectMenuItem(item.Id)"
                                 class="@GetItemButtonClass(item.Id)"
                                 style="height: 40px; min-height: 40px; max-height: 40px; flex-direction: row; flex-wrap: nowrap; align-items: center; justify-content: flex-start; gap: 4px;">
-                            <i class="@item.Icon fs-5" style="@Styles.Bi"></i>
+                            <i class="bi @item.Icon fs-5" style="@Styles.Bi"></i>
                             @if (isHovered)
                             {
                                 <span class="fs-6 ms-2">@item.Title</span>
                             }
                         </button>
-                        @if (isHovered && item.SubItems.Any())
+                        @if (item.SubItems.Any())
                         {
                             //TODO: Сделать прям точную копию навигации, с раскрывшимся списоком при свернутой навигации
                             <div style="@GetCollapseStyle(item)">
@@ -49,12 +49,16 @@
                                         {
                                             var subItem = item.SubItems[j];
 
-                                            <a class="@GetSubItemClass(item.Id, subItem.Id)"
-                                               @onclick="() => SelectSubItem(item.Id, subItem.Id)"
-                                               style="cursor: pointer; display: flex; align-items: center; gap: 8px; padding: 8px 12px;">
-                                               <i class="@subItem.Icon" style="@Styles.Bi"></i>
-                                               <span>@subItem.Title</span>
-                                            </a>
+                                            <button type="button"
+                                                    @onclick="() => SelectSubItem(item.Id, subItem.Id)"
+                                                    class="@GetSubItemClass(item.Id, subItem.Id)"
+                                                    style="height: 40px; min-height: 40px; max-height: 40px; flex-direction: row; flex-wrap: nowrap; align-items: center; justify-content: flex-start; gap: 4px;">
+                                                <i class="bi @subItem.Icon" style="@Styles.Bi"></i>
+                                                @if (isHovered)
+                                                {
+                                                    <span style="display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis">@subItem.Title</span>
+                                                }
+                                            </button>
                                         }
                                     </div>
                                 </div>

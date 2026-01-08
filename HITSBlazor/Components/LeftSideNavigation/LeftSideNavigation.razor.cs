@@ -51,10 +51,6 @@ namespace HITSBlazor.Components.LeftSideNavigation
                 activeSubItem = currentSubItem != null
                     ? (currentMenuItem.Id, currentSubItem.Id)
                     : (currentMenuItem.Id, -1);
-
-                foreach (var menuItem in _menuItems)
-                    menuItem.IsExpanded = menuItem.Id == currentMenuItem.Id &&
-                                              (currentSubItem != null || menuItem.SubItems.Count != 0);
             }
         }
 
@@ -75,10 +71,10 @@ namespace HITSBlazor.Components.LeftSideNavigation
 
         private string GetSubItemClass(int parentId, int subItemId)
         {
-            var baseClass = "nav-route list-group-item list-group-item-light";
+            var baseClass = "list-group-item list-group-item-light d-flex w-100";
             var isActive = activeSubItem.ParentId == parentId && activeSubItem.SubItemId == subItemId;
 
-            return isActive ? $"{baseClass} active router-link-exact-active" : baseClass;
+            return isActive ? $"active router-link-exact-active {baseClass}" : baseClass;
         }
 
         private static string GetCollapseStyle(NavigationItem item)
@@ -97,10 +93,6 @@ namespace HITSBlazor.Components.LeftSideNavigation
 
             if (item.SubItems.Count != 0)
             {
-                foreach (var menuItem in _menuItems)
-                    if (menuItem.Id != itemId && menuItem.IsExpanded)
-                        menuItem.IsExpanded = false;
-
                 item.IsExpanded = !item.IsExpanded;
 
                 if (item.SubItems.Count == 0)
