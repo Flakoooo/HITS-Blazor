@@ -8,14 +8,14 @@ using HITSBlazor.Utils.Mocks.Users;
 namespace HITSBlazor.Utils.Mocks.Teams
 {
     public static class MockTeams
-    {
-        private static readonly List<Team> _teams = CreateTeams();
-        
+    {        
         private static readonly string _lorem = "Lorem ipsum dolor sit amet consectetur adipisicing elit. Eius aperiam delectus possimus, voluptates quo accusamus? Consequatur, quasi rem temporibus blanditiis delectus aliquid officia aut, totam incidunt reiciendis eaque laborum fugiat!";
 
         public static Guid CardId { get; } = Guid.NewGuid();
         public static Guid CactusId { get; } = Guid.NewGuid();
         public static Guid CarpId { get; } = Guid.NewGuid();
+
+        private static readonly List<Team> _teams = CreateTeams();
 
         private static List<TeamMember> CreateTeamMembers(Guid teamId, params User[] users)
         {

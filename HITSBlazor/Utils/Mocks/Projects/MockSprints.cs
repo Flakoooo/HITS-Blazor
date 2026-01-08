@@ -8,17 +8,17 @@ namespace HITSBlazor.Utils.Mocks.Projects
 {
     public static class MockSprints
     {
-        private static readonly List<Sprint> _sprints = CreateSprints();
-        private static readonly List<Models.Projects.Entities.Task> _tasks = CreateTasks();
+        public static Guid Sprint1Id { get; } = Guid.NewGuid();
+        public static Guid Sprint2Id { get; } = Guid.NewGuid();
+        public static Guid Sprint3Id { get; } = Guid.NewGuid();
+        public static Guid ScrumDesignSprintId { get; } = Guid.NewGuid();
+        public static Guid AuthIntegrationTaskId { get; } = Guid.NewGuid();
+        public static Guid BlackThemeTaskId { get; } = Guid.NewGuid();
+        public static Guid FileUploadTaskId { get; } = Guid.NewGuid();
+        public static Guid TaskTemplatesTaskId { get; } = Guid.NewGuid();
 
-        public static Guid Sprint1Id { get; }
-        public static Guid Sprint2Id { get; }
-        public static Guid Sprint3Id { get; }
-        public static Guid ScrumDesignSprintId { get; } 
-        public static Guid AuthIntegrationTaskId { get; }
-        public static Guid BlackThemeTaskId { get; }
-        public static Guid FileUploadTaskId { get; }
-        public static Guid TaskTemplatesTaskId { get; }
+        private static readonly List<Models.Projects.Entities.Task> _tasks = CreateTasks();
+        private static readonly List<Sprint> _sprints = CreateSprints();
 
         private static int SumSprintDate(int sprintCount, bool isFinishDate, int sprintDurationDays = 7)
             => isFinishDate

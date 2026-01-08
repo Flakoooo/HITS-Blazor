@@ -4,8 +4,6 @@ namespace HITSBlazor.Utils.Mocks.Common
 {
     public static class MockTags
     {
-        private static readonly List<Tag> _tags = CreateTags();
-
         public static Guid FrontendId { get; } = Guid.NewGuid();
         public static Guid BackendId { get; } = Guid.NewGuid();
         public static Guid RefactorId { get; } = Guid.NewGuid();
@@ -18,6 +16,8 @@ namespace HITSBlazor.Utils.Mocks.Common
         public static Guid StatisticId { get; } = Guid.NewGuid();
         public static Guid SecurityId { get; } = Guid.NewGuid();
         public static Guid DesignId { get; } = Guid.NewGuid();
+
+        private static readonly List<Tag> _tags = CreateTags();
 
         private static List<Tag> CreateTags() => [
             new Tag { Id = FrontendId,      Name = "Фронтенд",      Color = "#0D6EFD",  Confirmed = true    },

@@ -1,8 +1,12 @@
 ﻿@namespace HITSBlazor.Components.SelectActiveRoleModal
 @using HITSBlazor.Models.Users.Enums
 @using HITSBlazor.Services
+@using HITSBlazor.Services.Auth
+@using HITSBlazor.Services.Modal
 @using HITSBlazor.Utils
 @using HITSBlazor.Utils.EnumTranslators
+@inject IAuthService AuthService
+@inject ModalService ModalService
 
 <div @onclick:stopPropagation="true"
      class="p-3 rounded bg-white"
@@ -15,3 +19,18 @@
         </button>
     }
 </div>
+
+@code {
+    public List<RoleType> Roles { get; set; } = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        Roles = AuthService.CurrentUser?.Roles ?? [];
+    }
+
+    private async void SetUserRole(RoleType role)
+    {
+        await AuthService.SetUserRoleAsync(role);
+        ModalService.Close();
+    }
+}

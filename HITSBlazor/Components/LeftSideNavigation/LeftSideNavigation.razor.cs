@@ -15,7 +15,7 @@ namespace HITSBlazor.Components.LeftSideNavigation
 
         private RoleType? CurrentRole { get; set; } = null;
 
-        private bool isLoading = false;
+        private bool isLoading = true;
         private bool isHovered = false;
         private (int ParentId, int SubItemId) activeSubItem = (0, 0);
         private List<NavigationItem> _menuItems = [];
@@ -29,12 +29,18 @@ namespace HITSBlazor.Components.LeftSideNavigation
             isLoading = true;
             AuthService.OnActiveRoleChanged += RoleStateChanged;
             NavigationService.OnNavigationChanged += HandleNavigationChanged;
-            _menuItems = NavigationService.GetMenuItems();
+            _menuItems = NavigationService.MenuItems;
             UpdateActiveState();
             isLoading = false;
         }
 
-        private void RoleStateChanged(RoleType? role) => CurrentRole = role;
+        private async void RoleStateChanged(RoleType? role)
+        {
+            CurrentRole = role;
+            _menuItems = NavigationService.MenuItems;
+            UpdateActiveState();
+            StateHasChanged();
+        }
 
         private void HandleNavigationChanged()
         {

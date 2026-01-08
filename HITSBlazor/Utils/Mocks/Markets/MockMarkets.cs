@@ -5,14 +5,12 @@ namespace HITSBlazor.Utils.Mocks.Markets
 {
     public static class MockMarkets
     {
-        private static readonly List<Market> _markets = CreateMarkets();
-
         public static Guid Summer2023Id { get; } = Guid.NewGuid();
         public static Guid Autumn2023Id { get; } = Guid.NewGuid();
         public static Guid Winter2024Id { get; } = Guid.NewGuid();
         public static Guid Spring2024Id { get; } = Guid.NewGuid();
 
-        
+        private static readonly List<Market> _markets = CreateMarkets();
 
         private static List<Market> CreateMarkets() => 
         [
@@ -49,5 +47,8 @@ namespace HITSBlazor.Utils.Mocks.Markets
                 Status = MarketStatus.NEW
             }
         ];
+
+        public static List<Market> GetActiveMarkets()
+            => [.. _markets.Where(m => m.Status == MarketStatus.ACTIVE)];
     }
 }

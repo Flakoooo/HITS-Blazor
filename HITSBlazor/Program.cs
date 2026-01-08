@@ -9,6 +9,10 @@ using HITSBlazor.Services.Ideas;
 using HITSBlazor.Services.Skills;
 using HITSBlazor.Services.Companies;
 using HITSBlazor.Services.Modal;
+using HITSBlazor.Services.Markets;
+using HITSBlazor.Services.Projects;
+
+
 
 #if DEBUGAPI || RELEASE
 using HITSBlazor.Services.Users;
@@ -74,6 +78,12 @@ namespace HITSBlazor
 
             //Ideas
             builder.Services.AddScoped<IIdeasService, MockIdeasService>();
+
+            //Projects
+            builder.Services.AddScoped<IProjectService, MockProjectService>();
+
+            //Market
+            builder.Services.AddScoped<IMarketService, MockMarketService>();
 
             // Notification
             builder.Services.AddScoped<INotificationService, MockNotificationService>();

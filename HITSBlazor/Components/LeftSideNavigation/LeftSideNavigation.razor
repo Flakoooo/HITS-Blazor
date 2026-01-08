@@ -33,7 +33,7 @@
                                 @onclick="() => SelectMenuItem(item.Id)"
                                 class="@GetItemButtonClass(item.Id)"
                                 style="height: 40px; min-height: 40px; max-height: 40px; flex-direction: row; flex-wrap: nowrap; align-items: center; justify-content: flex-start; gap: 4px;">
-                            <i class="bi @item.Icon fs-5" style="@Styles.Bi"></i>
+                            <i class="@item.Icon fs-5" style="@Styles.Bi"></i>
                             @if (isHovered)
                             {
                                 <span class="fs-6 ms-2">@item.Title</span>
@@ -53,7 +53,7 @@
                                                     @onclick="() => SelectSubItem(item.Id, subItem.Id)"
                                                     class="@GetSubItemClass(item.Id, subItem.Id)"
                                                     style="height: 40px; min-height: 40px; max-height: 40px; flex-direction: row; flex-wrap: nowrap; align-items: center; justify-content: flex-start; gap: 4px;">
-                                                <i class="bi @subItem.Icon" style="@Styles.Bi"></i>
+                                                <i class="@subItem.Icon" style="@Styles.Bi"></i>
                                                 @if (isHovered)
                                                 {
                                                     <span style="display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis">@subItem.Title</span>
