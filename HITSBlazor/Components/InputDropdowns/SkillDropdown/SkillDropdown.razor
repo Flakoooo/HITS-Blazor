@@ -1,8 +1,6 @@
 ﻿@namespace HITSBlazor.Components.InputDropdowns.SkillDropdown
 @using HITSBlazor.Models.Common.Entities
 @using HITSBlazor.Models.Common.Enums
-@using HITSBlazor.Services
-@using HITSBlazor.Utils
 
 <div class="w-25" tabindex="-1">
     <div class="w-100">
@@ -21,8 +19,8 @@
                 </div>
             </div>
 
-            <i class="@(IsOpen ? "bi-chevron-up" : "bi-chevron-down")"
-               style="@Styles.Bi position: absolute; bottom: auto; left: auto; top: 11px; right: 12px; z-index: 10000; cursor: pointer;"
+            <i class="bi @(IsOpen ? "bi-chevron-up" : "bi-chevron-down")"
+               style="position: absolute; bottom: auto; left: auto; top: 11px; right: 12px; z-index: 10000; cursor: pointer;"
                @onclick="ToggleDropdown"></i>
 
             @if (IsOpen)
@@ -61,8 +59,8 @@
                     <div class="px-2 py-1 rounded d-flex gap-1 @SkillTheme align-items-center">
                         <span class="fs-6">@skill.Name</span>
                         <i @onclick="@(() => RemoveSkill(skill))"
-                           class="bi-x-lg"
-                           style="@Styles.Bi cursor: pointer;"></i>
+                           class="bi bi-x-lg"
+                           style="cursor: pointer;"></i>
                     </div>
                 }
             </div>

@@ -9,12 +9,11 @@
 @inject ModalService ModalService
 
 <div @onclick:stopPropagation="true"
-     class="p-3 rounded bg-white"
-     style="width: 400px; display: flex; flex-direction: column; flex-wrap: nowrap; align-items: stretch; justify-content: stretch; gap: 12px; align-self: center; justify-self: center; transition: all .15s ease-out;">
+     class="role-modal p-3 rounded bg-white">
     <span class="fs-3 text-primary text-center">Доступные роли</span>
     @foreach (var role in Roles)
     {
-        <button type="button" @onclick="() => SetUserRole(role)" class="btn d-flex btn-primary" style="@Styles.Btn">
+        <button type="button" @onclick="() => SetUserRole(role)" class="btn d-flex btn-primary">
             @role.GetTranslation()
         </button>
     }

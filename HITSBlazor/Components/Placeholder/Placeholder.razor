@@ -1,0 +1,26 @@
+﻿@namespace HITSBlazor.Components.Placeholder
+
+<div class="placeholder-glow @Width">
+    <span class="placeholder w-100 bg-secondary rounded @heightClass" style="@heightStyle"></span>
+</div>
+
+@code {
+    [Parameter]
+    public string Width { get; set; } = "w-100";
+
+    [Parameter]
+    public PlaceholderHeight Height { get; set; } = PlaceholderHeight.None;
+
+    private string heightClass = "";
+    private string heightStyle = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        (heightClass, heightStyle) = Height switch
+        {
+            PlaceholderHeight.None => ("", ""),
+            PlaceholderHeight.Small => ("small", "height: 50px;"),
+            _ => ("", "")
+        };
+    }
+}

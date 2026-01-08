@@ -24,6 +24,8 @@ namespace HITSBlazor.Services.Ideas
         public async Task<List<Idea>> GetIdeasByStatusAsync(params IdeaStatusType[] statusTypes)
             => [.. _ideas.Where(i => statusTypes.Contains(i.Status))];
 
+        public async Task<Idea?> GetIdeaByIdAsync(Guid id) => MockIdeas.GetIdeaById(id);
+
         public async Task<ServiceResponse<bool>> CreateNewIdea(IdeasCreateModel ideasCreateModel)
         {
             if (_authService.CurrentUser is null)

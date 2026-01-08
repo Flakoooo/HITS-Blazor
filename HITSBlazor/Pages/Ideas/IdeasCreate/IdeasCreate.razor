@@ -1,10 +1,9 @@
 ﻿@using HITSBlazor.Components.InputDropdowns.CompanyDropdown
 @using HITSBlazor.Components.InputDropdowns.ContactPersonDropdown
 @using HITSBlazor.Components.InputDropdowns.SkillDropdown
+@using HITSBlazor.Components.Placeholder
 @using HITSBlazor.Models.Common.Entities
 @using HITSBlazor.Models.Common.Enums
-@using HITSBlazor.Services
-@using HITSBlazor.Utils
 
 <PageTitle>Портал ВШЦТ</PageTitle>
 
@@ -17,8 +16,8 @@
                 <div class="w-100">
                     <label class="form-label text-primary">
                         Название идеи*
-                        <i class="bi-patch-question" 
-                            style="@Styles.Bi cursor: pointer; display: inline-block; vertical-align: middle; color: #007bff;"></i>
+                        <i class="bi bi-patch-question" 
+                            style="cursor: pointer; display: inline-block; vertical-align: middle; color: #007bff;"></i>
                     </label>
                     <div class="input-group">
                         <input type="text" 
@@ -31,8 +30,8 @@
                 <div class="d-flex flex-column w-100 h-100">
                     <label class="form-label text-primary">
                         Проблема*
-                        <i class="bi-patch-question"
-                            style="@Styles.Bi cursor: pointer; display: inline-block; vertical-align: middle; color: #007bff;"></i>
+                        <i class="bi bi-patch-question"
+                            style="cursor: pointer; display: inline-block; vertical-align: middle; color: #007bff;"></i>
                     </label>
                     <div class="input-group h-100">
                         <textarea placeholder="Опишите проблему, которую решает ваша идея" 
@@ -45,8 +44,8 @@
                 <div class="d-flex flex-column w-100 h-100">
                     <label class="form-label text-primary">
                         Предлагаемое решение*
-                        <i class="bi-patch-question"
-                            style="@Styles.Bi cursor: pointer; display: inline-block; vertical-align: middle; color: #007bff;"></i>
+                        <i class="bi bi-patch-question"
+                            style="cursor: pointer; display: inline-block; vertical-align: middle; color: #007bff;"></i>
                     </label>
                     <div class="input-group h-100">
                         <textarea placeholder="Опишите, что вы предлагаете для решения проблемы" 
@@ -59,8 +58,8 @@
                 <div class="d-flex flex-column w-100 h-100">
                     <label class="form-label text-primary">
                         Ожидаемый результат*
-                        <i class="bi-patch-question"
-                            style="@Styles.Bi cursor: pointer; display: inline-block; vertical-align: middle; color: #007bff;"></i>
+                        <i class="bi bi-patch-question"
+                            style="cursor: pointer; display: inline-block; vertical-align: middle; color: #007bff;"></i>
                     </label>
                     <div class="input-group h-100">
                         <textarea placeholder="Опишите ожидаемый результат" 
@@ -73,8 +72,8 @@
                 <div class="d-flex flex-column w-100 h-100">
                     <label class="form-label text-primary">
                         Описание необходимых ресурсов для реализации*
-                        <i class="bi-patch-question"
-                            style="@Styles.Bi cursor: pointer; display: inline-block; vertical-align: middle; color: #007bff;"></i>
+                        <i class="bi bi-patch-question"
+                            style="cursor: pointer; display: inline-block; vertical-align: middle; color: #007bff;"></i>
                     </label>
                     <div class="input-group h-100">
                         <textarea placeholder="Укажите список требуемых для выполнения проекта ресурсов" 
@@ -88,8 +87,8 @@
                     <span class="fs-6 text-primary">
                         Желаемое количество участников в команде*
                     </span>
-                <i class="bi-patch-question"
-                    style="@Styles.Bi cursor: pointer; display: inline-block; vertical-align: middle; color: #007bff;"></i>
+                <i class="bi bi-patch-question"
+                    style="cursor: pointer; display: inline-block; vertical-align: middle; color: #007bff;"></i>
                 <div class="mt-2 d-flex gap-3">
                     <div class="w-100">
                         <div class="input-group">
@@ -118,16 +117,14 @@
             </div>
             <div>
                 <span class="fs-6 text-primary">Стек технологий*</span>
-                <i class="bi-patch-question"
-                    style="@Styles.Bi cursor: pointer; display: inline-block; vertical-align: middle; color: #007bff;"></i>
+                <i class="bi bi-patch-question"
+                   style="cursor: pointer; display: inline-block; vertical-align: middle; color: #007bff;"></i>
                 @if (isLoading)
                 {
                     <div class="mt-2 w-100 d-flex gap-3">
                         @for (int p = 0; p < 4; ++p)
                         {
-                            <div class="placeholder-glow w-100">
-                                <span class="placeholder w-100 bg-secondary rounded" style="height: 50px;"></span>
-                            </div>
+                            <Placeholder Height="PlaceholderHeight.Small" />
                         }
                     </div>
                 }
@@ -199,9 +196,7 @@
                 <span class="fs-6 text-primary">@preAssessmentText</span>
                 @if (animationTimer is not null)
                 {
-                    <div class="placeholder-glow w-100">
-                        <span class="placeholder w-100 bg-secondary rounded"></span>
-                    </div>
+                    <Placeholder />
                 }
                 else
                 {
@@ -212,10 +207,10 @@
                 }
             </div>
             <div style="display: flex; flex-direction: row; flex-wrap: nowrap; align-items: center; justify-content: center; gap: 16px;">
-                <button type="button" class="d-flex btn-primary" style="@Styles.Btn">
+                <button type="button" class="btn d-flex btn-primary">
                     Сохранить черновик
                 </button>
-                <button type="button" class="d-flex btn-success" style="@Styles.Btn">
+                <button type="button" class="btn d-flex btn-success">
                     Отправить на согласование
                 </button>
             </div>

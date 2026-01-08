@@ -20,7 +20,7 @@
 
                 <div class="input-group">
                     <span class="input-group-text fs-6">
-                        <i class="bi-fonts" style="@Styles.Bi"></i>
+                        <i class="bi bi-fonts"></i>
                     </span>
                     <input type="text"
                            @bind="registerModel.FirstName"
@@ -31,7 +31,7 @@
 
                 <div class="input-group">
                     <span class="input-group-text fs-6">
-                        <i class="bi-fonts" style="@Styles.Bi"></i>
+                        <i class="bi bi-fonts"></i>
                     </span>
                     <input type="text"
                            @bind="registerModel.LastName"
@@ -42,7 +42,7 @@
 
                 <div class="input-group">
                     <span class="input-group-text fs-6">
-                        <i class="bi-telephone" style="@Styles.Bi"></i>
+                        <i class="bi bi-telephone"></i>
                     </span>
                     <input type="tel"
                            @bind:get="phoneInput"
@@ -56,7 +56,7 @@
 
                 <div class="input-group">
                     <span class="input-group-text fs-6">
-                        <i class="bi-people" style="@Styles.Bi"></i>
+                        <i class="bi bi-people"></i>
                     </span>
                     <input type="text"
                            @bind="registerModel.StudyGroup"
@@ -67,7 +67,7 @@
 
                 <div class="input-group">
                     <span class="input-group-text fs-6">
-                        <i class="bi-key" style="@Styles.Bi"></i>
+                        <i class="bi bi-key"></i>
                     </span>
                     <input type="password"
                            @bind="registerModel.Password"
@@ -76,7 +76,7 @@
                            placeholder="Введите пароль" />
                 </div>
                 <button type="submit" disabled="@isLoading"
-                        class="btn d-flex btn-primary" style="@Styles.Btn">
+                        class="btn d-flex btn-primary">
                     @if (isLoading)
                     {
                         <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>

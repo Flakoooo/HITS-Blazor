@@ -8,42 +8,6 @@
     scrollbar-color: #888 transparent;
 }
 
-:root {
-    /* Bootstrap цветовая схема */
-    --bs-blue: #0d6efd;
-    --bs-indigo: #6610f2;
-    --bs-purple: #6f42c1;
-    --bs-pink: #d63384;
-    --bs-red: #dc3545;
-    --bs-orange: #fd7e14;
-    --bs-yellow: #ffc107;
-    --bs-green: #198754;
-    --bs-teal: #20c997;
-    --bs-cyan: #0dcaf0;
-    --bs-black: #000;
-    --bs-white: #fff;
-    --bs-gray: #6c757d;
-    --bs-gray-dark: #343a40;
-    /* Основные цвета из variables.scss */
-    --primary-color: #0d6efd;
-    --secondary-color: #ced4da;
-    --success-color: #198754;
-    --danger-color: #dc3545;
-    --white-color: #ffffff;
-    --black-color: #000000;
-    --background-color-blured: #0000005d;
-    /* Анимации */
-    --default-transition-settings: 0.15s ease-out;
-    --default-animation-settings: 0.3s ease-out forwards;
-    /* Дополнительные CSS переменные */
-    --bs-font-sans-serif: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-    --bs-border-radius: 0.375rem;
-    --bs-border-radius-sm: 0.25rem;
-    --bs-border-radius-lg: 0.5rem;
-    --bs-box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, .15);
-    scroll-behavior: smooth;
-}
-
 html, body {
     height: 100%;
     margin: 0;
@@ -81,4 +45,20 @@ body {
 input[type="checkbox"] {
     cursor: pointer;
     transform: scale(1.2);
+}
+
+.btn {
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+}
+
+.bi {
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    display: flex;
+    flex-wrap: nowrap;
 }

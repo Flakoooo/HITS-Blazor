@@ -1,6 +1,4 @@
 ﻿@namespace HITSBlazor.Pages.Ideas.IdeasList
-@using HITSBlazor.Services
-@using HITSBlazor.Utils
 
 <PageTitle>Портал ВШЦТ</PageTitle>
 
@@ -11,10 +9,9 @@
             <div class="d-flex gap-3">
                 @if (showCreateIdeaButton)
                 {
-                    <button class="btn d-flex btn-primary" style="@Styles.Btn">
-                        <i class="bi-plus-lg fs-5"
-                           style="@Styles.Bi">
-                        </i>
+                    <button type="button" @onclick="@(() => NavigationService.NavigateToAsync("ideas/create"))" 
+                            class="btn d-flex btn-primary">
+                        <i class="bi bi-plus-lg fs-5"></i>
                         Создать идею
                     </button>
                 }
@@ -25,8 +22,7 @@
                 <div class="w-100">
                     <div class="input-group">
                         <span class="input-group-text fs-6">
-                            <i class="bi-search" style="@Styles.Bi">
-                            </i>
+                            <i class="bi bi-search"></i>
                         </span>
                         <input type="text" placeholder="Поиск" class="form-control rounded-end" />
                     </div>
@@ -42,15 +38,14 @@
                             <tr>
                                 <td class="@tableDataClass">
                                     <div class="@tableDataContentClass">
-                                        <div class="bi-circle-fill fs-6 mt-1 @(idea.IsChecked ? "text-success" : "text-secondary")" 
-                                             style="@Styles.Bi">
+                                        <div class="bi bi-circle-fill fs-6 mt-1 @(idea.IsChecked ? "text-success" : "text-secondary")">
                                             <div></div>
                                         </div>
                                     </div>
                                 </td>
                                 <td class="@tableDataClass">
                                     <div class="@tableDataContentClass">
-                                        <div style="cursor: pointer;">
+                                        <div @onclick="@(() => ShowIdea(idea.Id))" style="cursor: pointer;">
                                             <div>@idea.Name</div>
                                         </div>
                                     </div>
@@ -103,12 +98,12 @@
                                     <div @onclick="ChangeDropdownMenuStatus"
                                          class="float-end"
                                          style="min-width: 24px; max-width: 24px; height: 24px; min-height: 24px; max-height: 24px; border-radius: 50%; width: 100%; cursor: pointer; display: flex; flex-direction: row; flex-wrap: nowrap; align-items: center; justify-content: center; transition: all .2s ease-out;">
-                                        <i class="bi-three-dots fs-5" style="@Styles.Bi"></i>
+                                        <i class="bi bi-three-dots fs-5"></i>
                                         <div class="dropdown-menu @(dropdownMenuIsShowed ? "show" : "")"
                                              style="@(dropdownMenuIsShowed ? "position: absolute; inset: 0px auto auto 0px; margin: 0px; transform: translate(1504px, 234px);" : "")"
                                              data-popper-placement="@(dropdownMenuIsShowed ? "bottom-start" : "")">
                                             <ul class="list-group list-group-flush">
-                                                <li class="list-group-item list-group-item-action px-2 py-1">Просмотреть</li>
+                                                <li @onclick="@(() => ShowIdea(idea.Id))" class="list-group-item list-group-item-action px-2 py-1">Просмотреть</li>
                                                 <li class="list-group-item list-group-item-action px-2 py-1">Редактировать</li>
                                                 <li class="list-group-item list-group-item-action px-2 py-1 text-danger">Удалить</li>
                                             </ul>
@@ -140,8 +135,8 @@
                      </div>
                  </div>
                  <div class="w-100 d-flex justify-content-center">
-                    <button type="button" onclick="@ResetFilters" class="btn d-flex btn-danger" style="@Styles.Btn">
-                        <i class="bi-x-lg fs-5" style="@Styles.Bi"></i>
+                    <button type="button" onclick="@ResetFilters" class="btn d-flex btn-danger">
+                        <i class="bi bi-x-lg fs-5"></i>
                          Сбросить фильтры
                      </button>
                  </div>

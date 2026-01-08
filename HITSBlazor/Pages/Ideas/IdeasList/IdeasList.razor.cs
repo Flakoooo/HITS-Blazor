@@ -1,6 +1,10 @@
-﻿using HITSBlazor.Models.Ideas.Entities;
+﻿using HITSBlazor.Components.SelectActiveRoleModal;
+using HITSBlazor.Components.ShowIdeaModal;
+using HITSBlazor.Models.Ideas.Entities;
 using HITSBlazor.Models.Ideas.Enums;
+using HITSBlazor.Services;
 using HITSBlazor.Services.Ideas;
+using HITSBlazor.Services.Modal;
 using HITSBlazor.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
@@ -9,10 +13,20 @@ namespace HITSBlazor.Pages.Ideas.IdeasList
 {
     [Authorize]
     [Route("/ideas/list")]
+    [Route("/ideas/list/{IdeaId}")]
     public partial class IdeasList
     {
         [Inject]
         private IIdeasService IdeasService { get; set; } = null!;
+
+        [Inject]
+        private NavigationService NavigationService { get; set; } = null!;
+
+        [Inject]
+        private ModalService ModalService { get; set; } = null!;
+
+        [Parameter]
+        public Guid? IdeaId { get; set; }
 
         private List<Idea> _ideas = [];
 
@@ -40,6 +54,12 @@ namespace HITSBlazor.Pages.Ideas.IdeasList
         protected override async Task OnInitializedAsync()
         {
             _ideas = await GetAllIdeasAsync();
+        }
+
+        protected override async Task OnParametersSetAsync()
+        {
+            if (IdeaId is not null)
+                ShowIdea((Guid)IdeaId);
         }
 
         private void ChangeDropdownMenuStatus() => dropdownMenuIsShowed = !dropdownMenuIsShowed;
@@ -95,6 +115,15 @@ namespace HITSBlazor.Pages.Ideas.IdeasList
         {
             SelectedStatuses.Clear();
             _ideas = await GetAllIdeasAsync();
+        }
+
+        private void ShowIdea(Guid ideaId)
+        {
+            var modalParameters = new Dictionary<string, object>
+            {
+                { "IdeaId", ideaId }
+            };
+            ModalService.Show<ShowIdeaModal>(parameters: modalParameters);
         }
     }
 }

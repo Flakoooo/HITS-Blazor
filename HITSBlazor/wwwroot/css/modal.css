@@ -1,0 +1,40 @@
+﻿.modal-layout {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 10;
+    background-color: rgba(0,0,0,.365);
+    display: grid;
+    transition: opacity .15s ease-out;
+}
+
+.role-modal {
+    width: 400px;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: stretch;
+    justify-content: stretch;
+    gap: 12px;
+    align-self: center;
+    justify-self: center;
+    transition: all .15s ease-out;
+}
+
+.idea-modal {
+    position: relative;
+    width: 80%;
+    border-top-left-radius: 8px;
+    border-bottom-left-radius: 8px;
+    background-color: #e9e9e9;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    gap: 16px;
+    align-self: stretch;
+    justify-self: flex-end;
+    transition: all .3s ease-out;
+}
