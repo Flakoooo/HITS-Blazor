@@ -1,6 +1,8 @@
 ﻿@namespace HITSBlazor.Components.LeftSideNavigation
+@using HITSBlazor.Models.Users.Enums
 @using HITSBlazor.Services
 @using HITSBlazor.Utils
+@using HITSBlazor.Utils.EnumTranslators
 
 <div class="bg-white border-end"
      style="@NavigationLayout"
@@ -75,7 +77,7 @@
                     <i class="bi-circle-fill fs-6" style="@Styles.Bi"></i>
                     @if (isHovered)
                     {
-                        <span>@CurrentRole</span>
+                        <span>@(CurrentRole is null ? CurrentRole : ((RoleType)CurrentRole).GetTranslation())</span>
                     }
                 </button>
                 <button @onclick="@(async () => await AuthService.LogoutAsync())"

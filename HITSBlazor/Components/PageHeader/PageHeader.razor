@@ -4,6 +4,7 @@
 @using HITSBlazor.Services
 @using HITSBlazor.Services.Auth
 @using HITSBlazor.Utils
+@using HITSBlazor.Utils.EnumTranslators
 @inject IAuthService AuthService
 @implements IDisposable
 
@@ -25,7 +26,7 @@
                 <button type="button" 
                         class="btn d-flex btn-outline-success btn-sm rounded-4 py-1" style="width: fit-content; @Styles.Btn">
                     <i class="bi-circle-fill fs-6" style="@Styles.Bi"></i>
-                    @CurrentRole
+                    @(CurrentRole is null ? CurrentRole : ((RoleType)CurrentRole).GetTranslation())
                 </button>
             </div>
         </div>
