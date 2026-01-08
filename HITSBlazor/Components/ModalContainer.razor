@@ -18,6 +18,7 @@
 
 @code {
     private bool IsVisible { get; set; }
+    private bool IsBlockCloseModal { get; set; }
     private Type? CurrentComponentType { get; set; }
     private Dictionary<string, object> Parameters { get; set; } = new();
 
@@ -32,6 +33,7 @@
         CurrentComponentType = modalData.ComponentType;
         Parameters = modalData.Parameters;
         IsVisible = true;
+        IsBlockCloseModal = modalData.BlockCloseModal;
         StateHasChanged();
     }
 

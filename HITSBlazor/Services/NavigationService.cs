@@ -31,6 +31,9 @@ namespace HITSBlazor.Services
 
         private const string DEFAULT_URL = "/ideas/list";
 
+        public NavigationItem? CurrentModule { get; set; } = GetMenuItems()[0];
+        public NavigationSubItem? CurrentPage { get; set; } = GetMenuItems()[0].SubItems[0];
+
         public event Action? OnNavigationChanged;
 
         public async Task NavigateToAsync(string url, bool forceLoad = false)
@@ -38,6 +41,9 @@ namespace HITSBlazor.Services
             try
             {
                 _navigationManager.NavigateTo(url, forceLoad);
+
+                CurrentModule = GetCurrentMenuItem(url);
+                CurrentPage = GetCurrentSubItem(url);
 
                 OnNavigationChanged?.Invoke();
             }
@@ -103,31 +109,24 @@ namespace HITSBlazor.Services
             ];
         }
 
-        public NavigationItem? GetCurrentMenuItem()
+        public static NavigationItem? GetCurrentMenuItem(string url)
         {
-            var currentUrl = _navigationManager.Uri;
-            var menuItems = GetMenuItems();
+            var menuItem = GetMenuItems().FirstOrDefault(item =>
+                url.Contains(item.BaseUrl ?? "", StringComparison.OrdinalIgnoreCase));
 
-            return menuItems.FirstOrDefault(item =>
-                currentUrl.Contains(item.BaseUrl ?? "", StringComparison.OrdinalIgnoreCase));
+            Console.WriteLine(menuItem?.BaseUrl);
+
+            return menuItem;
         }
 
-        public NavigationSubItem? GetCurrentSubItem()
+        public NavigationSubItem? GetCurrentSubItem(string url)
         {
-            var currentUrl = _navigationManager.Uri;
-            var menuItems = GetMenuItems();
+            var subMenuItem = CurrentModule?.SubItems?.FirstOrDefault(item => 
+                url.Contains(item.Url ?? "", StringComparison.OrdinalIgnoreCase));
 
-            foreach (var menuItem in menuItems)
-            {
-                var subItem = menuItem.SubItems.FirstOrDefault(sub =>
-                    currentUrl.Equals(_navigationManager.ToAbsoluteUri($"{menuItem.BaseUrl}{sub.Url}").ToString(),
-                        StringComparison.OrdinalIgnoreCase));
+            Console.WriteLine(subMenuItem?.Url);
 
-                if (subItem != null)
-                    return subItem;
-            }
-
-            return null;
+            return subMenuItem;
         }
 
         public void Dispose()

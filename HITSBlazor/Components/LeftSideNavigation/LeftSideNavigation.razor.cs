@@ -43,8 +43,8 @@ namespace HITSBlazor.Components.LeftSideNavigation
 
         private void UpdateActiveState()
         {
-            var currentSubItem = NavigationService.GetCurrentSubItem();
-            var currentMenuItem = NavigationService.GetCurrentMenuItem();
+            var currentMenuItem = NavigationService.CurrentModule;
+            var currentSubItem = NavigationService.CurrentPage;
 
             if (currentMenuItem != null)
             {
@@ -90,19 +90,6 @@ namespace HITSBlazor.Components.LeftSideNavigation
             return $"height: {height}px; overflow: hidden; transition: height 0.35s ease;";
         }
 
-        private void HandleMouseEnter() => isHovered = true;
-        private void HandleMouseLeave() => isHovered = false;
-
-        private async Task SelectSubItem(int parentId, int subItemId)
-        {
-            var parentItem = _menuItems.FirstOrDefault(n => n.Id == parentId);
-            var subItem = parentItem?.SubItems.FirstOrDefault(n => n.Id == subItemId);
-
-            if (parentItem == null || subItem == null) return;
-
-            await NavigationService.NavigateToAsync($"{parentItem.BaseUrl}{subItem.Url}");
-        }
-
         private async Task SelectMenuItem(int itemId)
         {
             var item = _menuItems.FirstOrDefault(n => n.Id == itemId);
@@ -121,6 +108,16 @@ namespace HITSBlazor.Components.LeftSideNavigation
             }
             else if (!string.IsNullOrEmpty(item.BaseUrl))
                 await NavigationService.NavigateToAsync(item.BaseUrl);
+        }
+
+        private async Task SelectSubItem(int parentId, int subItemId)
+        {
+            var parentItem = _menuItems.FirstOrDefault(n => n.Id == parentId);
+            var subItem = parentItem?.SubItems.FirstOrDefault(n => n.Id == subItemId);
+
+            if (parentItem == null || subItem == null) return;
+
+            await NavigationService.NavigateToAsync($"{parentItem.BaseUrl}{subItem.Url}");
         }
 
         public void Dispose()
