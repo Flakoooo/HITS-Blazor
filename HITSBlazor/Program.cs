@@ -11,6 +11,8 @@ using HITSBlazor.Services.Companies;
 using HITSBlazor.Services.Modal;
 using HITSBlazor.Services.Markets;
 using HITSBlazor.Services.Projects;
+using HITSBlazor.Services.IdeaSkills;
+using HITSBlazor.Services.IdeaRatings;
 
 
 
@@ -78,6 +80,8 @@ namespace HITSBlazor
 
             //Ideas
             builder.Services.AddScoped<IIdeasService, MockIdeasService>();
+            builder.Services.AddScoped<IIdeaSkillService, MockIdeaSkillService>();
+            builder.Services.AddScoped<IIdeaRatingService, MockIdeaRatingService>();
 
             //Projects
             builder.Services.AddScoped<IProjectService, MockProjectService>();

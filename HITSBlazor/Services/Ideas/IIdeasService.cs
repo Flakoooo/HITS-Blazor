@@ -7,7 +7,7 @@ namespace HITSBlazor.Services.Ideas
 {
     public interface IIdeasService
     {
-        Task<ServiceResponse<List<Idea>>> GetAllIdeasAsync();
+        Task<List<Idea>> GetAllIdeasAsync();
         Task<List<Idea>> GetIdeasByStatusAsync(params IdeaStatusType[] statusTypes);
         Task<Idea?> GetIdeaByIdAsync(Guid id);
         Task<ServiceResponse<bool>> CreateNewIdea(IdeasCreateModel ideasCreateModel);

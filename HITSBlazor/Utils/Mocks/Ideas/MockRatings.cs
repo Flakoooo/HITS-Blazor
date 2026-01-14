@@ -65,5 +65,8 @@ namespace HITSBlazor.Utils.Mocks.Ideas
                 }
             ];
         }
+
+        public static List<Rating> GetIdeaRatingById(Guid ideaId)
+            => [.. _ratings.Where(r => r.IdeaId == ideaId)];
     }
 }

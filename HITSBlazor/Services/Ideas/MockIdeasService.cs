@@ -14,11 +14,11 @@ namespace HITSBlazor.Services.Ideas
 
         private List<Idea> _ideas = [];
 
-        public async Task<ServiceResponse<List<Idea>>> GetAllIdeasAsync()
+        public async Task<List<Idea>> GetAllIdeasAsync()
         {
             _ideas = MockIdeas.GetAllIdeas();
 
-            return ServiceResponse<List<Idea>>.Success(_ideas);
+            return _ideas;
         }
 
         public async Task<List<Idea>> GetIdeasByStatusAsync(params IdeaStatusType[] statusTypes)

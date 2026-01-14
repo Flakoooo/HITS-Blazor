@@ -1,4 +1,5 @@
-﻿using HITSBlazor.Models.Ideas.Entities;
+﻿using HITSBlazor.Models.Common.Entities;
+using HITSBlazor.Models.Ideas.Entities;
 using HITSBlazor.Utils.Mocks.Common;
 
 namespace HITSBlazor.Utils.Mocks.Ideas
@@ -26,7 +27,7 @@ namespace HITSBlazor.Utils.Mocks.Ideas
             ];
         }
 
-        public static IdeaSkills? GetIdeaSkillsByIdeaId(Guid ideaId)
-            => _ideaSkills.FirstOrDefault(isk => isk.IdeaId == ideaId);
+        public static List<Skill> GetIdeaSkillsByIdeaId(Guid ideaId)
+            => _ideaSkills.FirstOrDefault(isk => isk.IdeaId == ideaId)?.Skills ?? [];
     }
 }

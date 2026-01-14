@@ -53,7 +53,7 @@ namespace HITSBlazor.Pages.Ideas.IdeasList
 
         protected override async Task OnInitializedAsync()
         {
-            _ideas = await GetAllIdeasAsync();
+            _ideas = await IdeasService.GetAllIdeasAsync();
         }
 
         protected override async Task OnParametersSetAsync()
@@ -63,12 +63,6 @@ namespace HITSBlazor.Pages.Ideas.IdeasList
         }
 
         private void ChangeDropdownMenuStatus() => dropdownMenuIsShowed = !dropdownMenuIsShowed;
-
-        private async Task<List<Idea>> GetAllIdeasAsync()
-        {
-            ServiceResponse<List<Idea>> ideas = await IdeasService.GetAllIdeasAsync();
-            return ideas.Response ?? [];
-        }
 
         private static string GetStatusStyle(IdeaStatusType status) => status switch
         {
@@ -108,13 +102,13 @@ namespace HITSBlazor.Pages.Ideas.IdeasList
             if (SelectedStatuses.Count > 0)
                 _ideas = await IdeasService.GetIdeasByStatusAsync([.. SelectedStatuses]);
             else
-                _ideas = await GetAllIdeasAsync();
+                _ideas = await IdeasService.GetAllIdeasAsync();
         }
 
         private async void ResetFilters()
         {
             SelectedStatuses.Clear();
-            _ideas = await GetAllIdeasAsync();
+            _ideas = await IdeasService.GetAllIdeasAsync();
         }
 
         private void ShowIdea(Guid ideaId)

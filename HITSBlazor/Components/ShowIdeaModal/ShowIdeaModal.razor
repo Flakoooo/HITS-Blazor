@@ -3,6 +3,10 @@
 @using HITSBlazor.Models.Common.Entities
 @using HITSBlazor.Models.Common.Enums
 @using HITSBlazor.Models.Ideas.Entities
+@using HITSBlazor.Models.Users.Entities
+@using HITSBlazor.Services.Auth
+@using HITSBlazor.Services.IdeaRatings
+@using HITSBlazor.Services.IdeaSkills
 @using HITSBlazor.Services.Ideas
 
 <div class="idea-modal p-3 h-100 overflow-y-scroll" @onclick:stopPropagation="true">
@@ -145,6 +149,18 @@
                     <span class="fs-6 px-3">Комментарии</span>
                 </div>
                 <div class="d-grid gap-3 pt-3 px-3 w-100">
+                    <!--TODO: Личные сообщения имеют дополнительные функции-->
+                    <div class="card rounded-3 shadow" style="@advertisementStyle @currentUserCommentStyle">
+                        <div class="card-header d-flex justify-content-between align-items-center" style="transition: background-color 5s ease-out;">
+                            <span class="fs-6 text-primary">EXPERT_FULL_NAME</span>
+                            <div class="d-flex gap-2 align-items-center">
+                                <span class="text-primary">EXPERT_MESSAGE_DATE формат dd.MM.yyyy в HH:mm</span>
+                            </div>
+                        </div>
+                        <div class="card-body py-2">
+                            EXPERT_MESSAGE
+                        </div>
+                    </div>
                 </div>
                 <form class="p-3">
                     <div class="d-flex gap-3 align-items-start">
@@ -214,11 +230,14 @@
                     <span class="fs-6 border-bottom text-secondary d-block">
                         Эксперты
                     </span>
-                    <div class="pt-2" style="@leftSideIdeaStyle @leftSideIdeaDataStyle">
-                        <i class="text-secondary fs-3 opacity-25 bi bi-check-lg text-success opacity-50"></i>
-                        <span class="fs-6 text-primary">EXPERT_FULL_NAME</span>
-                        <span class="fs-6 text-success">EXPERT_RATING</span>
-                    </div>
+                    @foreach (var rating in IdeaRatings)
+                    {
+                        <div class="pt-2" style="@leftSideIdeaStyle @leftSideIdeaDataStyle">
+                            <i class="text-secondary fs-3 opacity-25 bi bi-check-lg text-success opacity-50"></i>
+                            <span class="fs-6 text-primary">@rating.ExpertFirstName @rating.ExpertLastName</span>
+                            <span class="fs-6 text-success">@rating.RatingValue</span>
+                        </div>
+                    }
                 </div>
                 <div>
                     <span class="fs-6 border-bottom text-secondary d-block">
@@ -226,7 +245,7 @@
                     </span>
                     <div class="pt-2" style="@leftSideIdeaStyle @leftSideIdeaDataStyle">
                         <i class="bi bi-circle-fill text-success fs-3 opacity-50"></i>
-                        <span class="fs-6 text-primary">CURRENT_USER_ROLE</span>
+                        <span class="fs-6 text-primary">@CurrentUser?.Role</span>
                     </div>
                 </div>
                 <button type="button" class="btn d-flex btn-primary">
@@ -246,11 +265,22 @@
     private string leftSideIdeaStyle = "display: flex; flex-wrap: nowrap; justify-content: flex-start;";
     private string leftSideIdeaDataStyle = "flex-direction: row; align-items: center; gap: 8px;";
 
+    private User? CurrentUser { get; set; } = null;
     private Idea? CurrentIdea { get; set; } = null;
     private List<Skill> IdeaSkills { get; set; } = [];
+    private List<Rating> IdeaRatings { get; set; } = [];
+
+    [Inject]
+    private IAuthService AuthService { get; set; } = null!;
 
     [Inject]
     private IIdeasService IdeasService { get; set; } = null!;
+
+    [Inject]
+    private IIdeaSkillService IdeaSkillService { get; set; } = null!;
+
+    [Inject]
+    private IIdeaRatingService IdeaRatingService { get; set; } = null!;
 
     [Parameter]
     public Guid IdeaId { get; set; }
@@ -259,8 +289,10 @@
     {
         isLoading = true;
 
+        CurrentUser = AuthService.CurrentUser;
         CurrentIdea = await IdeasService.GetIdeaByIdAsync(IdeaId);
-        IdeaSkills = [];
+        IdeaSkills = await IdeaSkillService.GetAllIdeaSkillsAsync(IdeaId);
+        IdeaRatings = await IdeaRatingService.GetIdeaRatingsAsync(IdeaId);
 
         isLoading = false;
     }
