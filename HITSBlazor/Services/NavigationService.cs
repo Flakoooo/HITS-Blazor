@@ -491,7 +491,6 @@ namespace HITSBlazor.Services
 
         public async Task<NavigationItem?> GetCurrentMenuItem(string url)
         {
-            Console.WriteLine(url);
             var menuItems = MenuItems;
 
             foreach (var item in menuItems)
@@ -508,7 +507,6 @@ namespace HITSBlazor.Services
 
         public NavigationSubItem? GetCurrentSubItem(string url)
         {
-            Console.WriteLine(url);
             if (CurrentModule == null || CurrentModule.SubItems == null)
                 return null;
 

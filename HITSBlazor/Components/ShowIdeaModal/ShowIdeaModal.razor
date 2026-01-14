@@ -1,72 +1,172 @@
 ﻿@namespace HITSBlazor.Components.ShowIdeaModal
 @using HITSBlazor.Components.Placeholder
+@using HITSBlazor.Models.Common.Entities
+@using HITSBlazor.Models.Common.Enums
 @using HITSBlazor.Models.Ideas.Entities
 @using HITSBlazor.Services.Ideas
 
-<div class="idea-modal p-3 h-100 overflow-y-scroll">
-    @if (isLoading || CurrentIdea is null)
-    {
-        <div class="w-75" style="@placeholder_style">
-            @if (isLoading || CurrentIdea is null)
-            {
-                <Placeholder Width="w-75" />
-                <div class="p-2 bg-white rounded-3 d-flex flex-column gap-1">
-                    <Placeholder Width="w-50" />
-                    <Placeholder />
-                    <Placeholder />
-                    <Placeholder />
-                </div>
-                <div class="p-2 bg-white rounded-3 gap-2 d-flex">
-                    @for (int i = 0; i < 3; ++i)
-                    {
-                        <Placeholder Width="w-25" Height="PlaceholderHeight.Small" />
-                    }
-                </div>
-                <div class="pb-2 bg-white rounded-3">
-                    <div class="d-grid gap-3 pt-2 px-2 w-100">
-                        @for (int chatItem = 0; chatItem < 3; ++chatItem)
-                        {
-                            <div class="card rounded-3 shadow" style="@advertisementStyle @(chatItem % 2 == 0 ? currentUserCommentStyle : "")">
-                                <div class="card-header d-flex gap-3 justify-content-between align-items-center">
-                                    <Placeholder Width="w-25" />
-                                    <Placeholder Width="w-75" />
-                                </div>
-                                <div class="card-body">
-                                    <Placeholder />
-                                    <Placeholder />
+<div class="idea-modal p-3 h-100 overflow-y-scroll" @onclick:stopPropagation="true">
+    <div class="w-75" style="@placeholder_style">
+        @if (isLoading || CurrentIdea is null)
+        {
+            <Placeholder Width="w-75" />
+            <div class="p-2 bg-white rounded-3 d-flex flex-column gap-1">
+                <Placeholder Width="w-50" />
+                <Placeholder />
+                <Placeholder />
+                <Placeholder />
+            </div>
+        }
+        else
+        {
+            <div style="display: flex; flex-direction: row; flex-wrap: nowrap; align-items: stretch; justify-content: flex-start; gap: 16px;">
+                <button class="btn d-flex btn-primary">
+                    <i class="bi bi-backspace-fill fs-5"></i>
+                    Назад
+                </button>
+                <span class="p-2 w-100 bg-white rounded-3 fs-4 text-primary text-nowrap overflow-x-scroll">
+                    @CurrentIdea.Name
+                </span>
+            </div>
+            <ul class="list-group rounded-3">
+                <!-- //TODO: Текст можно скрывать, нужно реализовать это, похоже на скрытие и открытие в навигации -->
+                <li class="list-group-item p-0 overflow-hidden">
+                    <button type="button" class="btn d-flex btn-light w-100"
+                            style="border-radius: 0; background-color: #fff; color: #0d6efd; flex-direction: row; flex-wrap: nowrap; align-items: center; justify-content: flex-start;">
+                        Проблема
+                    </button>
+                    <div>
+                        <div class="list-group">
+                            <div class="p-2">@CurrentIdea.Problem</div>
+                        </div>
+                    </div>
+                </li>
+                <li class="list-group-item p-0 overflow-hidden">
+                    <button type="button" class="btn d-flex btn-light w-100"
+                            style="border-radius: 0; background-color: #fff; color: #0d6efd; flex-direction: row; flex-wrap: nowrap; align-items: center; justify-content: flex-start;">
+                        Предлагаемое решение
+                    </button>
+                    <div>
+                        <div class="list-group">
+                            <div class="p-2">@CurrentIdea.Solution</div>
+                        </div>
+                    </div>
+                </li>
+                <li class="list-group-item p-0 overflow-hidden">
+                    <button type="button" class="btn d-flex btn-light w-100"
+                            style="border-radius: 0; background-color: #fff; color: #0d6efd; flex-direction: row; flex-wrap: nowrap; align-items: center; justify-content: flex-start;">
+                        Ожидаемый результат
+                    </button>
+                    <div>
+                        <div class="list-group">
+                            <div class="p-2">@CurrentIdea.Result</div>
+                        </div>
+                    </div>
+                </li>
+                <li class="list-group-item p-0 overflow-hidden">
+                    <button type="button" class="btn d-flex btn-light w-100"
+                            style="border-radius: 0; background-color: #fff; color: #0d6efd; flex-direction: row; flex-wrap: nowrap; align-items: center; justify-content: flex-start;">
+                        Описание необходимых ресурсов для реализации
+                    </button>
+                    <div>
+                        <div class="list-group">
+                            <div class="p-2">@CurrentIdea.Description</div>
+                        </div>
+                    </div>
+                </li>
+                <li class="list-group-item p-0 overflow-hidden">
+                    <button type="button" class="btn d-flex btn-light w-100"
+                            style="border-radius: 0; background-color: #fff; color: #0d6efd; flex-direction: row; flex-wrap: nowrap; align-items: center; justify-content: flex-start;">
+                        Стек технологий
+                    </button>
+                    <div>
+                        <div class="list-group">
+                            <div class="p-2">
+                                <div class="d-flex flex-wrap gap-1">
+                                    @foreach (var skill in IdeaSkills)
+                                    {
+                                        <div class="px-2 py-1 rounded d-flex gap-1 @GetSkillClass(skill.Type)">
+                                            <span class="fs-6">@skill.Name</span>
+                                        </div>
+                                    }
                                 </div>
                             </div>
-                        }
+                        </div>
                     </div>
-                </div>
+                </li>
+            </ul>
+        }
+        <div class="bg-white d-flex rounded-3 @(isLoading ? "p-2 gap-2" : "p-3 gap-3 flex-wrap")">
+            @if (isLoading || CurrentIdea is null)
+            {
+                @for (int i = 0; i < 3; ++i)
+                {
+                    <Placeholder Width="w-25" Height="PlaceholderHeight.Small" />
+                }
             }
             else
             {
-                <div style="display: flex; flex-direction: row; flex-wrap: nowrap; align-items: stretch; justify-content: flex-start; gap: 16px;">
-                    <button class="btn d-flex btn-primary">
-                        <i class="bi bi-backspace-fill fs-5"></i>
-                        Назад
-                    </button>
-                    <span class="p-2 w-100 bg-white rounded-3 fs-4 text-primary text-nowrap overflow-x-scroll">
-                        @CurrentIdea.Name
-                    </span>
-                </div>
-                <ul class="list-group rounded-3">
-                    <!-- //TODO: Текст можно скрывать, нужно реализовать это, похоже на скрытие и открытие в навигации -->
-                    <li class="list-group-item p-0 overflow-hidden">
-                        <button type="button" class="btn d-flex btn-light w-100">
-                            Проблема
-                        </button>
-                        <div>
-                            <div class="list-group">
-                                <div class="p-2">@CurrentIdea.Problem</div>
-                            </div>
-                        </div>
-                    </li>
-                </ul>
+                <button class="btn d-flex btn-light">
+                    Редактировать
+                </button>
+                <button class="btn d-flex btn-success">
+                    Отправить на согласование
+                </button>
+                <button class="btn d-flex btn-danger">
+                    Отправить на доработку
+                </button>
+                <button class="btn d-flex btn-success">
+                    Отправить на утверждение
+                </button>
             }
         </div>
-        <div class="pb-3 w-25 bg-white rounded" style="@placeholder_style">
+        <div class="bg-white rounded-3 @(isLoading ? "pb-2" : string.Empty)">
+            @if (isLoading)
+            {
+                <div class="d-grid gap-3 pt-2 px-2 w-100">
+                    @for (int chatItem = 0; chatItem < 3; ++chatItem)
+                    {
+                        <div class="card rounded-3 shadow" style="@advertisementStyle @(chatItem % 2 == 0 ? currentUserCommentStyle : string.Empty)">
+                            <div class="card-header d-flex gap-3 justify-content-between align-items-center">
+                                <Placeholder Width="w-25" />
+                                <Placeholder Width="w-75" />
+                            </div>
+                            <div class="card-body">
+                                <Placeholder />
+                                <Placeholder />
+                            </div>
+                        </div>
+                    }
+                </div>                
+            }
+            else
+            {
+                <div class="py-2 w-100 border-bottom">
+                    <span class="fs-6 px-3">Комментарии</span>
+                </div>
+                <div class="d-grid gap-3 pt-3 px-3 w-100">
+                </div>
+                <form class="p-3">
+                    <div class="d-flex gap-3 align-items-start">
+                        <div class="w-100">
+                            <div class="input-group">
+                                <span class="input-group-text fs-6">
+                                    <i class="bi bi-chat"></i>
+                                </span>
+                                <input type="text" placeholder="Добавить комментарий" class="form-control rounded-end" />
+                            </div>
+                        </div>
+                        <button type="submit" class="btn d-flex btn-primary">
+                            Отправить
+                        </button>
+                    </div>
+                </form>
+            }
+        </div>
+    </div>
+    <div class="w-25 bg-white rounded @(isLoading ? "pb-3" : string.Empty)" style="@placeholder_style">
+        @if (isLoading || CurrentIdea is null)
+        {
             <div class="bg-primary py-4 rounded-top-3"></div>
             <div class="px-2">
                 <Placeholder Width="w-50" />
@@ -84,12 +184,57 @@
                 <Placeholder Width="w-75" />
                 <Placeholder Width="w-75" />
             </div>
-        </div>
-    }
-    else
-    {
-        
-    }
+        }
+        else
+        {
+            <span class="p-2 bg-primary rounded-top fs-4 text-center text-white">
+                @CurrentIdea.Status
+            </span>
+            <div class="w-100 pb-3 px-3"
+                 style="@leftSideIdeaStyle flex-direction: column; align-items: stretch; gap: 16px;">
+                <div>
+                    <span class="fs-6 border-bottom text-secondary d-block">
+                        Заказчик
+                    </span>
+                    <div class="pt-2" style="@leftSideIdeaStyle @leftSideIdeaDataStyle">
+                        <i class="bi bi-person-circle text-secondary fs-3 opacity-25"></i>
+                        <span class="fs-6 text-primary">@CurrentIdea.Customer</span>
+                    </div>
+                </div>
+                <div>
+                    <span class="fs-6 border-bottom text-secondary d-block">
+                        Инициатор
+                    </span>
+                    <div class="pt-2" style="@leftSideIdeaStyle @leftSideIdeaDataStyle">
+                        <i class="bi bi-envelope text-secondary fs-3 opacity-25"></i>
+                        <div class="text-primary" style="cursor: pointer;">@CurrentIdea.Initiator.FirstName @CurrentIdea.Initiator.LastName</div>
+                    </div>
+                </div>
+                <div>
+                    <span class="fs-6 border-bottom text-secondary d-block">
+                        Эксперты
+                    </span>
+                    <div class="pt-2" style="@leftSideIdeaStyle @leftSideIdeaDataStyle">
+                        <i class="text-secondary fs-3 opacity-25 bi bi-check-lg text-success opacity-50"></i>
+                        <span class="fs-6 text-primary">EXPERT_FULL_NAME</span>
+                        <span class="fs-6 text-success">EXPERT_RATING</span>
+                    </div>
+                </div>
+                <div>
+                    <span class="fs-6 border-bottom text-secondary d-block">
+                        Режим
+                    </span>
+                    <div class="pt-2" style="@leftSideIdeaStyle @leftSideIdeaDataStyle">
+                        <i class="bi bi-circle-fill text-success fs-3 opacity-50"></i>
+                        <span class="fs-6 text-primary">CURRENT_USER_ROLE</span>
+                    </div>
+                </div>
+                <button type="button" class="btn d-flex btn-primary">
+                    Поделиться идеей
+                </button>
+            </div>
+        }
+    </div>
 </div>
 
 @code {
@@ -98,8 +243,11 @@
     private string placeholder_style = "height: fit-content; display: flex; flex-direction: column; flex-wrap: nowrap; align-items: stretch; justify-content: flex-start; gap: 16px;";
     private string advertisementStyle = "width: 400px;";
     private string currentUserCommentStyle = "justify-self: end;";
+    private string leftSideIdeaStyle = "display: flex; flex-wrap: nowrap; justify-content: flex-start;";
+    private string leftSideIdeaDataStyle = "flex-direction: row; align-items: center; gap: 8px;";
 
     private Idea? CurrentIdea { get; set; } = null;
+    private List<Skill> IdeaSkills { get; set; } = [];
 
     [Inject]
     private IIdeasService IdeasService { get; set; } = null!;
@@ -112,7 +260,17 @@
         isLoading = true;
 
         CurrentIdea = await IdeasService.GetIdeaByIdAsync(IdeaId);
+        IdeaSkills = [];
 
         isLoading = false;
     }
+
+    private string GetSkillClass(SkillType type) => type switch
+    {
+        SkillType.Language => "bg-success-subtle text-success",
+        SkillType.Framework => "bg-info-subtle text-info",
+        SkillType.Database => "bg-warning-subtle text-warning",
+        SkillType.Devops => "bg-danger-subtle text-danger",
+        _ => string.Empty
+    };
 }
