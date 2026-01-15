@@ -1,0 +1,78 @@
+﻿.ideas-page {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+}
+
+.ideas-page-list {
+    height: auto;
+    overflow-y: scroll;
+    align-items: stretch;
+}
+
+.ideas-header {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.data-link {
+    cursor: pointer;
+}
+
+    .data-link:hover {
+        text-decoration: underline;
+        text-underline-offset: 4px;
+        text-decoration-thickness: 1px
+    }
+
+.idea-row-icon {
+    width: 24px;
+    min-width: 24px;
+    max-width: 24px;
+    height: 24px;
+    min-height: 24px;
+    max-height: 24px;
+    border-radius: 50%;
+    width: 100%;
+    cursor: pointer;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: center;
+    transition: all .2s ease-out;
+}
+
+.idea-row-modal {
+    position: absolute;
+    inset: 0px auto auto 0px;
+}
+
+.idea-filter {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: stretch;
+    justify-content: flex-start;
+    gap: 8px;
+}
+
+.idea-filter-choices {
+    max-height: 192px;
+    overflow-y: scroll;
+}
+
+.idea-filet-choice {
+    cursor: pointer;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: space-between;
+    transition: background-color;
+}

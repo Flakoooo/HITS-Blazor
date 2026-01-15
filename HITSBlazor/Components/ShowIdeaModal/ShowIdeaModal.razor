@@ -34,50 +34,23 @@
             </div>
             <ul class="list-group rounded-3">
                 <!-- //TODO: Текст можно скрывать, нужно реализовать это, похоже на скрытие и открытие в навигации -->
-                <li class="list-group-item p-0 overflow-hidden">
-                    <button type="button" class="btn d-flex btn-light w-100"
-                            style="border-radius: 0; background-color: #fff; color: #0d6efd; flex-direction: row; flex-wrap: nowrap; align-items: center; justify-content: flex-start;">
-                        Проблема
-                    </button>
-                    <div>
-                        <div class="list-group">
-                            <div class="p-2">@CurrentIdea.Problem</div>
-                        </div>
-                    </div>
-                </li>
-                <li class="list-group-item p-0 overflow-hidden">
-                    <button type="button" class="btn d-flex btn-light w-100"
-                            style="border-radius: 0; background-color: #fff; color: #0d6efd; flex-direction: row; flex-wrap: nowrap; align-items: center; justify-content: flex-start;">
-                        Предлагаемое решение
-                    </button>
-                    <div>
-                        <div class="list-group">
-                            <div class="p-2">@CurrentIdea.Solution</div>
-                        </div>
-                    </div>
-                </li>
-                <li class="list-group-item p-0 overflow-hidden">
-                    <button type="button" class="btn d-flex btn-light w-100"
-                            style="border-radius: 0; background-color: #fff; color: #0d6efd; flex-direction: row; flex-wrap: nowrap; align-items: center; justify-content: flex-start;">
-                        Ожидаемый результат
-                    </button>
-                    <div>
-                        <div class="list-group">
-                            <div class="p-2">@CurrentIdea.Result</div>
-                        </div>
-                    </div>
-                </li>
-                <li class="list-group-item p-0 overflow-hidden">
-                    <button type="button" class="btn d-flex btn-light w-100"
-                            style="border-radius: 0; background-color: #fff; color: #0d6efd; flex-direction: row; flex-wrap: nowrap; align-items: center; justify-content: flex-start;">
-                        Описание необходимых ресурсов для реализации
-                    </button>
-                    <div>
-                        <div class="list-group">
-                            <div class="p-2">@CurrentIdea.Description</div>
-                        </div>
-                    </div>
-                </li>
+                @foreach (var data in ideaData)
+                {
+                    <li class="list-group-item p-0 overflow-hidden">
+                        <button type="button" class="btn d-flex btn-light w-100" @onclick="@(() => data.IsExpanded = !data.IsExpanded)"
+                                style="border-radius: 0; background-color: #fff; color: #0d6efd; flex-direction: row; flex-wrap: nowrap; align-items: center; justify-content: flex-start;">
+                            @data.Title
+                        </button>
+                        @if (data.IsExpanded)
+                        {
+                            <div style="@GetCollapseStyle(data)">
+                                <div class="list-group">
+                                    <div class="p-2">@data.Data</div>
+                                </div>
+                            </div>
+                        }
+                    </li>
+                }
                 <li class="list-group-item p-0 overflow-hidden">
                     <button type="button" class="btn d-flex btn-light w-100"
                             style="border-radius: 0; background-color: #fff; color: #0d6efd; flex-direction: row; flex-wrap: nowrap; align-items: center; justify-content: flex-start;">
@@ -257,19 +230,6 @@
 </div>
 
 @code {
-    private bool isLoading = true;
-
-    private string placeholder_style = "height: fit-content; display: flex; flex-direction: column; flex-wrap: nowrap; align-items: stretch; justify-content: flex-start; gap: 16px;";
-    private string advertisementStyle = "width: 400px;";
-    private string currentUserCommentStyle = "justify-self: end;";
-    private string leftSideIdeaStyle = "display: flex; flex-wrap: nowrap; justify-content: flex-start;";
-    private string leftSideIdeaDataStyle = "flex-direction: row; align-items: center; gap: 8px;";
-
-    private User? CurrentUser { get; set; } = null;
-    private Idea? CurrentIdea { get; set; } = null;
-    private List<Skill> IdeaSkills { get; set; } = [];
-    private List<Rating> IdeaRatings { get; set; } = [];
-
     [Inject]
     private IAuthService AuthService { get; set; } = null!;
 
@@ -285,6 +245,22 @@
     [Parameter]
     public Guid IdeaId { get; set; }
 
+    private bool isLoading = true;
+
+    private string placeholder_style = "height: fit-content; display: flex; flex-direction: column; flex-wrap: nowrap; align-items: stretch; justify-content: flex-start; gap: 16px;";
+    private string advertisementStyle = "width: 400px;";
+    private string currentUserCommentStyle = "justify-self: end;";
+    private string leftSideIdeaStyle = "display: flex; flex-wrap: nowrap; justify-content: flex-start;";
+    private string leftSideIdeaDataStyle = "flex-direction: row; align-items: center; gap: 8px;";
+
+    private User? CurrentUser { get; set; } = null;
+    private Idea? CurrentIdea { get; set; } = null;
+    private List<Skill> IdeaSkills { get; set; } = [];
+    private List<Rating> IdeaRatings { get; set; } = [];
+    private bool isExpanded = false;
+
+    private List<ShowIdeaModalItem> ideaData = [];
+
     protected override async Task OnInitializedAsync()
     {
         isLoading = true;
@@ -292,9 +268,42 @@
         CurrentUser = AuthService.CurrentUser;
         CurrentIdea = await IdeasService.GetIdeaByIdAsync(IdeaId);
         IdeaSkills = await IdeaSkillService.GetAllIdeaSkillsAsync(IdeaId);
+        ideaData = GetIdeaData(CurrentIdea, IdeaSkills);
         IdeaRatings = await IdeaRatingService.GetIdeaRatingsAsync(IdeaId);
 
         isLoading = false;
+    }
+
+    private static List<ShowIdeaModalItem> GetIdeaData(Idea? idea, List<Skill> skills)
+    {
+        return
+        [
+            new ShowIdeaModalItem
+            {
+                Title = "Проблема",
+                Data = idea?.Problem
+            },
+            new ShowIdeaModalItem
+            {
+                Title = "Предлагаемое решение",
+                Data = idea?.Solution
+            },
+            new ShowIdeaModalItem
+            {
+                Title = "Ожидаемый результат",
+                Data = idea?.Result
+            },
+            new ShowIdeaModalItem
+            {
+                Title = "Описание необходимых ресурсов для реализации",
+                Data = idea?.Description
+            },
+            // new ShowIdeaModalItem
+            // {
+            //     Title = "Стек технологий",
+            //     Data = skills
+            // }
+        ];
     }
 
     private string GetSkillClass(SkillType type) => type switch
@@ -305,4 +314,12 @@
         SkillType.Devops => "bg-danger-subtle text-danger",
         _ => string.Empty
     };
+
+    private string GetCollapseStyle(ShowIdeaModalItem item)
+    {
+        if (!item.IsExpanded)
+            return "height: 0px; overflow: hidden; transition: height 0.35s ease;";
+
+        return $"overflow: hidden; transition: height 0.35s ease;";
+    }
 }

@@ -1,10 +1,12 @@
 ﻿@namespace HITSBlazor.Pages.Ideas.IdeasList
+@using HITSBlazor.Utils.EnumStyles
+@using HITSBlazor.Utils.EnumTranslators
 
 <PageTitle>Портал ВШЦТ</PageTitle>
 
-<div class="bg-white" style="height: auto; display: flex; flex-direction: column; flex-wrap: nowrap; justify-content: flex-start; overflow-y: scroll; align-items: stretch;">
+<div class="bg-white ideas-page ideas-page-list">
     <div class="w-100 bg-white p-3">
-        <div class="w-100" style="display: flex; flex-direction: row; flex-wrap: nowrap; align-items: center; justify-content: space-between; gap: 16px;">
+        <div class="w-100 ideas-header">
             <span class="fs-2 text-primary">Список идей: @_ideas.Count</span>
             <div class="d-flex gap-3">
                 @if (showCreateIdeaButton)
@@ -45,15 +47,15 @@
                                 </td>
                                 <td class="@tableDataClass">
                                     <div class="@tableDataContentClass">
-                                        <div @onclick="@(() => ShowIdea(idea.Id))" style="cursor: pointer;">
+                                        <div @onclick="@(() => ShowIdea(idea.Id))" class="data-link">
                                             <div>@idea.Name</div>
                                         </div>
                                     </div>
                                 </td>
                                 <td class="@tableDataClass">
                                     <div class="@tableDataContentCenterClass">
-                                        <div class="px-2 py-1 rounded-4 @GetStatusStyle(idea.Status)">
-                                            <div>@GetStatusName(idea.Status)</div>
+                                        <div class="px-2 py-1 rounded-4 @idea.Status.GetStyle()">
+                                            <div>@idea.Status.GetTranslation()</div>
                                         </div>
                                     </div>
                                 </td>
@@ -80,30 +82,27 @@
                                 </td>
                                 <td class="@tableDataClass">
                                     <div class="justify-content-center @tableDataContentClass">
-                                        @if (idea.Rating is not null)
-                                        {
-                                            <div class="@GetRatingStyle((double)idea.Rating)">
-                                                <div>@idea.Rating</div>
-                                            </div>
-                                        }
-                                        else
-                                        {
-                                            <div>
-                                                <div></div>
-                                            </div>
-                                        }
+                                        <div class="@GetRatingStyle(idea.Rating)">
+                                            <div>@idea.Rating</div>
+                                        </div>
                                     </div>
                                 </td>
-                                <td class="py-3">
-                                    <div @onclick="ChangeDropdownMenuStatus"
-                                         class="float-end"
-                                         style="min-width: 24px; max-width: 24px; height: 24px; min-height: 24px; max-height: 24px; border-radius: 50%; width: 100%; cursor: pointer; display: flex; flex-direction: row; flex-wrap: nowrap; align-items: center; justify-content: center; transition: all .2s ease-out;">
-                                        <i class="bi bi-three-dots fs-5"></i>
-                                        <div class="dropdown-menu @(dropdownMenuIsShowed ? "show" : "")"
-                                             style="@(dropdownMenuIsShowed ? "position: absolute; inset: 0px auto auto 0px; margin: 0px; transform: translate(1504px, 234px);" : "")"
-                                             data-popper-placement="@(dropdownMenuIsShowed ? "bottom-start" : "")">
+                                <!--TODO: Меню не закрывается, лучше перенести логику в отдельный компонент-->
+                                <!--TODO: Также, меню не может быть выше родительского компонента, нужно что то с этим сделать, так как меню должно быть либо снизу, либо сверху-->
+                                <td class="py-3" style="position: relative;">
+                                    <div class="float-end idea-row-icon">
+                                        <i @onclick="@(async (e) => await ToggleIdeaManu(idea.Id, e))"
+                                           class="bi bi-three-dots fs-5 @(CheckCurrentMenu(idea.Id) ? "active" : string.Empty)"
+                                           aria-expanded="@CheckCurrentMenu(idea.Id)">
+                                        </i>
+                                        <div @onclick:stopPropagation
+                                             class="dropdown-menu @(CheckCurrentMenu(idea.Id) ? "idea-row-modal show" : string.Empty)"
+                                             style="@(CheckCurrentMenu(idea.Id) ? "margin-top: 2.5rem; margin-left: 1.0rem" : string.Empty)">
                                             <ul class="list-group list-group-flush">
-                                                <li @onclick="@(() => ShowIdea(idea.Id))" class="list-group-item list-group-item-action px-2 py-1">Просмотреть</li>
+                                                <li @onclick="@(() => ShowIdea(idea.Id))" 
+                                                    class="list-group-item list-group-item-action px-2 py-1">
+                                                    Просмотреть
+                                                </li>
                                                 <li class="list-group-item list-group-item-action px-2 py-1">Редактировать</li>
                                                 <li class="list-group-item list-group-item-action px-2 py-1 text-danger">Удалить</li>
                                             </ul>
@@ -115,33 +114,31 @@
                     }
                 </table>
             </div>
-            <div class="w-25 bg-white p-2 ms-2 border-start"
-                 style="display: flex; flex-direction: column; flex-wrap: nowrap; align-items: stretch; justify-content: flex-start; gap: 8px;">
-                 <div class="w-100">
-                     <span class="fs-6 fw-semibold">Статус</span>
-                    <div style="max-height: 192px; overflow-y: scroll;">
+            <div class="idea-filter w-25 bg-white p-2 ms-2 border-start">
+                <div class="w-100">
+                    <span class="fs-6 fw-semibold">Статус</span>
+                    <div class="idea-filter-choices">
                         @foreach (var status in AllStatuses)
                         {
-                            <div class="px-2 py-1 rounded-1" style="@filterChoiceStyle">
+                            <div class="px-2 py-1 rounded-1 idea-filet-choice">
                                 <div class="d-flex">
                                     <input type="checkbox"
-                                           checked="@SelectedStatuses.Contains(status.Value)"
-                                           @onchange="@(e => OnStatusChanged(status.Value, (bool)e.Value!))"
+                                           checked="@SelectedStatuses.Contains(status)"
+                                           @onchange="@(e => OnStatusChanged(status, (bool)e.Value!))"
                                            class="form-check-input" />
-                                    <span class="form-check-label ms-2">@status.Text</span>
+                                    <span class="form-check-label ms-2">@status.GetTranslation()</span>
                                 </div>
                             </div>
                         }
-                     </div>
-                 </div>
-                 <div class="w-100 d-flex justify-content-center">
+                    </div>
+                </div>
+                <div class="w-100 d-flex justify-content-center">
                     <button type="button" onclick="@ResetFilters" class="btn d-flex btn-danger">
                         <i class="bi bi-x-lg fs-5"></i>
-                         Сбросить фильтры
-                     </button>
-                 </div>
+                        Сбросить фильтры
+                    </button>
+                </div>
             </div>
         </div>
     </div>
 </div>
-

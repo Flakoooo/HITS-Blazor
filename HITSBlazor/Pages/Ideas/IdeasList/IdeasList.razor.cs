@@ -1,13 +1,13 @@
-﻿using HITSBlazor.Components.SelectActiveRoleModal;
-using HITSBlazor.Components.ShowIdeaModal;
+﻿using HITSBlazor.Components.ShowIdeaModal;
 using HITSBlazor.Models.Ideas.Entities;
 using HITSBlazor.Models.Ideas.Enums;
 using HITSBlazor.Services;
 using HITSBlazor.Services.Ideas;
 using HITSBlazor.Services.Modal;
-using HITSBlazor.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Web;
+using Microsoft.JSInterop;
 
 namespace HITSBlazor.Pages.Ideas.IdeasList
 {
@@ -25,6 +25,9 @@ namespace HITSBlazor.Pages.Ideas.IdeasList
         [Inject]
         private ModalService ModalService { get; set; } = null!;
 
+        [Inject]
+        private IJSRuntime JSRuntime { get; set; } = null!;
+
         [Parameter]
         public Guid? IdeaId { get; set; }
 
@@ -35,18 +38,17 @@ namespace HITSBlazor.Pages.Ideas.IdeasList
         private readonly string tableDataClass = "py-3 col align-self-center";
         private readonly string tableDataContentClass = "flex-wrap d-flex gap-1";
         private readonly string tableDataContentCenterClass = "justify-content-center align-items-center text-center flex-wrap d-flex gap-1";
-        private bool dropdownMenuIsShowed = false;
 
-        private readonly string filterChoiceStyle = "cursor: pointer; display: flex; flex-direction: row; flex-wrap: nowrap; align-items: center; justify-content: space-between; transition: background-color;";
+        private Guid? IdeaMenuId { get; set; }
 
-        private readonly List<StatusOption> AllStatuses =
+        private readonly List<IdeaStatusType> AllStatuses =
         [
-            new() { Value = IdeaStatusType.New,             Text = "Новая"              },
-            new() { Value = IdeaStatusType.OnEditing,       Text = "На редактировании"  },
-            new() { Value = IdeaStatusType.OnApproval,      Text = "На согласовании"    },
-            new() { Value = IdeaStatusType.OnConfirmation,  Text = "На утверждении"     },
-            new() { Value = IdeaStatusType.Confirmed,       Text = "Утверждена"         },
-            new() { Value = IdeaStatusType.OnMarket,        Text = "Опубликована"       }
+            IdeaStatusType.New,
+            IdeaStatusType.OnEditing,
+            IdeaStatusType.OnApproval,
+            IdeaStatusType.OnConfirmation,
+            IdeaStatusType.Confirmed,
+            IdeaStatusType.OnMarket
         ];
 
         private HashSet<IdeaStatusType> SelectedStatuses { get; set; } = [];
@@ -54,6 +56,11 @@ namespace HITSBlazor.Pages.Ideas.IdeasList
         protected override async Task OnInitializedAsync()
         {
             _ideas = await IdeasService.GetAllIdeasAsync();
+
+            await JSRuntime.InvokeVoidAsync(
+                "setupDropdownCloseHandler",
+                DotNetObjectReference.Create(this)
+            );
         }
 
         protected override async Task OnParametersSetAsync()
@@ -62,34 +69,12 @@ namespace HITSBlazor.Pages.Ideas.IdeasList
                 ShowIdea((Guid)IdeaId);
         }
 
-        private void ChangeDropdownMenuStatus() => dropdownMenuIsShowed = !dropdownMenuIsShowed;
-
-        private static string GetStatusStyle(IdeaStatusType status) => status switch
-        {
-            IdeaStatusType.New => "bg-primary-subtle text-primary",
-            IdeaStatusType.OnEditing or IdeaStatusType.OnApproval => "bg-warning-subtle text-warning",
-            IdeaStatusType.OnConfirmation => "bg-danger-subtle text-danger",
-            IdeaStatusType.Confirmed or IdeaStatusType.OnMarket => "bg-success-subtle text-success",
-            _ => ""
-        };
-
-        private static string GetStatusName(IdeaStatusType status) => status switch
-        {
-            IdeaStatusType.New => "Новая",
-            IdeaStatusType.OnEditing => "На редактировании",
-            IdeaStatusType.OnApproval => "На согласовании",
-            IdeaStatusType.OnConfirmation => "На утверждении",
-            IdeaStatusType.Confirmed => "Утверждена",
-            IdeaStatusType.OnMarket => "Опубликована",
-            _ => ""
-        };
-
-        private static string GetRatingStyle(double rating) => rating switch
+        private static string GetRatingStyle(double? rating) => rating switch
         {
             < 3.0 => "text-danger",
             >= 3.0 and < 4.0 => "text-warning",
             >= 4.0 => "text-success",
-            _ => ""
+            _ => string.Empty
         };
 
         private async Task OnStatusChanged(IdeaStatusType status, bool isChecked)
@@ -113,11 +98,28 @@ namespace HITSBlazor.Pages.Ideas.IdeasList
 
         private void ShowIdea(Guid ideaId)
         {
+            CloseDropdown();
             var modalParameters = new Dictionary<string, object>
             {
                 { "IdeaId", ideaId }
             };
             ModalService.Show<ShowIdeaModal>(parameters: modalParameters);
+        }
+
+        private bool CheckCurrentMenu(Guid ideaId) => IdeaMenuId == ideaId;
+
+        private async Task ToggleIdeaManu(Guid ideaId, MouseEventArgs args)
+        {
+            IdeaMenuId = CheckCurrentMenu(ideaId) ? null : ideaId;
+
+            StateHasChanged();
+        }
+
+        [JSInvokable]
+        private void CloseDropdown()
+        {
+            IdeaMenuId = null;
+            StateHasChanged();
         }
     }
 }
