@@ -1,4 +1,5 @@
 ﻿@namespace HITSBlazor.Pages.Ideas.IdeasList
+@using HITSBlazor.Components.IdeaActionMenu
 @using HITSBlazor.Utils.EnumStyles
 @using HITSBlazor.Utils.EnumTranslators
 
@@ -87,28 +88,9 @@
                                         </div>
                                     </div>
                                 </td>
+                                <IdeaActionMenu IdeaId="@idea.Id" OnView="ShowIdea" />
                                 <!--TODO: Меню не закрывается, лучше перенести логику в отдельный компонент-->
                                 <!--TODO: Также, меню не может быть выше родительского компонента, нужно что то с этим сделать, так как меню должно быть либо снизу, либо сверху-->
-                                <td class="py-3" style="position: relative;">
-                                    <div class="float-end idea-row-icon">
-                                        <i @onclick="@(async (e) => await ToggleIdeaManu(idea.Id, e))"
-                                           class="bi bi-three-dots fs-5 @(CheckCurrentMenu(idea.Id) ? "active" : string.Empty)"
-                                           aria-expanded="@CheckCurrentMenu(idea.Id)">
-                                        </i>
-                                        <div @onclick:stopPropagation
-                                             class="dropdown-menu @(CheckCurrentMenu(idea.Id) ? "idea-row-modal show" : string.Empty)"
-                                             style="@(CheckCurrentMenu(idea.Id) ? "margin-top: 2.5rem; margin-left: 1.0rem" : string.Empty)">
-                                            <ul class="list-group list-group-flush">
-                                                <li @onclick="@(() => ShowIdea(idea.Id))" 
-                                                    class="list-group-item list-group-item-action px-2 py-1">
-                                                    Просмотреть
-                                                </li>
-                                                <li class="list-group-item list-group-item-action px-2 py-1">Редактировать</li>
-                                                <li class="list-group-item list-group-item-action px-2 py-1 text-danger">Удалить</li>
-                                            </ul>
-                                        </div>
-                                    </div>
-                                </td>
                             </tr>
                         </tbody>
                     }

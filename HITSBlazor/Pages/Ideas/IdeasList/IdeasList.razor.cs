@@ -56,11 +56,6 @@ namespace HITSBlazor.Pages.Ideas.IdeasList
         protected override async Task OnInitializedAsync()
         {
             _ideas = await IdeasService.GetAllIdeasAsync();
-
-            await JSRuntime.InvokeVoidAsync(
-                "setupDropdownCloseHandler",
-                DotNetObjectReference.Create(this)
-            );
         }
 
         protected override async Task OnParametersSetAsync()
@@ -98,28 +93,11 @@ namespace HITSBlazor.Pages.Ideas.IdeasList
 
         private void ShowIdea(Guid ideaId)
         {
-            CloseDropdown();
             var modalParameters = new Dictionary<string, object>
             {
                 { "IdeaId", ideaId }
             };
             ModalService.Show<ShowIdeaModal>(parameters: modalParameters);
-        }
-
-        private bool CheckCurrentMenu(Guid ideaId) => IdeaMenuId == ideaId;
-
-        private async Task ToggleIdeaManu(Guid ideaId, MouseEventArgs args)
-        {
-            IdeaMenuId = CheckCurrentMenu(ideaId) ? null : ideaId;
-
-            StateHasChanged();
-        }
-
-        [JSInvokable]
-        private void CloseDropdown()
-        {
-            IdeaMenuId = null;
-            StateHasChanged();
         }
     }
 }
