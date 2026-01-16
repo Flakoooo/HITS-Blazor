@@ -97,7 +97,7 @@ namespace HITSBlazor.Pages.Ideas.IdeasList
             {
                 { "IdeaId", ideaId }
             };
-            ModalService.Show<ShowIdeaModal>(parameters: modalParameters);
+            ModalService.Show<ShowIdeaModal>(type: ModalType.RightSide, parameters: modalParameters);
         }
     }
 }

@@ -124,7 +124,7 @@ namespace HITSBlazor.Services
         {
             if (_authService.CurrentUser?.Role == null)
             {
-                _modalService.Show<SelectActiveRoleModal>();
+                _modalService.Show<SelectActiveRoleModal>(blockCloseModal: true);
             }
             else
             {
