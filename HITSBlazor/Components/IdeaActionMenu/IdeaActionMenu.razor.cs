@@ -3,7 +3,7 @@ using Microsoft.JSInterop;
 
 namespace HITSBlazor.Components.IdeaActionMenu
 {
-    public partial class IdeaActionMenu : IDisposable
+    public partial class IdeaActionMenu : IDisposable, IAsyncDisposable
     {
         [Parameter]
         public Guid IdeaId { get; set; }
@@ -15,9 +15,13 @@ namespace HITSBlazor.Components.IdeaActionMenu
         private IJSRuntime JSRuntime { get; set; } = null!;
 
         private ElementReference _containerRef;
+        private ElementReference _triggerRef;
         private DotNetObjectReference<IdeaActionMenu>? _dotNetRef;
         private bool IsOpen { get; set; }
         private bool _isDisposed;
+        private string _menuStyle = "";
+        private long? _resizeObserverId;
+        private bool _isMenuAbove = false;
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
@@ -25,17 +29,96 @@ namespace HITSBlazor.Components.IdeaActionMenu
             {
                 _dotNetRef?.Dispose();
                 _dotNetRef = DotNetObjectReference.Create(this);
+
+                await CalculateMenuPosition();
+
                 await RegisterClickOutside();
+
+                await RegisterResizeObserver();
             }
             else
             {
                 await UnregisterClickOutside();
+                await UnregisterResizeObserver();
             }
+        }
+
+        private async Task CalculateMenuPosition()
+        {
+            try
+            {
+                var positionInfo = await JSRuntime.InvokeAsync<PositionInfo>(
+                    "dropdownManager.calculateMenuPosition",
+                    _triggerRef
+                );
+
+                if (positionInfo == null) return;
+
+                _isMenuAbove = positionInfo.ShowAbove;
+
+                var styleBuilder = new System.Text.StringBuilder();
+                styleBuilder.Append("position: absolute; ");
+
+                if (_isMenuAbove)
+                {
+                    styleBuilder.Append($"bottom: 100%; ");
+                    styleBuilder.Append($"left: {positionInfo.Left}px; ");
+                    styleBuilder.Append("margin-bottom: 5px; ");
+                }
+                else
+                {
+                    styleBuilder.Append($"top: 100%; ");
+                    styleBuilder.Append($"left: {positionInfo.Left}px; ");
+                    styleBuilder.Append("margin-top: 5px; ");
+                }
+
+                styleBuilder.Append($"max-width: min(200px, {positionInfo.MaxWidth}px); ");
+                styleBuilder.Append("z-index: 1000; ");
+
+                _menuStyle = styleBuilder.ToString();
+                StateHasChanged();
+            }
+            catch (Exception)
+            {
+                _menuStyle = "position: absolute; top: 100%; left: 0; margin-top: 5px; z-index: 1000;";
+            }
+        }
+
+        private async Task RegisterResizeObserver()
+        {
+            try
+            {
+                if (_resizeObserverId is null && _dotNetRef is not null)
+                {
+                    _resizeObserverId = await JSRuntime.InvokeAsync<long>(
+                        "dropdownManager.registerResizeObserver",
+                        _containerRef,
+                        _dotNetRef
+                    );
+                }
+            }
+            catch { }
+        }
+
+        private async Task UnregisterResizeObserver()
+        {
+            try
+            {
+                if (_resizeObserverId.HasValue)
+                {
+                    await JSRuntime.InvokeVoidAsync(
+                        "dropdownManager.unregisterResizeObserver",
+                        _resizeObserverId.Value
+                    );
+                    _resizeObserverId = null;
+                }
+            }
+            catch { }
         }
 
         private async Task RegisterClickOutside()
         {
-            if (_isDisposed || _dotNetRef == null) return;
+            if (_isDisposed || _dotNetRef is null) return;
 
             try
             {
@@ -45,10 +128,7 @@ namespace HITSBlazor.Components.IdeaActionMenu
                     _dotNetRef
                 );
             }
-            catch (ObjectDisposedException)
-            {
-                
-            }
+            catch (ObjectDisposedException) { }
         }
 
         private async Task UnregisterClickOutside()
@@ -60,39 +140,58 @@ namespace HITSBlazor.Components.IdeaActionMenu
                     _containerRef
                 );
             }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error unregistering click outside: {ex.Message}");
-            }
+            catch { }
         }
 
-        private void ToggleMenu() => IsOpen = !IsOpen;
+        private async Task ToggleMenu()
+        {
+            IsOpen = !IsOpen;
+            if (!IsOpen) _menuStyle = "";
+
+            await Task.CompletedTask;
+        }
 
         [JSInvokable]
-        public void CloseDropdown()
+        public async Task CloseDropdown()
         {
             if (_isDisposed) return;
 
             IsOpen = false;
+            _menuStyle = "";
+            await UnregisterResizeObserver();
             StateHasChanged();
         }
 
-        private async void OnViewClick()
+        [JSInvokable]
+        public async Task OnViewportChange()
+        {
+            if (IsOpen && !_isDisposed)
+                await CalculateMenuPosition();
+        }
+
+        private async Task OnViewClick()
         {
             IsOpen = false;
+            _menuStyle = "";
             await OnView.InvokeAsync(IdeaId);
         }
 
-        private string GetMenuPosition() 
-            => IsOpen ? "margin-top: 2.5rem; margin-left: 1.0rem;" : string.Empty;
+        private string GetMenuStyle() => _menuStyle;
 
         public void Dispose()
         {
+            DisposeAsync().AsTask().Wait();
+        }
+
+        public async ValueTask DisposeAsync()
+        {
+            if (_isDisposed) return;
             _isDisposed = true;
 
             try
             {
-                _ = UnregisterClickOutside();
+                await UnregisterClickOutside();
+                await UnregisterResizeObserver();
             }
             catch { }
 

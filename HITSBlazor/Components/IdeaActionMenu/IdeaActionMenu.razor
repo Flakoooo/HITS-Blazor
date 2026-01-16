@@ -2,13 +2,14 @@
 
 <td class="py-3" style="position: relative;" @ref="_containerRef">
     <div class="float-end idea-row-icon">
-        <i @onclick="@ToggleMenu"
+        <i @ref="_triggerRef"
+           @onclick="@ToggleMenu"
            class="bi bi-three-dots fs-5 @(IsOpen ? "active" : string.Empty)"
            aria-expanded="@IsOpen">
         </i>
         <div @onclick:stopPropagation
              class="dropdown-menu @(IsOpen ? "idea-row-modal show" : string.Empty)"
-             style="margin-top: 2.5rem; margin-left: 1.0rem;">
+             style="@GetMenuStyle()">
             <ul class="list-group list-group-flush">
                 <li @onclick="@OnViewClick"
                     class="list-group-item list-group-item-action px-2 py-1">
