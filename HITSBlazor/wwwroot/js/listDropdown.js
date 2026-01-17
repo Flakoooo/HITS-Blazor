@@ -1,4 +1,4 @@
-﻿window.dropdownManager = {
+﻿window.listDropdown = {
     registerClickOutside: function (element, dotNetHelper) {
         element._dotNetHelper = dotNetHelper;
 

@@ -29,7 +29,7 @@ namespace HITSBlazor.Components.InputDropdowns.SkillDropdown
             if (firstRender)
             {
                 dotNetHelper = DotNetObjectReference.Create(this);
-                await JSRuntime.InvokeVoidAsync("dropdownManager.registerClickOutside",
+                await JSRuntime.InvokeVoidAsync("listDropdown.registerClickOutside",
                     inputRef, dotNetHelper);
 
                 FilteredSkills = [.. AllSkills];
@@ -98,7 +98,7 @@ namespace HITSBlazor.Components.InputDropdowns.SkillDropdown
         {
             if (dotNetHelper != null)
             {
-                await JSRuntime.InvokeVoidAsync("dropdownManager.unregisterClickOutside", inputRef);
+                await JSRuntime.InvokeVoidAsync("listDropdown.unregisterClickOutside", inputRef);
                 dotNetHelper.Dispose();
             }
         }

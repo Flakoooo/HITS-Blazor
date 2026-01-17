@@ -34,7 +34,7 @@ namespace HITSBlazor.Components.InputDropdowns.ContactPersonDropdown
             if (firstRender)
             {
                 dotNetHelper = DotNetObjectReference.Create(this);
-                await JSRuntime.InvokeVoidAsync("dropdownManager.registerClickOutside", inputRef, dotNetHelper);
+                await JSRuntime.InvokeVoidAsync("listDropdown.registerClickOutside", inputRef, dotNetHelper);
                 FilteredContactPersons = [.. AllContactPersons];
             }
         }
@@ -84,7 +84,7 @@ namespace HITSBlazor.Components.InputDropdowns.ContactPersonDropdown
         {
             if (dotNetHelper != null)
             {
-                await JSRuntime.InvokeVoidAsync("dropdownManager.unregisterClickOutside", inputRef);
+                await JSRuntime.InvokeVoidAsync("listDropdown.unregisterClickOutside", inputRef);
                 dotNetHelper.Dispose();
             }
         }

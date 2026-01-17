@@ -1,4 +1,4 @@
-﻿window.dropdownManager = (function () {
+﻿window.menuDropdown = (function () {
     const openMenus = new Map();
     let clickOutsideHandler = null;
 

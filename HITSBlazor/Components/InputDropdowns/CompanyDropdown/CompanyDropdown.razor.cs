@@ -32,7 +32,7 @@ namespace HITSBlazor.Components.InputDropdowns.CompanyDropdown
             if (firstRender)
             {
                 dotNetHelper = DotNetObjectReference.Create(this);
-                await JSRuntime.InvokeVoidAsync("dropdownManager.registerClickOutside", inputRef, dotNetHelper);
+                await JSRuntime.InvokeVoidAsync("listDropdown.registerClickOutside", inputRef, dotNetHelper);
                 FilteredCompanies = [.. AllCompanies];
             }
         }
@@ -82,7 +82,7 @@ namespace HITSBlazor.Components.InputDropdowns.CompanyDropdown
         {
             if (dotNetHelper != null)
             {
-                await JSRuntime.InvokeVoidAsync("dropdownManager.unregisterClickOutside", inputRef);
+                await JSRuntime.InvokeVoidAsync("listDropdown.unregisterClickOutside", inputRef);
                 dotNetHelper.Dispose();
             }
         }

@@ -45,7 +45,7 @@ namespace HITSBlazor.Components.IdeaActionMenu
             try
             {
                 var shouldShowAbove = await JSRuntime.InvokeAsync<bool>(
-                    "dropdownManager.shouldShowAbove",
+                    "menuDropdown.shouldShowAbove",
                     _triggerRef
                 );
 
@@ -84,7 +84,7 @@ namespace HITSBlazor.Components.IdeaActionMenu
             try
             {
                 await JSRuntime.InvokeVoidAsync(
-                    "dropdownManager.registerClickOutside",
+                    "menuDropdown.registerClickOutside",
                     _containerRef,
                     _dotNetRef,
                     IdeaId.ToString()
@@ -98,7 +98,7 @@ namespace HITSBlazor.Components.IdeaActionMenu
             try
             {
                 await JSRuntime.InvokeVoidAsync(
-                    "dropdownManager.unregisterClickOutside",
+                    "menuDropdown.unregisterClickOutside",
                     _containerRef
                 );
             }
@@ -110,7 +110,7 @@ namespace HITSBlazor.Components.IdeaActionMenu
             IsOpen = !IsOpen;
 
             if (IsOpen)
-                await JSRuntime.InvokeVoidAsync("dropdownManager.closeOtherMenus", IdeaId.ToString());
+                await JSRuntime.InvokeVoidAsync("menuDropdown.closeOtherMenus", IdeaId.ToString());
 
             await Task.CompletedTask;
         }
