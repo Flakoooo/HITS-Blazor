@@ -1,6 +1,7 @@
 ﻿@namespace HITSBlazor.Components.InputDropdowns.SkillDropdown
 @using HITSBlazor.Models.Common.Entities
 @using HITSBlazor.Models.Common.Enums
+@using HITSBlazor.Utils.EnumStyles
 
 <div class="w-25" tabindex="-1">
     <div class="w-100">
@@ -56,7 +57,7 @@
             <div class="d-flex flex-wrap gap-1">
                 @foreach (var skill in SelectedSkills)
                 {
-                    <div class="px-2 py-1 rounded d-flex gap-1 @SkillTheme align-items-center">
+                    <div class="px-2 py-1 rounded d-flex gap-1 @skill.Type.GetStyle() align-items-center">
                         <span class="fs-6">@skill.Name</span>
                         <i @onclick="@(() => RemoveSkill(skill))"
                            class="bi bi-x-lg"

@@ -1,5 +1,5 @@
 ﻿using HITSBlazor.Components.LeftSideNavigation;
-using HITSBlazor.Components.SelectActiveRoleModal;
+using HITSBlazor.Components.Modals.SelectActiveRoleModal;
 using HITSBlazor.Models.Users.Enums;
 using HITSBlazor.Services.Auth;
 using HITSBlazor.Services.Markets;

@@ -1,4 +1,5 @@
-﻿using HITSBlazor.Models.Users.Enums;
+﻿using HITSBlazor.Components.Modals.SelectActiveRoleModal;
+using HITSBlazor.Models.Users.Enums;
 using HITSBlazor.Services;
 using HITSBlazor.Services.Auth;
 using HITSBlazor.Services.Modal;
@@ -135,7 +136,7 @@ namespace HITSBlazor.Components.LeftSideNavigation
 
         private void ShowRoleModal()
         {
-            ModalService.Show<HITSBlazor.Components.SelectActiveRoleModal.SelectActiveRoleModal>(blockCloseModal: true);
+            ModalService.Show<SelectActiveRoleModal>(blockCloseModal: true);
         }
 
         public void Dispose()

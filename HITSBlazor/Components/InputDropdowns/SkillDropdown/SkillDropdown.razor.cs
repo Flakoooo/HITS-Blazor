@@ -1,5 +1,6 @@
 ﻿using HITSBlazor.Models.Common.Entities;
 using HITSBlazor.Models.Common.Enums;
+using HITSBlazor.Utils.EnumTranslators;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
@@ -22,14 +23,6 @@ namespace HITSBlazor.Components.InputDropdowns.SkillDropdown
         private string searchText = "";
         private List<Skill> FilteredSkills { get; set; } = [];
         private DotNetObjectReference<SkillDropdown>? dotNetHelper;
-        private string SkillTheme => SkillType switch
-        {
-            SkillType.Language => "bg-success-subtle text-success",
-            SkillType.Framework => "bg-info-subtle text-info",
-            SkillType.Database => "bg-warning-subtle text-warning",
-            SkillType.Devops => "bg-danger-subtle text-danger",
-            _ => ""
-        };
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
@@ -44,18 +37,7 @@ namespace HITSBlazor.Components.InputDropdowns.SkillDropdown
         }
 
         private string GetPlaceholder()
-        {
-            var skillTypeName = SkillType switch
-            {
-                SkillType.Language => "Языки разработки",
-                SkillType.Framework => "Фреймворки",
-                SkillType.Database => "Базы данных",
-                SkillType.Devops => "DevOps технологии",
-                _ => "Навыки"
-            };
-
-            return $"{skillTypeName}{(SelectedSkills.Count > 0 ? $" ({SelectedSkills.Count})" : "")}";
-        }
+            => $"{SkillType.GetTranslation()}{(SelectedSkills.Count > 0 ? $" ({SelectedSkills.Count})" : "")}";
 
         private async Task OpenDropdown()
         {

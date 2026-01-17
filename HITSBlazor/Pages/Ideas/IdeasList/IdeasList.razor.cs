@@ -1,4 +1,4 @@
-﻿using HITSBlazor.Components.ShowIdeaModal;
+﻿using HITSBlazor.Components.Modals.ShowIdeaModal;
 using HITSBlazor.Models.Ideas.Entities;
 using HITSBlazor.Models.Ideas.Enums;
 using HITSBlazor.Services;
@@ -62,14 +62,6 @@ namespace HITSBlazor.Pages.Ideas.IdeasList
             if (IdeaId is not null)
                 ShowIdea((Guid)IdeaId);
         }
-
-        private static string GetRatingStyle(double? rating) => rating switch
-        {
-            < 3.0 => "text-danger",
-            >= 3.0 and < 4.0 => "text-warning",
-            >= 4.0 => "text-success",
-            _ => string.Empty
-        };
 
         private async Task OnStatusChanged(IdeaStatusType status, bool isChecked)
         {

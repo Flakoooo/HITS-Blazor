@@ -20,5 +20,8 @@ namespace HITSBlazor.Utils.EnumTranslators
             => Translations.TryGetValue(role, out var translation)
                 ? translation
                 : role.ToString();
+
+        public static string GetTranslation(this RoleType? role)
+            => role is null ? string.Empty : role.Value.GetTranslation();
     }
 }

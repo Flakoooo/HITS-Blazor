@@ -73,7 +73,7 @@
                     <i class="bi bi-circle-fill fs-6"></i>
                     @if (isHovered)
                     {
-                        <span>@(CurrentRole is null ? CurrentRole : ((RoleType)CurrentRole).GetTranslation())</span>
+                        <span>@CurrentRole.GetTranslation()</span>
                     }
                 </button>
                 <button @onclick="@(async () => await AuthService.LogoutAsync())"

@@ -18,5 +18,8 @@ namespace HITSBlazor.Utils.EnumStyles
             => Styles.TryGetValue(status, out var style)
                 ? style
                 : string.Empty;
+
+        public static string GetStyle(this IdeaStatusType? status)
+            => status is null ? string.Empty : status.Value.GetStyle();
     }
 }

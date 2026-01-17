@@ -18,5 +18,8 @@ namespace HITSBlazor.Utils.EnumTranslators
             => Translations.TryGetValue(status, out var translation)
                 ? translation
                 : status.ToString();
+
+        public static string GetTranslation(this IdeaStatusType? status)
+            => status is null ? string.Empty : status.Value.GetTranslation();
     }
 }

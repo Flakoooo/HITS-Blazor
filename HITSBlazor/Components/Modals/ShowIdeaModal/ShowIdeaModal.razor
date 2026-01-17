@@ -1,13 +1,16 @@
-﻿@namespace HITSBlazor.Components.ShowIdeaModal
+﻿@namespace HITSBlazor.Components.Modals.ShowIdeaModal
 @using HITSBlazor.Components.Placeholder
 @using HITSBlazor.Models.Common.Entities
 @using HITSBlazor.Models.Common.Enums
 @using HITSBlazor.Models.Ideas.Entities
 @using HITSBlazor.Models.Users.Entities
+@using HITSBlazor.Models.Users.Enums
 @using HITSBlazor.Services.Auth
 @using HITSBlazor.Services.IdeaRatings
 @using HITSBlazor.Services.IdeaSkills
 @using HITSBlazor.Services.Ideas
+@using HITSBlazor.Services.Modal
+@using HITSBlazor.Utils.EnumTranslators
 
 <div class="idea-modal p-3 h-100 overflow-y-scroll" @onclick:stopPropagation="true">
     <div class="w-75" style="@placeholder_style">
@@ -24,7 +27,9 @@
         else
         {
             <div style="display: flex; flex-direction: row; flex-wrap: nowrap; align-items: stretch; justify-content: flex-start; gap: 16px;">
-                <button class="btn d-flex btn-primary">
+                <button type="button"
+                        @onclick="@(() => ModalService.Close())"
+                        class="btn d-flex btn-primary">
                     <i class="bi bi-backspace-fill fs-5"></i>
                     Назад
                 </button>
@@ -177,7 +182,7 @@
         else
         {
             <span class="p-2 bg-primary rounded-top fs-4 text-center text-white">
-                @CurrentIdea.Status
+                @CurrentIdea.Status.GetTranslation()
             </span>
             <div class="w-100 pb-3 px-3"
                  style="@leftSideIdeaStyle flex-direction: column; align-items: stretch; gap: 16px;">
@@ -218,7 +223,7 @@
                     </span>
                     <div class="pt-2" style="@leftSideIdeaStyle @leftSideIdeaDataStyle">
                         <i class="bi bi-circle-fill text-success fs-3 opacity-50"></i>
-                        <span class="fs-6 text-primary">@CurrentUser?.Role</span>
+                        <span class="fs-6 text-primary">@CurrentUser?.Role.GetTranslation()</span>
                     </div>
                 </div>
                 <button type="button" class="btn d-flex btn-primary">
@@ -241,6 +246,9 @@
 
     [Inject]
     private IIdeaRatingService IdeaRatingService { get; set; } = null!;
+
+    [Inject]
+    private ModalService ModalService { get; set; } = null!;
 
     [Parameter]
     public Guid IdeaId { get; set; }
