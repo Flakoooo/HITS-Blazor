@@ -1,0 +1,32 @@
+﻿.new-idea, .idea-form-submit-buttons {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: center;
+}
+
+.idea-form {
+    align-items: center;
+    gap: 12px;
+}
+
+.idea-form-submit-buttons {
+    gap: 16px;
+}
+
+.hint {
+    cursor: pointer;
+    display: inline-block;
+    vertical-align: middle;
+    color: #007bff;
+}
+
+.stack-categories {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: flex-start;
+    justify-content: stretch;
+    gap: 16px;
+}

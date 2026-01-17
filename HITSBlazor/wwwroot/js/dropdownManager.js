@@ -36,7 +36,6 @@
 
         clickOutsideHandler = function (event) {
             if (!isInsideDropdown(event.target)) {
-                // Закрываем все открытые меню
                 openMenus.forEach((helper, id) => {
                     if (helper) {
                         try {
@@ -78,7 +77,6 @@
             }
         });
 
-        // Оставляем только текущее меню
         const currentHelper = openMenus.get(currentMenuId);
         openMenus.clear();
         if (currentHelper) {

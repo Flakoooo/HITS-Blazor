@@ -1,0 +1,47 @@
+﻿.ideas-list {
+    overflow-y: scroll;
+    align-items: stretch;
+}
+
+.ideas-header {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.data-link {
+    cursor: pointer;
+}
+
+    .data-link:hover {
+        text-decoration: underline;
+        text-underline-offset: 4px;
+        text-decoration-thickness: 1px
+    }
+
+.idea-filter {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: stretch;
+    justify-content: flex-start;
+    gap: 8px;
+}
+
+.idea-filter-choices {
+    max-height: 192px;
+    overflow-y: scroll;
+}
+
+.idea-filet-choice {
+    cursor: pointer;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: space-between;
+    transition: background-color;
+}

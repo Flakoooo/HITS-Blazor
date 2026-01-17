@@ -79,7 +79,6 @@ namespace HITSBlazor.Services
             CurrentModule = await GetCurrentMenuItem(relativePath);
             CurrentPage = GetCurrentSubItem(relativePath);
 
-            Console.WriteLine("event call");
             OnNavigationChanged?.Invoke();
         }
 

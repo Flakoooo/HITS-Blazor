@@ -24,9 +24,6 @@ namespace HITSBlazor.Pages.Ideas.IdeasList
         [Inject]
         private ModalService ModalService { get; set; } = null!;
 
-        [Inject]
-        private IJSRuntime JSRuntime { get; set; } = null!;
-
         [Parameter]
         public Guid? IdeaId { get; set; }
 
@@ -37,18 +34,6 @@ namespace HITSBlazor.Pages.Ideas.IdeasList
         private readonly string tableDataClass = "py-3 col align-self-center";
         private readonly string tableDataContentClass = "flex-wrap d-flex gap-1";
         private readonly string tableDataContentCenterClass = "justify-content-center align-items-center text-center flex-wrap d-flex gap-1";
-
-        private Guid? IdeaMenuId { get; set; }
-
-        private readonly List<IdeaStatusType> AllStatuses =
-        [
-            IdeaStatusType.New,
-            IdeaStatusType.OnEditing,
-            IdeaStatusType.OnApproval,
-            IdeaStatusType.OnConfirmation,
-            IdeaStatusType.Confirmed,
-            IdeaStatusType.OnMarket
-        ];
 
         private HashSet<IdeaStatusType> SelectedStatuses { get; set; } = [];
 

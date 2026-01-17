@@ -1,11 +1,12 @@
 ﻿@namespace HITSBlazor.Pages.Ideas.IdeasList
 @using HITSBlazor.Components.IdeaActionMenu
+@using HITSBlazor.Models.Ideas.Enums
 @using HITSBlazor.Utils.EnumStyles
 @using HITSBlazor.Utils.EnumTranslators
 
 <PageTitle>Портал ВШЦТ</PageTitle>
 
-<div class="bg-white ideas-page ideas-page-list">
+<div class="bg-white ideas-list page-content-with-header">
     <div class="w-100 bg-white p-3">
         <div class="w-100 ideas-header">
             <span class="fs-2 text-primary">Список идей: @_ideas.Count</span>
@@ -98,7 +99,7 @@
                 <div class="w-100">
                     <span class="fs-6 fw-semibold">Статус</span>
                     <div class="idea-filter-choices">
-                        @foreach (var status in AllStatuses)
+                        @foreach (var status in Enum.GetValues<IdeaStatusType>())
                         {
                             <div class="px-2 py-1 rounded-1 idea-filet-choice">
                                 <div class="d-flex">
