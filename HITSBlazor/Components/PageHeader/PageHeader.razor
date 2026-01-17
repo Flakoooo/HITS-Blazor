@@ -3,9 +3,11 @@
 @using HITSBlazor.Models.Users.Enums
 @using HITSBlazor.Services
 @using HITSBlazor.Services.Auth
+@using HITSBlazor.Services.Modal
 @using HITSBlazor.Utils
 @using HITSBlazor.Utils.EnumTranslators
 @inject IAuthService AuthService
+@inject ModalService ModalService
 @implements IDisposable
 
 <div class="bg-white border-bottom w-100" 
@@ -22,8 +24,8 @@
                 <div class="fw-semibold" style="width: fit-content; cursor: pointer;">
                     <span class="fs-6">@CurrentUser?.FirstName @CurrentUser?.LastName</span>
                 </div>
-                <!-- TODO: При нажатии вызывать окно выбора АКТИВНОЙ роли -->
                 <button type="button" 
+                        @onclick="ShowRoleModal"
                         class="btn d-flex btn-outline-success btn-sm rounded-4 py-1" style="width: fit-content;">
                     <i class="bi bi-circle-fill fs-6"></i>
                     @(CurrentRole is null ? CurrentRole : ((RoleType)CurrentRole).GetTranslation())
@@ -61,12 +63,17 @@
         }
     }
 
-    public void AuthStateChanged() => CurrentUser = AuthService.CurrentUser;
+    private void AuthStateChanged() => CurrentUser = AuthService.CurrentUser;
 
-    public void RoleStateChanged(RoleType? role)
+    private void RoleStateChanged(RoleType? role)
     {
         CurrentRole = role;
         StateHasChanged();
+    }
+
+    private void ShowRoleModal()
+    {
+        ModalService.Show<HITSBlazor.Components.SelectActiveRoleModal.SelectActiveRoleModal>(blockCloseModal: true);
     }
 
     public void Dispose()

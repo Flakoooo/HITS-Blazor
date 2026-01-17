@@ -7,7 +7,7 @@
 @if (IsVisible)
 {
     <div @onclick="CloseModalIfAllowed"
-         class="modal-layout @(IsClosing ? "modal-layout-leave-active" : "modal-layout-enter-active")">
+         class="modal-layout modal-layout-@(IsClosing ? "leave" : "enter")-active">
         @if (CurrentComponentType != null)
         {
             <DynamicComponent Type="@CurrentComponentType"

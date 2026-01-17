@@ -1,6 +1,7 @@
 ﻿using HITSBlazor.Models.Users.Enums;
 using HITSBlazor.Services;
 using HITSBlazor.Services.Auth;
+using HITSBlazor.Services.Modal;
 using Microsoft.AspNetCore.Components;
 
 namespace HITSBlazor.Components.LeftSideNavigation
@@ -12,6 +13,9 @@ namespace HITSBlazor.Components.LeftSideNavigation
 
         [Inject]
         private NavigationService NavigationService { get; set; } = null!;
+
+        [Inject]
+        private ModalService ModalService { get; set; } = null!;
 
         private RoleType? CurrentRole { get; set; } = null;
 
@@ -36,15 +40,26 @@ namespace HITSBlazor.Components.LeftSideNavigation
 
         private async void RoleStateChanged(RoleType? role)
         {
+            isLoading = true;
+            StateHasChanged();
+
             CurrentRole = role;
-            _menuItems = NavigationService.MenuItems;
             UpdateActiveState();
+
+            isLoading = false;
             StateHasChanged();
         }
 
         private void HandleNavigationChanged()
         {
+            isLoading = true;
+            StateHasChanged();
+
+            _menuItems = NavigationService.MenuItems;
             UpdateActiveState();
+
+            isLoading = false;
+            StateHasChanged();
         }
 
         private void UpdateActiveState()
@@ -116,6 +131,11 @@ namespace HITSBlazor.Components.LeftSideNavigation
             if (parentItem == null || subItem == null) return;
 
             await NavigationService.NavigateToAsync($"{parentItem.BaseUrl}{subItem.Url}");
+        }
+
+        private void ShowRoleModal()
+        {
+            ModalService.Show<HITSBlazor.Components.SelectActiveRoleModal.SelectActiveRoleModal>(blockCloseModal: true);
         }
 
         public void Dispose()

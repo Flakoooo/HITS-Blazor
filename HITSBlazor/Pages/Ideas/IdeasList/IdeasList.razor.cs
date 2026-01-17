@@ -6,7 +6,6 @@ using HITSBlazor.Services.Ideas;
 using HITSBlazor.Services.Modal;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
 
 namespace HITSBlazor.Pages.Ideas.IdeasList

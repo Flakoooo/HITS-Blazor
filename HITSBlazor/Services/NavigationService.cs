@@ -7,7 +7,6 @@ using HITSBlazor.Services.Modal;
 using HITSBlazor.Services.Projects;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Routing;
-using System;
 
 namespace HITSBlazor.Services
 {
@@ -37,7 +36,6 @@ namespace HITSBlazor.Services
             _logger = logger;
 
             _authService.OnActiveRoleChanged += OnActiveRoleChanged;
-
             _navigationManager.LocationChanged += OnLocationChanged;
         }
 
@@ -81,6 +79,7 @@ namespace HITSBlazor.Services
             CurrentModule = await GetCurrentMenuItem(relativePath);
             CurrentPage = GetCurrentSubItem(relativePath);
 
+            Console.WriteLine("event call");
             OnNavigationChanged?.Invoke();
         }
 
@@ -88,9 +87,7 @@ namespace HITSBlazor.Services
         {
             try
             {
-                var uri = new Uri(fullUrl);
-
-                var pathAndQuery = uri.PathAndQuery;
+                var pathAndQuery = new Uri(fullUrl).PathAndQuery;
 
                 var baseUri = new Uri(_navigationManager.BaseUri);
                 if (pathAndQuery.StartsWith(baseUri.AbsolutePath))
@@ -134,8 +131,19 @@ namespace HITSBlazor.Services
 
         private async void OnActiveRoleChanged(RoleType? role)
         {
+            await Task.Delay(100);
             await GetSortedMenuItem();
-            await NavigateToAsync(DEFAULT_URL);
+            string url = DEFAULT_URL;
+            var nav = MenuItems.FirstOrDefault();
+            if (nav is not null)
+            {
+                var subNav = nav.SubItems.FirstOrDefault();
+                if (subNav is not null)
+                    url = $"{nav.BaseUrl}{subNav.Url}";
+                else if (nav.SubItems.Count == 0)
+                    url = nav.BaseUrl!;
+            }
+            await NavigateToAsync(url);
         }
 
         public async Task GetSortedMenuItem()
