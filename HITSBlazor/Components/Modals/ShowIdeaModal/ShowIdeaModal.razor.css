@@ -1,25 +1,49 @@
-﻿.idea-modal {
-    position: relative;
-    width: 80%;
-    border-top-left-radius: 8px;
-    border-bottom-left-radius: 8px;
-    background-color: #e9e9e9;
+﻿.idea-modal-side {
+    height: fit-content;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: stretch;
+    justify-content: flex-start;
+    gap: 16px;
+}
+
+.idea-info {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: stretch;
+    justify-content: flex-start;
+    gap: 16px;
+}
+
+.idea-sub-info {
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
+    align-items: center;
     justify-content: flex-start;
-    gap: 16px;
-    align-self: stretch;
-    justify-self: flex-end;
-    transition: all .3s ease-out;
+    gap: 8px;
 }
 
-.modal-layout-enter-active .idea-modal {
-    transform: translateX(0);
-    animation: slideInRight 0.3s ease-out;
+.collapse-controller {
+    border-radius: 0;
+    background-color: #fff;
+    color: #0d6efd;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: flex-start;
 }
 
-.modal-layout-leave-active .idea-modal {
-    transform: translateX(100%);
-    animation: slideOutRight 0.3s ease-out;
+.advertisement {
+    width: 400px;
+}
+
+.advertisement-header {
+    transition: background-color 5s ease-out;
+}
+
+.current-user-advertisement {
+    justify-self: end;
 }

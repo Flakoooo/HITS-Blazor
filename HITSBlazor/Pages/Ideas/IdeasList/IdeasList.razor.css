@@ -12,16 +12,6 @@
     gap: 16px;
 }
 
-.data-link {
-    cursor: pointer;
-}
-
-    .data-link:hover {
-        text-decoration: underline;
-        text-underline-offset: 4px;
-        text-decoration-thickness: 1px
-    }
-
 .idea-filter {
     display: flex;
     flex-direction: column;

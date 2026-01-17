@@ -62,3 +62,13 @@ input[type="checkbox"] {
     display: flex;
     flex-wrap: nowrap;
 }
+
+.data-link {
+    cursor: pointer;
+}
+
+    .data-link:hover {
+        text-decoration: underline;
+        text-underline-offset: 4px;
+        text-decoration-thickness: 1px
+    }
