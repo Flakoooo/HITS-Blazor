@@ -41,7 +41,7 @@ namespace HITSBlazor.Utils.Mocks.Tests
             };
 
             return CreateTestQuestion(
-                10 * questionModuleNumber + questionNumber,
+                10 * questionModuleNumber + questionNumber - 1,
                 questionModuleNumber,
                 BelbinTestName,
                 $"{BelbinTestName}QuestionModule{questionModuleNumber}Number{questionNumber}",

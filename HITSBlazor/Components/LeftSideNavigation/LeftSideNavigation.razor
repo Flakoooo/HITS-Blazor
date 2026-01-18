@@ -27,6 +27,7 @@
 
                     <div class="@(isHovered ? "nav-item w-100" : "nav-item")"
                          style="@(isHovered ? "border-radius: 6px; transition: background-color .15s ease-out;" : string.Empty)">
+                        <!--TODO: Переделать на гиперссылку, чтобы открывать в других окнах-->
                         <button type="button"
                                 @onclick="() => SelectMenuItem(item.Id)"
                                 class="@GetItemButtonClass(item.Id)"

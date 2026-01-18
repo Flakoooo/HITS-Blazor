@@ -13,6 +13,8 @@ using HITSBlazor.Services.Markets;
 using HITSBlazor.Services.Projects;
 using HITSBlazor.Services.IdeaSkills;
 using HITSBlazor.Services.IdeaRatings;
+using HITSBlazor.Services.Profiles;
+using HITSBlazor.Services.Tests;
 
 
 
@@ -88,6 +90,12 @@ namespace HITSBlazor
 
             //Market
             builder.Services.AddScoped<IMarketService, MockMarketService>();
+
+            //Tests
+            builder.Services.AddScoped<ITestService, MockTestService>();
+
+            //Profile
+            builder.Services.AddScoped<IProfileService, MockProfileService>();
 
             // Notification
             builder.Services.AddScoped<INotificationService, MockNotificationService>();

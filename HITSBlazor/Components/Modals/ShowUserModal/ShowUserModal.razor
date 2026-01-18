@@ -1,49 +1,380 @@
 ﻿@namespace HITSBlazor.Components.Modals.ShowUserModal
+@using HITSBlazor.Components.Placeholder
+@using HITSBlazor.Utils.EnumStyles
+@using HITSBlazor.Utils.EnumTranslators
 
-<div class="right-side-modal p-3 overflow-y-scroll">
-    <div class="w-100">
-        <div class="right-side-modal-header mb-3">
-            <button type="button" class="btn d-flex btn-primary">
-                <i class="bi bi-backspace-fill fs-5"></i>
-                Назад
-            </button>
-            <span class="p-2 w-100 bg-white rounded-3 fs-4 text-primary text-nowrap overflow-scroll-hidden">
-                USER_FIRST_NAME USER_LAST_NAME
-            </span>
-        </div>
-        <div class="w-100">
-            <div class="d-flex flex-column gap-3 w-75">
-                <div class="w-100 bg-white border p-3 rounded-3 d-flex flex-column gap-3" style="height: fit-content;">
-                    <div class="d-flex justify-content-center w-100">
-                        <button class="position-relative p-0 border-radius-circle">
-                            <img class="text-secondary" width="150" height="150" src="/images//defProfile.png" />
-                        </button>
-                    </div>
-                    <div class="w-100 d-flex flex-wrap justify-content-center gap-1">
-                        <div class="w-auto">
-                            <div class="text-center rounded-pill px-2 py-1 bg-primary text-light">
-                                ACTIVE_ROLE_NAME
-                            </div>
-                            <div class="text-center border rounded-pill p-2 px-2 py-1 bg-light">
-                                ROLE_NAME
-                            </div>
+<div class="right-side-modal p-3 overflow-y-scroll" @onclick:stopPropagation="true">
+    <div class="w-100 @(isLoading || Profile is null ? "user-placeholder" : string.Empty)">
+        @if (isLoading || Profile is null)
+        {
+            <Placeholder Width="w-75" />
+            <div class="user-placeholder-content">
+                <div class="user-placeholder-left-side bg-white rounded p-3">
+                    <div class="w-100 d-flex justify-content-center">
+                        <div class="user-placeholder-avatar rounded-circle overflow-hidden">
+                            <Placeholder Height="PlaceholderHeight.Second" />
                         </div>
                     </div>
-                </div>
-                <div class="w-100 bg-white border p-3 rounded-3">
-                    <div class="user-info-header border-bottom pb-1">
-                        <span class="fs-5 text-primary">Информация</span>
+                    <div class="w-100 d-flex gap-2">
+                        @for (int i = 0; i < 4; ++i)
+                        {
+                            <Placeholder Width="w-25" AdditionalClass="p-3" />
+                        }
                     </div>
-                    <div class="user-info-content p-2">
-                        <div class="w-100 d-flex flex-column gap-2">
-
+                </div>
+                <div class="user-placeholder-right-side">
+                    <div class="bg-white rounded p-3">
+                        <div class="user-placeholder-right-side-header border-bottom">
+                            <Placeholder Width="w-25 mb-1"/>
+                        </div>
+                        <div class="user-placeholder-right-side-content">
+                            @for (int i = 0; i < 4; ++i)
+                            {
+                                <div class="w-75">
+                                    <Placeholder Width="w-50" />
+                                    <Placeholder Width="w-75" />
+                                </div>
+                            }
+                        </div>
+                    </div>
+                    <div class="bg-white rounded p-3">
+                        <div class="user-placeholder-right-side-header border-bottom">
+                            <Placeholder Width="w-25 m-2" />
+                            <Placeholder Width="w-25 m-2" />
+                        </div>
+                        <div class="user-placeholder-right-side-content p-2">
+                            @for (int i = 0; i < 3; ++i)
+                            {
+                                <Placeholder Width="w-50" Height="PlaceholderHeight.Medium" />
+                            }
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="user-info mb-3">
-
+        }
+        else
+        {
+            <div class="right-side-modal-header mb-3">
+                <button type="button" class="btn d-flex btn-primary">
+                    <i class="bi bi-backspace-fill fs-5"></i>
+                    Назад
+                </button>
+                <span class="p-2 w-100 bg-white rounded-3 fs-4 text-primary text-nowrap overflow-scroll-hidden">
+                    @Profile.FirstName @Profile.LastName
+                </span>
             </div>
-        </div>
+            <div class="right-side-modal-content">
+                <div class="d-flex flex-column gap-3 w-75">
+                    <div class="w-100 bg-white border p-3 rounded-3 d-flex flex-column gap-3" style="height: fit-content;">
+                        <div class="d-flex justify-content-center w-100">
+                            <button class="position-relative p-0 rounded-circle">
+                                <img class="text-secondary" width="150" height="150" src="/images//defProfile.png" />
+                            </button>
+                        </div>
+                        <div class="w-100 d-flex flex-wrap justify-content-center gap-1">
+                            @foreach (var role in Profile.Roles)
+                            {
+                                <div class="w-auto">
+                                    <div class="text-center rounded-pill px-2 py-1 @(role == CurrentUserRole ? "bg-primary text-light" : "bg-light border p-2")">
+                                        @role.GetTranslation()
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                    <div class="w-100 bg-white border p-3 rounded-3">
+                        <div class="user-info-header border-bottom pb-1">
+                            <span class="fs-5 text-primary">Информация</span>
+                        </div>
+                        <div class="user-info-content p-2">
+                            <div class="w-100 d-flex flex-column gap-2">
+                                <div class="d-flex gap-1">
+                                    <span class="fs-6 text-primary">Почта:</span>
+                                    <div class="data-link text-secondary cursor-pointer">
+                                        изменить
+                                    </div>
+                                </div>
+                                <div class="w-100">
+                                    <div class="input-group">
+                                        <input @bind="Profile.Email" @bind:event="oninput" type="text" class="form-control rounded-end w-100" disabled />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="w-100 d-flex flex-column gap-2">
+                                <div class="d-flex gap-1">
+                                    <span class="fs-6 text-primary">Имя:</span>
+                                    <div class="data-link text-secondary cursor-pointer">
+                                        изменить
+                                    </div>
+                                </div>
+                                <div class="w-100">
+                                    <div class="input-group">
+                                        <input @bind="Profile.FirstName" @bind:event="oninput" type="text" class="form-control rounded-end w-100" disabled />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="w-100 d-flex flex-column gap-2">
+                                <div class="d-flex gap-1">
+                                    <span class="fs-6 text-primary">Фамилия:</span>
+                                    <div class="data-link text-secondary cursor-pointer">
+                                        изменить
+                                    </div>
+                                </div>
+                                <div class="w-100">
+                                    <div class="input-group">
+                                        <input @bind="Profile.LastName" @bind:event="oninput" type="text" class="form-control rounded-end w-100" disabled />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="w-100 d-flex flex-column gap-2">
+                                <div class="d-flex gap-1">
+                                    <span class="fs-6 text-primary">Группа:</span>
+                                    <div class="data-link text-secondary cursor-pointer">
+                                        изменить
+                                    </div>
+                                </div>
+                                <div class="w-100">
+                                    <div class="input-group">
+                                        <input @bind="Profile.StudyGroup" @bind:event="oninput" type="text" class="form-control rounded-end w-100" disabled />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="w-100 d-flex flex-column gap-2">
+                                <div class="d-flex gap-1">
+                                    <span class="fs-6 text-primary">Телефон:</span>
+                                    <div class="data-link text-secondary cursor-pointer">
+                                        изменить
+                                    </div>
+                                </div>
+                                <div class="w-100">
+                                    <div class="input-group">
+                                        <input @bind="Profile.Telephone" @bind:event="oninput" type="text" class="form-control rounded-end w-100" disabled />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="d-flex gap-1">
+                                <span class="fs-6 text-primary">Дата регистрации:</span>
+                                <span class="fs-6 text-secondary">
+                                    @(Profile.CreatedAt is null ? "-" : Profile.CreatedAt.Value.ToString("dd.MM.yyyy"))
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="user-info mb-3">
+                    <!--TODO: Реализовать демонстрацию скиллов-->
+                    <div class="w-100 bg-white border p-3 rounded-3">
+                        <div class="user-info-header border-bottom pb-1">
+                            <span class="fs-5 text-primary">Компетенции</span>
+                            <button type="button" class="btn d-flex btn-light">
+                                Изменить стек
+                            </button>
+                        </div>
+                        <div>
+                            @if (Profile.Skills.Count == 0)
+                            {
+                                <span class="d-flex w-100 justify-content-center mt-3 fs-6 text-secondary">
+                                    Компетенции не выбраны
+                                </span>
+                            }
+                            else
+                            {
+                                <div class="user-skills-charts">
+
+                                </div>
+                            }
+                        </div>
+                    </div>
+                    <div class="w-100 bg-white border p-3 rounded-3">
+                        <div class="user-ideas-header border-bottom">
+                            <span class="fs-5 text-primary">Идеи</span>
+                        </div>
+                        <div class="user-ideas-content mt-3">
+                            @if (Profile.Ideas.Count == 0)
+                            {
+                                <span class="fs-6 text-secondary">Идей пока нет</span>
+                            }
+                            else
+                            {
+                                @foreach (var idea in Profile.Ideas)
+                                {
+                                    <div class="user-ideas-idea w-100 p-2 bg-white border rounded">
+                                        <div class="w-100 d-flex justify-content-between align-items-center gap-3">
+                                            <div class="w-100 d-flex gap-2 align-items-center justify-content-between">
+                                                <div class="user-ideas-idea-link fs-6 w-100">
+                                                    @idea.Name
+                                                </div>
+                                                <div class="px-2 py-1 rounded-4 fs-6 text-center @idea.Status.GetStyle()">
+                                                    @idea.Status.GetTranslation()
+                                                </div>
+                                            </div>
+                                            <div class="d-flex align-items-center gap-1" style="cursor: pointer;">
+                                                <span class="fs-6 text-primary">Описание</span>
+                                                <i class="bi bi-caret-down text-primary"></i>
+                                            </div>
+                                        </div>
+                                        <!--TODO: Сделать скрытие и открытие описания-->
+                                        <div class="w-100">
+                                            <div class="list-group">
+                                                <span class="fs-6 w-100 mt-1 border-top text-secondary">
+                                                    @idea.Description
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            }
+                        </div>
+                    </div>
+                    <div class="w-100 bg-white border p-3 rounded-3">
+                        <div class="user-ideas-header border-bottom mb-2">
+                            <span class="fs-5 text-primary">Портфолио</span>
+                        </div>
+                        <div class="w-100 bg-white">
+                            <div class="py-2 d-flex justify-content-between">
+                                <div class="w-50">
+                                    <div class="w-100">
+                                        <div class="input-group">
+                                            <span class="input-group-text fs-6">
+                                                <i class="bi bi-search"></i>
+                                            </span>
+                                            <input type="text" placeholder="Поиск" class="form-control rounded-end" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="w-100 d-flex">
+                                <div class="w-100">
+                                    <table class="table table-hover mb-0">
+                                        <thead>
+                                            <tr class="user-teams-table-lables">
+                                                <th class="py-3 col fw-semibold text-secondary">
+                                                    <div class="d-flex">
+                                                        Команда
+                                                    </div>
+                                                </th>
+                                                <th class="py-3 col fw-semibold text-secondary">
+                                                    <div class="justify-content-center align-items-center text-center d-flex">
+                                                        Дата вступления
+                                                    </div>
+                                                </th>
+                                                <th class="py-3 col fw-semibold text-secondary">
+                                                    <div class="justify-content-center align-items-center text-center d-flex">
+                                                        Дата исключения
+                                                    </div>
+                                                </th>
+                                                <th class="py-3 col fw-semibold text-secondary">
+                                                    <div class="justify-content-center align-items-center text-center d-flex">
+                                                        Статус
+                                                    </div>
+                                                </th>
+                                                <th></th>
+                                                <th></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                @foreach (var teamExp in Profile.Teams)
+                                                {
+                                                    <td class="py-3 col align-self-center">
+                                                        <div class="flex-wrap d-flex gap-1">
+                                                            <div class="data-link">
+                                                                <div>@teamExp.TeamName</div>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td class="py-3 col align-self-center">
+                                                        <div class="justify-content-center align-items-center text-center flex-wrap d-flex gap-1">
+                                                            <div class="">
+                                                                <div>@teamExp.StartDate</div>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td class="py-3 col align-self-center">
+                                                        <div class="justify-content-center align-items-center text-center flex-wrap d-flex gap-1">
+                                                            <div class="">
+                                                                <div>@teamExp.FinishDate</div>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td class="py-3 col align-self-center">
+                                                        <div class="justify-content-center align-items-center text-center flex-wrap d-flex gap-1">
+                                                            @if (teamExp.HasActiveProject)
+                                                            {
+                                                                <div class="px-2 py-1 rounded-4 bg-warning-subtle text-warning">
+                                                                    <div>В работе</div>
+                                                                </div>
+                                                            }
+                                                            else
+                                                            {
+                                                                <div class="px-2 py-1 rounded-4 bg-primary-subtle text-primary">
+                                                                    <div>В поисках</div>
+                                                                </div>
+                                                            }
+                                                        </div>
+                                                    </td>
+                                                    <!--TODO: Вероятно, я могу использовать тот же компонент, что и в таблице идей-->
+                                                    <td class="py-3">
+                                                        <div class="user-teams-table-icon float-end">
+                                                            <i class="bi bi-three-dots fs-5"></i>
+                                                            <div class="dropdown-menu">
+                                                                <ul class="list-group list-group-flush">
+                                                                    <li class="list-group-item list-group-item-action px-2 py-1">
+                                                                        Просмотреть
+                                                                    </li>
+                                                                </ul>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                }
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!--TODO: Нужно заменить отступы \n на <br> -->
+                    <div class="w-100 bg-white border p-3 rounded-3">
+                        <div class="user-test-header border-bottom">
+                            <span class="fs-5 text-primary">Результаты тестирований</span>
+                        </div>
+                        <div class="user-tests-content mt-3">
+                            <span class="fs-6 text-decoration-underline">Тест Белбина:</span>
+                            @if (BelbinTestResult is null)
+                            {
+                                <span class="fs-6 text-secondary">Вы не прошли тест</span>                                
+                            }
+                            else
+                            {
+                                <p>@BelbinTestResult.TestResultValue</p>
+                            }
+                        </div>
+                        <div class="user-tests-content mt-3">
+                            <span class="fs-6 text-decoration-underline">Айзенка личностный опросник:</span>
+                            @if (TemperTestResult is null)
+                            {
+                                <span class="fs-6 text-secondary">Вы не прошли тест</span>
+                            }
+                            else
+                            {
+                                <p>@TemperTestResult.TestResultValue</p>
+                            }
+                        </div>
+                        <div class="user-tests-content mt-3">
+                            <span class="fs-6 text-decoration-underline">Опросник «Стиль мышления»:</span>
+                            @if (MindTestResult is null)
+                            {
+                                <span class="fs-6 text-secondary">Вы не прошли тест</span>
+                            }
+                            else
+                            {
+                                <p>@MindTestResult.TestResultValue</p>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
     </div>
 </div>

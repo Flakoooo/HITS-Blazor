@@ -3,6 +3,8 @@
     public enum PlaceholderHeight
     {
         None,
-        Small
+        Small,
+        Medium,
+        Second
     }
 }

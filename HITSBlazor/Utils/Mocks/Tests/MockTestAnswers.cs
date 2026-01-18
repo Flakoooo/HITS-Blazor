@@ -8,8 +8,6 @@ namespace HITSBlazor.Utils.Mocks.Tests
     {
         private static readonly Random _random = new();
 
-        private static readonly List<TestAnswer> _testAnswers = CreateTestAnswer();
-
         private static string BelbinTestName => MockTests.GetTestById(MockTests.BelbinId)!.TestName;
         private static string TemperTestName => MockTests.GetTestById(MockTests.TemperId)!.TestName;
         private static string MindTestName => MockTests.GetTestById(MockTests.MindId)!.TestName;
@@ -44,7 +42,7 @@ namespace HITSBlazor.Utils.Mocks.Tests
                 else if (answersInModuleCount == 3)
                 {
                     var firstAnswer = _random.Next(2, 7);
-                    var secondAnswer = _random.Next(2, 7 - firstAnswer);
+                    var secondAnswer = _random.Next(2, 10 - firstAnswer);
                     scores.AddRange(firstAnswer, secondAnswer, 10 - firstAnswer - secondAnswer);
                 }
 
@@ -141,6 +139,8 @@ namespace HITSBlazor.Utils.Mocks.Tests
 
             return answers;
         }
+
+        private static readonly List<TestAnswer> _testAnswers = CreateTestAnswer();
 
         private static List<TestAnswer> CreateTestAnswer()
         {

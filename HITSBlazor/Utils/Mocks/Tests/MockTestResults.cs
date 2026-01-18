@@ -6,8 +6,6 @@ namespace HITSBlazor.Utils.Mocks.Tests
 {
     public static class MockTestResults
     {
-        private static readonly List<TestResult> _testResults = CreateTestResult();
-
         private static string BelbinTestName => MockTests.GetTestById(MockTests.BelbinId)!.TestName;
         private static string TemperTestName => MockTests.GetTestById(MockTests.TemperId)!.TestName;
         private static string MindTestName => MockTests.GetTestById(MockTests.MindId)!.TestName;
@@ -22,6 +20,8 @@ namespace HITSBlazor.Utils.Mocks.Tests
             {
                 if (!int.TryParse(answer.Answer, out int score))
                     throw new Exception("Ошибка создания мок данных ответов");
+
+                Console.WriteLine(answer.QuestionNumber);
 
                 _ = answer.QuestionNumber switch
                 {
@@ -331,6 +331,8 @@ namespace HITSBlazor.Utils.Mocks.Tests
             };
         }
 
+        private static readonly List<TestResult> _testResults = CreateTestResult();
+
         private static List<TestResult> CreateTestResult()
         {
             return 
@@ -340,5 +342,8 @@ namespace HITSBlazor.Utils.Mocks.Tests
                 GenerateMindTestResult(MockUsers.GetUserById(MockUsers.KirillId)!)!
             ];
         }
+
+        public static TestResult? GetTestResult(Guid userId, string testname)
+            => _testResults.FirstOrDefault(r => r.User.Id == userId && r.TestName == testname);
     }
 }

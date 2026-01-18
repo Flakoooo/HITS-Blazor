@@ -28,3 +28,149 @@
     justify-content: flex-start;
     gap: 16px;
 }
+
+.user-info-header {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.user-skills-charts {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+}
+
+.user-ideas-header, .user-test-header {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.user-ideas-content {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: flex-start;
+    justify-content: flex-start;
+    gap: 16px;
+}
+
+.user-ideas-idea {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 8px;
+}
+
+.user-ideas-idea-link {
+    cursor: pointer;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.user-teams-table-lables {
+    position: sticky;
+    top: 0;
+    right: auto;
+    bottom: auto;
+    left: auto;
+    z-index: 1;
+}
+
+.user-teams-table-icon {
+    min-width: 24px;
+    max-width: 24px;
+    height: 24px;
+    min-height: 24px;
+    max-height: 24px;
+    border-radius: 50%;
+    width: 100%;
+    cursor: pointer;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: center;
+    transition: all .2s ease-out;
+}
+
+.user-tests-content, .user-placeholder {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: flex-start;
+    justify-content: flex-start;
+    gap: 16px;
+}
+
+.user-placeholder-content {
+    height: fit-content;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: start;
+    justify-content: start;
+    gap: 16px;
+}
+
+.user-placeholder-left-side, .user-placeholder-right-side {
+    height: fit-content;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    gap: 16px;
+}
+
+.user-placeholder-left-side {
+    width: 33%;
+    align-items: flex-end;
+    justify-content: center;
+}
+
+.user-placeholder-avatar {
+    height: 200px;
+    min-height: 200px;
+    max-height: 200px;
+    width: 200px;
+    min-width: 200px;
+    max-width: 200px;
+}
+
+.user-placeholder-right-side {
+    width: 65%;
+    align-items: stretch;
+    justify-content: flex-start;
+}
+
+.user-placeholder-right-side-header {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: stretch;
+    justify-content: space-between;
+}
+
+.user-placeholder-right-side-content {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: stretch;
+    justify-content: flex-start;
+    gap: 16px;
+}

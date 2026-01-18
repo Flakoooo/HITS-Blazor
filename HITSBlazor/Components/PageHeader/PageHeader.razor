@@ -1,5 +1,6 @@
 ﻿@namespace HITSBlazor.Components.PageHeader
 @using HITSBlazor.Components.Modals.SelectActiveRoleModal
+@using HITSBlazor.Components.Modals.ShowUserModal
 @using HITSBlazor.Models.Users.Entities
 @using HITSBlazor.Models.Users.Enums
 @using HITSBlazor.Services
@@ -21,7 +22,7 @@
             </div>
             <div class="d-flex gap-1 flex-column">
                 <!-- TODO: При нажатии вызывать боковую панель профиля ТЕКУЩЕГО пользователя -->
-                <div class="fw-semibold data-link" style="width: fit-content;">
+                <div @onclick="ShowUserProfile" class="fw-semibold data-link" style="width: fit-content;">
                     <span class="fs-6">@CurrentUser?.FirstName @CurrentUser?.LastName</span>
                 </div>
                 <button type="button" 
@@ -69,6 +70,18 @@
     {
         CurrentRole = role;
         StateHasChanged();
+    }
+
+    private void ShowUserProfile()
+    {
+        var userId = CurrentUser?.Id;
+        if (userId is null) return;
+
+        var parameters = new Dictionary<string, object>
+        {
+            { "UserId", userId }
+        };
+        ModalService.Show<ShowUserModal>(parameters: parameters);
     }
 
     private void ShowRoleModal()

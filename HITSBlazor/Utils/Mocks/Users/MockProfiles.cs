@@ -35,17 +35,20 @@ namespace HITSBlazor.Utils.Mocks.Users
                 Email = user.Email,
                 FirstName = user.FirstName,
                 LastName = user.LastName,
-                Roles = [.. user.Roles],
+                Roles = user.Roles,
                 CreatedAt = user.CreatedAt,
                 Telephone = user.Telephone,
                 StudyGroup = user.StudyGroup,
 
-                Skills = [.. MockUsersSkills.GetUserSkillsById(user.Id)],
-                Ideas = [.. MockIdeas.GetIdeasByInitiatorId(user.Id)],
-                Teams = [.. MockTeamExperiences.GetTeamExperiencesByUserId(user.Id)],
+                Skills = MockUsersSkills.GetUserSkillsById(user.Id) ?? [],
+                Ideas = MockIdeas.GetIdeasByInitiatorId(user.Id),
+                Teams = MockTeamExperiences.GetTeamExperiencesByUserId(user.Id),
                 UserTag = userTag?.UserTag,
                 IsUserTagVisible = userTag?.IsVisible
             };
         }
+
+        public static Profile? GetUserProfileByUserId(Guid userId)
+            => _profiles.FirstOrDefault(p => p.Id == userId);
     }
 }

@@ -4,8 +4,6 @@ namespace HITSBlazor.Utils.Mocks.Tests
 {
     public static class MockTests
     {
-        private static readonly List<Test> _tests = CreateTests();
-
         public static Guid BelbinId { get; } = Guid.NewGuid();
         public static Guid TemperId { get; } = Guid.NewGuid();
         public static Guid MindId { get; } = Guid.NewGuid();
@@ -34,6 +32,8 @@ namespace HITSBlazor.Utils.Mocks.Tests
                 Description = "Каждый пункт данного опросника состоит из утверждения, за которым следует пять его возможных окончаний. Ваша задача – указать ту степень, в которой каждое окончание применимо к Вам. На бланке ответов напротив каждого окончания проставьте номера: 5, 4, 3, 2, или 1, указывающие на ту степень, в какой данное окончание применимо к Вам: от 5 (более всего подходит) до 1 (менее всего подходит). Каждый номер (балл) должен быть использован только один раз (!!!) в группе из пяти окончаний. ( Всего таких групп в опроснике 18). Даже если 2 окончания (или больше) в одной группе покажутся одинаково применимы к Вам, все-таки постарайтесь их упорядочить. Имейте ввиду, что для каждой группы каждый балл (5, 4, 3, 2 или 1) нельзя использовать более одного раза."
             }
         ];
+
+        private static readonly List<Test> _tests = CreateTests();
 
         public static List<Test> GetAllTests() => _tests;
 

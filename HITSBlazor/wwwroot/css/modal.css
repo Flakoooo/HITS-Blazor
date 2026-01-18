@@ -15,13 +15,17 @@
     transition: all .3s ease-out;
 }
 
-.right-side-modal-header {
+.right-side-modal-header, .right-side-modal-content {
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
     align-items: stretch;
     justify-content: flex-start;
     gap: 16px;
+}
+
+.right-side-modal-content {
+    width: 100%;
 }
 
 .modal-layout-enter-active .right-side-modal {
