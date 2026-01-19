@@ -189,39 +189,52 @@
                         <div class="user-ideas-header border-bottom">
                             <span class="fs-5 text-primary">Идеи</span>
                         </div>
-                        <div class="user-ideas-content mt-3">
-                            @if (Profile.Ideas.Count == 0)
+                        <div class="user-ideas-content @(ideasIsLoading ? "p-3" : "mt-3")">
+                            @if (ideasIsLoading)
                             {
-                                <span class="fs-6 text-secondary">Идей пока нет</span>
+                                @for (int i = 0; i < 3; ++i)
+                                {
+                                    <div class="w-100 p-2 d-flex flex-column border rounded">
+                                        <Placeholder Width="w-75" />
+                                        <Placeholder Width="w-50" />
+                                    </div>                                    
+                                }
                             }
                             else
                             {
-                                @foreach (var idea in Profile.Ideas)
+                                @if (Profile.Ideas.Count == 0)
                                 {
-                                    <div class="user-ideas-idea w-100 p-2 bg-white border rounded">
-                                        <div class="w-100 d-flex justify-content-between align-items-center gap-3">
-                                            <div class="w-100 d-flex gap-2 align-items-center justify-content-between">
-                                                <div class="user-ideas-idea-link fs-6 w-100">
-                                                    @idea.Name
+                                    <span class="fs-6 text-secondary">Идей пока нет</span>
+                                }
+                                else
+                                {
+                                    @foreach (var idea in Profile.Ideas)
+                                    {
+                                        <div class="user-ideas-idea w-100 p-2 bg-white border rounded">
+                                            <div class="w-100 d-flex justify-content-between align-items-center gap-3">
+                                                <div class="w-100 d-flex gap-2 align-items-center justify-content-between">
+                                                    <div class="user-ideas-idea-link fs-6 w-100">
+                                                        @idea.Name
+                                                    </div>
+                                                    <div class="px-2 py-1 rounded-4 fs-6 text-center @idea.Status.GetStyle()">
+                                                        @idea.Status.GetTranslation()
+                                                    </div>
                                                 </div>
-                                                <div class="px-2 py-1 rounded-4 fs-6 text-center @idea.Status.GetStyle()">
-                                                    @idea.Status.GetTranslation()
+                                                <div class="d-flex align-items-center gap-1" style="cursor: pointer;">
+                                                    <span class="fs-6 text-primary">Описание</span>
+                                                    <i class="bi bi-caret-down text-primary"></i>
                                                 </div>
                                             </div>
-                                            <div class="d-flex align-items-center gap-1" style="cursor: pointer;">
-                                                <span class="fs-6 text-primary">Описание</span>
-                                                <i class="bi bi-caret-down text-primary"></i>
+                                            <!--TODO: Сделать скрытие и открытие описания-->
+                                            <div class="w-100">
+                                                <div class="list-group">
+                                                    <span class="fs-6 w-100 mt-1 border-top text-secondary">
+                                                        @idea.Description
+                                                    </span>
+                                                </div>
                                             </div>
                                         </div>
-                                        <!--TODO: Сделать скрытие и открытие описания-->
-                                        <div class="w-100">
-                                            <div class="list-group">
-                                                <span class="fs-6 w-100 mt-1 border-top text-secondary">
-                                                    @idea.Description
-                                                </span>
-                                            </div>
-                                        </div>
-                                    </div>
+                                    }
                                 }
                             }
                         </div>
@@ -292,7 +305,7 @@
                                                     </td>
                                                     <td class="py-3 col align-self-center">
                                                         <div class="justify-content-center align-items-center text-center flex-wrap d-flex gap-1">
-                                                            <div class="">
+                                                            <div class="@(teamExp.FinishDate is null ? "text-primary" : string.Empty)">
                                                                 <div>@teamExp.FinishDate</div>
                                                             </div>
                                                         </div>
@@ -347,7 +360,7 @@
                             }
                             else
                             {
-                                <p>@BelbinTestResult.TestResultValue</p>
+                                <p>@((MarkupString)BelbinTestResult.TestResultValue.Replace("\n", "<br>"))</p>
                             }
                         </div>
                         <div class="user-tests-content mt-3">
@@ -358,7 +371,7 @@
                             }
                             else
                             {
-                                <p>@TemperTestResult.TestResultValue</p>
+                                <p>@((MarkupString)TemperTestResult.TestResultValue.Replace("\n", "<br>"))</p>
                             }
                         </div>
                         <div class="user-tests-content mt-3">
@@ -369,7 +382,7 @@
                             }
                             else
                             {
-                                <p>@MindTestResult.TestResultValue</p>
+                                <p>@((MarkupString)MindTestResult.TestResultValue.Replace("\n", "<br>"))</p>
                             }
                         </div>
                     </div>

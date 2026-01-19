@@ -27,7 +27,8 @@ namespace HITSBlazor.Components.Modals.ShowUserModal
         public Guid UserId { get; set; }
 
         private bool isLoading = true;
-
+        //нужно как то продемонстрировать процесс загрузки идей, но как, если это одна модель, хмммм
+        private bool ideasIsLoading = false;
         private Profile? Profile { get; set; }
         private RoleType? CurrentUserRole { get; set; }
         private TestResult? BelbinTestResult { get; set; }
