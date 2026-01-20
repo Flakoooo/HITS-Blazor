@@ -1,4 +1,6 @@
-﻿using HITSBlazor.Models.Tests.Entities;
+﻿using ApexCharts;
+using HITSBlazor.Models.Common.Entities;
+using HITSBlazor.Models.Tests.Entities;
 using HITSBlazor.Models.Users.Entities;
 using HITSBlazor.Models.Users.Enums;
 using HITSBlazor.Services.Auth;
@@ -23,14 +25,21 @@ namespace HITSBlazor.Components.Modals.ShowUserModal
         [Inject]
         private ITestService TestService { get; set; } = null!;
 
+        [Inject] 
+        public IApexChartService ApexChartService { get; set; } = null!;
+
         [Parameter]
         public Guid UserId { get; set; }
 
         private bool isLoading = true;
         //нужно как то продемонстрировать процесс загрузки идей, но как, если это одна модель, хмммм
         private bool ideasIsLoading = false;
+
         private Profile? Profile { get; set; }
         private RoleType? CurrentUserRole { get; set; }
+
+        private ApexChartOptions<Skill> Options = new();
+
         private TestResult? BelbinTestResult { get; set; }
         private TestResult? TemperTestResult { get; set; }
         private TestResult? MindTestResult { get; set; }
@@ -41,7 +50,31 @@ namespace HITSBlazor.Components.Modals.ShowUserModal
 
             Profile = await ProfileService.GetUserProifleAsync(UserId);
             if (Profile is null) return;
-            
+
+            var globalOptions = ApexChartService.GlobalOptions;
+            Options.Annotations = globalOptions.Annotations;
+            Options.Blazor = globalOptions.Blazor;
+            Options.Chart = globalOptions.Chart;
+            Options.Colors = globalOptions.Colors;
+            Options.DataLabels = globalOptions.DataLabels;
+            Options.Debug = globalOptions.Debug;
+            Options.Fill = globalOptions.Fill;
+            Options.ForecastDataPoints = globalOptions.ForecastDataPoints;
+            Options.Grid = globalOptions.Grid;
+            Options.Labels = globalOptions.Labels;
+            Options.Legend = globalOptions.Legend;
+            Options.Markers = globalOptions.Markers;
+            Options.NoData = globalOptions.NoData;
+            Options.PlotOptions = globalOptions.PlotOptions;
+            Options.States = globalOptions.States;
+            Options.Stroke = globalOptions.Stroke;
+            Options.Subtitle = globalOptions.Subtitle;
+            Options.Theme = globalOptions.Theme;
+            Options.Title = globalOptions.Title;
+            Options.Tooltip = globalOptions.Tooltip;
+            Options.Xaxis = globalOptions.Xaxis;
+            Options.Yaxis = globalOptions.Yaxis;
+
             BelbinTestResult = await TestService.GetTestResultAsync(UserId, TestService.BelbinTestName);
             TemperTestResult = await TestService.GetTestResultAsync(UserId, TestService.TemperTestName);
             MindTestResult = await TestService.GetTestResultAsync(UserId, TestService.MindTestName);

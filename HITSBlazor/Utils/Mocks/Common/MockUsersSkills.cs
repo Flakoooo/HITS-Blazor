@@ -19,7 +19,7 @@ namespace HITSBlazor.Utils.Mocks.Common
             var redis = MockSkills.GetSkillById(MockSkills.RedisId)!;
 
             return [
-                new UsersSkills { IdUsers = MockUsers.KirillId,     Skills = [ javaScript, kotlin, react, vue ] },
+                new UsersSkills { IdUsers = MockUsers.KirillId,     Skills = [ javaScript, kotlin, python, react, vue ] },
                 new UsersSkills { IdUsers = MockUsers.IvanId,       Skills = [ python, rust, cpp, redis ]       },
                 new UsersSkills { IdUsers = MockUsers.ManagerId,    Skills = [ javaScript, python, vue, redis ] },
                 new UsersSkills 

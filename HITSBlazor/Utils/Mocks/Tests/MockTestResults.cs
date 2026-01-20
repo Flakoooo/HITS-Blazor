@@ -21,8 +21,6 @@ namespace HITSBlazor.Utils.Mocks.Tests
                 if (!int.TryParse(answer.Answer, out int score))
                     throw new Exception("Ошибка создания мок данных ответов");
 
-                Console.WriteLine(answer.QuestionNumber);
-
                 _ = answer.QuestionNumber switch
                 {
                     16 or 20 or 37 or 43 or 51 or 65 or 74 => scores[0] += score,

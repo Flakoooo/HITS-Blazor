@@ -1,5 +1,8 @@
 ﻿@namespace HITSBlazor.Components.Modals.ShowUserModal
+@using ApexCharts
 @using HITSBlazor.Components.Placeholder
+@using HITSBlazor.Models.Common.Entities
+@using HITSBlazor.Models.Common.Enums
 @using HITSBlazor.Utils.EnumStyles
 @using HITSBlazor.Utils.EnumTranslators
 
@@ -180,7 +183,25 @@
                             else
                             {
                                 <div class="user-skills-charts">
-
+                                    @foreach (var type in Enum.GetValues<SkillType>())
+                                    {
+                                        var userSkills = Profile.Skills.Where(s => s.Type == type).ToList();
+                                        if (userSkills.Count > 0)
+                                        {
+                                            <ApexChart TItem="Skill"
+                                                       Options="@Options"
+                                                       Width="300"
+                                                       Height="186.335">
+                                                <ApexPointSeries TItem="Skill"
+                                                                 Items="userSkills"
+                                                                 Name="Фактические компетенции"
+                                                                 SeriesType="SeriesType.Radar"
+                                                                 XValue="@(s => s.Name)"
+                                                                 YValue="@(s => 1)" 
+                                                                 Color="@type.GetColor()" />
+                                            </ApexChart>
+                                        }
+                                    }
                                 </div>
                             }
                         </div>
@@ -347,7 +368,6 @@
                             </div>
                         </div>
                     </div>
-                    <!--TODO: Нужно заменить отступы \n на <br> -->
                     <div class="w-100 bg-white border p-3 rounded-3">
                         <div class="user-test-header border-bottom">
                             <span class="fs-5 text-primary">Результаты тестирований</span>
