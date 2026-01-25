@@ -54,29 +54,7 @@ namespace HITSBlazor
                 sp.GetRequiredService<IHttpClientFactory>().CreateClient(Settings.HttpClientName)
             );
 #endif
-            builder.Services.AddApexCharts(e =>
-            {
-                e.GlobalOptions = new ApexChartBaseOptions
-                {
-                    Debug = false,
-                    Chart = new Chart
-                    {
-                        Toolbar = new Toolbar
-                        {
-                            Tools = new Tools
-                            {
-                                Download = false,
-                                Pan = false,
-                                Reset = false,
-                                Selection = false,
-                                Zoom = false,
-                                Zoomin = false,
-                                Zoomout = false
-                            }
-                        }
-                    }
-                };
-            });
+            builder.Services.AddApexCharts();
 
             // Utils
             builder.Services.AddScoped<GlobalNotificationService>();

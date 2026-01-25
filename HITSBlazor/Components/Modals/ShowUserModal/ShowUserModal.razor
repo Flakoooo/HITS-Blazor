@@ -189,7 +189,7 @@
                                         if (userSkills.Count > 0)
                                         {
                                             <ApexChart TItem="Skill"
-                                                       Options="@Options"
+                                                       Options="@GetRadarChartOptions(type)"
                                                        Width="300"
                                                        Height="186.335">
                                                 <ApexPointSeries TItem="Skill"
@@ -197,7 +197,7 @@
                                                                  Name="Фактические компетенции"
                                                                  SeriesType="SeriesType.Radar"
                                                                  XValue="@(s => s.Name)"
-                                                                 YValue="@(s => 1)" 
+                                                                 YValue="@(s => 1)"
                                                                  Color="@type.GetColor()" />
                                             </ApexChart>
                                         }

@@ -1,5 +1,6 @@
 ﻿using ApexCharts;
 using HITSBlazor.Models.Common.Entities;
+using HITSBlazor.Models.Common.Enums;
 using HITSBlazor.Models.Tests.Entities;
 using HITSBlazor.Models.Users.Entities;
 using HITSBlazor.Models.Users.Enums;
@@ -38,11 +39,50 @@ namespace HITSBlazor.Components.Modals.ShowUserModal
         private Profile? Profile { get; set; }
         private RoleType? CurrentUserRole { get; set; }
 
-        private ApexChartOptions<Skill> Options = new();
-
         private TestResult? BelbinTestResult { get; set; }
         private TestResult? TemperTestResult { get; set; }
         private TestResult? MindTestResult { get; set; }
+
+        private ApexChartOptions<Skill> GetRadarChartOptions(SkillType type)
+        {
+            return new ApexChartOptions<Skill>
+            {
+                Chart = new Chart
+                {
+                    Type = ChartType.Radar,
+                    Toolbar = new Toolbar { Show = false }
+                },
+                Yaxis =
+                [
+                    new YAxis
+                    {
+                        Min = 0,
+                        Max = 1,
+                        Labels = new YAxisLabels { Show = false },
+                        Show = false
+                    }
+                ],
+                Xaxis = new XAxis
+                {
+                    Labels = new XAxisLabels
+                    {
+                        Style = new AxisLabelStyle
+                        {
+                            Colors = new List<string> { "#a8a8a8" },
+                            FontSize = "11px"
+                        }
+                    }
+                },
+                Stroke = new Stroke { Width = 2 },
+                Fill = new Fill { Opacity = 0.1 },
+                Markers = new Markers { Size = 4 },
+                Legend = new Legend
+                {
+                    Show = true,
+                    Position = LegendPosition.Bottom
+                }
+            };
+        }
 
         protected override async Task OnInitializedAsync()
         {
@@ -50,30 +90,6 @@ namespace HITSBlazor.Components.Modals.ShowUserModal
 
             Profile = await ProfileService.GetUserProifleAsync(UserId);
             if (Profile is null) return;
-
-            var globalOptions = ApexChartService.GlobalOptions;
-            Options.Annotations = globalOptions.Annotations;
-            Options.Blazor = globalOptions.Blazor;
-            Options.Chart = globalOptions.Chart;
-            Options.Colors = globalOptions.Colors;
-            Options.DataLabels = globalOptions.DataLabels;
-            Options.Debug = globalOptions.Debug;
-            Options.Fill = globalOptions.Fill;
-            Options.ForecastDataPoints = globalOptions.ForecastDataPoints;
-            Options.Grid = globalOptions.Grid;
-            Options.Labels = globalOptions.Labels;
-            Options.Legend = globalOptions.Legend;
-            Options.Markers = globalOptions.Markers;
-            Options.NoData = globalOptions.NoData;
-            Options.PlotOptions = globalOptions.PlotOptions;
-            Options.States = globalOptions.States;
-            Options.Stroke = globalOptions.Stroke;
-            Options.Subtitle = globalOptions.Subtitle;
-            Options.Theme = globalOptions.Theme;
-            Options.Title = globalOptions.Title;
-            Options.Tooltip = globalOptions.Tooltip;
-            Options.Xaxis = globalOptions.Xaxis;
-            Options.Yaxis = globalOptions.Yaxis;
 
             BelbinTestResult = await TestService.GetTestResultAsync(UserId, TestService.BelbinTestName);
             TemperTestResult = await TestService.GetTestResultAsync(UserId, TestService.TemperTestName);
