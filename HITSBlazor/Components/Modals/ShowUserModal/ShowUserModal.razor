@@ -1,5 +1,5 @@
 ﻿@namespace HITSBlazor.Components.Modals.ShowUserModal
-@using ApexCharts
+@using HITSBlazor.Components.InputDropdowns.SkillDropdown
 @using HITSBlazor.Components.Placeholder
 @using HITSBlazor.Models.Common.Entities
 @using HITSBlazor.Models.Common.Enums
@@ -58,7 +58,9 @@
         else
         {
             <div class="right-side-modal-header mb-3">
-                <button type="button" class="btn d-flex btn-primary">
+                <button @onclick="@(() => ModalService.Close())" 
+                        type="button" 
+                        class="btn d-flex btn-primary">
                     <i class="bi bi-backspace-fill fs-5"></i>
                     Назад
                 </button>
@@ -78,7 +80,7 @@
                             @foreach (var role in Profile.Roles)
                             {
                                 <div class="w-auto">
-                                    <div class="text-center rounded-pill px-2 py-1 @(role == CurrentUserRole ? "bg-primary text-light" : "bg-light border p-2")">
+                                    <div class="text-center rounded-pill px-2 py-1 @(isCurrentUser && role == AuthService.CurrentUser?.Role ? "bg-primary text-light" : "bg-light border p-2")">
                                         @role.GetTranslation()
                                     </div>
                                 </div>
@@ -93,9 +95,12 @@
                             <div class="w-100 d-flex flex-column gap-2">
                                 <div class="d-flex gap-1">
                                     <span class="fs-6 text-primary">Почта:</span>
-                                    <div class="data-link text-secondary cursor-pointer">
-                                        изменить
-                                    </div>
+                                    @if (isCurrentUser)
+                                    {
+                                        <div class="data-link text-secondary cursor-pointer">
+                                            изменить
+                                        </div>
+                                    }
                                 </div>
                                 <div class="w-100">
                                     <div class="input-group">
@@ -106,9 +111,12 @@
                             <div class="w-100 d-flex flex-column gap-2">
                                 <div class="d-flex gap-1">
                                     <span class="fs-6 text-primary">Имя:</span>
-                                    <div class="data-link text-secondary cursor-pointer">
-                                        изменить
-                                    </div>
+                                    @if (isCurrentUser)
+                                    {
+                                        <div class="data-link text-secondary cursor-pointer">
+                                            изменить
+                                        </div>
+                                    }
                                 </div>
                                 <div class="w-100">
                                     <div class="input-group">
@@ -119,9 +127,12 @@
                             <div class="w-100 d-flex flex-column gap-2">
                                 <div class="d-flex gap-1">
                                     <span class="fs-6 text-primary">Фамилия:</span>
-                                    <div class="data-link text-secondary cursor-pointer">
-                                        изменить
-                                    </div>
+                                    @if (isCurrentUser)
+                                    {
+                                        <div class="data-link text-secondary cursor-pointer">
+                                            изменить
+                                        </div>
+                                    }
                                 </div>
                                 <div class="w-100">
                                     <div class="input-group">
@@ -132,9 +143,12 @@
                             <div class="w-100 d-flex flex-column gap-2">
                                 <div class="d-flex gap-1">
                                     <span class="fs-6 text-primary">Группа:</span>
-                                    <div class="data-link text-secondary cursor-pointer">
-                                        изменить
-                                    </div>
+                                    @if (isCurrentUser)
+                                    {
+                                        <div class="data-link text-secondary cursor-pointer">
+                                            изменить
+                                        </div>
+                                    }
                                 </div>
                                 <div class="w-100">
                                     <div class="input-group">
@@ -145,9 +159,12 @@
                             <div class="w-100 d-flex flex-column gap-2">
                                 <div class="d-flex gap-1">
                                     <span class="fs-6 text-primary">Телефон:</span>
-                                    <div class="data-link text-secondary cursor-pointer">
-                                        изменить
-                                    </div>
+                                    @if (isCurrentUser)
+                                    {
+                                        <div class="data-link text-secondary cursor-pointer">
+                                            изменить
+                                        </div>
+                                    }
                                 </div>
                                 <div class="w-100">
                                     <div class="input-group">
@@ -169,40 +186,99 @@
                     <div class="w-100 bg-white border p-3 rounded-3">
                         <div class="user-info-header border-bottom pb-1">
                             <span class="fs-5 text-primary">Компетенции</span>
-                            <button type="button" class="btn d-flex btn-light">
-                                Изменить стек
-                            </button>
+                            @if (isCurrentUser)
+                            {
+                                @if (isChangeSkills)
+                                {
+                                    <div class="d-flex gap-2">
+                                        <button @onclick="@UpdateUserSkills"
+                                                type="button" 
+                                                class="btn d-flex btn-primary">
+                                            Сохранить
+                                        </button>
+                                        <button @onclick="@(() => isChangeSkills = !isChangeSkills)" 
+                                                type="button" 
+                                                class="btn d-flex btn-danger">
+                                            Отменить
+                                        </button>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <button @onclick="@ChangeToUpdateSkills"
+                                            type="button"
+                                            class="btn d-flex btn-light">
+                                        Изменить стек
+                                    </button>
+                                }
+                            }
                         </div>
                         <div>
-                            @if (Profile.Skills.Count == 0)
+                            @if (isCurrentUser && isChangeSkills)
                             {
-                                <span class="d-flex w-100 justify-content-center mt-3 fs-6 text-secondary">
-                                    Компетенции не выбраны
-                                </span>
+                                @if (isSkillsLoading)
+                                {
+                                    <div class="mt-2 w-100 d-flex gap-3">
+                                        @for (int p = 0; p < 4; ++p)
+                                        {
+                                            <Placeholder Height="PlaceholderHeight.Small" />
+                                        }
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="mt-2 w-100 stack-categories">
+                                        <SkillDropdown SkillType="SkillType.Language"
+                                                       AllSkills="@LanguageSkills"
+                                                       @bind-SelectedSkills="@SelectedLanguageSkills"
+                                                       SearchFunction="@SearchSkillsAsync" />
+                                        <SkillDropdown SkillType="SkillType.Framework"
+                                                       AllSkills="@FrameworkSkills"
+                                                       @bind-SelectedSkills="@SelectedFrameworkSkills"
+                                                       SearchFunction="@SearchSkillsAsync" />
+                                        <SkillDropdown SkillType="SkillType.Database"
+                                                       AllSkills="@DatabaseSkills"
+                                                       @bind-SelectedSkills="@SelectedDatabaseSkills"
+                                                       SearchFunction="@SearchSkillsAsync" />
+                                        <SkillDropdown SkillType="SkillType.Devops"
+                                                       AllSkills="@DevopsSkills"
+                                                       @bind-SelectedSkills="@SelectedDevopsSkills"
+                                                       SearchFunction="@SearchSkillsAsync" />
+                                    </div>
+                                }
                             }
                             else
                             {
-                                <div class="user-skills-charts">
-                                    @foreach (var type in Enum.GetValues<SkillType>())
-                                    {
-                                        var userSkills = Profile.Skills.Where(s => s.Type == type).ToList();
-                                        if (userSkills.Count > 0)
+                                @if (Profile.Skills.Count == 0)
+                                {
+                                    <span class="d-flex w-100 justify-content-center mt-3 fs-6 text-secondary">
+                                        Компетенции не выбраны
+                                    </span>
+                                }
+                                else
+                                {
+                                    <div class="user-skills-charts">
+                                        @foreach (var type in Enum.GetValues<SkillType>())
                                         {
-                                            <ApexChart TItem="Skill"
-                                                       Options="@GetRadarChartOptions(type)"
-                                                       Width="300"
-                                                       Height="186.335">
-                                                <ApexPointSeries TItem="Skill"
-                                                                 Items="userSkills"
-                                                                 Name="Фактические компетенции"
-                                                                 SeriesType="SeriesType.Radar"
-                                                                 XValue="@(s => s.Name)"
-                                                                 YValue="@(s => 1)"
-                                                                 Color="@type.GetColor()" />
-                                            </ApexChart>
+                                            var userSkills = Profile.Skills.Where(s => s.Type == type).ToList();
+                                            if (userSkills.Count > 0)
+                                            {
+                                                <ApexChart TItem="Skill"
+                                                           Options="@GetRadarChartOptions(type)"
+                                                           Width="300"
+                                                           Height="186.335">
+                                                    <ApexPointSeries TItem="Skill"
+                                                                     Items="userSkills"
+                                                                     Name="Фактические компетенции"
+                                                                     SeriesType="SeriesType.Radar"
+                                                                     XValue="@(s => s.Name)"
+                                                                     YValue="@(s => 1)"
+                                                                     Color="@type.GetColor()" />
+                                                </ApexChart>
+                                            }
                                         }
-                                    }
-                                </div>
+                                    </div>
+                                }
                             }
                         </div>
                     </div>

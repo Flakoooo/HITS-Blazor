@@ -5,8 +5,12 @@ using HITSBlazor.Models.Tests.Entities;
 using HITSBlazor.Models.Users.Entities;
 using HITSBlazor.Models.Users.Enums;
 using HITSBlazor.Services.Auth;
+using HITSBlazor.Services.Modal;
 using HITSBlazor.Services.Profiles;
+using HITSBlazor.Services.Skills;
 using HITSBlazor.Services.Tests;
+using HITSBlazor.Services.UserSkills;
+using HITSBlazor.Utils.Mocks.Common;
 using Microsoft.AspNetCore.Components;
 
 namespace HITSBlazor.Components.Modals.ShowUserModal
@@ -18,10 +22,19 @@ namespace HITSBlazor.Components.Modals.ShowUserModal
     public partial class ShowUserModal
     {
         [Inject]
+        private ModalService ModalService { get; set; } = null!;
+
+        [Inject]
         private IAuthService AuthService { get; set; } = null!;
 
         [Inject]
         private IProfileService ProfileService { get; set; } = null!;
+
+        [Inject]
+        private ISkillService SkillService { get; set; } = null!;
+
+        [Inject]
+        private IUserSkillService UserSkillService { get; set; } = null!;
 
         [Inject]
         private ITestService TestService { get; set; } = null!;
@@ -33,17 +46,99 @@ namespace HITSBlazor.Components.Modals.ShowUserModal
         public Guid UserId { get; set; }
 
         private bool isLoading = true;
+        private bool isCurrentUser = false;
+
+        private bool isChangeSkills = false;
+        private bool isSkillsLoading = true;
+
         //нужно как то продемонстрировать процесс загрузки идей, но как, если это одна модель, хмммм
         private bool ideasIsLoading = false;
 
         private Profile? Profile { get; set; }
-        private RoleType? CurrentUserRole { get; set; }
+
+        private List<Skill> LanguageSkills { get; set; } = [];
+        private List<Skill> FrameworkSkills { get; set; } = [];
+        private List<Skill> DatabaseSkills { get; set; } = [];
+        private List<Skill> DevopsSkills { get; set; } = [];
+
+        private HashSet<Skill> SelectedLanguageSkills { get; set; } = [];
+        private HashSet<Skill> SelectedFrameworkSkills { get; set; } = [];
+        private HashSet<Skill> SelectedDatabaseSkills { get; set; } = [];
+        private HashSet<Skill> SelectedDevopsSkills { get; set; } = [];
 
         private TestResult? BelbinTestResult { get; set; }
         private TestResult? TemperTestResult { get; set; }
         private TestResult? MindTestResult { get; set; }
 
-        private ApexChartOptions<Skill> GetRadarChartOptions(SkillType type)
+        protected override async Task OnInitializedAsync()
+        {
+            isLoading = true;
+
+            Profile = await ProfileService.GetUserProifleAsync(UserId);
+            if (Profile is null) return;
+
+            BelbinTestResult = await TestService.GetTestResultAsync(UserId, TestService.BelbinTestName);
+            TemperTestResult = await TestService.GetTestResultAsync(UserId, TestService.TemperTestName);
+            MindTestResult = await TestService.GetTestResultAsync(UserId, TestService.MindTestName);
+
+            if (UserId == AuthService.CurrentUser?.Id)
+                isCurrentUser = true;
+
+            isLoading = false;
+        }
+
+        private async Task ChangeToUpdateSkills()
+        {
+            isChangeSkills = true;
+            isSkillsLoading = true;
+            StateHasChanged();
+
+            LanguageSkills = await SkillService.GetSkillsByTypeAsync(SkillType.Language);
+            FrameworkSkills = await SkillService.GetSkillsByTypeAsync(SkillType.Framework);
+            DatabaseSkills = await SkillService.GetSkillsByTypeAsync(SkillType.Database);
+            DevopsSkills = await SkillService.GetSkillsByTypeAsync(SkillType.Devops);
+
+            SelectedLanguageSkills = Profile?.Skills.Where(s => s.Type == SkillType.Language).ToHashSet() ?? [];
+            SelectedFrameworkSkills = Profile?.Skills.Where(s => s.Type == SkillType.Framework).ToHashSet() ?? [];
+            SelectedDatabaseSkills = Profile?.Skills.Where(s => s.Type == SkillType.Database).ToHashSet() ?? [];
+            SelectedDevopsSkills = Profile?.Skills.Where(s => s.Type == SkillType.Devops).ToHashSet() ?? [];
+
+            isSkillsLoading = false;
+        }
+
+        private async Task UpdateUserSkills()
+        {
+            List<Skill>? newSkills = 
+            [
+                .. SelectedLanguageSkills, 
+                .. SelectedFrameworkSkills, 
+                .. SelectedDatabaseSkills, 
+                .. SelectedDevopsSkills
+            ];
+            await UserSkillService.UpdateUserSkillsAsync(UserId, newSkills);
+            Profile?.Skills = await UserSkillService.GetUserSkillsAsync(UserId);
+
+            isChangeSkills = false;
+        }
+
+        private async Task<List<Skill>> SearchSkillsAsync(SkillType skillType, string searchText)
+        {
+            if (string.IsNullOrWhiteSpace(searchText))
+            {
+                return skillType switch
+                {
+                    SkillType.Language => LanguageSkills,
+                    SkillType.Framework => FrameworkSkills,
+                    SkillType.Database => DatabaseSkills,
+                    SkillType.Devops => DevopsSkills,
+                    _ => []
+                };
+            }
+
+            return await SkillService.GetSkillByTypeAndByNameAsync(skillType, searchText);
+        }
+
+        private static ApexChartOptions<Skill> GetRadarChartOptions(SkillType type)
         {
             return new ApexChartOptions<Skill>
             {
@@ -82,24 +177,6 @@ namespace HITSBlazor.Components.Modals.ShowUserModal
                     Position = LegendPosition.Bottom
                 }
             };
-        }
-
-        protected override async Task OnInitializedAsync()
-        {
-            isLoading = true;
-
-            Profile = await ProfileService.GetUserProifleAsync(UserId);
-            if (Profile is null) return;
-
-            BelbinTestResult = await TestService.GetTestResultAsync(UserId, TestService.BelbinTestName);
-            TemperTestResult = await TestService.GetTestResultAsync(UserId, TestService.TemperTestName);
-            MindTestResult = await TestService.GetTestResultAsync(UserId, TestService.MindTestName);
-
-            var currentUser = AuthService.CurrentUser;
-            if (UserId == currentUser?.Id)
-                CurrentUserRole = currentUser.Role;
-
-            isLoading = false;
         }
     }
 }
