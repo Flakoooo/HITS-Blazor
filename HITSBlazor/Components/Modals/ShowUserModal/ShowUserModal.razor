@@ -1,4 +1,5 @@
 ﻿@namespace HITSBlazor.Components.Modals.ShowUserModal
+@using HITSBlazor.Components.Collapse
 @using HITSBlazor.Components.InputDropdowns.SkillDropdown
 @using HITSBlazor.Components.Placeholder
 @using HITSBlazor.Models.Common.Entities
@@ -182,7 +183,6 @@
                     </div>
                 </div>
                 <div class="user-info mb-3">
-                    <!--TODO: Реализовать демонстрацию скиллов-->
                     <div class="w-100 bg-white border p-3 rounded-3">
                         <div class="user-info-header border-bottom pb-1">
                             <span class="fs-5 text-primary">Компетенции</span>
@@ -308,28 +308,31 @@
                                     @foreach (var idea in Profile.Ideas)
                                     {
                                         <div class="user-ideas-idea w-100 p-2 bg-white border rounded">
-                                            <div class="w-100 d-flex justify-content-between align-items-center gap-3">
-                                                <div class="w-100 d-flex gap-2 align-items-center justify-content-between">
-                                                    <div class="user-ideas-idea-link fs-6 w-100">
-                                                        @idea.Name
+                                            <Collapse ExpandedClass="w-100" StartCollapsed="true">
+                                                <MainContent Context="collapse">
+                                                    <div class="w-100 d-flex justify-content-between align-items-center gap-3">
+                                                        <div class="w-100 d-flex gap-2 align-items-center justify-content-between">
+                                                            <div class="user-ideas-idea-link fs-6 w-100">
+                                                                @idea.Name
+                                                            </div>
+                                                            <div class="px-2 py-1 rounded-4 fs-6 text-center @idea.Status.GetStyle()">
+                                                                @idea.Status.GetTranslation()
+                                                            </div>
+                                                        </div>
+                                                        <div @onclick="@(() => collapse.Toggle())" class="d-flex align-items-center gap-1" style="cursor: pointer;">
+                                                            <span class="fs-6 text-primary">Описание</span>
+                                                            <i class="bi bi-caret-down text-primary"></i>
+                                                        </div>
                                                     </div>
-                                                    <div class="px-2 py-1 rounded-4 fs-6 text-center @idea.Status.GetStyle()">
-                                                        @idea.Status.GetTranslation()
+                                                </MainContent>
+                                                <ExpandedContent>
+                                                    <div class="list-group">
+                                                        <span class="fs-6 w-100 mt-1 border-top text-secondary">
+                                                            @idea.Description
+                                                        </span>
                                                     </div>
-                                                </div>
-                                                <div class="d-flex align-items-center gap-1" style="cursor: pointer;">
-                                                    <span class="fs-6 text-primary">Описание</span>
-                                                    <i class="bi bi-caret-down text-primary"></i>
-                                                </div>
-                                            </div>
-                                            <!--TODO: Сделать скрытие и открытие описания-->
-                                            <div class="w-100">
-                                                <div class="list-group">
-                                                    <span class="fs-6 w-100 mt-1 border-top text-secondary">
-                                                        @idea.Description
-                                                    </span>
-                                                </div>
-                                            </div>
+                                                </ExpandedContent>
+                                            </Collapse>
                                         </div>
                                     }
                                 }

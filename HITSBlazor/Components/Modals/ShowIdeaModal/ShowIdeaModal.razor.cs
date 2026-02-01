@@ -76,11 +76,11 @@ namespace HITSBlazor.Components.Modals.ShowIdeaModal
                     Title = "Описание необходимых ресурсов для реализации",
                     Data = idea?.Description
                 },
-                // new ShowIdeaModalItem
-                // {
-                //     Title = "Стек технологий",
-                //     Data = skills
-                // }
+                 new ShowIdeaModalItem
+                 {
+                     Title = "Стек технологий",
+                     Data = skills
+                 }
             ];
         }
 

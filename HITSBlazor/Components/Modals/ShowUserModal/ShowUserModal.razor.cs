@@ -1,4 +1,5 @@
 ﻿using ApexCharts;
+using HITSBlazor.Components.Modals.ShowIdeaModal;
 using HITSBlazor.Models.Common.Entities;
 using HITSBlazor.Models.Common.Enums;
 using HITSBlazor.Models.Tests.Entities;
@@ -177,6 +178,14 @@ namespace HITSBlazor.Components.Modals.ShowUserModal
                     Position = LegendPosition.Bottom
                 }
             };
+        }
+
+        private string GetCollapseStyle(ShowIdeaModalItem item)
+        {
+            if (!item.IsExpanded)
+                return "height: 0px; overflow: hidden; transition: height 0.35s ease;";
+
+            return $"overflow: hidden; transition: height 0.35s ease;";
         }
     }
 }

@@ -1,5 +1,7 @@
 ﻿@namespace HITSBlazor.Components.Modals.ShowIdeaModal
+@using HITSBlazor.Components.Collapse
 @using HITSBlazor.Components.Placeholder
+@using HITSBlazor.Models.Common.Entities
 @using HITSBlazor.Utils.EnumStyles
 @using HITSBlazor.Utils.EnumTranslators
 
@@ -29,42 +31,41 @@
                 </span>
             </div>
             <ul class="list-group rounded-3">
-                <!-- //TODO: Текст можно скрывать, нужно реализовать это, похоже на скрытие и открытие в навигации -->
                 @foreach (var data in ideaData)
                 {
                     <li class="list-group-item p-0 overflow-hidden">
-                        <button type="button" class="btn d-flex btn-light w-100 collapse-controller" @onclick="@(() => data.IsExpanded = !data.IsExpanded)">
-                            @data.Title
-                        </button>
-                        @if (data.IsExpanded)
-                        {
-                            <div style="@GetCollapseStyle(data)">
+                        <Collapse StartCollapsed="false">
+                            <MainContent Context="collapse">
+                                <button @onclick="@(() => collapse.Toggle())"
+                                        type="button"
+                                        class="btn d-flex btn-light w-100 collapse-controller">
+                                    @data.Title
+                                </button>
+                            </MainContent>
+                            <ExpandedContent>
                                 <div class="list-group">
-                                    <div class="p-2">@data.Data</div>
+                                    <div class="p-2">
+                                        @if (data.Data is List<Skill>)
+                                        {
+                                            <div class="d-flex flex-wrap gap-1">
+                                                @foreach (var skill in IdeaSkills)
+                                                {
+                                                    <div class="px-2 py-1 rounded d-flex gap-1 @skill.Type.GetStyle()">
+                                                        <span class="fs-6">@skill.Name</span>
+                                                    </div>
+                                                }
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            @data.Data
+                                        }
+                                    </div>
                                 </div>
-                            </div>
-                        }
+                            </ExpandedContent>
+                        </Collapse>
                     </li>
                 }
-                <li class="list-group-item p-0 overflow-hidden">
-                    <button type="button" class="btn d-flex btn-light w-100 collapse-controller">
-                        Стек технологий
-                    </button>
-                    <div>
-                        <div class="list-group">
-                            <div class="p-2">
-                                <div class="d-flex flex-wrap gap-1">
-                                    @foreach (var skill in IdeaSkills)
-                                    {
-                                        <div class="px-2 py-1 rounded d-flex gap-1 @skill.Type.GetStyle()">
-                                            <span class="fs-6">@skill.Name</span>
-                                        </div>
-                                    }
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </li>
             </ul>
         }
         <div class="bg-white d-flex rounded-3 @(isLoading ? "p-2 gap-2" : "p-3 gap-3 flex-wrap")">
