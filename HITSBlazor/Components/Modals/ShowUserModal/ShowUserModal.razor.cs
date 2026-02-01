@@ -179,13 +179,5 @@ namespace HITSBlazor.Components.Modals.ShowUserModal
                 }
             };
         }
-
-        private string GetCollapseStyle(ShowIdeaModalItem item)
-        {
-            if (!item.IsExpanded)
-                return "height: 0px; overflow: hidden; transition: height 0.35s ease;";
-
-            return $"overflow: hidden; transition: height 0.35s ease;";
-        }
     }
 }

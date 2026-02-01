@@ -1,45 +1,9 @@
 ﻿@namespace HITSBlazor.Components.Collapse
 
 @MainContent(this)
-@if (_isExpanded)
-{
-    <div class="@ExpandedClass" style="@GetCollapseStyle(_isExpanded)">
+<div class="@ExpandedClass collapse-@(_isExpanded ? "show" : "hide")">
+    @if (_isExpanded)
+    {
         @ExpandedContent
-    </div>
-}
-
-@code {
-    [Parameter]
-    public RenderFragment<Collapse> MainContent { get; set; } = default!;
-
-    [Parameter]
-    public RenderFragment ExpandedContent { get; set; } = default!;
-
-    [Parameter]
-    public string ExpandedClass { get; set; } = string.Empty;
-
-    [Parameter]
-    public bool StartCollapsed { get; set; } = true;
-
-    private bool _isExpanded = false;
-
-    protected override void OnInitialized()
-    {
-        _isExpanded = !StartCollapsed;
     }
-
-
-    private string GetCollapseStyle(bool isExpanded)
-    {
-        if (!isExpanded)
-            return "height: 0px; overflow: hidden; transition: height 0.35s ease;";
-
-        return $"overflow: hidden; transition: height 0.35s ease;";
-    }
-
-    public void Toggle()
-    {
-        _isExpanded = !_isExpanded;
-        StateHasChanged();
-    }
-}
+</div>
