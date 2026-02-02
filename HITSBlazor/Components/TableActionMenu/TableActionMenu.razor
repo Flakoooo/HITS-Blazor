@@ -1,4 +1,4 @@
-﻿@namespace HITSBlazor.Components.IdeaActionMenu
+﻿@namespace HITSBlazor.Components.TableActionMenu
 
 <td class="py-3" style="position: relative;" @ref="_containerRef">
     <div class="float-end idea-row-icon">
@@ -9,14 +9,15 @@
         </i>
         <div @onclick:stopPropagation
              class="dropdown-menu @(IsOpen ? "idea-row-modal show" : string.Empty)"
-             style="@GetMenuStyle()">
+             style="@_menuStyle">
             <ul class="list-group list-group-flush">
-                <li @onclick="@OnViewClick"
-                    class="list-group-item list-group-item-action px-2 py-1">
-                    Просмотреть
-                </li>
-                <li class="list-group-item list-group-item-action px-2 py-1">Редактировать</li>
-                <li class="list-group-item list-group-item-action px-2 py-1 text-danger">Удалить</li>
+                @foreach (var action in Actions)
+                {
+                    <li @onclick="@(() => HandleActionClick(action))"
+                        class="list-group-item list-group-item-action px-2 py-1 @(action == TableAction.Delete ? "text-danger" : string.Empty)">
+                        @GetActionText(action)
+                    </li>
+                }
             </ul>
         </div>
     </div>

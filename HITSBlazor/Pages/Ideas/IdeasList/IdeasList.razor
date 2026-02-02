@@ -1,5 +1,5 @@
 ﻿@namespace HITSBlazor.Pages.Ideas.IdeasList
-@using HITSBlazor.Components.IdeaActionMenu
+@using HITSBlazor.Components.TableActionMenu
 @using HITSBlazor.Models.Ideas.Enums
 @using HITSBlazor.Utils.EnumStyles
 @using HITSBlazor.Utils.EnumTranslators
@@ -89,7 +89,9 @@
                                         </div>
                                     </div>
                                 </td>
-                                <IdeaActionMenu IdeaId="@idea.Id" OnView="ShowIdea" />
+                                <TableActionMenu ItemId="@idea.Id"
+                                                 OnAction="OnIdeaAction"
+                                                 Actions="@(new List<TableAction> { TableAction.View, TableAction.Edit, TableAction.Delete })" />
                             </tr>
                         </tbody>
                     }

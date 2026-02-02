@@ -1,22 +1,28 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 
-namespace HITSBlazor.Components.IdeaActionMenu
+namespace HITSBlazor.Components.TableActionMenu
 {
-    public partial class IdeaActionMenu : IDisposable
+    public partial class TableActionMenu : IDisposable
     {
         [Parameter]
-        public Guid IdeaId { get; set; }
+        public Guid ItemId { get; set; }
 
         [Parameter]
-        public EventCallback<Guid> OnView { get; set; }
+        public List<TableAction> Actions { get; set; } = [];
+
+        [Parameter]
+        public EventCallback<TableActionContext> OnAction { get; set; }
+
+        [Parameter]
+        public bool ShowToRight { get; set; } = false;
 
         [Inject]
         private IJSRuntime JSRuntime { get; set; } = null!;
 
         private ElementReference _containerRef;
         private ElementReference _triggerRef;
-        private DotNetObjectReference<IdeaActionMenu>? _dotNetRef;
+        private DotNetObjectReference<TableActionMenu>? _dotNetRef;
         private bool IsOpen { get; set; }
         private bool _isDisposed;
         private string _menuStyle = "";
@@ -46,7 +52,11 @@ namespace HITSBlazor.Components.IdeaActionMenu
             {
                 var shouldShowAbove = await JSRuntime.InvokeAsync<bool>(
                     "menuDropdown.shouldShowAbove",
-                    _triggerRef
+                    new
+                    {
+                        triggerElement = _triggerRef,
+                        minHeight = 18 + (32 * Actions.Count) + Actions.Count - 1 + 10
+                    }
                 );
 
                 var styleBuilder = new System.Text.StringBuilder();
@@ -55,13 +65,13 @@ namespace HITSBlazor.Components.IdeaActionMenu
                 if (shouldShowAbove)
                 {
                     styleBuilder.Append("bottom: 100%; ");
-                    styleBuilder.Append("left: 0; ");
+                    styleBuilder.Append(ShowToRight ? "right: 0; " : "left: 0; ");
                     styleBuilder.Append("margin-bottom: 5px; ");
                 }
                 else
                 {
                     styleBuilder.Append("top: 100%; ");
-                    styleBuilder.Append("left: 0; ");
+                    styleBuilder.Append(ShowToRight ? "right: 0; " : "left: 0; ");
                     styleBuilder.Append("margin-top: 5px; ");
                 }
 
@@ -87,7 +97,7 @@ namespace HITSBlazor.Components.IdeaActionMenu
                     "menuDropdown.registerClickOutside",
                     _containerRef,
                     _dotNetRef,
-                    IdeaId.ToString()
+                    ItemId.ToString()
                 );
             }
             catch { }
@@ -110,7 +120,7 @@ namespace HITSBlazor.Components.IdeaActionMenu
             IsOpen = !IsOpen;
 
             if (IsOpen)
-                await JSRuntime.InvokeVoidAsync("menuDropdown.closeOtherMenus", IdeaId.ToString());
+                await JSRuntime.InvokeVoidAsync("menuDropdown.closeOtherMenus", ItemId.ToString());
 
             await Task.CompletedTask;
         }
@@ -126,14 +136,27 @@ namespace HITSBlazor.Components.IdeaActionMenu
             await Task.CompletedTask;
         }
 
-        private async Task OnViewClick()
+        private string GetActionText(TableAction action) => action switch
+        {
+            TableAction.View => "Просмотреть",
+            TableAction.Edit => "Редактировать",
+            TableAction.Delete => "Удалить",
+            _ => action.ToString()
+        };
+
+        private async Task HandleActionClick(TableAction action)
         {
             IsOpen = false;
             _menuStyle = "";
-            await OnView.InvokeAsync(IdeaId);
-        }
 
-        private string GetMenuStyle() => _menuStyle;
+            var context = new TableActionContext
+            {
+                Action = action,
+                ItemId = ItemId
+            };
+
+            await OnAction.InvokeAsync(context);
+        }
 
         public void Dispose()
         {

@@ -22,7 +22,7 @@ namespace HITSBlazor.Utils.Mocks.Teams
                     UserId = kirill.Id,
                     FirstName = kirill.FirstName,
                     LastName = kirill.LastName,
-                    StartDate = new DateTime(2023, 1, 1, 11, 2, 17, DateTimeKind.Utc).ToString(Settings.DateFormat),
+                    StartDate = new DateTime(2023, 1, 1, 11, 2, 17, DateTimeKind.Utc),
                     FinishDate = null,
                     HasActiveProject = cardTeam.HasActiveProject
                 }

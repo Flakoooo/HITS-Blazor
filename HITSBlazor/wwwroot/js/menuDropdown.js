@@ -2,18 +2,18 @@
     const openMenus = new Map();
     let clickOutsideHandler = null;
 
-    function shouldShowAbove(triggerElement) {
+    function shouldShowAbove(options) {
+        const { triggerElement, minHeight = 40 } = options;
+
         if (!triggerElement) return false;
 
         const triggerRect = triggerElement.getBoundingClientRect();
         const viewportHeight = window.innerHeight;
 
-        const MENU_HEIGHT = 120;
-
         const spaceBelow = viewportHeight - triggerRect.bottom;
         const spaceAbove = triggerRect.top;
 
-        return spaceBelow < MENU_HEIGHT && spaceAbove >= MENU_HEIGHT;
+        return spaceBelow < minHeight && spaceAbove >= minHeight;
     }
 
     function shouldShowAboveOptimized(triggerElement) {

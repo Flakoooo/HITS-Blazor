@@ -1,7 +1,9 @@
 ﻿using ApexCharts;
 using HITSBlazor.Components.Modals.ShowIdeaModal;
+using HITSBlazor.Components.TableActionMenu;
 using HITSBlazor.Models.Common.Entities;
 using HITSBlazor.Models.Common.Enums;
+using HITSBlazor.Models.Teams.Entities;
 using HITSBlazor.Models.Tests.Entities;
 using HITSBlazor.Models.Users.Entities;
 using HITSBlazor.Models.Users.Enums;
@@ -11,7 +13,6 @@ using HITSBlazor.Services.Profiles;
 using HITSBlazor.Services.Skills;
 using HITSBlazor.Services.Tests;
 using HITSBlazor.Services.UserSkills;
-using HITSBlazor.Utils.Mocks.Common;
 using Microsoft.AspNetCore.Components;
 
 namespace HITSBlazor.Components.Modals.ShowUserModal
@@ -178,6 +179,14 @@ namespace HITSBlazor.Components.Modals.ShowUserModal
                     Position = LegendPosition.Bottom
                 }
             };
+        }
+
+        private async Task OnTeamAction(TableActionContext context)
+        {
+            if (context.Action == TableAction.View)
+            {
+                Console.WriteLine($"Демонстрация идеи {context.ItemId}");
+            }
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using HITSBlazor.Components.Modals.ShowIdeaModal;
+using HITSBlazor.Components.TableActionMenu;
 using HITSBlazor.Models.Ideas.Entities;
 using HITSBlazor.Models.Ideas.Enums;
 using HITSBlazor.Services;
@@ -6,7 +7,6 @@ using HITSBlazor.Services.Ideas;
 using HITSBlazor.Services.Modal;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
-using Microsoft.JSInterop;
 
 namespace HITSBlazor.Pages.Ideas.IdeasList
 {
@@ -74,6 +74,22 @@ namespace HITSBlazor.Pages.Ideas.IdeasList
                 { "IdeaId", ideaId }
             };
             ModalService.Show<ShowIdeaModal>(type: ModalType.RightSide, parameters: modalParameters);
+        }
+
+        private async Task OnIdeaAction(TableActionContext context)
+        {
+            if (context.Action == TableAction.View)
+            {
+                ShowIdea(context.ItemId);
+            }
+            else if (context.Action == TableAction.Edit)
+            {
+                Console.WriteLine($"Редактирование идеи {context.ItemId}");
+            }
+            else 
+            {
+                Console.WriteLine($"Удаление идеи {context.ItemId}");
+            }
         }
     }
 }
