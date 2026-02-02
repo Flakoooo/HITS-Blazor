@@ -1,9 +1,8 @@
 ﻿@namespace HITSBlazor.Components.Collapse
 
 @MainContent(this)
-<div class="@ExpandedClass collapse-@(_isExpanded ? "show" : "hide")">
-    @if (_isExpanded)
-    {
-        @ExpandedContent
-    }
+<div @ref="_collapseElement"
+     class="@ExpandedClass @(_isAnimating ? "collapsing" : (_isExpanded ? "expanded" : "collapsed"))"
+     style="@GetCollapseStyle()">
+    @ExpandedContent
 </div>

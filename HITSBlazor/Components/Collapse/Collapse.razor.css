@@ -1,10 +1,14 @@
-﻿.collapse-show {
-    overflow: hidden;
+﻿.collapsing {
     transition: height 0.35s ease;
+    overflow: hidden;
 }
 
-.collapse-hide {
-    height: 0px;
+.expanded {
+    height: auto;
+    overflow: visible;
+}
+
+.collapsed {
+    height: 0;
     overflow: hidden;
-    transition: height 0.35s ease;
 }
