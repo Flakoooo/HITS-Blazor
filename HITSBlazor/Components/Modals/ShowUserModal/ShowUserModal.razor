@@ -313,7 +313,7 @@
                                                 <MainContent Context="collapse">
                                                     <div class="w-100 d-flex justify-content-between align-items-center gap-3">
                                                         <div class="w-100 d-flex gap-2 align-items-center justify-content-between">
-                                                            <div class="user-ideas-idea-link fs-6 w-100">
+                                                            <div @onclick="@(() => ShowIdea(idea.Id))" class="user-ideas-idea-link data-link fs-6 w-100">
                                                                 @idea.Name
                                                             </div>
                                                             <div class="px-2 py-1 rounded-4 fs-6 text-center @idea.Status.GetStyle()">

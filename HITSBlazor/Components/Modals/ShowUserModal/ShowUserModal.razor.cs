@@ -1,12 +1,9 @@
 ﻿using ApexCharts;
-using HITSBlazor.Components.Modals.ShowIdeaModal;
 using HITSBlazor.Components.TableActionMenu;
 using HITSBlazor.Models.Common.Entities;
 using HITSBlazor.Models.Common.Enums;
-using HITSBlazor.Models.Teams.Entities;
 using HITSBlazor.Models.Tests.Entities;
 using HITSBlazor.Models.Users.Entities;
-using HITSBlazor.Models.Users.Enums;
 using HITSBlazor.Services.Auth;
 using HITSBlazor.Services.Modal;
 using HITSBlazor.Services.Profiles;
@@ -179,6 +176,15 @@ namespace HITSBlazor.Components.Modals.ShowUserModal
                     Position = LegendPosition.Bottom
                 }
             };
+        }
+
+        private void ShowIdea(Guid ideaId)
+        {
+            var modalParameters = new Dictionary<string, object>
+            {
+                { "IdeaId", ideaId }
+            };
+            ModalService.Show<ShowIdeaModal.ShowIdeaModal>(type: ModalType.RightSide, parameters: modalParameters);
         }
 
         private async Task OnTeamAction(TableActionContext context)

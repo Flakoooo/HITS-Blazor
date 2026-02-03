@@ -1,4 +1,5 @@
 ﻿@namespace HITSBlazor.Components.LeftSideNavigation
+@using HITSBlazor.Components.Collapse
 @using HITSBlazor.Components.Placeholder
 @using HITSBlazor.Models.Users.Enums
 @using HITSBlazor.Utils.EnumTranslators
@@ -27,26 +28,30 @@
 
                     <div class="@(isHovered ? "nav-item w-100" : "nav-item")"
                          style="@(isHovered ? "border-radius: 6px; transition: background-color .15s ease-out;" : string.Empty)">
-                        <!--TODO: Переделать на гиперссылку, чтобы открывать в других окнах-->
-                        <button type="button"
-                                @onclick="() => SelectMenuItem(item.Id)"
-                                class="@GetItemButtonClass(item.Id)"
-                                style="height: 40px; min-height: 40px; max-height: 40px; flex-direction: row; flex-wrap: nowrap; align-items: center; justify-content: flex-start; gap: 4px;">
-                            <i class="bi @item.Icon fs-5"></i>
-                            @if (isHovered)
-                            {
-                                <span class="fs-6 ms-2">@item.Title</span>
-                            }
-                        </button>
-                        @if (item.SubItems.Any())
-                        {
-                            <div style="@GetCollapseStyle(item)">
+                        <Collapse StartCollapsed="!item.IsExpanded">
+                            <MainContent Context="collapse">
+                                <button type="button"
+                                        @onclick="async () => { 
+                                            await SelectMenuItem(item.Id); 
+                                            await collapse.Toggle(); 
+                                        }"
+                                        class="@GetItemButtonClass(item.Id)"
+                                        style="height: 40px; min-height: 40px; max-height: 40px; flex-direction: row; flex-wrap: nowrap; align-items: center; justify-content: flex-start; gap: 4px;">
+                                    <i class="bi @item.Icon fs-5"></i>
+                                    @if (isHovered)
+                                    {
+                                        <span class="fs-6 ms-2">@item.Title</span>
+                                    }
+                                </button>
+                            </MainContent>
+                            <ExpandedContent>
                                 <div class="list-group">
                                     <div class="pt-2 rounded">
                                         @for (int j = 0; j < item.SubItems.Count; j++)
                                         {
                                             var subItem = item.SubItems[j];
 
+                                            <!--TODO: Переделать на гиперссылку, чтобы открывать в других окнах-->
                                             <button type="button"
                                                     @onclick="() => SelectSubItem(item.Id, subItem.Id)"
                                                     class="@GetSubItemClass(item.Id, subItem.Id)"
@@ -60,8 +65,8 @@
                                         }
                                     </div>
                                 </div>
-                            </div>
-                        }
+                            </ExpandedContent>
+                        </Collapse>
                     </div>
                 }
             </ul>

@@ -12,7 +12,7 @@ namespace HITSBlazor.Components.Modals.ModalContainer
         private bool IsClosing { get; set; } = false;
         private bool IsBlockCloseModal { get; set; }
         private Type? CurrentComponentType { get; set; }
-        private Dictionary<string, object> Parameters { get; set; } = new();
+        private Dictionary<string, object> Parameters { get; set; } = [];
 
         protected override void OnInitialized()
         {

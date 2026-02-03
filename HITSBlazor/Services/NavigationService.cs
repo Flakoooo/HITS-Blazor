@@ -105,8 +105,6 @@ namespace HITSBlazor.Services
             try
             {
                 _navigationManager.NavigateTo(url, forceLoad);
-
-                await UpdateNavigationState(url);
             }
             catch (Exception ex)
             {

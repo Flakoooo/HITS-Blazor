@@ -99,15 +99,6 @@ namespace HITSBlazor.Components.LeftSideNavigation
             return isActive ? $"active router-link-exact-active {baseClass}" : baseClass;
         }
 
-        private static string GetCollapseStyle(NavigationItem item)
-        {
-            if (!item.IsExpanded)
-                return "height: 0px; overflow: hidden; transition: height 0.35s ease;";
-
-            var height = 8 + (item.SubItems.Count * 40);
-            return $"height: {height}px; overflow: hidden; transition: height 0.35s ease;";
-        }
-
         private async Task SelectMenuItem(int itemId)
         {
             var item = _menuItems.FirstOrDefault(n => n.Id == itemId);
