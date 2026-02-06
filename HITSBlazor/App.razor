@@ -72,14 +72,14 @@
             {
                 if (!isPublicRoute && !currentPath.Equals("redirect", StringComparison.OrdinalIgnoreCase))
                 {
-                    Navigation.NavigateTo("/redirect", replace: true);
+                    Navigation.NavigateTo("redirect", replace: true);
                 }
             }
             else
             {
                 if (!currentPath.StartsWith("login", StringComparison.OrdinalIgnoreCase))
                 {
-                    Navigation.NavigateTo("/login", replace: true);
+                    Navigation.NavigateTo("login", replace: true);
                 }
             }
 

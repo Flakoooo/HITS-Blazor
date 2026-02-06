@@ -1,7 +1,9 @@
 ﻿using ApexCharts;
+using HITSBlazor.Components.Modals.UpdateEmailModal;
 using HITSBlazor.Components.TableActionMenu;
 using HITSBlazor.Models.Common.Entities;
 using HITSBlazor.Models.Common.Enums;
+using HITSBlazor.Models.Ideas.Entities;
 using HITSBlazor.Models.Tests.Entities;
 using HITSBlazor.Models.Users.Entities;
 using HITSBlazor.Services.Auth;
@@ -14,10 +16,6 @@ using Microsoft.AspNetCore.Components;
 
 namespace HITSBlazor.Components.Modals.ShowUserModal
 {
-
-    //TODO: Это модальное окно многофункциональное, в том плане что вызывается в разных частях сайта, я не конкретной части
-    //TODO: путь будет "profile/userId", указать этот путь каждой странице не могу, значит надо как то через срвис навигации вызывать компонент
-    //TODO: Если такое реализовать, то модальное окно идей также нужно реализовать
     public partial class ShowUserModal
     {
         [Inject]
@@ -44,16 +42,19 @@ namespace HITSBlazor.Components.Modals.ShowUserModal
         [Parameter]
         public Guid UserId { get; set; }
 
-        private bool isLoading = true;
-        private bool isCurrentUser = false;
+        private bool _isLoading = true;
+        private bool _isCurrentUser = false;
 
-        private bool isChangeSkills = false;
-        private bool isSkillsLoading = true;
+        private string? _editingField;
+
+        private bool _isChangeSkills = false;
+        private bool _isSkillsLoading = true;
 
         //нужно как то продемонстрировать процесс загрузки идей, но как, если это одна модель, хмммм
         private bool ideasIsLoading = false;
 
         private Profile? Profile { get; set; }
+        private UserDataForm? _userDataForm;
 
         private List<Skill> LanguageSkills { get; set; } = [];
         private List<Skill> FrameworkSkills { get; set; } = [];
@@ -71,25 +72,74 @@ namespace HITSBlazor.Components.Modals.ShowUserModal
 
         protected override async Task OnInitializedAsync()
         {
-            isLoading = true;
+            _isLoading = true;
 
             Profile = await ProfileService.GetUserProifleAsync(UserId);
             if (Profile is null) return;
+
+            _userDataForm = new UserDataForm
+            {
+                Email = Profile.Email,
+                FirstName = Profile.FirstName,
+                LastName = Profile.LastName,
+                Telephone = Profile.Telephone,
+                StudyGroup = Profile.StudyGroup
+            };
 
             BelbinTestResult = await TestService.GetTestResultAsync(UserId, TestService.BelbinTestName);
             TemperTestResult = await TestService.GetTestResultAsync(UserId, TestService.TemperTestName);
             MindTestResult = await TestService.GetTestResultAsync(UserId, TestService.MindTestName);
 
             if (UserId == AuthService.CurrentUser?.Id)
-                isCurrentUser = true;
+                _isCurrentUser = true;
 
-            isLoading = false;
+            _isLoading = false;
+        }
+
+        private UserDataForm ResetUserForm(Profile original) => new()
+        {
+            Email = original.Email,
+            FirstName = original.FirstName,
+            LastName = original.LastName,
+            Telephone = original.Telephone,
+            StudyGroup = original.StudyGroup
+        };
+
+        private void StartEdit(string fieldName)
+        {
+            _editingField = fieldName;
+
+            if (Profile is null) return;
+            _userDataForm = ResetUserForm(Profile);
+        }
+
+        private async Task SaveEdit()
+        {
+            if (Profile is not null && _editingField is not null && _userDataForm is not null)
+            {
+                await ProfileService.UpdateProfileUserData(_userDataForm);
+
+                Profile.Email = _userDataForm.Email;
+                Profile.FirstName = _userDataForm.FirstName;
+                Profile.LastName = _userDataForm.LastName;
+                Profile.StudyGroup = _userDataForm.StudyGroup;
+                Profile.Telephone = _userDataForm.Telephone;
+            }
+            _editingField = null;
+        }
+
+        private void CancelEdit()
+        {
+            _editingField = null;
+
+            if (Profile is null) return;
+            _userDataForm = ResetUserForm(Profile);
         }
 
         private async Task ChangeToUpdateSkills()
         {
-            isChangeSkills = true;
-            isSkillsLoading = true;
+            _isChangeSkills = true;
+            _isSkillsLoading = true;
             StateHasChanged();
 
             LanguageSkills = await SkillService.GetSkillsByTypeAsync(SkillType.Language);
@@ -102,7 +152,7 @@ namespace HITSBlazor.Components.Modals.ShowUserModal
             SelectedDatabaseSkills = Profile?.Skills.Where(s => s.Type == SkillType.Database).ToHashSet() ?? [];
             SelectedDevopsSkills = Profile?.Skills.Where(s => s.Type == SkillType.Devops).ToHashSet() ?? [];
 
-            isSkillsLoading = false;
+            _isSkillsLoading = false;
         }
 
         private async Task UpdateUserSkills()
@@ -117,7 +167,7 @@ namespace HITSBlazor.Components.Modals.ShowUserModal
             await UserSkillService.UpdateUserSkillsAsync(UserId, newSkills);
             Profile?.Skills = await UserSkillService.GetUserSkillsAsync(UserId);
 
-            isChangeSkills = false;
+            _isChangeSkills = false;
         }
 
         private async Task<List<Skill>> SearchSkillsAsync(SkillType skillType, string searchText)
@@ -176,6 +226,11 @@ namespace HITSBlazor.Components.Modals.ShowUserModal
                     Position = LegendPosition.Bottom
                 }
             };
+        }
+
+        private void ShowUpdateEmail()
+        {
+            ModalService.Show<UpdateEmailModal.UpdateEmailModal>();
         }
 
         private void ShowIdea(Guid ideaId)

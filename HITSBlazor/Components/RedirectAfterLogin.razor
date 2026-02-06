@@ -1,12 +1,2 @@
 ﻿@namespace HITSBlazor.Components
-@using HITSBlazor.Services
-@inject NavigationService NavigationService
-@inject NavigationManager NavigationManager
 @page "/redirect"
-
-@code {
-    protected override async Task OnInitializedAsync()
-    {
-        await NavigationService.InitializeAsync();
-    }
-}

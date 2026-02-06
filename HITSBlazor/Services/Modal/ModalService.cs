@@ -6,6 +6,13 @@ namespace HITSBlazor.Services.Modal
     {
         public event Action<ModalData>? OnShow;
         public event Action? OnClose;
+        public event Action? OnCloseContainer;
+
+        private Stack<ModalData> _modalStack = [];
+
+        public int ModalCount => _modalStack.Count;
+        public bool HasModals => _modalStack.Count > 0;
+        public ModalData? CurrentModal => _modalStack.Count > 0 ? _modalStack.Peek() : null;
 
         public void Show<TComponent>(
             ModalType type = ModalType.Center,
@@ -34,12 +41,33 @@ namespace HITSBlazor.Services.Modal
                 CustomClass = customClass
             };
 
+            _modalStack.Push(modalData);
             OnShow?.Invoke(modalData);
         }
 
-        public void Close()
+        public async void Close()
         {
+            if (_modalStack.Count == 0)
+                return;
+
+            _modalStack.Pop();
+
             OnClose?.Invoke();
+
+            await Task.Delay(100).ContinueWith(_ =>
+            {
+                if (_modalStack.Count > 0)
+                    OnShow?.Invoke(_modalStack.Peek());
+                else
+                    OnCloseContainer?.Invoke();
+            });
+        }
+
+        public void CloseAll()
+        {
+            _modalStack.Clear();
+            OnClose?.Invoke();
+            OnCloseContainer?.Invoke();
         }
     }
 }

@@ -1,0 +1,76 @@
+﻿@namespace HITSBlazor.Components.Modals.UpdateEmailModal
+
+<div @onclick:stopPropagation="true"
+      class="p-3 rounded-3 shadow new-email-request-modal bg-white p-3 rounded">
+    <div class="d-flex align-items-center justify-content-between">
+        <span class="fs-3 text-primary text-center">Изменение почты</span>
+        <button @onclick="@(() => ModalService.Close())" type="button" class="btn d-flex btn-close"></button>
+    </div>
+    @if (_isEmailRequestSended)
+    {
+        <div class="w-100">
+            <div class="input-group">
+                <span class="input-group-text fs-6">
+                    <i class="bi bi-fonts"></i>
+                </span>
+                <input type="text"
+                       @bind="@_verificationCode"
+                       @bind:event="oninput"
+                       class="form-control"
+                       placeholder="Введите код аутентификации"
+                       maxlength="6" />
+            </div>
+        </div>
+        <div class="w-100">
+            <div class="input-group">
+                <span class="input-group-text fs-6">&#64;</span>
+                <input type="email"
+                       @bind="_emailValue"
+                       @bind:event="oninput"
+                       class="form-control"
+                       placeholder="Введите ваш новый email" />
+            </div>
+        </div>
+        <button type="button" 
+                @onclick="@VirificateEmailRequest"
+                disabled="@_isLoading"
+                class="btn d-flex btn-primary">
+            @if (_isLoading)
+            {
+                <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                <span>Изменение...</span>
+            }
+            else
+            {
+                <span>Изменить пароль</span>
+            }
+        </button>
+    }
+    else
+    {
+        <div class="w-100">
+            <div class="input-group">
+                <span class="input-group-text fs-6">&#64;</span>
+                <input @bind="@_emailValue"
+                       @bind:event="oninput"
+                       type="email"
+                       placeholder="Введите ваш новый email"
+                       class="form-control rounded-end" />
+            </div>
+        </div>
+        <button type="button" 
+                @onclick="@SendNewEmailRequest"
+                disabled="@_isLoading" 
+                class="btn d-flex btn-primary">
+            @if (_isLoading)
+            {
+                <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                <span>Отправка...</span>
+            }
+            else
+            {
+                <span>Отправить</span>
+            }
+        </button>
+    }
+</div>

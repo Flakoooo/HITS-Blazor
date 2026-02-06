@@ -1,0 +1,22 @@
+﻿.new-email-request-modal {
+    width: 400px;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    gap: 16px;
+    align-items: stretch;
+    align-self: center;
+    justify-content: flex-start;
+    justify-self: center;
+    transition: all .15s ease-out;
+}
+
+.modal-layout-enter-active .new-email-request-modal {
+    transform: scale(1);
+    animation: scaleIn 0.15s ease-out;
+}
+
+.modal-layout-leave-active .new-email-request-modal {
+    transform: scale(0.9);
+    animation: scaleOut 0.15s ease-out;
+}

@@ -1,13 +1,13 @@
 ﻿@namespace HITSBlazor.Components.Modals.ModalContainer
 
-@if (IsVisible)
+@if (_isContainerVisible)
 {
     <div @onclick="CloseModalIfAllowed"
-         class="modal-layout modal-layout-@(IsClosing ? "leave" : "enter")-active">
-        @if (CurrentComponentType != null)
+         class="modal-layout modal-layout-@(_isContainerClosing ? "leave" : "enter")-active">
+        @if (_currentComponentType != null)
         {
-            <DynamicComponent Type="@CurrentComponentType"
-                              Parameters="@Parameters" />
+            <DynamicComponent Type="@_currentComponentType"
+                              Parameters="@_parameters" />
         }
     </div>
 }

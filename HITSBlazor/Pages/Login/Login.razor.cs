@@ -1,4 +1,5 @@
-﻿using HITSBlazor.Services.Auth;
+﻿using HITSBlazor.Services;
+using HITSBlazor.Services.Auth;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
 
@@ -15,9 +16,9 @@ namespace HITSBlazor.Pages.Login
         private IAuthService AuthService { get; set; } = null!;
 
         [Inject]
-        private NavigationManager Navigation { get; set; } = null!;
+        private NavigationService Navigation { get; set; } = null!;
 
-        protected override void OnInitialized()
+        protected async override Task OnInitializedAsync()
         {
             //TODO: УБРАТЬ ПОСЛЕ РАЗРАБОТКИ
 #if DEBUG
@@ -27,9 +28,6 @@ namespace HITSBlazor.Pages.Login
             loginModel.Email = "lexunok@gmail.com";
             loginModel.Password = "lexunok2505";
 #endif
-
-            if (AuthService.IsAuthenticated)
-                Navigation.NavigateTo("/redirect");
         }
 
         private async Task HandleLogin()
@@ -41,7 +39,7 @@ namespace HITSBlazor.Pages.Login
             if (await AuthService.LoginAsync(loginModel))
             {
                 loginModel = new LoginModel();
-                Navigation.NavigateTo("/redirect");
+                await Navigation.NavigateToAsync("redirect");
             }
 
             isLoading = false;

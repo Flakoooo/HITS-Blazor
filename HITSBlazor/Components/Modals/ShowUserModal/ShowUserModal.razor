@@ -3,14 +3,15 @@
 @using HITSBlazor.Components.InputDropdowns.SkillDropdown
 @using HITSBlazor.Components.Placeholder
 @using HITSBlazor.Components.TableActionMenu
+@using HITSBlazor.Components.UserInfoField
 @using HITSBlazor.Models.Common.Entities
 @using HITSBlazor.Models.Common.Enums
 @using HITSBlazor.Utils.EnumStyles
 @using HITSBlazor.Utils.EnumTranslators
 
 <div class="right-side-modal p-3 overflow-y-scroll" @onclick:stopPropagation="true">
-    <div class="w-100 @(isLoading || Profile is null ? "user-placeholder" : string.Empty)">
-        @if (isLoading || Profile is null)
+    <div class="w-100 @(_isLoading || Profile is null ? "user-placeholder" : string.Empty)">
+        @if (_isLoading || Profile is null)
         {
             <Placeholder Width="w-75" />
             <div class="user-placeholder-content">
@@ -82,7 +83,7 @@
                             @foreach (var role in Profile.Roles)
                             {
                                 <div class="w-auto">
-                                    <div class="text-center rounded-pill px-2 py-1 @(isCurrentUser && role == AuthService.CurrentUser?.Role ? "bg-primary text-light" : "bg-light border p-2")">
+                                    <div class="text-center rounded-pill px-2 py-1 @(_isCurrentUser && role == AuthService.CurrentUser?.Role ? "bg-primary text-light" : "bg-light border p-2")">
                                         @role.GetTranslation()
                                     </div>
                                 </div>
@@ -92,92 +93,60 @@
                     <div class="w-100 bg-white border p-3 rounded-3">
                         <div class="user-info-header border-bottom pb-1">
                             <span class="fs-5 text-primary">Информация</span>
+                            @if (_isCurrentUser && _editingField != null)
+                            {
+                                <div class="d-flex justify-content-end gap-2">
+                                    <button @onclick="@SaveEdit" type="button" class="btn d-flex btn-success">
+                                        Сохранить
+                                    </button>
+                                    <button @onclick="@CancelEdit" type="button" class="btn d-flex btn-danger">
+                                        Отменить
+                                    </button>
+                                </div>                                
+                            }
                         </div>
                         <div class="user-info-content p-2">
-                            <div class="w-100 d-flex flex-column gap-2">
-                                <div class="d-flex gap-1">
-                                    <span class="fs-6 text-primary">Почта:</span>
-                                    @if (isCurrentUser)
-                                    {
-                                        <div class="data-link text-secondary cursor-pointer">
-                                            изменить
-                                        </div>
-                                    }
-                                </div>
-                                <div class="w-100">
-                                    <div class="input-group">
-                                        <input @bind="Profile.Email" @bind:event="oninput" type="text" class="form-control rounded-end w-100" disabled />
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="w-100 d-flex flex-column gap-2">
-                                <div class="d-flex gap-1">
-                                    <span class="fs-6 text-primary">Имя:</span>
-                                    @if (isCurrentUser)
-                                    {
-                                        <div class="data-link text-secondary cursor-pointer">
-                                            изменить
-                                        </div>
-                                    }
-                                </div>
-                                <div class="w-100">
-                                    <div class="input-group">
-                                        <input @bind="Profile.FirstName" @bind:event="oninput" type="text" class="form-control rounded-end w-100" disabled />
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="w-100 d-flex flex-column gap-2">
-                                <div class="d-flex gap-1">
-                                    <span class="fs-6 text-primary">Фамилия:</span>
-                                    @if (isCurrentUser)
-                                    {
-                                        <div class="data-link text-secondary cursor-pointer">
-                                            изменить
-                                        </div>
-                                    }
-                                </div>
-                                <div class="w-100">
-                                    <div class="input-group">
-                                        <input @bind="Profile.LastName" @bind:event="oninput" type="text" class="form-control rounded-end w-100" disabled />
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="w-100 d-flex flex-column gap-2">
-                                <div class="d-flex gap-1">
-                                    <span class="fs-6 text-primary">Группа:</span>
-                                    @if (isCurrentUser)
-                                    {
-                                        <div class="data-link text-secondary cursor-pointer">
-                                            изменить
-                                        </div>
-                                    }
-                                </div>
-                                <div class="w-100">
-                                    <div class="input-group">
-                                        <input @bind="Profile.StudyGroup" @bind:event="oninput" type="text" class="form-control rounded-end w-100" disabled />
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="w-100 d-flex flex-column gap-2">
-                                <div class="d-flex gap-1">
-                                    <span class="fs-6 text-primary">Телефон:</span>
-                                    @if (isCurrentUser)
-                                    {
-                                        <div class="data-link text-secondary cursor-pointer">
-                                            изменить
-                                        </div>
-                                    }
-                                </div>
-                                <div class="w-100">
-                                    <div class="input-group">
-                                        <input @bind="Profile.Telephone" @bind:event="oninput" type="text" class="form-control rounded-end w-100" disabled />
-                                    </div>
-                                </div>
-                            </div>
+                            <UserInfoField 
+                                Title="Почта" 
+                                Value="@_userDataForm?.Email"
+                                ValueChanged="@((value) => _userDataForm?.Email = value)"
+                                IsEditing="@(_editingField == nameof(_userDataForm.Email))"
+                                IsCurrentUser="@_isCurrentUser"
+                                OnEdit="@(() => ShowUpdateEmail())" />
+
+                            <UserInfoField 
+                                Title="Имя" 
+                                Value="@_userDataForm?.FirstName"
+                                ValueChanged="@((value) => _userDataForm?.FirstName = value)"
+                                IsEditing="@(_editingField == nameof(_userDataForm.FirstName))"
+                                IsCurrentUser="@_isCurrentUser"
+                                OnEdit="@(() => StartEdit(nameof(_userDataForm.FirstName)))" />
+
+                            <UserInfoField 
+                                Title="Фамилия" 
+                                Value="@Profile?.LastName"
+                                IsEditing="@(_editingField == nameof(Profile.LastName))"
+                                IsCurrentUser="@_isCurrentUser"
+                                OnEdit="@(() => StartEdit(nameof(Profile.LastName)))" />
+
+                            <UserInfoField 
+                                Title="Группа" 
+                                Value="@Profile?.StudyGroup"
+                                IsEditing="@(_editingField == nameof(Profile.StudyGroup))"
+                                IsCurrentUser="@_isCurrentUser"
+                                OnEdit="@(() => StartEdit(nameof(Profile.StudyGroup)))" />
+
+                            <UserInfoField 
+                                Title="Телефон" 
+                                Value="@Profile?.Telephone"
+                                IsEditing="@(_editingField == nameof(Profile.Telephone))"
+                                IsCurrentUser="@_isCurrentUser"
+                                OnEdit="@(() => StartEdit(nameof(Profile.Telephone)))" />
+
                             <div class="d-flex gap-1">
                                 <span class="fs-6 text-primary">Дата регистрации:</span>
                                 <span class="fs-6 text-secondary">
-                                    @(Profile.CreatedAt is null ? "-" : Profile.CreatedAt.Value.ToString("dd.MM.yyyy"))
+                                    @(Profile?.CreatedAt is null ? "-" : Profile.CreatedAt.Value.ToString("dd.MM.yyyy"))
                                 </span>
                             </div>
                         </div>
@@ -187,9 +156,9 @@
                     <div class="w-100 bg-white border p-3 rounded-3">
                         <div class="user-info-header border-bottom pb-1">
                             <span class="fs-5 text-primary">Компетенции</span>
-                            @if (isCurrentUser)
+                            @if (_isCurrentUser)
                             {
-                                @if (isChangeSkills)
+                                @if (_isChangeSkills)
                                 {
                                     <div class="d-flex gap-2">
                                         <button @onclick="@UpdateUserSkills"
@@ -197,7 +166,7 @@
                                                 class="btn d-flex btn-primary">
                                             Сохранить
                                         </button>
-                                        <button @onclick="@(() => isChangeSkills = !isChangeSkills)" 
+                                        <button @onclick="@(() => _isChangeSkills = !_isChangeSkills)"
                                                 type="button" 
                                                 class="btn d-flex btn-danger">
                                             Отменить
@@ -215,9 +184,9 @@
                             }
                         </div>
                         <div>
-                            @if (isCurrentUser && isChangeSkills)
+                            @if (_isCurrentUser && _isChangeSkills)
                             {
-                                @if (isSkillsLoading)
+                                @if (_isSkillsLoading)
                                 {
                                     <div class="mt-2 w-100 d-flex gap-3">
                                         @for (int p = 0; p < 4; ++p)
@@ -250,7 +219,7 @@
                             }
                             else
                             {
-                                @if (Profile.Skills.Count == 0)
+                                @if (Profile?.Skills.Count == 0)
                                 {
                                     <span class="d-flex w-100 justify-content-center mt-3 fs-6 text-secondary">
                                         Компетенции не выбраны
@@ -261,8 +230,8 @@
                                     <div class="user-skills-charts">
                                         @foreach (var type in Enum.GetValues<SkillType>())
                                         {
-                                            var userSkills = Profile.Skills.Where(s => s.Type == type).ToList();
-                                            if (userSkills.Count > 0)
+                                            var userSkills = Profile?.Skills.Where(s => s.Type == type).ToList();
+                                            if (userSkills?.Count > 0)
                                             {
                                                 <ApexChart TItem="Skill"
                                                            Options="@GetRadarChartOptions(type)"
@@ -300,13 +269,13 @@
                             }
                             else
                             {
-                                @if (Profile.Ideas.Count == 0)
+                                @if (Profile?.Ideas.Count == 0)
                                 {
                                     <span class="fs-6 text-secondary">Идей пока нет</span>
                                 }
                                 else
                                 {
-                                    @foreach (var idea in Profile.Ideas)
+                                    @foreach (var idea in Profile?.Ideas ?? [])
                                     {
                                         <div class="user-ideas-idea w-100 p-2 bg-white border rounded">
                                             <Collapse ExpandedClass="w-100" StartCollapsed="true">
@@ -388,7 +357,7 @@
                                         </thead>
                                         <tbody>
                                             <tr>
-                                                @foreach (var teamExp in Profile.Teams)
+                                                @foreach (var teamExp in Profile?.Teams ?? [])
                                                 {
                                                     <td class="py-3 col align-self-center">
                                                         <div class="flex-wrap d-flex gap-1">

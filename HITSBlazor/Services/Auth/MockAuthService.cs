@@ -34,7 +34,10 @@ namespace HITSBlazor.Services.Auth
         public async Task InitializeAsync()
         {
             var token = await GetTokenAsync();
-            if (!string.IsNullOrEmpty(token) && Guid.TryParse(token.Skip(_mockTokenTemplate.Length).ToString(), out Guid guid))
+            if (string.IsNullOrEmpty(token)) return;
+
+            string userId = token[_mockTokenTemplate.Length..];
+            if (!string.IsNullOrEmpty(token) && Guid.TryParse(userId, out Guid guid))
             {
                 var user = MockUsers.GetUserById(guid);
                 if (user is not null)
@@ -171,6 +174,24 @@ namespace HITSBlazor.Services.Auth
             CurrentUser.Role = roleType;
 
             OnActiveRoleChanged?.Invoke(roleType);
+
+            return true;
+        }
+
+        public async Task<bool> UpdateCurrentUser(
+            string? email, string? firstName, string? lastName, List<RoleType>? roles, string? studyGroup, string? telephone
+        )
+        {
+            if (CurrentUser is null) return false;
+
+            if (email is not null) CurrentUser.Email = email;
+            if (firstName is not null) CurrentUser.FirstName = firstName;
+            if (lastName is not null) CurrentUser.LastName = lastName;
+            if (roles is not null) CurrentUser.Roles = [.. roles];
+            if (studyGroup is not null) CurrentUser.StudyGroup = studyGroup;
+            if (telephone is not null) CurrentUser.Telephone = telephone;
+
+            OnAuthStateChanged?.Invoke();
 
             return true;
         }

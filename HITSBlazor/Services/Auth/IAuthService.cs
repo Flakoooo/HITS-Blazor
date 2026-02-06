@@ -22,5 +22,13 @@ namespace HITSBlazor.Services.Auth
         Task<bool> RegistrationAsync(RegisterModel request, Guid invitationId);
 
         Task<bool> SetUserRoleAsync(RoleType roleType);
+        Task<bool> UpdateCurrentUser(
+            string? email = null, 
+            string? firstName = null, 
+            string? lastName = null, 
+            List<RoleType>? roles = null, 
+            string? studyGroup = null, 
+            string? telephone = null
+        );
     }
 }

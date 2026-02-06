@@ -64,7 +64,11 @@
         }
     }
 
-    private void AuthStateChanged() => CurrentUser = AuthService.CurrentUser;
+    private void AuthStateChanged()
+    {
+        CurrentUser = AuthService.CurrentUser;
+        StateHasChanged();
+    }
 
     private void RoleStateChanged(RoleType? role)
     {

@@ -8,52 +8,89 @@ namespace HITSBlazor.Components.Modals.ModalContainer
         [Inject]
         private ModalService ModalService { get; set; } = null!;
 
-        private bool IsVisible { get; set; }
-        private bool IsClosing { get; set; } = false;
-        private bool IsBlockCloseModal { get; set; }
-        private Type? CurrentComponentType { get; set; }
-        private Dictionary<string, object> Parameters { get; set; } = [];
+        private bool _isContainerVisible;
+        private bool _isContainerClosing;
+        private bool _isModalClosing;
+        private bool _isBlockCloseModal;
+        private Type? _currentComponentType;
+        private Dictionary<string, object> _parameters = [];
+        private ModalType _currentModalType;
+        private string? _customClass;
 
         protected override void OnInitialized()
         {
             ModalService.OnShow += ShowModal;
-            ModalService.OnClose += CloseModal;
+            ModalService.OnClose += StartModalCloseAnimation;
+            ModalService.OnCloseContainer += StartContainerCloseAnimation;
         }
 
         private async void ShowModal(ModalData modalData)
         {
-            IsBlockCloseModal = modalData.BlockCloseModal;
-            IsVisible = true;
-            CurrentComponentType = modalData.ComponentType;
-            Parameters = modalData.Parameters;
+            if (_isContainerClosing)
+                _isContainerClosing = false;
 
-            IsClosing = false;
-            await Task.Delay(10);
+            if (_isModalClosing)
+            {
+                await Task.Delay(150);
+                _isModalClosing = false;
+            }
+
+            _currentComponentType = modalData.ComponentType;
+            _isBlockCloseModal = modalData.BlockCloseModal;
+            _parameters = modalData.Parameters ?? [];
+            _currentModalType = modalData.Type;
+            _customClass = modalData.CustomClass;
+
+            if (!_isContainerVisible)
+            {
+                _isContainerVisible = true;
+                await Task.Delay(10);
+            }
+
             StateHasChanged();
         }
 
         private void CloseModalIfAllowed()
         {
-            if (!IsBlockCloseModal)
-                CloseModal();
+            if (!_isBlockCloseModal)
+                ModalService.Close();
         }
 
-        private async void CloseModal()
+        private async void StartModalCloseAnimation()
         {
-            IsClosing = true;
+            _isModalClosing = true;
             StateHasChanged();
-            await Task.Delay(100);
 
-            IsVisible = false;
-            CurrentComponentType = null;
-            Parameters.Clear();
+            await Task.Delay(150);
+
+            _currentComponentType = null;
+            _parameters.Clear();
+            _isModalClosing = false;
+
+            StateHasChanged();
+        }
+
+        private async void StartContainerCloseAnimation()
+        {
+            _isContainerClosing = true;
+            StateHasChanged();
+
+            await Task.Delay(150);
+
+            _isContainerVisible = false;
+            _currentComponentType = null;
+            _parameters.Clear();
+            _isContainerClosing = false;
+            _isModalClosing = false;
+
             StateHasChanged();
         }
 
         public void Dispose()
         {
             ModalService.OnShow -= ShowModal;
-            ModalService.OnClose -= CloseModal;
+            ModalService.OnClose -= StartModalCloseAnimation;
+            ModalService.OnCloseContainer -= StartContainerCloseAnimation;
         }
     }
 }

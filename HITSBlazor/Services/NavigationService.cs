@@ -47,12 +47,6 @@ namespace HITSBlazor.Services
 
         public event Action? OnNavigationChanged;
 
-        public async Task InitializeAsync()
-        {
-            var currentUrl = _navigationManager.Uri;
-            await UpdateNavigationState(currentUrl);
-        }
-
         private async void OnLocationChanged(object? sender, LocationChangedEventArgs e)
         {
             try

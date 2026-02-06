@@ -1,0 +1,23 @@
+﻿@namespace HITSBlazor.Components.UserInfoField
+
+<div class="w-100 d-flex flex-column gap-2">
+    <div class="d-flex gap-1">
+        <span class="fs-6 text-primary">@Title:</span>
+        @if (IsCurrentUser && !IsEditing)
+        {
+            <div @onclick="@StartEdit" class="data-link text-secondary cursor-pointer">
+                изменить
+            </div>
+        }
+    </div>
+    <div class="w-100">
+        <div class="input-group">
+            <input @ref="_inputRef"
+                   value="@Value"
+                   @oninput="OnInputChanged"
+                   type="text" 
+                   class="form-control rounded-end w-100" 
+                   disabled="@_inputDisable" />
+        </div>
+    </div>
+</div>
