@@ -76,14 +76,7 @@ namespace HITSBlazor.Components.Modals.RightSideModals.ShowUserModal
             Profile = await ProfileService.GetUserProifleAsync(UserId);
             if (Profile is null) return;
 
-            _userDataForm = new UserDataForm
-            {
-                Email = Profile.Email,
-                FirstName = Profile.FirstName,
-                LastName = Profile.LastName,
-                Telephone = Profile.Telephone,
-                StudyGroup = Profile.StudyGroup
-            };
+            _userDataForm = ResetUserForm(Profile);
 
             BelbinTestResult = await TestService.GetTestResultAsync(UserId, TestService.BelbinTestName);
             TemperTestResult = await TestService.GetTestResultAsync(UserId, TestService.TemperTestName);
@@ -92,17 +85,33 @@ namespace HITSBlazor.Components.Modals.RightSideModals.ShowUserModal
             if (UserId == AuthService.CurrentUser?.Id)
                 _isCurrentUser = true;
 
+            AuthService.OnAuthStateChanged += _isCurrentUser ? UpdateCurrentProfile : null;
+
             _isLoading = false;
         }
 
         private static UserDataForm ResetUserForm(Profile original) => new()
         {
-            Email = original.Email,
             FirstName = original.FirstName,
             LastName = original.LastName,
             Telephone = original.Telephone,
             StudyGroup = original.StudyGroup
         };
+
+        private void UpdateCurrentProfile()
+        {
+            var user = AuthService.CurrentUser;
+            if (user is null || Profile is null) return;
+
+            Profile.Email = user.Email;
+            _userDataForm?.FirstName = Profile.FirstName = user.FirstName;
+            _userDataForm?.LastName = Profile.LastName = user.LastName;
+            _userDataForm?.Telephone = Profile.Telephone = user.Telephone;
+            _userDataForm?.StudyGroup = Profile.StudyGroup = user.StudyGroup;
+            Profile.Roles = user.Roles;
+
+            StateHasChanged();
+        }
 
         private void StartEdit(string fieldName)
         {
@@ -116,13 +125,7 @@ namespace HITSBlazor.Components.Modals.RightSideModals.ShowUserModal
         {
             if (Profile is not null && _editingField is not null && _userDataForm is not null)
             {
-                await ProfileService.UpdateProfileUserData(_userDataForm);
-
-                Profile.Email = _userDataForm.Email;
-                Profile.FirstName = _userDataForm.FirstName;
-                Profile.LastName = _userDataForm.LastName;
-                Profile.StudyGroup = _userDataForm.StudyGroup;
-                Profile.Telephone = _userDataForm.Telephone;
+                await ProfileService.UpdateProfileUserDataAsync(_userDataForm);
             }
             _editingField = null;
         }

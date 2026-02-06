@@ -2,7 +2,6 @@
 using HITSBlazor.Pages.NewPassword;
 using HITSBlazor.Pages.RecoveryPassword;
 using HITSBlazor.Pages.Register;
-using HITSBlazor.Services.Notifications;
 using System.Text.RegularExpressions;
 
 namespace HITSBlazor.Services.Auth

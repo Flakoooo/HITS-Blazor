@@ -6,6 +6,8 @@ namespace HITSBlazor.Services.Profiles
     public interface IProfileService
     {
         Task<Profile?> GetUserProifleAsync(Guid userId);
-        Task<bool> UpdateProfileUserData(UserDataForm userDataForm);
+        Task<bool> UpdateProfileUserDataAsync(UserDataForm userDataForm);
+        Task<Guid> SendUpdateEmailRequestAsync(string email);
+        Task<bool> UpdateEmailConfirmAsync(Guid updateVerificationCode, string code);
     }
 }

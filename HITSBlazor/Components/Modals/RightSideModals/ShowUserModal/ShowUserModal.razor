@@ -109,9 +109,9 @@
                         <div class="user-info-content p-2">
                             <UserInfoField 
                                 Title="Почта" 
-                                Value="@_userDataForm?.Email"
-                                ValueChanged="@((value) => _userDataForm?.Email = value)"
-                                IsEditing="@(_editingField == nameof(_userDataForm.Email))"
+                                Value="@Profile?.Email"
+                                ValueChanged="@((value) => value = string.Empty)"
+                                IsEditing="false"
                                 IsCurrentUser="@_isCurrentUser"
                                 OnEdit="@(() => ShowUpdateEmail())" />
 
