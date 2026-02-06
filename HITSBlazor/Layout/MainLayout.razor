@@ -1,6 +1,7 @@
 ﻿@using HITSBlazor.Components.GlobalNotification
 @using HITSBlazor.Components.LeftSideNavigation
-@using HITSBlazor.Components.Modals.ModalContainer
+@using HITSBlazor.Components.Modals.RightSideModals.RightSideModalContainer
+@using HITSBlazor.Components.Modals.CenterModals.CenterModalContainer
 @using HITSBlazor.Components.PageHeader
 @using HITSBlazor.Services.Auth
 @inherits LayoutComponentBase
@@ -9,7 +10,8 @@
 <div style="display: flex; flex-direction: row; flex-wrap: nowrap; align-items: flex-start; justify-content: flex-start;">
     @if (AuthService.IsAuthenticated)
     {
-        <ModalContainer />
+        <RightSideModalContainer />
+        <CenterModalContainer />
 
         <LeftSideNavigation />
         <main class="w-100 overflow-y-scroll bg-white" style="height: 100vh; display: grid; grid-template-rows: min-content auto;">

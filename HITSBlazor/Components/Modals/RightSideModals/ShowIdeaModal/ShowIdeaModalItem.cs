@@ -1,4 +1,4 @@
-﻿namespace HITSBlazor.Components.Modals.ShowIdeaModal
+﻿namespace HITSBlazor.Components.Modals.RightSideModals.ShowIdeaModal
 {
     public class ShowIdeaModalItem
     {

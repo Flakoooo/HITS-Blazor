@@ -3,7 +3,7 @@ using HITSBlazor.Services.Auth;
 using HITSBlazor.Services.Modal;
 using Microsoft.AspNetCore.Components;
 
-namespace HITSBlazor.Components.Modals.SelectActiveRoleModal
+namespace HITSBlazor.Components.Modals.CenterModals.SelectActiveRoleModal
 {
     public partial class SelectActiveRoleModal
     {
@@ -23,7 +23,7 @@ namespace HITSBlazor.Components.Modals.SelectActiveRoleModal
         private async void SetUserRole(RoleType role)
         {
             await AuthService.SetUserRoleAsync(role);
-            ModalService.Close();
+            ModalService.Close(ModalType.Center);
         }
     }
 }

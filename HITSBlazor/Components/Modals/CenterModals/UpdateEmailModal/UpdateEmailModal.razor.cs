@@ -1,7 +1,7 @@
 ﻿using HITSBlazor.Services.Modal;
 using Microsoft.AspNetCore.Components;
 
-namespace HITSBlazor.Components.Modals.UpdateEmailModal
+namespace HITSBlazor.Components.Modals.CenterModals.UpdateEmailModal
 {
     public partial class UpdateEmailModal
     {
@@ -27,10 +27,7 @@ namespace HITSBlazor.Components.Modals.UpdateEmailModal
         {
             _isLoading = true;
 
-            _isEmailRequestSended = false;
-
-            _isLoading = false;
-            ModalService.Close();
+            ModalService.Close(ModalType.Center);
         }
     }
 }

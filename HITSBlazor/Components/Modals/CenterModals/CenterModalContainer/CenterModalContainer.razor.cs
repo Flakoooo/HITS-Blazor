@@ -1,9 +1,9 @@
 ﻿using HITSBlazor.Services.Modal;
 using Microsoft.AspNetCore.Components;
 
-namespace HITSBlazor.Components.Modals.ModalContainer
+namespace HITSBlazor.Components.Modals.CenterModals.CenterModalContainer
 {
-    public partial class ModalContainer : IDisposable
+    public partial class CenterModalContainer : IDisposable
     {
         [Inject]
         private ModalService ModalService { get; set; } = null!;
@@ -14,14 +14,12 @@ namespace HITSBlazor.Components.Modals.ModalContainer
         private bool _isBlockCloseModal;
         private Type? _currentComponentType;
         private Dictionary<string, object> _parameters = [];
-        private ModalType _currentModalType;
-        private string? _customClass;
 
         protected override void OnInitialized()
         {
-            ModalService.OnShow += ShowModal;
-            ModalService.OnClose += StartModalCloseAnimation;
-            ModalService.OnCloseContainer += StartContainerCloseAnimation;
+            ModalService.OnShowCenterModal += ShowModal;
+            ModalService.OnCloseCenterModal += StartModalCloseAnimation;
+            ModalService.OnCloseCenterModalContainer += StartContainerCloseAnimation;
         }
 
         private async void ShowModal(ModalData modalData)
@@ -38,8 +36,6 @@ namespace HITSBlazor.Components.Modals.ModalContainer
             _currentComponentType = modalData.ComponentType;
             _isBlockCloseModal = modalData.BlockCloseModal;
             _parameters = modalData.Parameters ?? [];
-            _currentModalType = modalData.Type;
-            _customClass = modalData.CustomClass;
 
             if (!_isContainerVisible)
             {
@@ -53,7 +49,7 @@ namespace HITSBlazor.Components.Modals.ModalContainer
         private void CloseModalIfAllowed()
         {
             if (!_isBlockCloseModal)
-                ModalService.Close();
+                ModalService.Close(ModalType.Center);
         }
 
         private async void StartModalCloseAnimation()
@@ -88,9 +84,9 @@ namespace HITSBlazor.Components.Modals.ModalContainer
 
         public void Dispose()
         {
-            ModalService.OnShow -= ShowModal;
-            ModalService.OnClose -= StartModalCloseAnimation;
-            ModalService.OnCloseContainer -= StartContainerCloseAnimation;
+            ModalService.OnShowCenterModal -= ShowModal;
+            ModalService.OnCloseCenterModal -= StartModalCloseAnimation;
+            ModalService.OnCloseCenterModalContainer -= StartContainerCloseAnimation;
         }
     }
 }

@@ -1,7 +1,8 @@
-﻿@namespace HITSBlazor.Components.Modals.ShowIdeaModal
+﻿@namespace HITSBlazor.Components.Modals.RightSideModals.ShowIdeaModal
 @using HITSBlazor.Components.Collapse
 @using HITSBlazor.Components.Placeholder
 @using HITSBlazor.Models.Common.Entities
+@using HITSBlazor.Services.Modal
 @using HITSBlazor.Utils.EnumStyles
 @using HITSBlazor.Utils.EnumTranslators
 
@@ -21,7 +22,7 @@
         {
             <div class="right-side-modal-header">
                 <button type="button"
-                        @onclick="@(() => ModalService.Close())"
+                        @onclick="@(() => ModalService.Close(ModalType.RightSide))"
                         class="btn d-flex btn-primary">
                     <i class="bi bi-backspace-fill fs-5"></i>
                     Назад

@@ -1,6 +1,6 @@
 ﻿@namespace HITSBlazor.Components.PageHeader
-@using HITSBlazor.Components.Modals.SelectActiveRoleModal
-@using HITSBlazor.Components.Modals.ShowUserModal
+@using HITSBlazor.Components.Modals.CenterModals.SelectActiveRoleModal
+@using HITSBlazor.Components.Modals.RightSideModals.ShowUserModal
 @using HITSBlazor.Models.Users.Entities
 @using HITSBlazor.Models.Users.Enums
 @using HITSBlazor.Services
@@ -21,7 +21,6 @@
                 <img class="text-secondary" width="58" height="58" src="/images//defProfile.png" />
             </div>
             <div class="d-flex gap-1 flex-column">
-                <!-- TODO: При нажатии вызывать боковую панель профиля ТЕКУЩЕГО пользователя -->
                 <div @onclick="ShowUserProfile" class="fw-semibold data-link" style="width: fit-content;">
                     <span class="fs-6">@CurrentUser?.FirstName @CurrentUser?.LastName</span>
                 </div>
@@ -85,12 +84,12 @@
         {
             { "UserId", userId }
         };
-        ModalService.Show<ShowUserModal>(parameters: parameters);
+        ModalService.Show<ShowUserModal>(ModalType.RightSide, parameters: parameters);
     }
 
     private void ShowRoleModal()
     {
-        ModalService.Show<SelectActiveRoleModal>(blockCloseModal: true);
+        ModalService.Show<SelectActiveRoleModal>(ModalType.Center, blockCloseModal: true);
     }
 
     public void Dispose()

@@ -1,4 +1,4 @@
-﻿namespace HITSBlazor.Components.Modals.ShowUserModal
+﻿namespace HITSBlazor.Components.Modals.RightSideModals.ShowUserModal
 {
     public class UserDataForm
     {

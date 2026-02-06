@@ -1,0 +1,13 @@
+﻿@namespace HITSBlazor.Components.Modals.CenterModals.CenterModalContainer
+
+@if (_isContainerVisible)
+{
+    <div @onclick="CloseModalIfAllowed"
+         class="modal-layout modal-layout-@(_isContainerClosing ? "leave" : "enter")-active">
+        @if (_currentComponentType != null)
+        {
+            <DynamicComponent Type="@_currentComponentType"
+                              Parameters="@_parameters" />
+        }
+    </div>
+}

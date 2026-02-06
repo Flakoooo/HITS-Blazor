@@ -8,7 +8,7 @@ using HITSBlazor.Services.IdeaSkills;
 using HITSBlazor.Services.Modal;
 using Microsoft.AspNetCore.Components;
 
-namespace HITSBlazor.Components.Modals.ShowIdeaModal
+namespace HITSBlazor.Components.Modals.RightSideModals.ShowIdeaModal
 {
     public partial class ShowIdeaModal
     {

@@ -1,4 +1,4 @@
-﻿using HITSBlazor.Components.Modals.ShowIdeaModal;
+﻿using HITSBlazor.Components.Modals.RightSideModals.ShowIdeaModal;
 using HITSBlazor.Components.TableActionMenu;
 using HITSBlazor.Models.Ideas.Entities;
 using HITSBlazor.Models.Ideas.Enums;

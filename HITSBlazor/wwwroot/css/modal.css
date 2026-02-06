@@ -1,4 +1,26 @@
-﻿.right-side-modal {
+﻿.modal-layout {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 1050;
+    background-color: rgba(0,0,0,.365);
+    display: grid;
+    transition: opacity .15s ease-out;
+}
+
+.modal-layout-enter-active {
+    opacity: 1;
+    animation: fadeIn 0.15s ease-out;
+}
+
+.modal-layout-leave-active {
+    opacity: 0;
+    animation: fadeOut 0.15s ease-out;
+}
+
+.right-side-modal {
     position: relative;
     height: 100%;
     width: 80%;
@@ -36,6 +58,29 @@
 .modal-layout-leave-active .right-side-modal {
     transform: translateX(100%);
     animation: slideOutRight 0.3s ease-out;
+}
+
+.center-modal {
+    width: 400px;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    gap: 12px;
+    align-self: center;
+    align-items: stretch;
+    justify-self: center;
+    justify-content: stretch;
+    transition: all .15s ease-out;
+}
+
+.modal-layout-enter-active .center-modal {
+    transform: scale(1);
+    animation: scaleIn 0.15s ease-out;
+}
+
+.modal-layout-leave-active .center-modal {
+    transform: scale(0.9);
+    animation: scaleOut 0.15s ease-out;
 }
 
 

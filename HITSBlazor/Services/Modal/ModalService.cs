@@ -4,18 +4,26 @@ namespace HITSBlazor.Services.Modal
 {
     public class ModalService
     {
-        public event Action<ModalData>? OnShow;
-        public event Action? OnClose;
-        public event Action? OnCloseContainer;
+        public event Action<ModalData>? OnShowCenterModal;
+        public event Action<ModalData>? OnShowSideModal;
 
-        private Stack<ModalData> _modalStack = [];
+        public event Action? OnCloseCenterModal;
+        public event Action? OnCloseSideModal;
 
-        public int ModalCount => _modalStack.Count;
-        public bool HasModals => _modalStack.Count > 0;
-        public ModalData? CurrentModal => _modalStack.Count > 0 ? _modalStack.Peek() : null;
+        public event Action? OnCloseCenterModalContainer;
+        public event Action? OnCloseSideModalContainer;
+
+        private Stack<ModalData> _centerModals = [];
+        private Stack<ModalData> _sideModals = [];
+
+        private ModalData? _currentCenterModal;
+        private ModalData? _currentSideModal;
+
+        public bool HasActiveCenterModal => _currentCenterModal != null;
+        public bool HasActiveSideModal => _currentSideModal != null;
 
         public void Show<TComponent>(
-            ModalType type = ModalType.Center,
+            ModalType type,
             bool blockCloseModal = false, 
             Dictionary<string, object>? parameters = null,
             string? customClass = null
@@ -26,7 +34,7 @@ namespace HITSBlazor.Services.Modal
 
         public void Show(
             Type componentType,
-            ModalType type = ModalType.Center,
+            ModalType type,
             bool blockCloseModal = false,
             Dictionary<string, object>? parameters = null,
             string? customClass = null
@@ -41,33 +49,87 @@ namespace HITSBlazor.Services.Modal
                 CustomClass = customClass
             };
 
-            _modalStack.Push(modalData);
-            OnShow?.Invoke(modalData);
-        }
-
-        public async void Close()
-        {
-            if (_modalStack.Count == 0)
-                return;
-
-            _modalStack.Pop();
-
-            OnClose?.Invoke();
-
-            await Task.Delay(100).ContinueWith(_ =>
+            switch (type)
             {
-                if (_modalStack.Count > 0)
-                    OnShow?.Invoke(_modalStack.Peek());
-                else
-                    OnCloseContainer?.Invoke();
-            });
+                case ModalType.Center:
+                    _centerModals.Push(modalData);
+                    _currentCenterModal = modalData;
+                    OnShowCenterModal?.Invoke(modalData);
+                    break;
+
+                case ModalType.RightSide:
+                    _sideModals.Push(modalData);
+                    _currentSideModal = modalData;
+                    OnShowSideModal?.Invoke(modalData);
+                    break;
+
+                default:
+                    break;
+            }
         }
 
-        public void CloseAll()
+        public async void Close(ModalType type)
         {
-            _modalStack.Clear();
-            OnClose?.Invoke();
-            OnCloseContainer?.Invoke();
+            switch (type)
+            {
+                case ModalType.Center:
+                    if (_centerModals.Count == 0)
+                        return;
+
+                    _centerModals.Pop();
+
+                    OnCloseCenterModal?.Invoke();
+
+                    await Task.Delay(100).ContinueWith(_ =>
+                    {
+                        if (_centerModals.Count > 0)
+                            OnShowCenterModal?.Invoke(_centerModals.Peek());
+                        else
+                            OnCloseCenterModalContainer?.Invoke();
+                    });
+                    break;
+
+                case ModalType.RightSide:
+                    if (_sideModals.Count == 0)
+                        return;
+
+                    _sideModals.Pop();
+
+                    OnCloseSideModal?.Invoke();
+
+                    await Task.Delay(100).ContinueWith(_ =>
+                    {
+                        if (_sideModals.Count > 0)
+                            OnShowSideModal?.Invoke(_sideModals.Peek());
+                        else
+                            OnCloseSideModalContainer?.Invoke();
+                    });
+                    break;
+
+                default: 
+                    break;
+            }
+        }
+
+        public void CloseAll(ModalType type)
+        {
+            switch (type)
+            {
+                case ModalType.Center:
+                    _centerModals.Clear();
+                    OnCloseCenterModal?.Invoke();
+                    OnCloseCenterModalContainer?.Invoke();
+                    break;
+
+                case ModalType.RightSide:
+                    _sideModals.Clear();
+                    OnCloseSideModal?.Invoke();
+                    OnCloseSideModalContainer?.Invoke();
+                    break;
+
+                default:
+                    break;
+            }
         }
     }
 }

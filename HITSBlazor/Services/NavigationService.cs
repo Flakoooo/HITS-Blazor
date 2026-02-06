@@ -1,5 +1,5 @@
 ﻿using HITSBlazor.Components.LeftSideNavigation;
-using HITSBlazor.Components.Modals.SelectActiveRoleModal;
+using HITSBlazor.Components.Modals.CenterModals.SelectActiveRoleModal;
 using HITSBlazor.Models.Users.Enums;
 using HITSBlazor.Services.Auth;
 using HITSBlazor.Services.Markets;
@@ -112,7 +112,7 @@ namespace HITSBlazor.Services
         {
             if (_authService.CurrentUser?.Role == null)
             {
-                _modalService.Show<SelectActiveRoleModal>(blockCloseModal: true);
+                _modalService.Show<SelectActiveRoleModal>(ModalType.Center, blockCloseModal: true);
             }
             else
             {

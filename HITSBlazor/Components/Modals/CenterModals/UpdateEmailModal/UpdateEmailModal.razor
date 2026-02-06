@@ -1,10 +1,11 @@
-﻿@namespace HITSBlazor.Components.Modals.UpdateEmailModal
+﻿@namespace HITSBlazor.Components.Modals.CenterModals.UpdateEmailModal
+@using HITSBlazor.Services.Modal
 
 <div @onclick:stopPropagation="true"
-      class="p-3 rounded-3 shadow new-email-request-modal bg-white p-3 rounded">
+     class="p-3 rounded-3 shadow center-modal new-email-request-modal bg-white p-3 rounded">
     <div class="d-flex align-items-center justify-content-between">
         <span class="fs-3 text-primary text-center">Изменение почты</span>
-        <button @onclick="@(() => ModalService.Close())" type="button" class="btn d-flex btn-close"></button>
+        <button @onclick="@(() => ModalService.Close(ModalType.Center))" type="button" class="btn d-flex btn-close"></button>
     </div>
     @if (_isEmailRequestSended)
     {
@@ -42,7 +43,7 @@
             }
             else
             {
-                <span>Изменить пароль</span>
+                <span>Изменить email</span>
             }
         </button>
     }

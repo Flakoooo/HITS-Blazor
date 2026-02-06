@@ -1,4 +1,4 @@
-﻿using HITSBlazor.Components.Modals.ShowUserModal;
+﻿using HITSBlazor.Components.Modals.RightSideModals.ShowUserModal;
 using HITSBlazor.Models.Users.Entities;
 using HITSBlazor.Services.Auth;
 using HITSBlazor.Utils.Mocks.Users;

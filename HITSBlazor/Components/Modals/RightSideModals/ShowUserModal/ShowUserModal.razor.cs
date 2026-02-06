@@ -1,9 +1,8 @@
 ﻿using ApexCharts;
-using HITSBlazor.Components.Modals.UpdateEmailModal;
+using HITSBlazor.Components.Modals.CenterModals.UpdateEmailModal;
 using HITSBlazor.Components.TableActionMenu;
 using HITSBlazor.Models.Common.Entities;
 using HITSBlazor.Models.Common.Enums;
-using HITSBlazor.Models.Ideas.Entities;
 using HITSBlazor.Models.Tests.Entities;
 using HITSBlazor.Models.Users.Entities;
 using HITSBlazor.Services.Auth;
@@ -14,7 +13,7 @@ using HITSBlazor.Services.Tests;
 using HITSBlazor.Services.UserSkills;
 using Microsoft.AspNetCore.Components;
 
-namespace HITSBlazor.Components.Modals.ShowUserModal
+namespace HITSBlazor.Components.Modals.RightSideModals.ShowUserModal
 {
     public partial class ShowUserModal
     {
@@ -96,7 +95,7 @@ namespace HITSBlazor.Components.Modals.ShowUserModal
             _isLoading = false;
         }
 
-        private UserDataForm ResetUserForm(Profile original) => new()
+        private static UserDataForm ResetUserForm(Profile original) => new()
         {
             Email = original.Email,
             FirstName = original.FirstName,
@@ -187,16 +186,14 @@ namespace HITSBlazor.Components.Modals.ShowUserModal
             return await SkillService.GetSkillByTypeAndByNameAsync(skillType, searchText);
         }
 
-        private static ApexChartOptions<Skill> GetRadarChartOptions(SkillType type)
+        private static ApexChartOptions<Skill> GetRadarChartOptions() => new()
         {
-            return new ApexChartOptions<Skill>
+            Chart = new Chart
             {
-                Chart = new Chart
-                {
-                    Type = ChartType.Radar,
-                    Toolbar = new Toolbar { Show = false }
-                },
-                Yaxis =
+                Type = ChartType.Radar,
+                Toolbar = new Toolbar { Show = false }
+            },
+            Yaxis =
                 [
                     new YAxis
                     {
@@ -206,31 +203,30 @@ namespace HITSBlazor.Components.Modals.ShowUserModal
                         Show = false
                     }
                 ],
-                Xaxis = new XAxis
+            Xaxis = new XAxis
+            {
+                Labels = new XAxisLabels
                 {
-                    Labels = new XAxisLabels
+                    Style = new AxisLabelStyle
                     {
-                        Style = new AxisLabelStyle
-                        {
-                            Colors = new List<string> { "#a8a8a8" },
-                            FontSize = "11px"
-                        }
+                        Colors = new List<string> { "#a8a8a8" },
+                        FontSize = "11px"
                     }
-                },
-                Stroke = new Stroke { Width = 2 },
-                Fill = new Fill { Opacity = 0.1 },
-                Markers = new Markers { Size = 4 },
-                Legend = new Legend
-                {
-                    Show = true,
-                    Position = LegendPosition.Bottom
                 }
-            };
-        }
+            },
+            Stroke = new Stroke { Width = 2 },
+            Fill = new Fill { Opacity = 0.1 },
+            Markers = new Markers { Size = 4 },
+            Legend = new Legend
+            {
+                Show = true,
+                Position = LegendPosition.Bottom
+            }
+        };
 
         private void ShowUpdateEmail()
         {
-            ModalService.Show<UpdateEmailModal.UpdateEmailModal>();
+            ModalService.Show<UpdateEmailModal>(ModalType.Center);
         }
 
         private void ShowIdea(Guid ideaId)
