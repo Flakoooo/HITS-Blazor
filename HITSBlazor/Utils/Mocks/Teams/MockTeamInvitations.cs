@@ -24,11 +24,14 @@ namespace HITSBlazor.Utils.Mocks.Teams
                     TeamId = MockTeams.CardId,
                     UserId = maga.Id,
                     Email = maga.Email,
-                    Status = JoinStatus.ACCEPTED,
+                    Status = JoinStatus.Accepted,
                     FirstName = maga.FirstName,
                     LastName = maga.LastName
                 }
             ];
         }
+
+        public static List<TeamInvitation> GetTeamInvitationsByTeamId(Guid teamId)
+            => [.. _teamInvitations.Where(ti => ti.TeamId == teamId)];
     }
 }

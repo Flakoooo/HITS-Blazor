@@ -2,10 +2,10 @@
 {
     public enum JoinStatus
     {
-        NEW,
-        ANNULLED,
-        ACCEPTED,
-        CANCELED,
-        WITHDRAWN
+        New,
+        Annulled,
+        Accepted,
+        Canceled,
+        Withdrawn
     }
 }

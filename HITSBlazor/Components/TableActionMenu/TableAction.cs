@@ -3,6 +3,7 @@
     public enum TableAction
     {
         View,
+        ViewProfile,
         Edit,
         Delete
     }

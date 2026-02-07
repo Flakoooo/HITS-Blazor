@@ -1,0 +1,13 @@
+﻿@namespace HITSBlazor.Components.Modals.Components.ModalHeader
+
+<div class="right-side-modal-header mb-3">
+    <button @onclick="@CloseModal"
+            type="button"
+            class="btn d-flex btn-primary">
+        <i class="bi bi-backspace-fill fs-5"></i>
+        Назад
+    </button>
+    <span class="p-2 w-100 bg-white rounded-3 fs-4 text-primary text-nowrap overflow-scroll-hidden">
+        @Title
+    </span>
+</div>

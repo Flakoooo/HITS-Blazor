@@ -37,7 +37,7 @@
     transition: all .3s ease-out;
 }
 
-.right-side-modal-header, .right-side-modal-content {
+.right-side-modal-content {
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;

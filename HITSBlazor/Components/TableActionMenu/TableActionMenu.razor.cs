@@ -139,6 +139,7 @@ namespace HITSBlazor.Components.TableActionMenu
         private string GetActionText(TableAction action) => action switch
         {
             TableAction.View => "Просмотреть",
+            TableAction.ViewProfile => "Перейти на профиль",
             TableAction.Edit => "Редактировать",
             TableAction.Delete => "Удалить",
             _ => action.ToString()

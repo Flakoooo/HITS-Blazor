@@ -1,6 +1,7 @@
 ﻿@namespace HITSBlazor.Components.Modals.RightSideModals.ShowUserModal
 @using HITSBlazor.Components.Collapse
 @using HITSBlazor.Components.InputDropdowns.SkillDropdown
+@using HITSBlazor.Components.Modals.Components.ModalHeader
 @using HITSBlazor.Components.Placeholder
 @using HITSBlazor.Components.TableActionMenu
 @using HITSBlazor.Components.UserInfoField
@@ -61,17 +62,7 @@
         }
         else
         {
-            <div class="right-side-modal-header mb-3">
-                <button @onclick="@(() => ModalService.Close(ModalType.RightSide))" 
-                        type="button" 
-                        class="btn d-flex btn-primary">
-                    <i class="bi bi-backspace-fill fs-5"></i>
-                    Назад
-                </button>
-                <span class="p-2 w-100 bg-white rounded-3 fs-4 text-primary text-nowrap overflow-scroll-hidden">
-                    @Profile.FirstName @Profile.LastName
-                </span>
-            </div>
+            <ModalHeader Title="@($"{Profile.FirstName} {Profile.LastName}")" />
             <div class="right-side-modal-content">
                 <div class="d-flex flex-column gap-3 w-75">
                     <div class="w-100 bg-white border p-3 rounded-3 d-flex flex-column gap-3" style="height: fit-content;">
