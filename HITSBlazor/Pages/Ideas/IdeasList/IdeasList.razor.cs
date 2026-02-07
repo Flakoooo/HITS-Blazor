@@ -1,5 +1,5 @@
 ﻿using HITSBlazor.Components.Modals.RightSideModals.ShowIdeaModal;
-using HITSBlazor.Components.TableActionMenu;
+using HITSBlazor.Components.Tables.TableActionMenu;
 using HITSBlazor.Models.Ideas.Entities;
 using HITSBlazor.Models.Ideas.Enums;
 using HITSBlazor.Services;
@@ -30,10 +30,6 @@ namespace HITSBlazor.Pages.Ideas.IdeasList
         private List<Idea> _ideas = [];
 
         private bool showCreateIdeaButton = true;
-
-        private readonly string tableDataClass = "py-3 col align-self-center";
-        private readonly string tableDataContentClass = "flex-wrap d-flex gap-1";
-        private readonly string tableDataContentCenterClass = "justify-content-center align-items-center text-center flex-wrap d-flex gap-1";
 
         private HashSet<IdeaStatusType> SelectedStatuses { get; set; } = [];
 

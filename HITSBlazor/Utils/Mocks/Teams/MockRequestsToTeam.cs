@@ -20,7 +20,7 @@ namespace HITSBlazor.Utils.Mocks.Teams
                     Id = MagaId,
                     TeamId = MockTeams.CactusId,
                     UserId = maga.Id,
-                    Status = JoinStatus.NEW,
+                    Status = JoinStatus.New,
                     Email = maga.Email,
                     FirstName = maga.FirstName,
                     LastName = maga.LastName

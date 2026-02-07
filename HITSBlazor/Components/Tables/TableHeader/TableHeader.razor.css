@@ -1,0 +1,8 @@
+﻿.table-lables {
+    position: sticky;
+    top: 0;
+    right: auto;
+    bottom: auto;
+    left: auto;
+    z-index: 1;
+}

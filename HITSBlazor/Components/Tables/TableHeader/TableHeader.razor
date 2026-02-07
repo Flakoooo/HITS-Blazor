@@ -1,0 +1,19 @@
+﻿@namespace HITSBlazor.Components.Tables.TableHeader
+
+<thead>
+    <tr class="table-lables">
+        @foreach (var item in Items)
+        {
+            <th class="py-3 col fw-semibold text-secondary @item.ColumnClass">
+                <div class="@GetItemClass(item.InCentered) d-flex">
+                    @item.Text
+                </div>
+            </th>
+        }
+        @if (TableActionMenuIsEnable)
+        {
+            <th></th>
+            <th></th>
+        }
+    </tr>
+</thead>

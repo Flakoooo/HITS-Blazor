@@ -1,12 +1,14 @@
 ﻿@namespace HITSBlazor.Components.Modals.RightSideModals.ShowTeamModal
 @using HITSBlazor.Components.Collapse
 @using HITSBlazor.Components.Modals.Components.ModalHeader
-@using HITSBlazor.Components.TableActionMenu
+@using HITSBlazor.Components.Tables.TableActionMenu
+@using HITSBlazor.Components.Tables.TableBodyRow
+@using HITSBlazor.Components.Tables.TableHeader
 @using HITSBlazor.Utils.EnumStyles
 @using HITSBlazor.Utils.EnumTranslators
 
 <div class="right-side-modal p-3 overflow-y-scroll" @onclick:stopPropagation="true">
-    @if (_currentTeam is not null)
+    @if (!_isLoading && _currentTeam is not null)
     {
         <div class="team-modal-side w-75">
             <ModalHeader Title="TEAM_NAME" />
@@ -58,72 +60,38 @@
                                 <table class="table table-hover mb-0">
                                     @if (_isMembersCategory)
                                     {
-                                        <thead>
-                                            <tr class="tead-modal-table-label">
-                                                <th class="py-3 col fw-semibold text-secondary col-5">
-                                                    <div class="d-flex">Почта</div>
-                                                </th>
-                                                <th class="py-3 col fw-semibold text-secondary col-3">
-                                                    <div class="d-flex">Имя</div>
-                                                </th>
-                                                <th class="py-3 col fw-semibold text-secondary col-3">
-                                                    <div class="d-flex">Фамилия</div>
-                                                </th>
-                                                <th></th>
-                                                <th></th>
-                                            </tr>
-                                        </thead>
+                                        <TableHeader TableActionMenuIsEnable="true" 
+                                                     Items="GetMembersTableHeader()" />
+                                        <tbody>
+
+                                        </tbody>
                                     }
                                     else if (_isInvitationsCategory)
                                     {
-                                        <thead>
-                                            <tr class="tead-modal-table-label">
-                                                <th class="py-3 col fw-semibold text-secondary col-1">
-                                                    <div class="justify-content-center align-items-center text-center d-flex">Статус</div>
-                                                </th>
-                                                <th class="py-3 col fw-semibold text-secondary col-3">
-                                                    <div class="justify-content-center align-items-center text-center d-flex">Почта</div>
-                                                </th>
-                                                <th class="py-3 col fw-semibold text-secondary col-3">
-                                                    <div class="justify-content-center align-items-center text-center d-flex">Имя</div>
-                                                </th>
-                                                <th class="py-3 col fw-semibold text-secondary col-3">
-                                                    <div class="justify-content-center align-items-center text-center d-flex">Фамилия</div>
-                                                </th>
-                                                <th></th>
-                                                <th></th>
-                                            </tr>
-                                        </thead>
+                                        <TableHeader TableActionMenuIsEnable="true"
+                                                     Items="GetInvitationsTableHeader()" />
                                         <tbody>
                                             @foreach (var invitation in _teamInvitations)
                                             {
                                                 <tr>
-                                                    <td class="py-3 col align-self-center">
-                                                        <div class="justify-content-center align-items-center text-center flex-wrap d-flex gap-1">
-                                                            <div class="px-2 py-1 rounded-4 @invitation.Status.GetStyle()">
-                                                                @invitation.Status.GetTranslation()
-                                                            </div>
+                                                    <TableBodyRow IsCentered="true">
+                                                        <div class="px-2 py-1 rounded-4 @invitation.Status.GetStyle()">
+                                                            @invitation.Status.GetTranslation()
                                                         </div>
-                                                    </td>
-                                                    <td class="py-3 col align-self-center">
-                                                        <div class="justify-content-center align-items-center text-center flex-wrap d-flex gap-1">
-                                                            <div class="data-link">
-                                                                @invitation.Email
-                                                            </div>
+                                                    </TableBodyRow>
+                                                    <TableBodyRow IsCentered="true">
+                                                        <div class="data-link">
+                                                            @invitation.Email
                                                         </div>
-                                                    </td>
-                                                    <td class="py-3 col align-self-center">
-                                                        <div class="justify-content-center align-items-center text-center flex-wrap d-flex gap-1">
-                                                            @invitation.FirstName
-                                                        </div>
-                                                    </td>
-                                                    <td class="py-3 col align-self-center">
-                                                        <div class="justify-content-center align-items-center text-center flex-wrap d-flex gap-1">
-                                                            @invitation.LastName
-                                                        </div>
-                                                    </td>
+                                                    </TableBodyRow>
+                                                    <TableBodyRow IsCentered="true">
+                                                        @invitation.FirstName
+                                                    </TableBodyRow>
+                                                    <TableBodyRow IsCentered="true">
+                                                        @invitation.LastName
+                                                    </TableBodyRow>
                                                     <TableActionMenu ItemId="invitation.UserId"
-                                                                     OnAction="@(() => ShowUserProfile(invitation.UserId))"
+                                                                     OnAction="@ShowUserProfile"
                                                                      Actions="@(new List<TableAction> { TableAction.ViewProfile })" />
                                                 </tr>
                                             }

@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 
-namespace HITSBlazor.Components.TableActionMenu
+namespace HITSBlazor.Components.Tables.TableActionMenu
 {
     public partial class TableActionMenu : IDisposable
     {

@@ -1,4 +1,6 @@
 ﻿
+using HITSBlazor.Components.Tables.TableActionMenu;
+using HITSBlazor.Components.Tables.TableHeader;
 using HITSBlazor.Models.Teams.Entities;
 using HITSBlazor.Services.Modal;
 using HITSBlazor.Services.Teams;
@@ -37,11 +39,58 @@ namespace HITSBlazor.Components.Modals.RightSideModals.ShowTeamModal
             _isLoading = false;
         }
 
-        private void ShowUserProfile(Guid userId)
+        private static List<TableHeaderItem> GetMembersTableHeader() =>
+        [
+            new TableHeaderItem
+            {
+                Text = "Почта",
+                ColumnClass = "col-5"
+            },
+            new TableHeaderItem
+            {
+                Text = "Имя",
+                ColumnClass = "col-3"
+            },
+            new TableHeaderItem
+            {
+                Text = "Фамилия",
+                ColumnClass = "col-3"
+            }
+        ];
+
+        private static List<TableHeaderItem> GetInvitationsTableHeader() =>
+        [
+            new TableHeaderItem
+            {
+                Text = "Статус",
+                InCentered = true,
+                ColumnClass = "col-1"
+            },
+            new TableHeaderItem
+            {
+                Text = "Почта",
+                InCentered = true,
+                ColumnClass = "col-3"
+            },
+            new TableHeaderItem
+            {
+                Text = "Имя",
+                InCentered = true,
+                ColumnClass = "col-3"
+            },
+            new TableHeaderItem
+            {
+                Text = "Фамилия",
+                InCentered = true,
+                ColumnClass = "col-3"
+            }
+        ];
+
+        private void ShowUserProfile(TableActionContext context)
         {
             var parameters = new Dictionary<string, object>
             {
-                { "UserId", userId }
+                { "UserId", context.ItemId }
             };
             ModalService.Show<ShowUserModal.ShowUserModal>(ModalType.RightSide, parameters: parameters);
         }

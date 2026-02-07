@@ -1,6 +1,7 @@
 ﻿using ApexCharts;
 using HITSBlazor.Components.Modals.CenterModals.UpdateEmailModal;
-using HITSBlazor.Components.TableActionMenu;
+using HITSBlazor.Components.Tables.TableActionMenu;
+using HITSBlazor.Components.Tables.TableHeader;
 using HITSBlazor.Models.Common.Entities;
 using HITSBlazor.Models.Common.Enums;
 using HITSBlazor.Models.Tests.Entities;
@@ -226,6 +227,29 @@ namespace HITSBlazor.Components.Modals.RightSideModals.ShowUserModal
                 Position = LegendPosition.Bottom
             }
         };
+
+        private static List<TableHeaderItem> GetHeaderItems() =>
+        [
+            new TableHeaderItem
+            {
+                Text = "Команда"
+            },
+            new TableHeaderItem
+            {
+                Text = "Дата вступления",
+                InCentered = true
+            },
+            new TableHeaderItem
+            {
+                Text = "Дата исключения",
+                InCentered = true
+            },
+            new TableHeaderItem
+            {
+                Text = "Статус",
+                InCentered = true
+            },
+        ];
 
         private void ShowUpdateEmail()
         {

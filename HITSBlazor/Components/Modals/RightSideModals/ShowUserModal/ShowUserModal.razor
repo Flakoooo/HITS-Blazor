@@ -3,7 +3,9 @@
 @using HITSBlazor.Components.InputDropdowns.SkillDropdown
 @using HITSBlazor.Components.Modals.Components.ModalHeader
 @using HITSBlazor.Components.Placeholder
-@using HITSBlazor.Components.TableActionMenu
+@using HITSBlazor.Components.Tables.TableActionMenu
+@using HITSBlazor.Components.Tables.TableBodyRow
+@using HITSBlazor.Components.Tables.TableHeader
 @using HITSBlazor.Components.UserInfoField
 @using HITSBlazor.Models.Common.Entities
 @using HITSBlazor.Models.Common.Enums
@@ -321,79 +323,45 @@
                             <div class="w-100 d-flex">
                                 <div class="w-100">
                                     <table class="table table-hover mb-0">
-                                        <thead>
-                                            <tr class="user-teams-table-lables">
-                                                <th class="py-3 col fw-semibold text-secondary">
-                                                    <div class="d-flex">
-                                                        Команда
-                                                    </div>
-                                                </th>
-                                                <th class="py-3 col fw-semibold text-secondary">
-                                                    <div class="justify-content-center align-items-center text-center d-flex">
-                                                        Дата вступления
-                                                    </div>
-                                                </th>
-                                                <th class="py-3 col fw-semibold text-secondary">
-                                                    <div class="justify-content-center align-items-center text-center d-flex">
-                                                        Дата исключения
-                                                    </div>
-                                                </th>
-                                                <th class="py-3 col fw-semibold text-secondary">
-                                                    <div class="justify-content-center align-items-center text-center d-flex">
-                                                        Статус
-                                                    </div>
-                                                </th>
-                                                <th></th>
-                                                <th></th>
-                                            </tr>
-                                        </thead>
+                                        <TableHeader TableActionMenuIsEnable="true" 
+                                                     Items="GetHeaderItems()" />
                                         <tbody>
-                                            <tr>
-                                                @foreach (var teamExp in Profile?.Teams ?? [])
-                                                {
-                                                    <td class="py-3 col align-self-center">
-                                                        <div class="flex-wrap d-flex gap-1">
-                                                            <div class="data-link">
-                                                                <div>@teamExp.TeamName</div>
+                                            @foreach (var teamExp in Profile?.Teams ?? [])
+                                            {
+                                                <tr>
+                                                    <TableBodyRow>
+                                                        <div class="data-link">
+                                                            <div>@teamExp.TeamName</div>
+                                                        </div>
+                                                    </TableBodyRow>
+                                                    <TableBodyRow IsCentered="true">
+                                                        <div>@teamExp.StartDate.ToString("dd.MM.yyyy")</div>
+                                                    </TableBodyRow>
+                                                    <TableBodyRow IsCentered="true">
+                                                        <div class="@(teamExp.FinishDate is null ? "text-primary" : string.Empty)">
+                                                            <div>@(teamExp.FinishDate is null ? "В команде" : teamExp.FinishDate.Value.ToString("dd.MM.yyyy"))</div>
+                                                        </div>
+                                                    </TableBodyRow>
+                                                    <TableBodyRow IsCentered="true">
+                                                        @if (teamExp.HasActiveProject)
+                                                        {
+                                                            <div class="px-2 py-1 rounded-4 bg-warning-subtle text-warning">
+                                                                <div>В работе</div>
                                                             </div>
-                                                        </div>
-                                                    </td>
-                                                    <td class="py-3 col align-self-center">
-                                                        <div class="justify-content-center align-items-center text-center flex-wrap d-flex gap-1">
-                                                            <div class="">
-                                                                <div>@teamExp.StartDate.ToString("dd.MM.yyyy")</div>
+                                                        }
+                                                        else
+                                                        {
+                                                            <div class="px-2 py-1 rounded-4 bg-primary-subtle text-primary">
+                                                                <div>В поисках</div>
                                                             </div>
-                                                        </div>
-                                                    </td>
-                                                    <td class="py-3 col align-self-center">
-                                                        <div class="justify-content-center align-items-center text-center flex-wrap d-flex gap-1">
-                                                            <div class="@(teamExp.FinishDate is null ? "text-primary" : string.Empty)">
-                                                                <div>@(teamExp.FinishDate is null ? "В команде" : teamExp.FinishDate.Value.ToString("dd.MM.yyyy"))</div>
-                                                            </div>
-                                                        </div>
-                                                    </td>
-                                                    <td class="py-3 col align-self-center">
-                                                        <div class="justify-content-center align-items-center text-center flex-wrap d-flex gap-1">
-                                                            @if (teamExp.HasActiveProject)
-                                                            {
-                                                                <div class="px-2 py-1 rounded-4 bg-warning-subtle text-warning">
-                                                                    <div>В работе</div>
-                                                                </div>
-                                                            }
-                                                            else
-                                                            {
-                                                                <div class="px-2 py-1 rounded-4 bg-primary-subtle text-primary">
-                                                                    <div>В поисках</div>
-                                                                </div>
-                                                            }
-                                                        </div>
-                                                    </td>
-                                                    <TableActionMenu ItemId="@teamExp.TeamId" 
+                                                        }
+                                                    </TableBodyRow>
+                                                    <TableActionMenu ItemId="@teamExp.TeamId"
                                                                      OnAction="OnTeamAction"
                                                                      ShowToRight="true"
                                                                      Actions="@(new List<TableAction> { TableAction.View })" />
-                                                }
-                                            </tr>
+                                                </tr>
+                                            }
                                         </tbody>
                                     </table>
                                 </div>

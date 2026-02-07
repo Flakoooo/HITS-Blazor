@@ -1,4 +1,4 @@
-﻿namespace HITSBlazor.Components.IdeaActionMenu
+﻿namespace HITSBlazor.Components.Tables.TableActionMenu
 {
     public class PositionInfo
     {
