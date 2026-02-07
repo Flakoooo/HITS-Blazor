@@ -330,7 +330,7 @@
                                             {
                                                 <tr>
                                                     <TableBodyRow>
-                                                        <div class="data-link">
+                                                        <div @onclick="@(() => ShowTeam(teamExp.TeamId))" class="data-link">
                                                             <div>@teamExp.TeamName</div>
                                                         </div>
                                                     </TableBodyRow>

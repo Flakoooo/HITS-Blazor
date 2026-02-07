@@ -27,5 +27,8 @@ namespace HITSBlazor.Utils.Mocks.Teams
                 }
             ];
         }
+
+        public static List<RequestToTeam> GetRequestToTeamsByTeamId(Guid teamId)
+            => [.. _requestsToTeam.Where(rtt => rtt.TeamId == teamId)];
     }
 }

@@ -11,7 +11,7 @@
     @if (!_isLoading && _currentTeam is not null)
     {
         <div class="team-modal-side w-75">
-            <ModalHeader Title="TEAM_NAME" />
+            <ModalHeader Title="@_currentTeam.Name" />
             <ul class="list-group rounded-3">
                 <li class="list-group-item p-0 overflow-hidden">
                     <Collapse StartCollapsed="false">
@@ -36,7 +36,8 @@
                 <div class="border-bottom px-3">
                     <ul class="nav nav-underline">
                         <!-- active text-primary при активной категории -->
-                        <div class="nav-link fw-normal pb-1 active text-primary">Участники</div>
+                        <!-- сделать pointer -->
+                        <div class="nav-link fw-normal pb-1 @GetCategoryClass(_isMembersCategory)">Участники</div>
                         <div class="nav-link fw-normal pb-1 text-secondary">Приглашения в команду</div>
                         <div class="nav-link fw-normal pb-1 text-secondary">Заявки в команду</div>
                         <div class="nav-link fw-normal pb-1 text-secondary">Заявки в идеи</div>
@@ -60,17 +61,24 @@
                                 <table class="table table-hover mb-0">
                                     @if (_isMembersCategory)
                                     {
-                                        <TableHeader TableActionMenuIsEnable="true" 
-                                                     Items="GetMembersTableHeader()" />
-                                        <tbody>
-
-                                        </tbody>
+                                        <TableHeader TableActionMenuIsEnable="true" Items="GetMembersTableHeader()" />
                                     }
-                                    else if (_isInvitationsCategory)
+                                    else if (_isInvitationsCategory || _isRequestsInTeamCategory)
                                     {
-                                        <TableHeader TableActionMenuIsEnable="true"
-                                                     Items="GetInvitationsTableHeader()" />
-                                        <tbody>
+                                        <TableHeader TableActionMenuIsEnable="true" Items="GetNewMembersTableHeader()" />
+                                    }
+                                    <tbody>
+                                        @if (_isMembersCategory)
+                                        {
+                                            @foreach (var member in _currentTeam.Members)
+                                            {
+                                                <tr>
+
+                                                </tr>
+                                            }
+                                        }
+                                        else if (_isInvitationsCategory)
+                                        {
                                             @foreach (var invitation in _teamInvitations)
                                             {
                                                 <tr>
@@ -91,12 +99,43 @@
                                                         @invitation.LastName
                                                     </TableBodyRow>
                                                     <TableActionMenu ItemId="invitation.UserId"
-                                                                     OnAction="@ShowUserProfile"
+                                                                     OnAction="@HandleTableMenuClick"
                                                                      Actions="@(new List<TableAction> { TableAction.ViewProfile })" />
                                                 </tr>
                                             }
-                                        </tbody>
-                                    }
+                                        }
+                                        else if (_isRequestsInTeamCategory)
+                                        {
+                                            @foreach (var request in _requestsToTeam)
+                                            {
+                                                <tr>
+                                                    <TableBodyRow IsCentered="true">
+                                                        <div class="px-2 py-1 rounded-4 @request.Status.GetStyle()">
+                                                            @request.Status.GetTranslation()
+                                                        </div>
+                                                    </TableBodyRow>
+                                                    <TableBodyRow IsCentered="true">
+                                                        <div class="data-link">
+                                                            @request.Email
+                                                        </div>
+                                                    </TableBodyRow>
+                                                    <TableBodyRow IsCentered="true">
+                                                        @request.FirstName
+                                                    </TableBodyRow>
+                                                    <TableBodyRow IsCentered="true">
+                                                        @request.LastName
+                                                    </TableBodyRow>
+                                                    <TableActionMenu ItemId="request.UserId"
+                                                                     OnAction="@HandleTableMenuClick"
+                                                                     Actions="@(new List<TableAction> { 
+                                                                        TableAction.ViewProfile, 
+                                                                        TableAction.TeamRequestAccept,
+                                                                        TableAction.TeamRequestCancel 
+                                                                     })" />
+                                                </tr>
+                                            }
+                                        }
+                                    </tbody>
                                 </table>
                             </div>
                         </div>

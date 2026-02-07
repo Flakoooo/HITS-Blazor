@@ -136,13 +136,23 @@ namespace HITSBlazor.Components.Tables.TableActionMenu
             await Task.CompletedTask;
         }
 
-        private string GetActionText(TableAction action) => action switch
+        private static string GetActionText(TableAction action) => action switch
         {
             TableAction.View => "Просмотреть",
             TableAction.ViewProfile => "Перейти на профиль",
             TableAction.Edit => "Редактировать",
+            TableAction.TeamRequestAccept => "Принять",
             TableAction.Delete => "Удалить",
+            TableAction.TeamRequestCancel => "Отклонить",
             _ => action.ToString()
+        };
+
+        private static string GetActionStyle(TableAction action) => action switch
+        {
+            TableAction.TeamRequestAccept => "text-success",
+            TableAction.Delete => "text-danger",
+            TableAction.TeamRequestCancel => "text-danger",
+            _ => string.Empty
         };
 
         private async Task HandleActionClick(TableAction action)

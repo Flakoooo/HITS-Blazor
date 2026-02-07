@@ -14,7 +14,7 @@
                 @foreach (var action in Actions)
                 {
                     <li @onclick="@(() => HandleActionClick(action))"
-                        class="list-group-item list-group-item-action px-2 py-1 @(action == TableAction.Delete ? "text-danger" : string.Empty)">
+                        class="list-group-item list-group-item-action px-2 py-1 @GetActionStyle(action)">
                         @GetActionText(action)
                     </li>
                 }

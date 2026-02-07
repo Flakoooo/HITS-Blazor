@@ -17,6 +17,7 @@ using HITSBlazor.Services.Profiles;
 using HITSBlazor.Services.Tests;
 using ApexCharts;
 using HITSBlazor.Services.UserSkills;
+using HITSBlazor.Services.Teams;
 
 
 
@@ -91,6 +92,9 @@ namespace HITSBlazor
             builder.Services.AddScoped<IIdeasService, MockIdeasService>();
             builder.Services.AddScoped<IIdeaSkillService, MockIdeaSkillService>();
             builder.Services.AddScoped<IIdeaRatingService, MockIdeaRatingService>();
+
+            //Teams
+            builder.Services.AddScoped<ITeamService, MockTeamService>();
 
             //Projects
             builder.Services.AddScoped<IProjectService, MockProjectService>();

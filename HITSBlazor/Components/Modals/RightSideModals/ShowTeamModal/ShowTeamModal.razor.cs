@@ -23,9 +23,13 @@ namespace HITSBlazor.Components.Modals.RightSideModals.ShowTeamModal
 
         private Team? _currentTeam;
         private List<TeamInvitation> _teamInvitations = [];
+        private List<RequestToTeam> _requestsToTeam = [];
 
+        // сделать enum для раделения логики
+        private string _activeCategory = nameof(_currentTeam.Members);
         private bool _isMembersCategory = true;
         private bool _isInvitationsCategory = false;
+        private bool _isRequestsInTeamCategory = false;
 
         protected override async Task OnInitializedAsync()
         {
@@ -35,9 +39,15 @@ namespace HITSBlazor.Components.Modals.RightSideModals.ShowTeamModal
             if (_currentTeam is null) return;
 
             _teamInvitations = await TeamService.GetTeamInvitationsAsync(TeamId);
+            _requestsToTeam = await TeamService.GetTeamRequestsToTeamAsync(TeamId);
 
             _isLoading = false;
         }
+
+        private 
+
+        private static string GetCategoryClass(bool boolCategory)
+            => boolCategory ? "active text-primary" : "text-secondary";
 
         private static List<TableHeaderItem> GetMembersTableHeader() =>
         [
@@ -58,7 +68,7 @@ namespace HITSBlazor.Components.Modals.RightSideModals.ShowTeamModal
             }
         ];
 
-        private static List<TableHeaderItem> GetInvitationsTableHeader() =>
+        private static List<TableHeaderItem> GetNewMembersTableHeader() =>
         [
             new TableHeaderItem
             {
@@ -86,13 +96,27 @@ namespace HITSBlazor.Components.Modals.RightSideModals.ShowTeamModal
             }
         ];
 
-        private void ShowUserProfile(TableActionContext context)
+        private void HandleTableMenuClick(TableActionContext context)
         {
-            var parameters = new Dictionary<string, object>
+            if (context.Action == TableAction.ViewProfile)
             {
-                { "UserId", context.ItemId }
-            };
-            ModalService.Show<ShowUserModal.ShowUserModal>(ModalType.RightSide, parameters: parameters);
+                var parameters = new Dictionary<string, object>
+                {
+                    { "UserId", context.ItemId }
+                };
+                ModalService.Show<ShowUserModal.ShowUserModal>(ModalType.RightSide, parameters: parameters);
+            }
+            else if (_isRequestsInTeamCategory)
+            {
+                if (context.Action == TableAction.TeamRequestAccept)
+                {
+
+                }
+                else if (context.Action == TableAction.TeamRequestCancel)
+                {
+
+                }
+            }
         }
     }
 }

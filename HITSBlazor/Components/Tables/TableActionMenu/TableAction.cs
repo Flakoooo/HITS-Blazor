@@ -5,6 +5,8 @@
         View,
         ViewProfile,
         Edit,
-        Delete
+        TeamRequestAccept,
+        Delete,
+        TeamRequestCancel
     }
 }

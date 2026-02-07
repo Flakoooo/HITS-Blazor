@@ -1,9 +1,11 @@
 ﻿using ApexCharts;
 using HITSBlazor.Components.Modals.CenterModals.UpdateEmailModal;
+using HITSBlazor.Components.Modals.RightSideModals.ShowTeamModal;
 using HITSBlazor.Components.Tables.TableActionMenu;
 using HITSBlazor.Components.Tables.TableHeader;
 using HITSBlazor.Models.Common.Entities;
 using HITSBlazor.Models.Common.Enums;
+using HITSBlazor.Models.Ideas.Entities;
 using HITSBlazor.Models.Tests.Entities;
 using HITSBlazor.Models.Users.Entities;
 using HITSBlazor.Services.Auth;
@@ -265,11 +267,20 @@ namespace HITSBlazor.Components.Modals.RightSideModals.ShowUserModal
             ModalService.Show<ShowIdeaModal.ShowIdeaModal>(type: ModalType.RightSide, parameters: modalParameters);
         }
 
+        private void ShowTeam(Guid teamId)
+        {
+            var modalParameters = new Dictionary<string, object>
+            {
+                { "TeamId", teamId }
+            };
+            ModalService.Show<ShowTeamModal.ShowTeamModal>(type: ModalType.RightSide, parameters: modalParameters);
+        }
+
         private async Task OnTeamAction(TableActionContext context)
         {
             if (context.Action == TableAction.View)
             {
-                Console.WriteLine($"Демонстрация идеи {context.ItemId}");
+                ShowTeam(context.ItemId);
             }
         }
     }
