@@ -24,12 +24,11 @@ namespace HITSBlazor.Components.Modals.RightSideModals.ShowTeamModal
         private Team? _currentTeam;
         private List<TeamInvitation> _teamInvitations = [];
         private List<RequestToTeam> _requestsToTeam = [];
+        private List<RequestTeamToIdea> _requestsTeamToIdeas = [];
+        private List<InvitationTeamToIdea> _invitationsTeamToIdeas = [];
 
         // сделать enum для раделения логики
-        private string _activeCategory = nameof(_currentTeam.Members);
-        private bool _isMembersCategory = true;
-        private bool _isInvitationsCategory = false;
-        private bool _isRequestsInTeamCategory = false;
+        private TeamTableCategory _activeCategory = TeamTableCategory.Members;
 
         protected override async Task OnInitializedAsync()
         {
@@ -40,14 +39,14 @@ namespace HITSBlazor.Components.Modals.RightSideModals.ShowTeamModal
 
             _teamInvitations = await TeamService.GetTeamInvitationsAsync(TeamId);
             _requestsToTeam = await TeamService.GetTeamRequestsToTeamAsync(TeamId);
+            _requestsTeamToIdeas = await TeamService.GetRequestsTeamToIdeasAsync(TeamId);
+            _invitationsTeamToIdeas = await TeamService.GetInvitationsTeamToIdeasAsync(TeamId);
 
             _isLoading = false;
         }
 
-        private 
-
-        private static string GetCategoryClass(bool boolCategory)
-            => boolCategory ? "active text-primary" : "text-secondary";
+        private string GetCategoryClass(TeamTableCategory category)
+            => _activeCategory == category ? "active text-primary" : "text-secondary";
 
         private static List<TableHeaderItem> GetMembersTableHeader() =>
         [
@@ -106,7 +105,7 @@ namespace HITSBlazor.Components.Modals.RightSideModals.ShowTeamModal
                 };
                 ModalService.Show<ShowUserModal.ShowUserModal>(ModalType.RightSide, parameters: parameters);
             }
-            else if (_isRequestsInTeamCategory)
+            else if (_activeCategory == TeamTableCategory.RequestsToTeam)
             {
                 if (context.Action == TableAction.TeamRequestAccept)
                 {

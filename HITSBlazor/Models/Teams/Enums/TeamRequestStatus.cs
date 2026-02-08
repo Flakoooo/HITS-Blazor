@@ -1,6 +1,6 @@
 ﻿namespace HITSBlazor.Models.Teams.Enums
 {
-    public enum JoinStatus
+    public enum TeamRequestStatus
     {
         New,
         Annulled,

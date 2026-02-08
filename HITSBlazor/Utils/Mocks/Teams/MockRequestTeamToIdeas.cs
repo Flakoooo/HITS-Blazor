@@ -1,14 +1,11 @@
-﻿using HITSBlazor.Models.Markets.Entities;
-using HITSBlazor.Models.Markets.Enums;
+﻿using HITSBlazor.Models.Teams.Entities;
+using HITSBlazor.Models.Teams.Enums;
 using HITSBlazor.Utils.Mocks.Markets;
-using HITSBlazor.Utils.Mocks.Teams;
 
-namespace HITSBlazor.Utils.Mocks.Ideas
+namespace HITSBlazor.Utils.Mocks.Teams
 {
     public class MockRequestTeamToIdeas
     {
-        private static readonly List<RequestTeamToIdea> requestTeamToIdeas = CreateRequestTeamToIdeas();
-
         private static readonly string _lorem = "Lorem ipsum dolor sit amet consectetur adipisicing elit. Dolorbeatae ipsum dicta omnis adipisci magni autem eos quisquam doloresmaxime. Dignissimos cum nulla consequatur accusantium distinctioaut. Velit, assumenda porro!";
 
         public static Guid Card1Id { get; } = Guid.NewGuid();
@@ -19,6 +16,8 @@ namespace HITSBlazor.Utils.Mocks.Ideas
         public static Guid Carp1Id { get; } = Guid.NewGuid();
         public static Guid Carp2Id { get; } = Guid.NewGuid();
         public static Guid Carp3Id { get; } = Guid.NewGuid();
+
+        private static readonly List<RequestTeamToIdea> _requestTeamToIdeas = CreateRequestTeamToIdeas();
 
         private static List<RequestTeamToIdea> CreateRequestTeamToIdeas()
         {
@@ -33,7 +32,7 @@ namespace HITSBlazor.Utils.Mocks.Ideas
                     IdeaMarketId = MockIdeaMarkets.EMetricsViewerId,
                     MarketId = MockMarkets.Autumn2023Id,
                     TeamId = cardTeam.Id,
-                    Status = RequestToIdeaStatus.ANNULLED,
+                    Status = TeamRequestStatus.Annulled,
                     Name = cardTeam.Name,
                     MembersCount = cardTeam.MembersCount,
                     Skills = cardTeam.Skills,
@@ -45,7 +44,7 @@ namespace HITSBlazor.Utils.Mocks.Ideas
                     IdeaMarketId = MockIdeaMarkets.PWTechnologyId,
                     MarketId = MockMarkets.Autumn2023Id,
                     TeamId = cardTeam.Id,
-                    Status = RequestToIdeaStatus.ANNULLED,
+                    Status = TeamRequestStatus.Annulled,
                     Name = cardTeam.Name,
                     MembersCount = cardTeam.MembersCount,
                     Skills = cardTeam.Skills,
@@ -57,7 +56,7 @@ namespace HITSBlazor.Utils.Mocks.Ideas
                     IdeaMarketId = MockIdeaMarkets.PWTechnologyId,
                     MarketId = MockMarkets.Autumn2023Id,
                     TeamId = cactusTeam.Id,
-                    Status = RequestToIdeaStatus.ANNULLED,
+                    Status = TeamRequestStatus.Annulled,
                     Name = cactusTeam.Name,
                     MembersCount = cactusTeam.MembersCount,
                     Skills = cactusTeam.Skills,
@@ -69,7 +68,7 @@ namespace HITSBlazor.Utils.Mocks.Ideas
                     IdeaMarketId = MockIdeaMarkets.ChatBotId,
                     MarketId = MockMarkets.Autumn2023Id,
                     TeamId = cardTeam.Id,
-                    Status = RequestToIdeaStatus.ACCEPTED,
+                    Status = TeamRequestStatus.Accepted,
                     Name = cardTeam.Name,
                     MembersCount = cardTeam.MembersCount,
                     Skills = cardTeam.Skills,
@@ -81,7 +80,7 @@ namespace HITSBlazor.Utils.Mocks.Ideas
                     IdeaMarketId = MockIdeaMarkets.ArmatureId,
                     MarketId = MockMarkets.Autumn2023Id,
                     TeamId = cactusTeam.Id,
-                    Status = RequestToIdeaStatus.ACCEPTED,
+                    Status = TeamRequestStatus.Accepted,
                     Name = cactusTeam.Name,
                     MembersCount = cactusTeam.MembersCount,
                     Skills = cactusTeam.Skills,
@@ -93,7 +92,7 @@ namespace HITSBlazor.Utils.Mocks.Ideas
                     IdeaMarketId = MockIdeaMarkets.ArmatureId,
                     MarketId = MockMarkets.Autumn2023Id,
                     TeamId = carpTeam.Id,
-                    Status = RequestToIdeaStatus.WITHDRAWN,
+                    Status = TeamRequestStatus.Withdrawn,
                     Name = carpTeam.Name,
                     MembersCount = carpTeam.MembersCount,
                     Skills = carpTeam.Skills,
@@ -105,7 +104,7 @@ namespace HITSBlazor.Utils.Mocks.Ideas
                     IdeaMarketId = MockIdeaMarkets.HelperId,
                     MarketId = MockMarkets.Autumn2023Id,
                     TeamId = carpTeam.Id,
-                    Status = RequestToIdeaStatus.CANCELED,
+                    Status = TeamRequestStatus.Canceled,
                     Name = carpTeam.Name,
                     MembersCount = carpTeam.MembersCount,
                     Skills = carpTeam.Skills,
@@ -117,7 +116,7 @@ namespace HITSBlazor.Utils.Mocks.Ideas
                     IdeaMarketId = MockIdeaMarkets.PWTechnologyId,
                     MarketId = MockMarkets.Autumn2023Id,
                     TeamId = carpTeam.Id,
-                    Status = RequestToIdeaStatus.NEW,
+                    Status = TeamRequestStatus.New,
                     Name = carpTeam.Name,
                     MembersCount = carpTeam.MembersCount,
                     Skills = carpTeam.Skills,
@@ -125,5 +124,8 @@ namespace HITSBlazor.Utils.Mocks.Ideas
                 }
             ];
         }
+
+        public static List<RequestTeamToIdea> GetRequestsTeamToIdeas(Guid teamId)
+            => [.. _requestTeamToIdeas.Where(rtti => rtti.TeamId == teamId)];
     }
 }

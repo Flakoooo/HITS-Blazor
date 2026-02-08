@@ -1,6 +1,7 @@
 ﻿@namespace HITSBlazor.Components.Modals.RightSideModals.ShowTeamModal
 @using HITSBlazor.Components.Collapse
 @using HITSBlazor.Components.Modals.Components.ModalHeader
+@using HITSBlazor.Components.Placeholder
 @using HITSBlazor.Components.Tables.TableActionMenu
 @using HITSBlazor.Components.Tables.TableBodyRow
 @using HITSBlazor.Components.Tables.TableHeader
@@ -8,7 +9,79 @@
 @using HITSBlazor.Utils.EnumTranslators
 
 <div class="right-side-modal p-3 overflow-y-scroll" @onclick:stopPropagation="true">
-    @if (!_isLoading && _currentTeam is not null)
+    @if (_isLoading || _currentTeam is null)
+    {
+        <div class="team-modal-placeholder w-75 h-100">
+            <Placeholder Width="w-75" />
+            <div class="p-2 bg-white rounded-3 d-flex flex-column gap-1">
+                <Placeholder Width="w-50" />
+                <Placeholder />
+                <Placeholder />
+            </div>
+            <div class="w-100">
+                <table class="table mb-0">
+                    <thead>
+                        <tr>
+                            @for (int i = 0; i < 6; ++i)
+                            {
+                                <th>
+                                    <Placeholder />
+                                </th>                                
+                            }
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (int i = 0; i < 5; ++i)
+                        {
+                            <tr>
+                                <td>
+                                    <div class="h-100 d-flex align-items-center">
+                                        <Placeholder />
+                                    </div>
+                                </td>
+                                @for (int j = 0; j < 5; ++j)
+                                {
+                                    <td>
+                                        <div class="h-100 d-flex align-items-center">
+                                            <Placeholder Height="PlaceholderHeight.Small" />
+                                        </div>
+                                    </td>
+                                }
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div class="p-2 bg-white rounded-3 gap-2 d-flex">
+                <Placeholder Width="w-25" Height="PlaceholderHeight.Small" />
+                <Placeholder Width="w-25" Height="PlaceholderHeight.Small" />
+                <Placeholder Width="w-25" Height="PlaceholderHeight.Small" />
+            </div>
+        </div>
+        <div class="team-modal-placeholder p-2 w-25 bg-white rounded">
+            <div class="d-flex gap-2 w-100 px-1 pt-1">
+                <div class="bg-primary w-50 py-3 rounded-3"></div>
+                <div class="bg-primary w-50 py-3 rounded-3"></div>
+            </div>
+            <div class="px-1">
+                <Placeholder Width="w-50" />
+                <Placeholder />
+                <Placeholder />
+            </div>
+            <div class="px-1">
+                <Placeholder Width="w-50" />
+                <Placeholder />
+                <Placeholder />
+                <Placeholder />
+            </div>
+            <div class="px-1 pb-1">
+                <Placeholder />
+                <Placeholder Width="w-75" />
+                <Placeholder Width="w-75" />
+            </div>
+        </div>
+    }
+    else
     {
         <div class="team-modal-side w-75">
             <ModalHeader Title="@_currentTeam.Name" />
@@ -35,13 +108,26 @@
             <div class="bg-white rounded-3">
                 <div class="border-bottom px-3">
                     <ul class="nav nav-underline">
-                        <!-- active text-primary при активной категории -->
-                        <!-- сделать pointer -->
-                        <div class="nav-link fw-normal pb-1 @GetCategoryClass(_isMembersCategory)">Участники</div>
-                        <div class="nav-link fw-normal pb-1 text-secondary">Приглашения в команду</div>
-                        <div class="nav-link fw-normal pb-1 text-secondary">Заявки в команду</div>
-                        <div class="nav-link fw-normal pb-1 text-secondary">Заявки в идеи</div>
-                        <div class="nav-link fw-normal pb-1 text-secondary">Приглашения в идеи</div>
+                        <div @onclick="@(() => _activeCategory = TeamTableCategory.Members)"
+                             class="nav-link fw-normal pb-1 @GetCategoryClass(TeamTableCategory.Members)">
+                            Участники
+                        </div>
+                        <div @onclick="@(() => _activeCategory = TeamTableCategory.Invitations)"
+                             class="nav-link fw-normal pb-1 @GetCategoryClass(TeamTableCategory.Invitations)">
+                            Приглашения в команду
+                        </div>
+                        <div @onclick="@(() => _activeCategory = TeamTableCategory.RequestsToTeam)"
+                             class="nav-link fw-normal pb-1 @GetCategoryClass(TeamTableCategory.RequestsToTeam)">
+                            Заявки в команду
+                        </div>
+                        <div @onclick="@(() => _activeCategory = TeamTableCategory.RequestsTeamToIdeas)"
+                             class="nav-link fw-normal pb-1 @GetCategoryClass(TeamTableCategory.RequestsTeamToIdeas)">
+                            Заявки в идеи
+                        </div>
+                        <div @onclick="@(() => _activeCategory = TeamTableCategory.InvitationsTeamToIdeas)"
+                             class="nav-link fw-normal pb-1 @GetCategoryClass(TeamTableCategory.InvitationsTeamToIdeas)">
+                            Приглашения в идеи
+                        </div>
                     </ul>
                 </div>
                 <div class="team-modal-tables">
@@ -59,25 +145,39 @@
                         <div class="w-100 d-flex">
                             <div class="w-100">
                                 <table class="table table-hover mb-0">
-                                    @if (_isMembersCategory)
+                                    @if (_activeCategory == TeamTableCategory.Members)
                                     {
                                         <TableHeader TableActionMenuIsEnable="true" Items="GetMembersTableHeader()" />
                                     }
-                                    else if (_isInvitationsCategory || _isRequestsInTeamCategory)
+                                    else if (_activeCategory == TeamTableCategory.Invitations || _activeCategory == TeamTableCategory.RequestsToTeam)
                                     {
                                         <TableHeader TableActionMenuIsEnable="true" Items="GetNewMembersTableHeader()" />
                                     }
                                     <tbody>
-                                        @if (_isMembersCategory)
+                                        @if (_activeCategory == TeamTableCategory.Members)
                                         {
                                             @foreach (var member in _currentTeam.Members)
                                             {
                                                 <tr>
-
+                                                    <TableBodyRow>
+                                                        <div class="data-link @(member.Id == _currentTeam.Owner.Id ? "text-warning" : string.Empty)">
+                                                            @member.Email
+                                                            @(member.Id == _currentTeam.Owner.Id ? " (Владелец)" : string.Empty)
+                                                        </div>
+                                                    </TableBodyRow>
+                                                    <TableBodyRow>
+                                                        @member.FirstName
+                                                    </TableBodyRow>
+                                                    <TableBodyRow>
+                                                        @member.LastName
+                                                    </TableBodyRow>
+                                                    <TableActionMenu ItemId="member.UserId"
+                                                                     OnAction="@HandleTableMenuClick"
+                                                                     Actions="@(new List<TableAction> { TableAction.ViewProfile })" />
                                                 </tr>
                                             }
                                         }
-                                        else if (_isInvitationsCategory)
+                                        else if (_activeCategory == TeamTableCategory.Invitations)
                                         {
                                             @foreach (var invitation in _teamInvitations)
                                             {
@@ -104,7 +204,7 @@
                                                 </tr>
                                             }
                                         }
-                                        else if (_isRequestsInTeamCategory)
+                                        else if (_activeCategory == TeamTableCategory.RequestsToTeam)
                                         {
                                             @foreach (var request in _requestsToTeam)
                                             {
@@ -125,13 +225,60 @@
                                                     <TableBodyRow IsCentered="true">
                                                         @request.LastName
                                                     </TableBodyRow>
-                                                    <TableActionMenu ItemId="request.UserId"
+                                                    <TableActionMenu ItemId="request.Id"
                                                                      OnAction="@HandleTableMenuClick"
                                                                      Actions="@(new List<TableAction> { 
                                                                         TableAction.ViewProfile, 
                                                                         TableAction.TeamRequestAccept,
                                                                         TableAction.TeamRequestCancel 
                                                                      })" />
+                                                </tr>
+                                            }
+                                        }
+                                        else if (_activeCategory == TeamTableCategory.RequestsTeamToIdeas)
+                                        {
+                                            @foreach (var request in _requestsTeamToIdeas)
+                                            {
+                                                <tr>
+                                                    <TableBodyRow>
+                                                        <div class="data-link">
+                                                            @request.Name
+                                                        </div>
+                                                    </TableBodyRow>
+                                                    <TableBodyRow IsCentered="true">
+                                                        <div class="px-2 py-1 rounded-4 @request.Status.GetStyle()">
+                                                            @request.Status.GetTranslation()
+                                                        </div>
+                                                    </TableBodyRow>
+                                                    <TableActionMenu ItemId="request.Id"
+                                                                     OnAction="@HandleTableMenuClick"
+                                                                     Actions="@(new List<TableAction> { TableAction.ViewIdea, TableAction.ViewLetter})" />
+                                                </tr>
+                                            }
+                                        }
+                                        else if (_activeCategory == TeamTableCategory.InvitationsTeamToIdeas)
+                                        {
+                                            @foreach (var invitation in _invitationsTeamToIdeas)
+                                            {
+                                                <tr>
+                                                    <TableBodyRow IsCentered="true">
+                                                        <div class="px-2 py-1 rounded-4 @invitation.Status.GetStyle()">
+                                                            @invitation.Status.GetTranslation()
+                                                        </div>
+                                                    </TableBodyRow>
+                                                    <TableBodyRow>
+                                                        <div class="data-link">
+                                                            @invitation.IdeaName
+                                                        </div>
+                                                    </TableBodyRow>
+                                                    <TableBodyRow IsCentered="true">
+                                                        @foreach (var skill in invitation.Skills)
+                                                        {
+                                                            <div class="px-2 py-1 rounded d-flex gap-1 @skill.Type.GetStyle()">
+                                                                @skill.Name
+                                                            </div>
+                                                        }
+                                                    </TableBodyRow>
                                                 </tr>
                                             }
                                         }

@@ -1,15 +1,15 @@
-﻿using HITSBlazor.Models.Ideas.Enums;
-using HITSBlazor.Models.Teams.Entities;
+﻿using HITSBlazor.Models.Teams.Entities;
+using HITSBlazor.Models.Teams.Enums;
 using HITSBlazor.Utils.Mocks.Markets;
 
 namespace HITSBlazor.Utils.Mocks.Teams
 {
     public static class MockInvitationTeamToIdeas
     {
-        private static readonly List<InvitationTeamToIdea> _invitationTeamToIdeas = CreateInvitationTeamToIdeas();
-
         public static Guid CarpArmatureId { get; } = Guid.NewGuid();
         public static Guid CarpEMetricsViewerId { get; } = Guid.NewGuid();
+
+        private static readonly List<InvitationTeamToIdea> _invitationTeamToIdeas = CreateInvitationTeamToIdeas();
 
         private static List<InvitationTeamToIdea> CreateInvitationTeamToIdeas()
         {
@@ -25,7 +25,7 @@ namespace HITSBlazor.Utils.Mocks.Teams
                     Id = CarpArmatureId,
                     IdeaId = armatureIdea.Id,
                     IdeaName = armatureIdea.Name,
-                    Status = InvitationTeamToIdeaStatus.ANNULLED,
+                    Status = TeamRequestStatus.Annulled,
                     TeamId = carpTeam.Id,
                     InitiatorId = armatureIdea.Initiator.Id,
                     TeamName = carpTeam.Name,
@@ -37,7 +37,7 @@ namespace HITSBlazor.Utils.Mocks.Teams
                     Id = CarpEMetricsViewerId,
                     IdeaId = eMetricsViewer.Id,
                     IdeaName = eMetricsViewer.Name,
-                    Status = InvitationTeamToIdeaStatus.NEW,
+                    Status = TeamRequestStatus.New,
                     TeamId = carpTeam.Id,
                     InitiatorId = eMetricsViewer.Initiator.Id,
                     TeamName = carpTeam.Name,
@@ -46,5 +46,8 @@ namespace HITSBlazor.Utils.Mocks.Teams
                 }
             ];
         }
+
+        public static List<InvitationTeamToIdea> GetInvitationsTeamToIdeas(Guid teamId)
+            => [.. _invitationTeamToIdeas.Where(itti => itti.TeamId == teamId)];
     }
 }

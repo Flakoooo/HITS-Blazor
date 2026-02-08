@@ -1,12 +1,12 @@
 ﻿using HITSBlazor.Models.Common.Entities;
-using HITSBlazor.Models.Markets.Enums;
+using HITSBlazor.Models.Teams.Enums;
 
-namespace HITSBlazor.Models.Markets.Entities
+namespace HITSBlazor.Models.Teams.Entities
 {
     public class RequestTeamToIdea
     {
         public Guid IdeaMarketId { get; set; }
-        public RequestToIdeaStatus Status { get; set; }
+        public TeamRequestStatus Status { get; set; }
         public string Letter { get; set; } = string.Empty;
         public Guid TeamId { get; set; }
         public Guid MarketId { get; set; }

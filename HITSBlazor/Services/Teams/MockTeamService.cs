@@ -16,5 +16,11 @@ namespace HITSBlazor.Services.Teams
 
         public async Task<List<RequestToTeam>> GetTeamRequestsToTeamAsync(Guid teamId)
             => MockRequestsToTeam.GetRequestToTeamsByTeamId(teamId);
+
+        public async Task<List<RequestTeamToIdea>> GetRequestsTeamToIdeasAsync(Guid teamId)
+            => MockRequestTeamToIdeas.GetRequestsTeamToIdeas(teamId);
+
+        public async Task<List<InvitationTeamToIdea>> GetInvitationsTeamToIdeasAsync(Guid teamId)
+            => MockInvitationTeamToIdeas.GetInvitationsTeamToIdeas(teamId);
     }
 }

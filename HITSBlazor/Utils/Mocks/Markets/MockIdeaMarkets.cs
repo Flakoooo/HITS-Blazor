@@ -9,14 +9,14 @@ namespace HITSBlazor.Utils.Mocks.Markets
 {
     public static class MockIdeaMarkets
     {
-        private static readonly List<IdeaMarket> _ideaMarkets = CreateIdeaMarkets();
-
         public static Guid HelperId { get; } = Guid.NewGuid();
         public static Guid PWTechnologyId { get; } = Guid.NewGuid();
         public static Guid EMetricsViewerId { get; } = Guid.NewGuid();
         public static Guid CalculatorId { get; } = Guid.NewGuid();
         public static Guid ChatBotId { get; } = Guid.NewGuid();
         public static Guid ArmatureId { get; } = Guid.NewGuid();
+
+        private static readonly List<IdeaMarket> _ideaMarkets = CreateIdeaMarkets();
 
         private static List<IdeaMarket> CreateIdeaMarkets()
         {

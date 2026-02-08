@@ -39,3 +39,17 @@
     left: auto;
     z-index: 1;
 }
+
+.nav-link {
+    cursor: pointer;
+}
+
+.team-modal-placeholder {
+    height: fit-content;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: stretch;
+    justify-content: flex-start;
+    gap: 16px;
+}

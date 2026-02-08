@@ -81,3 +81,13 @@ input[type="checkbox"] {
     justify-content: stretch;
     gap: 16px;
 }
+
+.collapse-controller {
+    border-radius: 0;
+    background-color: #fff;
+    color: #0d6efd;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: flex-start;
+}

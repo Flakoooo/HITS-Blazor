@@ -24,7 +24,7 @@ namespace HITSBlazor.Utils.Mocks.Teams
                     TeamId = MockTeams.CardId,
                     UserId = maga.Id,
                     Email = maga.Email,
-                    Status = JoinStatus.Accepted,
+                    Status = TeamRequestStatus.Accepted,
                     FirstName = maga.FirstName,
                     LastName = maga.LastName
                 }

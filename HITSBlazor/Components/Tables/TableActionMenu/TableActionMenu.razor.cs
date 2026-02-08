@@ -139,7 +139,9 @@ namespace HITSBlazor.Components.Tables.TableActionMenu
         private static string GetActionText(TableAction action) => action switch
         {
             TableAction.View => "Просмотреть",
+            TableAction.ViewIdea => "Открыть идею",
             TableAction.ViewProfile => "Перейти на профиль",
+            TableAction.ViewLetter => "Просмотреть письмо",
             TableAction.Edit => "Редактировать",
             TableAction.TeamRequestAccept => "Принять",
             TableAction.Delete => "Удалить",
