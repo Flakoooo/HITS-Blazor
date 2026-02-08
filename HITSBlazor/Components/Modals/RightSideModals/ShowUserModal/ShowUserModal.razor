@@ -221,7 +221,7 @@
                                 }
                                 else
                                 {
-                                    <div class="user-skills-charts">
+                                    <div class="radar-charts">
                                         @foreach (var type in Enum.GetValues<SkillType>())
                                         {
                                             var userSkills = Profile?.Skills.Where(s => s.Type == type).ToList();
@@ -323,8 +323,7 @@
                             <div class="w-100 d-flex">
                                 <div class="w-100">
                                     <table class="table table-hover mb-0">
-                                        <TableHeader TableActionMenuIsEnable="true" 
-                                                     Items="GetHeaderItems()" />
+                                        <TableHeader TableActionMenuIsEnable="true" Items="HeaderItems" />
                                         <tbody>
                                             @foreach (var teamExp in Profile?.Teams ?? [])
                                             {

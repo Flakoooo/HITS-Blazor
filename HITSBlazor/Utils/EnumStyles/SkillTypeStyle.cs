@@ -20,6 +20,14 @@ namespace HITSBlazor.Utils.EnumStyles
             [SkillType.Devops] = "#f8d7db"
         };
 
+        private static readonly Dictionary<SkillType, string> WantedColors = new()
+        {
+            [SkillType.Language] = "#8ac1a7",
+            [SkillType.Framework] = "#84e4f7",
+            [SkillType.Database] = "#ffdf81",
+            [SkillType.Devops] = "#ed98a0"
+        };
+
         public static string GetStyle(this SkillType status)
             => Styles.TryGetValue(status, out var style)
                 ? style
@@ -34,6 +42,14 @@ namespace HITSBlazor.Utils.EnumStyles
                 : string.Empty;
 
         public static string GetColor(this SkillType? status)
-            => status is null ? string.Empty : status.Value.GetStyle();
+            => status is null ? string.Empty : status.Value.GetColor();
+
+        public static string GetWantedColor(this SkillType status)
+            => WantedColors.TryGetValue(status, out var color)
+                ? color
+                : string.Empty;
+
+        public static string GetWantedColor(this SkillType? status)
+            => status is null ? string.Empty : status.Value.GetWantedColor();
     }
 }

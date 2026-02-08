@@ -5,7 +5,7 @@ namespace HITSBlazor.Components.Tables.TableHeader
     public partial class TableHeader
     {
         [Parameter]
-        public List<TableHeaderItem> Items { get; set; } = [];
+        public IReadOnlyList<TableHeaderItem> Items { get; set; } = [];
 
         [Parameter]
         public bool TableActionMenuIsEnable { get; set; } = false;

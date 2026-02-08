@@ -68,6 +68,14 @@ namespace HITSBlazor.Components.Modals.RightSideModals.ShowUserModal
         private HashSet<Skill> SelectedDatabaseSkills { get; set; } = [];
         private HashSet<Skill> SelectedDevopsSkills { get; set; } = [];
 
+        private static IReadOnlyList<TableHeaderItem> HeaderItems { get; } =
+        [
+            new TableHeaderItem { Text = "Команда"                              },
+            new TableHeaderItem { Text = "Дата вступления", InCentered = true   },
+            new TableHeaderItem { Text = "Дата исключения", InCentered = true   },
+            new TableHeaderItem { Text = "Статус",          InCentered = true   },
+        ];
+
         private TestResult? BelbinTestResult { get; set; }
         private TestResult? TemperTestResult { get; set; }
         private TestResult? MindTestResult { get; set; }
@@ -229,29 +237,6 @@ namespace HITSBlazor.Components.Modals.RightSideModals.ShowUserModal
                 Position = LegendPosition.Bottom
             }
         };
-
-        private static List<TableHeaderItem> GetHeaderItems() =>
-        [
-            new TableHeaderItem
-            {
-                Text = "Команда"
-            },
-            new TableHeaderItem
-            {
-                Text = "Дата вступления",
-                InCentered = true
-            },
-            new TableHeaderItem
-            {
-                Text = "Дата исключения",
-                InCentered = true
-            },
-            new TableHeaderItem
-            {
-                Text = "Статус",
-                InCentered = true
-            },
-        ];
 
         private void ShowUpdateEmail()
         {

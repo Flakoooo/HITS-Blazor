@@ -5,6 +5,8 @@
 @using HITSBlazor.Components.Tables.TableActionMenu
 @using HITSBlazor.Components.Tables.TableBodyRow
 @using HITSBlazor.Components.Tables.TableHeader
+@using HITSBlazor.Models.Common.Entities
+@using HITSBlazor.Models.Common.Enums
 @using HITSBlazor.Utils.EnumStyles
 @using HITSBlazor.Utils.EnumTranslators
 
@@ -108,24 +110,24 @@
             <div class="bg-white rounded-3">
                 <div class="border-bottom px-3">
                     <ul class="nav nav-underline">
-                        <div @onclick="@(() => _activeCategory = TeamTableCategory.Members)"
-                             class="nav-link fw-normal pb-1 @GetCategoryClass(TeamTableCategory.Members)">
+                        <div @onclick="@(() => _activeTableCategory = TeamTableCategory.Members)"
+                             class="nav-link fw-normal pb-1 @GetTableCategoryClass(TeamTableCategory.Members)">
                             Участники
                         </div>
-                        <div @onclick="@(() => _activeCategory = TeamTableCategory.Invitations)"
-                             class="nav-link fw-normal pb-1 @GetCategoryClass(TeamTableCategory.Invitations)">
+                        <div @onclick="@(() => _activeTableCategory = TeamTableCategory.Invitations)"
+                             class="nav-link fw-normal pb-1 @GetTableCategoryClass(TeamTableCategory.Invitations)">
                             Приглашения в команду
                         </div>
-                        <div @onclick="@(() => _activeCategory = TeamTableCategory.RequestsToTeam)"
-                             class="nav-link fw-normal pb-1 @GetCategoryClass(TeamTableCategory.RequestsToTeam)">
+                        <div @onclick="@(() => _activeTableCategory = TeamTableCategory.RequestsToTeam)"
+                             class="nav-link fw-normal pb-1 @GetTableCategoryClass(TeamTableCategory.RequestsToTeam)">
                             Заявки в команду
                         </div>
-                        <div @onclick="@(() => _activeCategory = TeamTableCategory.RequestsTeamToIdeas)"
-                             class="nav-link fw-normal pb-1 @GetCategoryClass(TeamTableCategory.RequestsTeamToIdeas)">
+                        <div @onclick="@(() => _activeTableCategory = TeamTableCategory.RequestsTeamToIdeas)"
+                             class="nav-link fw-normal pb-1 @GetTableCategoryClass(TeamTableCategory.RequestsTeamToIdeas)">
                             Заявки в идеи
                         </div>
-                        <div @onclick="@(() => _activeCategory = TeamTableCategory.InvitationsTeamToIdeas)"
-                             class="nav-link fw-normal pb-1 @GetCategoryClass(TeamTableCategory.InvitationsTeamToIdeas)">
+                        <div @onclick="@(() => _activeTableCategory = TeamTableCategory.InvitationsTeamToIdeas)"
+                             class="nav-link fw-normal pb-1 @GetTableCategoryClass(TeamTableCategory.InvitationsTeamToIdeas)">
                             Приглашения в идеи
                         </div>
                     </ul>
@@ -145,16 +147,21 @@
                         <div class="w-100 d-flex">
                             <div class="w-100">
                                 <table class="table table-hover mb-0">
-                                    @if (_activeCategory == TeamTableCategory.Members)
+                                    @switch (_activeTableCategory)
                                     {
-                                        <TableHeader TableActionMenuIsEnable="true" Items="GetMembersTableHeader()" />
-                                    }
-                                    else if (_activeCategory == TeamTableCategory.Invitations || _activeCategory == TeamTableCategory.RequestsToTeam)
-                                    {
-                                        <TableHeader TableActionMenuIsEnable="true" Items="GetNewMembersTableHeader()" />
+                                        case TeamTableCategory.Members:
+                                            <TableHeader TableActionMenuIsEnable="true" Items="MembersTableHeader" />
+                                            break;
+                                        case TeamTableCategory.Invitations:
+                                        case TeamTableCategory.RequestsToTeam:
+                                            <TableHeader TableActionMenuIsEnable="true" Items="NewMembersTableHeader" />
+                                            break;
+                                        case TeamTableCategory.RequestsTeamToIdeas:
+                                        case TeamTableCategory.InvitationsTeamToIdeas:
+                                            break;
                                     }
                                     <tbody>
-                                        @if (_activeCategory == TeamTableCategory.Members)
+                                        @if (_activeTableCategory == TeamTableCategory.Members)
                                         {
                                             @foreach (var member in _currentTeam.Members)
                                             {
@@ -177,7 +184,7 @@
                                                 </tr>
                                             }
                                         }
-                                        else if (_activeCategory == TeamTableCategory.Invitations)
+                                        else if (_activeTableCategory == TeamTableCategory.Invitations)
                                         {
                                             @foreach (var invitation in _teamInvitations)
                                             {
@@ -204,7 +211,7 @@
                                                 </tr>
                                             }
                                         }
-                                        else if (_activeCategory == TeamTableCategory.RequestsToTeam)
+                                        else if (_activeTableCategory == TeamTableCategory.RequestsToTeam)
                                         {
                                             @foreach (var request in _requestsToTeam)
                                             {
@@ -235,7 +242,7 @@
                                                 </tr>
                                             }
                                         }
-                                        else if (_activeCategory == TeamTableCategory.RequestsTeamToIdeas)
+                                        else if (_activeTableCategory == TeamTableCategory.RequestsTeamToIdeas)
                                         {
                                             @foreach (var request in _requestsTeamToIdeas)
                                             {
@@ -256,7 +263,7 @@
                                                 </tr>
                                             }
                                         }
-                                        else if (_activeCategory == TeamTableCategory.InvitationsTeamToIdeas)
+                                        else if (_activeTableCategory == TeamTableCategory.InvitationsTeamToIdeas)
                                         {
                                             @foreach (var invitation in _invitationsTeamToIdeas)
                                             {
@@ -303,54 +310,108 @@
         </div>
         <div class="team-modal-side rounded-3 w-25 bg-white">
             <div class="p-2 rounded-top d-flex gap-2">
-                <!-- btn-secondary на НЕ активной категории -->
-                <button type="button" class="btn d-flex btn-primary w-50">
+                <button type="button" 
+                        @onclick="@(() => _activeInfoCategory = TeamInfoCategory.Info)"
+                        class="btn d-flex w-50 @GetInfoCategoryClass(TeamInfoCategory.Info)">
                     Информация
                 </button>
-                <button type="button" class="btn d-flex btn-secondary w-50">
+                <button type="button" 
+                        @onclick="@(() => _activeInfoCategory = TeamInfoCategory.Skills)"
+                        class="btn d-flex w-50 @GetInfoCategoryClass(TeamInfoCategory.Skills)">
                     Компетенции
                 </button>
             </div>
-            <div class="team-modal-info w-100 pb-3 px-3">
-                <div class="w-100">
-                    <span class="fs-6 border-bottom text-secondary d-block">Владелец команды</span>
-                    <div class="team-modal-info-item pt-2">
-                        <i class="bi bi-person-circle text-secondary fs-3 opacity-25"></i>
-                        <div class="data-link">
-                            <span class="fs-6">
-                                @_currentTeam.Owner?.FirstName @_currentTeam.Owner?.LastName
-                            </span>
+            @if (_activeInfoCategory == TeamInfoCategory.Info)
+            {
+                <div class="team-modal-info w-100 pb-3 px-3">
+                    <div class="w-100">
+                        <span class="fs-6 border-bottom text-secondary d-block">Владелец команды</span>
+                        <div class="team-modal-info-item pt-2">
+                            <i class="bi bi-person-circle text-secondary fs-3 opacity-25"></i>
+                            <div class="data-link">
+                                <span class="fs-6">
+                                    @_currentTeam.Owner?.FirstName @_currentTeam.Owner?.LastName
+                                </span>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="w-100">
-                    <span class="fs-6 border-bottom text-secondary d-block">Тим-лидер команды</span>
-                    <div class="team-modal-info-item pt-2">
-                        <i class="bi bi-person-circle text-secondary fs-3 opacity-25"></i>
-                        <div class="data-link">
-                            <span class="fs-6">
-                                @_currentTeam.Leader?.FirstName @_currentTeam.Leader?.LastName
-                            </span>
+                    <div class="w-100">
+                        <span class="fs-6 border-bottom text-secondary d-block">Тим-лидер команды</span>
+                        <div class="team-modal-info-item pt-2">
+                            <i class="bi bi-person-circle text-secondary fs-3 opacity-25"></i>
+                            <div class="data-link">
+                                <span class="fs-6">
+                                    @_currentTeam.Leader?.FirstName @_currentTeam.Leader?.LastName
+                                </span>
+                            </div>
                         </div>
                     </div>
+                    <div class="w-100">
+                        <span class="fs-6 border-bottom text-secondary d-block">Дата создания</span>
+                        <div class="team-modal-info-item pt-2">
+                            <i class="bi bi-calendar-date text-secondary fs-3 opacity-25"></i>
+                            <span class="fs-6 text-primary">@_currentTeam.CreatedAt.ToString("dd.MM.yyyy")</span>
+                        </div>
+                    </div>
+                    <div class="w-100">
+                        <span class="fs-6 border-bottom text-secondary d-block">
+                            Количество участников:
+                            <span class="fs-6 text-primary">@_currentTeam.MembersCount</span>
+                        </span>
+                    </div>
+                    <button type="button" class="btn d-flex btn-primary">
+                        Поделиться командой
+                    </button>
                 </div>
-                <div class="w-100">
-                    <span class="fs-6 border-bottom text-secondary d-block">Дата создания</span>
-                    <div class="team-modal-info-item pt-2">
-                        <i class="bi bi-calendar-date text-secondary fs-3 opacity-25"></i>
-                        <span class="fs-6 text-primary">@_currentTeam.CreatedAt.ToString("dd.MM.yyyy")</span>
+            }
+            else if (_activeInfoCategory == TeamInfoCategory.Skills)
+            {
+                <div class="team-modal-info px-2 pb-2">
+                    <div class="radar-charts">
+                        @foreach (var type in Enum.GetValues<SkillType>())
+                        {
+                            var teamSkills = _currentTeam.Skills.Where(s => s.Type == type).ToList();
+                            var teamWantedSkills = _currentTeam.WantedSkills.Where(s => s.Type == type).ToList();
+                            var intersectSkills = teamWantedSkills.IntersectBy(teamSkills.Select(s => s.Id), ws => ws.Id).ToList();
+
+                            var allSkills = teamSkills
+                                .UnionBy(teamWantedSkills, s => s.Id)
+                                .OrderBy(s => s.Name)
+                                .ToList();
+
+                            if (allSkills?.Count > 0)
+                            {
+                                <ApexChart TItem="Skill"
+                                           Options="@GetRadarChartOptions()"
+                                           Width="250"
+                                           Height="275">
+                                    <ApexPointSeries TItem="Skill"
+                                                     Items="allSkills"
+                                                     Name="Желаемые компетенции"
+                                                     SeriesType="SeriesType.Radar"
+                                                     XValue="@(s => s.Name)"
+                                                     YValue="@(s => teamWantedSkills.Contains(s) ? 1 : 0)"
+                                                     Color="@type.GetWantedColor()" />
+                                    <ApexPointSeries TItem="Skill"
+                                                     Items="allSkills"
+                                                     Name="Фактические компетенции"
+                                                     SeriesType="SeriesType.Radar"
+                                                     XValue="@(s => s.Name)"
+                                                     YValue="@(s => teamSkills.Contains(s) ? 1 : 0)"
+                                                     Color="@type.GetColor()" />
+                                    <ApexPointSeries TItem="Skill"
+                                                     Items="allSkills"
+                                                     Name="Пересечение"
+                                                     SeriesType="SeriesType.Radar"
+                                                     XValue="@(s => s.Name)"
+                                                     YValue="@(s => intersectSkills.Contains(s) ? 1 : 0)"
+                                                     Color="#bfbfbf" />
+                                </ApexChart>
+                            }
+                        }
                     </div>
                 </div>
-                <div class="w-100">
-                    <span class="fs-6 border-bottom text-secondary d-block">
-                        Количество участников:
-                        <span class="fs-6 text-primary">@_currentTeam.MembersCount</span>
-                    </span>
-                </div>
-                <button type="button" class="btn d-flex btn-primary">
-                    Поделиться командой
-                </button>
-            </div>
+            }
         </div>
     }
 </div>

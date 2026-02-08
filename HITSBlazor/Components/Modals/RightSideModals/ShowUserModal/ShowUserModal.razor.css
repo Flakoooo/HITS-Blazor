@@ -38,14 +38,6 @@
     justify-content: space-between;
 }
 
-.user-skills-charts {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: center;
-}
-
 .user-ideas-header, .user-test-header {
     display: flex;
     flex-direction: row;
