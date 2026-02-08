@@ -120,7 +120,10 @@ namespace HITSBlazor.Components.Modals.RightSideModals.ShowTeamModal
                 }
             },
             Stroke = new Stroke { Width = 2 },
-            Fill = new Fill { Opacity = 0.1 },
+            Fill = new Fill { 
+                Opacity = 0.1,
+                Type = new FillTypeSelections(FillType.Solid)
+            },
             Markers = new Markers { Size = 4 },
             Legend = new Legend
             {

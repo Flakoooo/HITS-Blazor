@@ -31,7 +31,7 @@ namespace HITSBlazor.Utils.Mocks.Teams
                     Email = user.Email,
                     FirstName = user.FirstName,
                     LastName = user.LastName,
-                    Skills = []
+                    Skills = MockUsersSkills.GetUserSkillsById(user.Id) ?? []
                 });
             }
 
@@ -41,14 +41,6 @@ namespace HITSBlazor.Utils.Mocks.Teams
         private static List<Team> CreateTeams()
         {
             var javaScript = MockSkills.GetSkillById(MockSkills.JavaScriptId)!;
-
-            var skills = new List<Skill>() 
-            {
-                javaScript,
-                MockSkills.GetSkillById(MockSkills.KotlinId)!,
-                MockSkills.GetSkillById(MockSkills.ReactId)!,
-                MockSkills.GetSkillById(MockSkills.AngularId)!
-            };
 
             var wantedSkills = new List<Skill>()
             {
@@ -61,10 +53,12 @@ namespace HITSBlazor.Utils.Mocks.Teams
                 CardId, MockUsers.GetUserById(MockUsers.KirillId)!, MockUsers.GetUserById(MockUsers.DenisId)!
             );
             var kirill = cardMembers.FirstOrDefault(m => m.UserId == MockUsers.KirillId)!;
+
             var cactusMembers = CreateTeamMembers(
                 CactusId, MockUsers.GetUserById(MockUsers.TimurId)!, MockUsers.GetUserById(MockUsers.AdminId)!
             );
             var timur = cactusMembers.FirstOrDefault(m => m.UserId == MockUsers.TimurId)!;
+
             var carpMembers = CreateTeamMembers(
                 CarpId, MockUsers.GetUserById(MockUsers.LubovId)!, MockUsers.GetUserById(MockUsers.DmitryId)!, MockUsers.GetUserById(MockUsers.AntonId)!
             );
@@ -83,7 +77,7 @@ namespace HITSBlazor.Utils.Mocks.Teams
                     Owner = kirill,
                     Leader = kirill,
                     Members = cardMembers,
-                    Skills = [.. skills],
+                    Skills = [.. cardMembers.SelectMany(m => m.Skills).Distinct()],
                     Tags = new TeamTags { StudyGroups = ["ИИП-22-1", "ИСТНб-21"], StudyCourses = [Course.first, Course.second] },
                     WantedSkills = [.. wantedSkills],
                     IsRefused = false,
@@ -102,7 +96,7 @@ namespace HITSBlazor.Utils.Mocks.Teams
                     Owner = timur,
                     Leader = timur,
                     Members = cactusMembers,
-                    Skills = [..skills],
+                    Skills = [.. cactusMembers.SelectMany(m => m.Skills).Distinct()],
                     Tags = new TeamTags { StudyGroups = ["ИИПб-23-1", "АСОИУ-22-1"], StudyCourses = [Course.second] },
                     WantedSkills = [..wantedSkills],
                     StatusQuest = false,
@@ -121,7 +115,7 @@ namespace HITSBlazor.Utils.Mocks.Teams
                     Owner = lubov,
                     Leader = lubov,
                     Members = carpMembers,
-                    Skills = [..skills],
+                    Skills = [.. carpMembers.SelectMany(m => m.Skills).Distinct()],
                     Tags = new TeamTags { StudyGroups = ["ИСТНб-21-2", "АСОИУ-20-1"], StudyCourses = [Course.third, Course.fourth] },
                     WantedSkills = [..wantedSkills],
                     IsRefused = false,
