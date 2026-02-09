@@ -4,11 +4,15 @@
     {
         View,
         ViewIdea,
+        ViewIdeaMarket,
         ViewProfile,
         ViewLetter,
         Edit,
         TeamRequestAccept,
+        SetLeader,
         Delete,
-        TeamRequestCancel
+        TeamRequestCancel,
+        UnsetLeader,
+        RemoveTeamMember
     }
 }

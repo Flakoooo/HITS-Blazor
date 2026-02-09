@@ -4,6 +4,7 @@ using HITSBlazor.Components.Tables.TableActionMenu;
 using HITSBlazor.Components.Tables.TableHeader;
 using HITSBlazor.Models.Common.Entities;
 using HITSBlazor.Models.Teams.Entities;
+using HITSBlazor.Models.Users.Entities;
 using HITSBlazor.Services.Modal;
 using HITSBlazor.Services.Teams;
 using Microsoft.AspNetCore.Components;
@@ -47,6 +48,18 @@ namespace HITSBlazor.Components.Modals.RightSideModals.ShowTeamModal
             new() { Text = "Фамилия", InCentered = true, ColumnClass = "col-3" }
         ];
 
+        private static IReadOnlyList<TableHeaderItem> RequestsToIdeasTableHeader { get; } =
+        [
+            new() { Text = "Название", ColumnClass = "col-7" },
+            new() { Text = "Статус", InCentered = true, ColumnClass = "col-4" }
+        ];
+        private static IReadOnlyList<TableHeaderItem> InvitationsToIdeasTableHeader { get; } =
+        [
+            new() { Text = "Статус",InCentered = true },
+            new() { Text = "Название", ColumnClass = "col-5" },
+            new() { Text = "Компетенции", InCentered = true, ColumnClass = "col-4" }
+        ];
+
         protected override async Task OnInitializedAsync()
         {
             _isLoading = true;
@@ -57,6 +70,7 @@ namespace HITSBlazor.Components.Modals.RightSideModals.ShowTeamModal
             _teamInvitations = await TeamService.GetTeamInvitationsAsync(TeamId);
             _requestsToTeam = await TeamService.GetTeamRequestsToTeamAsync(TeamId);
             _requestsTeamToIdeas = await TeamService.GetRequestsTeamToIdeasAsync(TeamId);
+            _requestsTeamToIdeas = [.. _requestsTeamToIdeas, .. _requestsTeamToIdeas, .. _requestsTeamToIdeas];
             _invitationsTeamToIdeas = await TeamService.GetInvitationsTeamToIdeasAsync(TeamId);
 
             _isLoading = false;
@@ -72,11 +86,25 @@ namespace HITSBlazor.Components.Modals.RightSideModals.ShowTeamModal
         {
             if (context.Action == TableAction.ViewProfile)
             {
-                var parameters = new Dictionary<string, object>
+                ModalService.Show<ShowUserModal.ShowUserModal>(
+                    ModalType.RightSide,
+                    parameters: new Dictionary<string, object> { ["UserId"] = context.Item }
+                );
+            }
+            if (_activeTableCategory == TeamTableCategory.Members)
+            {
+                if (context.Action == TableAction.SetLeader)
                 {
-                    { "UserId", context.ItemId }
-                };
-                ModalService.Show<ShowUserModal.ShowUserModal>(ModalType.RightSide, parameters: parameters);
+                    Console.WriteLine($"Назначение лидером {context.Item}");
+                }
+                else if (context.Action == TableAction.UnsetLeader)
+                {
+                    Console.WriteLine($"Снтие лидера {context.Item}");
+                }
+                else if (context.Action == TableAction.RemoveTeamMember)
+                {
+                    Console.WriteLine($"Исключение {context.Item}");
+                }
             }
             else if (_activeTableCategory == TeamTableCategory.RequestsToTeam)
             {
@@ -99,15 +127,15 @@ namespace HITSBlazor.Components.Modals.RightSideModals.ShowTeamModal
                 Toolbar = new Toolbar { Show = false }
             },
             Yaxis =
-                [
-                    new YAxis
-                    {
-                        Min = 0,
-                        Max = 1,
-                        Labels = new YAxisLabels { Show = false },
-                        Show = false
-                    }
-                ],
+            [
+                new YAxis
+                {
+                    Min = 0,
+                    Max = 1,
+                    Labels = new YAxisLabels { Show = false },
+                    Show = false
+                }
+            ],
             Xaxis = new XAxis
             {
                 Labels = new XAxisLabels
@@ -121,8 +149,8 @@ namespace HITSBlazor.Components.Modals.RightSideModals.ShowTeamModal
             },
             Stroke = new Stroke { Width = 2 },
             Fill = new Fill { 
-                Opacity = 0.1,
-                Type = new FillTypeSelections(FillType.Solid)
+                Opacity = 0.5,
+                Type = new List<FillType> { FillType.Solid }
             },
             Markers = new Markers { Size = 4 },
             Legend = new Legend

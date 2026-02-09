@@ -2,7 +2,7 @@
 {
     public class TableActionContext
     {
-        public TableAction Action { get; set; }
-        public Guid ItemId { get; set; }
+        public required TableAction Action { get; set; }
+        public required object Item { get; set; }
     }
 }

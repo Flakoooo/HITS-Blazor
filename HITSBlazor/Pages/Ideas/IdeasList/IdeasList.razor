@@ -74,7 +74,11 @@
                                 </TableBodyRow>
                                 <TableActionMenu ItemId="@idea.Id"
                                                  OnAction="OnIdeaAction"
-                                                 Actions="@(new List<TableAction> { TableAction.View, TableAction.Edit, TableAction.Delete })" />
+                                                 ActionIds="@(new Dictionary<TableAction, object> { 
+                                                    [TableAction.View] = idea.Id,
+                                                    [TableAction.Edit] = idea.Id,
+                                                    [TableAction.Delete] = idea.Id
+                                                 })" />
                             </tr>
                         }
                     </tbody>

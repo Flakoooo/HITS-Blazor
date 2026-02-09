@@ -157,7 +157,10 @@
                                             <TableHeader TableActionMenuIsEnable="true" Items="NewMembersTableHeader" />
                                             break;
                                         case TeamTableCategory.RequestsTeamToIdeas:
+                                            <TableHeader TableActionMenuIsEnable="true" Items="RequestsToIdeasTableHeader" />
+                                            break;
                                         case TeamTableCategory.InvitationsTeamToIdeas:
+                                            <TableHeader TableActionMenuIsEnable="true" Items="InvitationsToIdeasTableHeader" />
                                             break;
                                     }
                                     <tbody>
@@ -178,9 +181,14 @@
                                                     <TableBodyRow>
                                                         @member.LastName
                                                     </TableBodyRow>
-                                                    <TableActionMenu ItemId="member.UserId"
+                                                    <TableActionMenu ItemId="member.Id"
                                                                      OnAction="@HandleTableMenuClick"
-                                                                     Actions="@(new List<TableAction> { TableAction.ViewProfile })" />
+                                                                     ActionIds="@(new Dictionary<TableAction, object> {
+                                                                        [TableAction.ViewProfile] = member.UserId,
+                                                                        [TableAction.SetLeader] = member.UserId,
+                                                                        [TableAction.UnsetLeader] = member.UserId,
+                                                                        [TableAction.RemoveTeamMember] = member.UserId
+                                                                     })" />
                                                 </tr>
                                             }
                                         }
@@ -205,9 +213,11 @@
                                                     <TableBodyRow IsCentered="true">
                                                         @invitation.LastName
                                                     </TableBodyRow>
-                                                    <TableActionMenu ItemId="invitation.UserId"
+                                                    <TableActionMenu ItemId="invitation.Id"
                                                                      OnAction="@HandleTableMenuClick"
-                                                                     Actions="@(new List<TableAction> { TableAction.ViewProfile })" />
+                                                                     ActionIds="@(new Dictionary<TableAction, object> { 
+                                                                        [TableAction.ViewProfile] = invitation.UserId 
+                                                                     })" />
                                                 </tr>
                                             }
                                         }
@@ -234,10 +244,10 @@
                                                     </TableBodyRow>
                                                     <TableActionMenu ItemId="request.Id"
                                                                      OnAction="@HandleTableMenuClick"
-                                                                     Actions="@(new List<TableAction> { 
-                                                                        TableAction.ViewProfile, 
-                                                                        TableAction.TeamRequestAccept,
-                                                                        TableAction.TeamRequestCancel 
+                                                                     ActionIds="@(new Dictionary<TableAction, object> {
+                                                                        [TableAction.ViewProfile] = request.UserId,
+                                                                        [TableAction.TeamRequestAccept] = request.Id,
+                                                                        [TableAction.TeamRequestCancel] = request.Id
                                                                      })" />
                                                 </tr>
                                             }
@@ -259,7 +269,10 @@
                                                     </TableBodyRow>
                                                     <TableActionMenu ItemId="request.Id"
                                                                      OnAction="@HandleTableMenuClick"
-                                                                     Actions="@(new List<TableAction> { TableAction.ViewIdea, TableAction.ViewLetter})" />
+                                                                     ActionIds="@(new Dictionary<TableAction, object> {
+                                                                        [TableAction.ViewIdeaMarket] = request.IdeaMarketId,
+                                                                        [TableAction.ViewLetter] = request.Letter
+                                                                     })" />
                                                 </tr>
                                             }
                                         }
@@ -286,6 +299,11 @@
                                                             </div>
                                                         }
                                                     </TableBodyRow>
+                                                    <TableActionMenu ItemId="invitation.Id"
+                                                                     OnAction="@HandleTableMenuClick"
+                                                                     ActionIds="@(new Dictionary<TableAction, object> {
+                                                                        [TableAction.ViewIdea] = invitation.IdeaId
+                                                                     })" />
                                                 </tr>
                                             }
                                         }

@@ -1,11 +1,9 @@
 ﻿using ApexCharts;
 using HITSBlazor.Components.Modals.CenterModals.UpdateEmailModal;
-using HITSBlazor.Components.Modals.RightSideModals.ShowTeamModal;
 using HITSBlazor.Components.Tables.TableActionMenu;
 using HITSBlazor.Components.Tables.TableHeader;
 using HITSBlazor.Models.Common.Entities;
 using HITSBlazor.Models.Common.Enums;
-using HITSBlazor.Models.Ideas.Entities;
 using HITSBlazor.Models.Tests.Entities;
 using HITSBlazor.Models.Users.Entities;
 using HITSBlazor.Services.Auth;
@@ -264,9 +262,8 @@ namespace HITSBlazor.Components.Modals.RightSideModals.ShowUserModal
         private async Task OnTeamAction(TableActionContext context)
         {
             if (context.Action == TableAction.View)
-            {
-                ShowTeam(context.ItemId);
-            }
+                if (context.Item is Guid guid)
+                    ShowTeam(guid);
         }
     }
 }

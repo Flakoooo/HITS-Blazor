@@ -9,7 +9,7 @@ namespace HITSBlazor.Components.Tables.TableActionMenu
         public Guid ItemId { get; set; }
 
         [Parameter]
-        public List<TableAction> Actions { get; set; } = [];
+        public Dictionary<TableAction, object> ActionIds { get; set; } = [];
 
         [Parameter]
         public EventCallback<TableActionContext> OnAction { get; set; }
@@ -55,12 +55,11 @@ namespace HITSBlazor.Components.Tables.TableActionMenu
                     new
                     {
                         triggerElement = _triggerRef,
-                        minHeight = 18 + (32 * Actions.Count) + Actions.Count - 1 + 10
+                        minHeight = 18 + (32 * ActionIds.Count) + ActionIds.Count - 1 + 10
                     }
                 );
 
                 var styleBuilder = new System.Text.StringBuilder();
-                styleBuilder.Append("position: absolute; ");
 
                 if (shouldShowAbove)
                 {
@@ -75,15 +74,12 @@ namespace HITSBlazor.Components.Tables.TableActionMenu
                     styleBuilder.Append("margin-top: 5px; ");
                 }
 
-                styleBuilder.Append("width: 160px; ");
-                styleBuilder.Append("z-index: 1000; ");
-
                 _menuStyle = styleBuilder.ToString();
                 StateHasChanged();
             }
             catch (Exception)
             {
-                _menuStyle = "position: absolute; top: 100%; left: 0; margin-top: 5px; width: 160px; z-index: 1000;";
+                _menuStyle = "top: 100%; left: 0; margin-top: 5px;";
             }
         }
 
@@ -139,36 +135,36 @@ namespace HITSBlazor.Components.Tables.TableActionMenu
         private static string GetActionText(TableAction action) => action switch
         {
             TableAction.View => "Просмотреть",
-            TableAction.ViewIdea => "Открыть идею",
+            TableAction.ViewIdea or TableAction.ViewIdeaMarket => "Открыть идею",
             TableAction.ViewProfile => "Перейти на профиль",
             TableAction.ViewLetter => "Просмотреть письмо",
             TableAction.Edit => "Редактировать",
             TableAction.TeamRequestAccept => "Принять",
+            TableAction.SetLeader => "Назначить лидером",
             TableAction.Delete => "Удалить",
             TableAction.TeamRequestCancel => "Отклонить",
-            _ => action.ToString()
+            TableAction.UnsetLeader => "Снять роль лидера",
+            TableAction.RemoveTeamMember => "Исключить",
+                _ => action.ToString()
         };
 
         private static string GetActionStyle(TableAction action) => action switch
         {
             TableAction.TeamRequestAccept => "text-success",
-            TableAction.Delete => "text-danger",
-            TableAction.TeamRequestCancel => "text-danger",
+            TableAction.SetLeader => "text-primary",
+            TableAction.Delete 
+            or TableAction.TeamRequestCancel 
+            or TableAction.UnsetLeader
+            or TableAction.RemoveTeamMember => "text-danger",
             _ => string.Empty
         };
 
-        private async Task HandleActionClick(TableAction action)
+        private async Task HandleActionClick(TableAction action, object item)
         {
             IsOpen = false;
             _menuStyle = "";
 
-            var context = new TableActionContext
-            {
-                Action = action,
-                ItemId = ItemId
-            };
-
-            await OnAction.InvokeAsync(context);
+            await OnAction.InvokeAsync(new() { Action = action, Item = item });
         }
 
         public void Dispose()

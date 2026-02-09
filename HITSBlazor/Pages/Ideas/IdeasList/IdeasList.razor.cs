@@ -76,15 +76,16 @@ namespace HITSBlazor.Pages.Ideas.IdeasList
         {
             if (context.Action == TableAction.View)
             {
-                ShowIdea(context.ItemId);
+                if (context.Item is Guid guid)
+                    ShowIdea(guid);
             }
             else if (context.Action == TableAction.Edit)
             {
-                Console.WriteLine($"Редактирование идеи {context.ItemId}");
+                Console.WriteLine($"Редактирование идеи {context.Item}");
             }
             else 
             {
-                Console.WriteLine($"Удаление идеи {context.ItemId}");
+                Console.WriteLine($"Удаление идеи {context.Item}");
             }
         }
     }

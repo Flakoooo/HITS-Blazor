@@ -111,7 +111,12 @@ namespace HITSBlazor
             // Notification
             builder.Services.AddScoped<INotificationService, MockNotificationService>();
 
-            await builder.Build().RunAsync();
+            var host = builder.Build();
+
+            var apexChartService = host.Services.GetRequiredService<IApexChartService>();
+            await apexChartService.InitalizeChartAsync();
+
+            await host.RunAsync();
         }
     }
 }

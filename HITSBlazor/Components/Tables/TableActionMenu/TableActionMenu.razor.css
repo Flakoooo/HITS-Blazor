@@ -1,16 +1,16 @@
-﻿.idea-row-modal {
+﻿.table-row-modal {
     position: absolute;
     background: white;
     border: 1px solid #dee2e6;
     border-radius: 4px;
     box-shadow: 0 2px 10px rgba(0,0,0,0.1);
     min-width: 150px;
-    max-width: 200px;
+    max-width: 300px;
     z-index: 1000;
     transition: opacity 0.2s ease;
 }
 
-    .idea-row-modal.show {
+    .table-row-modal.show {
         animation: fadeIn 0.2s ease;
     }
 
@@ -26,17 +26,7 @@
     }
 }
 
-.idea-row-modal.above {
-    bottom: 100%;
-    margin-bottom: 5px;
-}
-
-.idea-row-modal.below {
-    top: 100%;
-    margin-top: 5px;
-}
-
-.idea-row-icon {
+.table-row-icon {
     width: 24px;
     min-width: 24px;
     max-width: 24px;
@@ -54,7 +44,7 @@
     position: relative;
 }
 
-    .idea-row-icon i.active {
+    .table-row-icon i.active {
         background-color: #e9ecef;
         border-radius: 4px;
     }

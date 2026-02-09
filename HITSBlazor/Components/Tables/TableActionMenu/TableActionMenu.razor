@@ -1,21 +1,21 @@
 ﻿@namespace HITSBlazor.Components.Tables.TableActionMenu
 
-<td class="py-3" style="position: relative;" @ref="_containerRef">
-    <div class="float-end idea-row-icon">
+<td class="py-3" @ref="_containerRef">
+    <div class="float-end table-row-icon">
         <i @ref="_triggerRef"
            @onclick="@ToggleMenu"
            class="bi bi-three-dots fs-5 @(IsOpen ? "active" : string.Empty)"
            aria-expanded="@IsOpen">
         </i>
         <div @onclick:stopPropagation
-             class="dropdown-menu @(IsOpen ? "idea-row-modal show" : string.Empty)"
+             class="dropdown-menu @(IsOpen ? "table-row-modal show" : string.Empty)"
              style="@_menuStyle">
             <ul class="list-group list-group-flush">
-                @foreach (var action in Actions)
+                @foreach (var action in ActionIds)
                 {
-                    <li @onclick="@(() => HandleActionClick(action))"
-                        class="list-group-item list-group-item-action px-2 py-1 @GetActionStyle(action)">
-                        @GetActionText(action)
+                    <li @onclick="@(() => HandleActionClick(action.Key, action.Value))"
+                        class="list-group-item list-group-item-action px-2 py-1 @GetActionStyle(action.Key)">
+                        @GetActionText(action.Key)
                     </li>
                 }
             </ul>
