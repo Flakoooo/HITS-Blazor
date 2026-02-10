@@ -33,9 +33,18 @@ namespace HITSBlazor.Pages.Ideas.IdeasList
 
         private HashSet<IdeaStatusType> SelectedStatuses { get; set; } = [];
 
+        private async Task LoadIdeasAsync()
+        {
+            _ideas = await IdeasService.GetIdeasAsync(
+                searchText: _searchText,
+                statusTypes: SelectedStatuses.Count > 0 ? [.. SelectedStatuses] : null
+            );
+            StateHasChanged();
+        }
+
         protected override async Task OnInitializedAsync()
         {
-            _ideas = await IdeasService.GetAllIdeasAsync(true);
+            await LoadIdeasAsync();
         }
 
         protected override async Task OnParametersSetAsync()
@@ -47,10 +56,7 @@ namespace HITSBlazor.Pages.Ideas.IdeasList
         private async Task SearchIdea(string value)
         {
             _searchText = value;
-            if (SelectedStatuses.Count > 0)
-                _ideas = await IdeasService.GetIdeasByStatusAsync(_searchText, statusTypes: [.. SelectedStatuses]);
-            else
-                _ideas = await IdeasService.GetAllIdeasAsync(seacrhText: _searchText);
+            await LoadIdeasAsync();
         }
 
         private async Task OnStatusChanged(IdeaStatusType status, bool isChecked)
@@ -60,16 +66,13 @@ namespace HITSBlazor.Pages.Ideas.IdeasList
             else
                 SelectedStatuses.Remove(status);
 
-            if (SelectedStatuses.Count > 0)
-                _ideas = await IdeasService.GetIdeasByStatusAsync(_searchText, statusTypes: [.. SelectedStatuses]);
-            else
-                _ideas = await IdeasService.GetAllIdeasAsync(seacrhText: _searchText);
+            await LoadIdeasAsync();
         }
 
         private async void ResetFilters()
         {
             SelectedStatuses.Clear();
-            _ideas = await IdeasService.GetAllIdeasAsync(seacrhText: _searchText);
+            await LoadIdeasAsync();
         }
 
         private void ShowIdea(Guid ideaId) => ModalService.ShowIdeaModal(ideaId);

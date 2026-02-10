@@ -12,23 +12,33 @@ namespace HITSBlazor.Services.Ideas
         private readonly IAuthService _authService = authService;
         private readonly GlobalNotificationService _globalNotificationService = globalNotificationService;
 
-        private List<Idea> _ideas = [];
+        private List<Idea> _cachedIdeas = [];
+        private DateTime _lastRefreshTime;
+        private readonly TimeSpan _cacheLifetime = TimeSpan.FromMinutes(5);
 
-        public async Task<List<Idea>> GetAllIdeasAsync(bool isApiResponse, string? seacrhText)
+        private async Task RefreshCacheAsync()
         {
-            if (isApiResponse)
-                _ideas = MockIdeas.GetAllIdeas();
-
-            return string.IsNullOrWhiteSpace(seacrhText) 
-                ? _ideas 
-                : [.. _ideas.Where(i => i.Name.Contains(seacrhText, StringComparison.CurrentCultureIgnoreCase))];
+            _cachedIdeas = MockIdeas.GetAllIdeas();
+            _lastRefreshTime = DateTime.UtcNow;
         }
 
-        public async Task<List<Idea>> GetIdeasByStatusAsync(
-            string? seacrhText, params IdeaStatusType[] statusTypes
-        ) => string.IsNullOrWhiteSpace(seacrhText)
-            ? [.. _ideas.Where(i => statusTypes.Contains(i.Status))]
-            : [.. _ideas.Where(i => statusTypes.Contains(i.Status) && i.Name.Contains(seacrhText, StringComparison.CurrentCultureIgnoreCase))];
+        public async Task<List<Idea>> GetIdeasAsync(
+            string? searchText = null,
+            IdeaStatusType[]? statusTypes = null
+        )
+        {
+            if (_cachedIdeas.Count == 0 || DateTime.UtcNow - _lastRefreshTime > _cacheLifetime)
+                await RefreshCacheAsync();
+
+            var query = _cachedIdeas.AsEnumerable();
+            if (statusTypes != null && statusTypes.Length > 0)
+                query = query.Where(i => statusTypes.Contains(i.Status));
+
+            if (!string.IsNullOrWhiteSpace(searchText))
+                query = query.Where(i => i.Name.Contains(searchText, StringComparison.CurrentCultureIgnoreCase));
+
+            return [.. query];
+        }
 
         public async Task<Idea?> GetIdeaByIdAsync(Guid id) => MockIdeas.GetIdeaById(id);
 
