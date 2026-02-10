@@ -14,15 +14,21 @@ namespace HITSBlazor.Services.Ideas
 
         private List<Idea> _ideas = [];
 
-        public async Task<List<Idea>> GetAllIdeasAsync()
+        public async Task<List<Idea>> GetAllIdeasAsync(bool isApiResponse, string? seacrhText)
         {
-            _ideas = MockIdeas.GetAllIdeas();
+            if (isApiResponse)
+                _ideas = MockIdeas.GetAllIdeas();
 
-            return _ideas;
+            return string.IsNullOrWhiteSpace(seacrhText) 
+                ? _ideas 
+                : [.. _ideas.Where(i => i.Name.Contains(seacrhText, StringComparison.CurrentCultureIgnoreCase))];
         }
 
-        public async Task<List<Idea>> GetIdeasByStatusAsync(params IdeaStatusType[] statusTypes)
-            => [.. _ideas.Where(i => statusTypes.Contains(i.Status))];
+        public async Task<List<Idea>> GetIdeasByStatusAsync(
+            string? seacrhText, params IdeaStatusType[] statusTypes
+        ) => string.IsNullOrWhiteSpace(seacrhText)
+            ? [.. _ideas.Where(i => statusTypes.Contains(i.Status))]
+            : [.. _ideas.Where(i => statusTypes.Contains(i.Status) && i.Name.Contains(seacrhText, StringComparison.CurrentCultureIgnoreCase))];
 
         public async Task<Idea?> GetIdeaByIdAsync(Guid id) => MockIdeas.GetIdeaById(id);
 
