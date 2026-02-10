@@ -14,9 +14,9 @@ using HITSBlazor.Services.Tests;
 using HITSBlazor.Services.UserSkills;
 using Microsoft.AspNetCore.Components;
 
-namespace HITSBlazor.Components.Modals.RightSideModals.ShowUserModal
+namespace HITSBlazor.Components.Modals.RightSideModals.ProfileModal
 {
-    public partial class ShowUserModal
+    public partial class ProfileModal
     {
         [Inject]
         private ModalService ModalService { get; set; } = null!;
@@ -236,28 +236,11 @@ namespace HITSBlazor.Components.Modals.RightSideModals.ShowUserModal
             }
         };
 
-        private void ShowUpdateEmail()
-        {
-            ModalService.Show<UpdateEmailModal>(ModalType.Center);
-        }
+        private void ShowUpdateEmail() => ModalService.Show<UpdateEmailModal>(ModalType.Center);
 
-        private void ShowIdea(Guid ideaId)
-        {
-            var modalParameters = new Dictionary<string, object>
-            {
-                { "IdeaId", ideaId }
-            };
-            ModalService.Show<ShowIdeaModal.ShowIdeaModal>(type: ModalType.RightSide, parameters: modalParameters);
-        }
+        private void ShowIdea(Guid ideaId) => ModalService.ShowIdeaModal(ideaId);
 
-        private void ShowTeam(Guid teamId)
-        {
-            var modalParameters = new Dictionary<string, object>
-            {
-                { "TeamId", teamId }
-            };
-            ModalService.Show<ShowTeamModal.ShowTeamModal>(type: ModalType.RightSide, parameters: modalParameters);
-        }
+        private void ShowTeam(Guid teamId) => ModalService.ShowTeamModal(teamId);
 
         private async Task OnTeamAction(TableActionContext context)
         {

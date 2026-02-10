@@ -1,17 +1,15 @@
-﻿
-using ApexCharts;
+﻿using ApexCharts;
 using HITSBlazor.Components.Tables.TableActionMenu;
 using HITSBlazor.Components.Tables.TableHeader;
 using HITSBlazor.Models.Common.Entities;
 using HITSBlazor.Models.Teams.Entities;
-using HITSBlazor.Models.Users.Entities;
 using HITSBlazor.Services.Modal;
 using HITSBlazor.Services.Teams;
 using Microsoft.AspNetCore.Components;
 
-namespace HITSBlazor.Components.Modals.RightSideModals.ShowTeamModal
+namespace HITSBlazor.Components.Modals.RightSideModals.TeamModal
 {
-    public partial class ShowTeamModal
+    public partial class TeamModal
     {
         [Inject]
         private ITeamService TeamService { get; set; } = null!;
@@ -86,10 +84,7 @@ namespace HITSBlazor.Components.Modals.RightSideModals.ShowTeamModal
         {
             if (context.Action == TableAction.ViewProfile)
             {
-                ModalService.Show<ShowUserModal.ShowUserModal>(
-                    ModalType.RightSide,
-                    parameters: new Dictionary<string, object> { ["UserId"] = context.Item }
-                );
+                ModalService.ShowProfileModal((Guid)context.Item);
             }
             if (_activeTableCategory == TeamTableCategory.Members)
             {
@@ -159,5 +154,9 @@ namespace HITSBlazor.Components.Modals.RightSideModals.ShowTeamModal
                 Position = LegendPosition.Bottom
             }
         };
+
+        internal class ShowTeamModal
+        {
+        }
     }
 }

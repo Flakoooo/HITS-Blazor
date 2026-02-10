@@ -125,10 +125,7 @@ namespace HITSBlazor.Components.LeftSideNavigation
             await NavigationService.NavigateToAsync($"{parentItem.BaseUrl}{subItem.Url}");
         }
 
-        private void ShowRoleModal()
-        {
-            ModalService.Show<SelectActiveRoleModal>(ModalType.Center, blockCloseModal: true);
-        }
+        private void ShowRoleModal() => ModalService.ShowActiveRoleModal();
 
         public void Dispose()
         {

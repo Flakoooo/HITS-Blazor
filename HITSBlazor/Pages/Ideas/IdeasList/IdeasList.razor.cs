@@ -1,5 +1,4 @@
-﻿using HITSBlazor.Components.Modals.RightSideModals.ShowIdeaModal;
-using HITSBlazor.Components.Tables.TableActionMenu;
+﻿using HITSBlazor.Components.Tables.TableActionMenu;
 using HITSBlazor.Models.Ideas.Entities;
 using HITSBlazor.Models.Ideas.Enums;
 using HITSBlazor.Services;
@@ -44,6 +43,11 @@ namespace HITSBlazor.Pages.Ideas.IdeasList
                 ShowIdea((Guid)IdeaId);
         }
 
+        private async Task SearchIdea(string value)
+        {
+
+        }
+
         private async Task OnStatusChanged(IdeaStatusType status, bool isChecked)
         {
             if (isChecked)
@@ -63,14 +67,7 @@ namespace HITSBlazor.Pages.Ideas.IdeasList
             _ideas = await IdeasService.GetAllIdeasAsync();
         }
 
-        private void ShowIdea(Guid ideaId)
-        {
-            var modalParameters = new Dictionary<string, object>
-            {
-                { "IdeaId", ideaId }
-            };
-            ModalService.Show<ShowIdeaModal>(type: ModalType.RightSide, parameters: modalParameters);
-        }
+        private void ShowIdea(Guid ideaId) => ModalService.ShowIdeaModal(ideaId);
 
         private async Task OnIdeaAction(TableActionContext context)
         {

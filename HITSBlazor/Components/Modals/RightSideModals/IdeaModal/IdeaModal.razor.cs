@@ -8,9 +8,9 @@ using HITSBlazor.Services.IdeaSkills;
 using HITSBlazor.Services.Modal;
 using Microsoft.AspNetCore.Components;
 
-namespace HITSBlazor.Components.Modals.RightSideModals.ShowIdeaModal
+namespace HITSBlazor.Components.Modals.RightSideModals.IdeaModal
 {
-    public partial class ShowIdeaModal
+    public partial class IdeaModal
     {
         [Inject]
         private IAuthService AuthService { get; set; } = null!;
@@ -37,7 +37,7 @@ namespace HITSBlazor.Components.Modals.RightSideModals.ShowIdeaModal
         private List<Skill> IdeaSkills { get; set; } = [];
         private List<Rating> IdeaRatings { get; set; } = [];
 
-        private List<ShowIdeaModalItem> ideaData = [];
+        private List<IdeaModalItem> ideaData = [];
 
         protected override async Task OnInitializedAsync()
         {
@@ -52,31 +52,31 @@ namespace HITSBlazor.Components.Modals.RightSideModals.ShowIdeaModal
             isLoading = false;
         }
 
-        private static List<ShowIdeaModalItem> GetIdeaData(Idea? idea, List<Skill> skills)
+        private static List<IdeaModalItem> GetIdeaData(Idea? idea, List<Skill> skills)
         {
             return
             [
-                new ShowIdeaModalItem
+                new IdeaModalItem
                 {
                     Title = "Проблема",
                     Data = idea?.Problem
                 },
-                new ShowIdeaModalItem
+                new IdeaModalItem
                 {
                     Title = "Предлагаемое решение",
                     Data = idea?.Solution
                 },
-                new ShowIdeaModalItem
+                new IdeaModalItem
                 {
                     Title = "Ожидаемый результат",
                     Data = idea?.Result
                 },
-                new ShowIdeaModalItem
+                new IdeaModalItem
                 {
                     Title = "Описание необходимых ресурсов для реализации",
                     Data = idea?.Description
                 },
-                 new ShowIdeaModalItem
+                 new IdeaModalItem
                  {
                      Title = "Стек технологий",
                      Data = skills

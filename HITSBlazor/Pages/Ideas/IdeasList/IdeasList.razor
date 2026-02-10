@@ -1,4 +1,5 @@
 ﻿@namespace HITSBlazor.Pages.Ideas.IdeasList
+@using HITSBlazor.Components.Inputs.SearchInput
 @using HITSBlazor.Components.Tables.TableActionMenu
 @using HITSBlazor.Components.Tables.TableBodyRow
 @using HITSBlazor.Models.Ideas.Enums
@@ -24,14 +25,7 @@
         </div>
         <div class="py-2 d-flex justify-content-between">
             <div class="w-50">
-                <div class="w-100">
-                    <div class="input-group">
-                        <span class="input-group-text fs-6">
-                            <i class="bi bi-search"></i>
-                        </span>
-                        <input type="text" placeholder="Поиск" class="form-control rounded-end" />
-                    </div>
-                </div>
+                <SearchInput ValueChanged="@((value) => SearchIdea(value))"/>
             </div>
         </div>
         <div class="w-100 d-flex">

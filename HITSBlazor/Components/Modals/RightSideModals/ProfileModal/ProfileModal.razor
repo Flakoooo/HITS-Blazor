@@ -1,4 +1,4 @@
-﻿@namespace HITSBlazor.Components.Modals.RightSideModals.ShowUserModal
+﻿@namespace HITSBlazor.Components.Modals.RightSideModals.ProfileModal
 @using HITSBlazor.Components.Collapse
 @using HITSBlazor.Components.InputDropdowns.SkillDropdown
 @using HITSBlazor.Components.Modals.Components.ModalHeader
@@ -118,24 +118,27 @@
 
                             <UserInfoField 
                                 Title="Фамилия" 
-                                Value="@Profile?.LastName"
-                                IsEditing="@(_editingField == nameof(Profile.LastName))"
+                                Value="@_userDataForm?.LastName"
+                                ValueChanged="@((value) => _userDataForm?.LastName = value)"
+                                IsEditing="@(_editingField == nameof(_userDataForm.LastName))"
                                 IsCurrentUser="@_isCurrentUser"
-                                OnEdit="@(() => StartEdit(nameof(Profile.LastName)))" />
+                                OnEdit="@(() => StartEdit(nameof(_userDataForm.LastName)))" />
 
                             <UserInfoField 
                                 Title="Группа" 
-                                Value="@Profile?.StudyGroup"
-                                IsEditing="@(_editingField == nameof(Profile.StudyGroup))"
+                                Value="@_userDataForm?.StudyGroup"
+                                ValueChanged="@((value) => _userDataForm?.StudyGroup = value)"
+                                IsEditing="@(_editingField == nameof(_userDataForm.StudyGroup))"
                                 IsCurrentUser="@_isCurrentUser"
-                                OnEdit="@(() => StartEdit(nameof(Profile.StudyGroup)))" />
+                                OnEdit="@(() => StartEdit(nameof(_userDataForm.StudyGroup)))" />
 
                             <UserInfoField 
                                 Title="Телефон" 
-                                Value="@Profile?.Telephone"
-                                IsEditing="@(_editingField == nameof(Profile.Telephone))"
+                                Value="@_userDataForm?.Telephone"
+                                ValueChanged="@((value) => _userDataForm?.Telephone = value)"
+                                IsEditing="@(_editingField == nameof(_userDataForm.Telephone))"
                                 IsCurrentUser="@_isCurrentUser"
-                                OnEdit="@(() => StartEdit(nameof(Profile.Telephone)))" />
+                                OnEdit="@(() => StartEdit(nameof(_userDataForm.Telephone)))" />
 
                             <div class="d-flex gap-1">
                                 <span class="fs-6 text-primary">Дата регистрации:</span>

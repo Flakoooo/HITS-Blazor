@@ -1,4 +1,4 @@
-﻿namespace HITSBlazor.Components.Modals.RightSideModals.ShowTeamModal
+﻿namespace HITSBlazor.Components.Modals.RightSideModals.TeamModal
 {
     public enum TeamInfoCategory
     {

@@ -1,6 +1,6 @@
-﻿namespace HITSBlazor.Components.Modals.RightSideModals.ShowIdeaModal
+﻿namespace HITSBlazor.Components.Modals.RightSideModals.IdeaModal
 {
-    public class ShowIdeaModalItem
+    public class IdeaModalItem
     {
         public string Title { get; set; } = string.Empty;
         public object? Data { get; set; }

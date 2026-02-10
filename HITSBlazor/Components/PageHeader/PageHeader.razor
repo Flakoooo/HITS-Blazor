@@ -1,6 +1,5 @@
 ﻿@namespace HITSBlazor.Components.PageHeader
 @using HITSBlazor.Components.Modals.CenterModals.SelectActiveRoleModal
-@using HITSBlazor.Components.Modals.RightSideModals.ShowUserModal
 @using HITSBlazor.Models.Users.Entities
 @using HITSBlazor.Models.Users.Enums
 @using HITSBlazor.Services
@@ -80,17 +79,10 @@
         var userId = CurrentUser?.Id;
         if (userId is null) return;
 
-        var parameters = new Dictionary<string, object>
-        {
-            { "UserId", userId }
-        };
-        ModalService.Show<ShowUserModal>(ModalType.RightSide, parameters: parameters);
+        ModalService.ShowProfileModal(userId.Value);
     }
 
-    private void ShowRoleModal()
-    {
-        ModalService.Show<SelectActiveRoleModal>(ModalType.Center, blockCloseModal: true);
-    }
+    private void ShowRoleModal() => ModalService.ShowActiveRoleModal();
 
     public void Dispose()
     {

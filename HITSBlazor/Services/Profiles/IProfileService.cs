@@ -1,4 +1,4 @@
-﻿using HITSBlazor.Components.Modals.RightSideModals.ShowUserModal;
+﻿using HITSBlazor.Components.Modals.RightSideModals.ProfileModal;
 using HITSBlazor.Models.Users.Entities;
 
 namespace HITSBlazor.Services.Profiles
