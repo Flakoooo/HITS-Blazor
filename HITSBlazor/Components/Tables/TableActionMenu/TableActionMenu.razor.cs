@@ -10,6 +10,9 @@ namespace HITSBlazor.Components.Tables.TableActionMenu
         public Guid ItemId { get; set; }
 
         [Parameter]
+        public Strategy StrategyPosition { get; set; } = Strategy.Absolute;
+
+        [Parameter]
         public Dictionary<TableAction, object> ActionIds { get; set; } = [];
 
         [Parameter]
@@ -93,7 +96,7 @@ namespace HITSBlazor.Components.Tables.TableActionMenu
                 options: new Options
                 {
                     Placement = Placement.BottomStart,
-                    Strategy = Strategy.Absolute,
+                    Strategy = StrategyPosition,
                     Modifiers = [.. InstanceModifiers]
                 }
             );

@@ -182,6 +182,7 @@
                                                         @member.LastName
                                                     </TableBodyRow>
                                                     <TableActionMenu ItemId="member.Id"
+                                                                     StrategyPosition="Strategy.Fixed"
                                                                      OnAction="@HandleTableMenuClick"
                                                                      ActionIds="@(new Dictionary<TableAction, object> {
                                                                         [TableAction.ViewProfile] = member.UserId,
@@ -214,6 +215,7 @@
                                                         @invitation.LastName
                                                     </TableBodyRow>
                                                     <TableActionMenu ItemId="invitation.Id"
+                                                                     StrategyPosition="Strategy.Fixed"
                                                                      OnAction="@HandleTableMenuClick"
                                                                      ActionIds="@(new Dictionary<TableAction, object> { 
                                                                         [TableAction.ViewProfile] = invitation.UserId 
@@ -243,6 +245,7 @@
                                                         @request.LastName
                                                     </TableBodyRow>
                                                     <TableActionMenu ItemId="request.Id"
+                                                                     StrategyPosition="Strategy.Fixed"
                                                                      OnAction="@HandleTableMenuClick"
                                                                      ActionIds="@(new Dictionary<TableAction, object> {
                                                                         [TableAction.ViewProfile] = request.UserId,
@@ -268,6 +271,7 @@
                                                         </div>
                                                     </TableBodyRow>
                                                     <TableActionMenu ItemId="request.Id"
+                                                                     StrategyPosition="Strategy.Fixed"
                                                                      OnAction="@HandleTableMenuClick"
                                                                      ActionIds="@(new Dictionary<TableAction, object> {
                                                                         [TableAction.ViewIdeaMarket] = request.IdeaMarketId,
@@ -300,6 +304,7 @@
                                                         }
                                                     </TableBodyRow>
                                                     <TableActionMenu ItemId="invitation.Id"
+                                                                     StrategyPosition="Strategy.Fixed"
                                                                      OnAction="@HandleTableMenuClick"
                                                                      ActionIds="@(new Dictionary<TableAction, object> {
                                                                         [TableAction.ViewIdea] = invitation.IdeaId

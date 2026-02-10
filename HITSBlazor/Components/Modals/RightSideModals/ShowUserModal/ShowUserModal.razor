@@ -356,6 +356,7 @@
                                                         }
                                                     </TableBodyRow>
                                                     <TableActionMenu ItemId="@teamExp.TeamId"
+                                                                     StrategyPosition="Strategy.Fixed"
                                                                      OnAction="OnTeamAction"
                                                                      ActionIds="@(new Dictionary<TableAction, object> { [TableAction.View] = teamExp.TeamId })" />
                                                 </tr>
