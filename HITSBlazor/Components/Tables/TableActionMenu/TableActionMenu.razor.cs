@@ -15,9 +15,6 @@ namespace HITSBlazor.Components.Tables.TableActionMenu
         [Parameter]
         public EventCallback<TableActionContext> OnAction { get; set; }
 
-        [Parameter]
-        public bool ShowToRight { get; set; } = false;
-
         [Inject]
         private IJSRuntime JSRuntime { get; set; } = null!;
 
