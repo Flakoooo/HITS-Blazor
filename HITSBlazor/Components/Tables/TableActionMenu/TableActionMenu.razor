@@ -7,9 +7,10 @@
            class="bi bi-three-dots fs-5 @(IsOpen ? "active" : string.Empty)"
            aria-expanded="@IsOpen">
         </i>
-        <div @onclick:stopPropagation
-             class="dropdown-menu @(IsOpen ? "table-row-modal show" : string.Empty)"
-             style="@_menuStyle">
+        <div @ref="_menuRef"
+             @onclick:stopPropagation
+             class="dropdown-menu table-row-modal @(IsOpen ? "is-visible" : "")"
+             style="z-index: 1100; position: absolute; visibility: @(IsOpen ? "visible" : "hidden"); opacity: 0;">
             <ul class="list-group list-group-flush">
                 @foreach (var action in ActionIds)
                 {

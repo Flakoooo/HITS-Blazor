@@ -1,126 +1,49 @@
 ﻿window.menuDropdown = (function () {
     const openMenus = new Map();
-    let clickOutsideHandler = null;
 
-    function shouldShowAbove(options) {
-        const { triggerElement, minHeight = 40 } = options;
-
-        if (!triggerElement) return false;
-
-        const triggerRect = triggerElement.getBoundingClientRect();
-        const viewportHeight = window.innerHeight;
-
-        const spaceBelow = viewportHeight - triggerRect.bottom;
-        const spaceAbove = triggerRect.top;
-
-        return spaceBelow < minHeight && spaceAbove >= minHeight;
+    function registerClickOutside(triggerRef, menuRef, dotNetRef) {
+        setTimeout(() => {
+            const handler = (e) => {
+                // Если кликнули ВНЕ триггера и ВНЕ самого меню
+                if (triggerRef && !triggerRef.contains(e.target) && menuRef && !menuRef.contains(e.target)) {
+                    dotNetRef.invokeMethodAsync('CloseDropdown');
+                    document.removeEventListener('click', handler);
+                }
+            };
+            document.addEventListener('click', handler);
+        }, 10);
     }
 
-    function shouldShowAboveOptimized(triggerElement) {
-        return new Promise(resolve => {
+    function closeOtherMenus(currentMenuId) {
+        openMenus.forEach((dotNet, id) => {
+            if (id !== currentMenuId) {
+                dotNet.invokeMethodAsync('CloseDropdown');
+            }
+        });
+    }
+
+    function startMenuAnimation(menuRef) {
+        if (!menuRef) return;
+
+        menuRef.classList.remove('show');
+
+        requestAnimationFrame(() => {
             requestAnimationFrame(() => {
-                resolve(shouldShowAbove(triggerElement));
+                menuRef.classList.add('show');
             });
         });
     }
 
-    function registerClickOutside(element, dotNetHelper, menuId) {
-        if (clickOutsideHandler) {
-            document.removeEventListener('click', clickOutsideHandler, true);
-        }
-
-        function isInsideDropdown(target) {
-            const componentRoot = element.closest('[tabindex="-1"]') || element;
-            return componentRoot.contains(target);
-        }
-
-        clickOutsideHandler = function (event) {
-            if (!isInsideDropdown(event.target)) {
-                openMenus.forEach((helper, id) => {
-                    if (helper) {
-                        try {
-                            helper.invokeMethodAsync('CloseDropdown');
-                        } catch (e) {
-                            console.warn('Error closing dropdown:', e);
-                            openMenus.delete(id);
-                        }
-                    }
-                });
-                openMenus.clear();
-            }
-        };
-
-        document.addEventListener('click', clickOutsideHandler, {
-            capture: true,
-            passive: true
-        });
-
-        element._menuId = menuId;
-        openMenus.set(menuId, dotNetHelper);
-    }
-
-    function unregisterClickOutside(element) {
-        if (element._menuId) {
-            openMenus.delete(element._menuId);
-            element._menuId = null;
-        }
-    }
-
-    function closeOtherMenus(currentMenuId) {
-        openMenus.forEach((helper, menuId) => {
-            if (menuId !== currentMenuId && helper) {
-                try {
-                    helper.invokeMethodAsync('CloseDropdown');
-                } catch (e) {
-                    console.warn('Error closing other dropdown:', e);
-                }
-            }
-        });
-
-        const currentHelper = openMenus.get(currentMenuId);
-        openMenus.clear();
-        if (currentHelper) {
-            openMenus.set(currentMenuId, currentHelper);
-        }
-    }
-
-    function cleanupAll() {
-        if (clickOutsideHandler) {
-            document.removeEventListener('click', clickOutsideHandler, true);
-            clickOutsideHandler = null;
-        }
-
-        openMenus.forEach((helper, id) => {
-            if (helper) {
-                try {
-                    helper.invokeMethodAsync('CloseDropdown');
-                } catch (e) {
-                    console.warn('Error cleaning up dropdown:', e);
-                }
-            }
-        });
-        openMenus.clear();
-    }
-
     return {
-        shouldShowAbove: shouldShowAboveOptimized,
         registerClickOutside: registerClickOutside,
-        unregisterClickOutside: unregisterClickOutside,
-        closeOtherMenus: closeOtherMenus,
-        cleanupAll: cleanupAll
+        closeOtherMenus: (id, dotNet) => {
+            closeOtherMenus(id);
+            openMenus.set(id, dotNet);
+        },
+        startMenuAnimation: startMenuAnimation,
+        cleanupAll: () => {
+            openMenus.forEach(dotNet => dotNet.invokeMethodAsync('CloseDropdown'));
+            openMenus.clear();
+        }
     };
 })();
-
-window.addEventListener('beforeunload', function () {
-    if (window.dropdownManager && window.dropdownManager.cleanupAll) {
-        window.dropdownManager.cleanupAll();
-    }
-});
-
-if (window.Blazor) {
-    window.Blazor.addEventListener('beforeNavigate', function () {
-        if (window.dropdownManager && window.dropdownManager.cleanupAll) {
-            window.dropdownManager.cleanupAll();
-        }
-    });
-}

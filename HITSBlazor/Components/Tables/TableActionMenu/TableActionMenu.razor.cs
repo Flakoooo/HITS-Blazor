@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using KristofferStrube.Blazor.Popper;
+using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 
 namespace HITSBlazor.Components.Tables.TableActionMenu
@@ -20,12 +21,45 @@ namespace HITSBlazor.Components.Tables.TableActionMenu
         [Inject]
         private IJSRuntime JSRuntime { get; set; } = null!;
 
+        [Inject]
+        private Popper PopperService { get; set; } = null!;
+
         private ElementReference _containerRef;
         private ElementReference _triggerRef;
+        private ElementReference _menuRef;
         private DotNetObjectReference<TableActionMenu>? _dotNetRef;
+        private Instance? _popperInstance;
+
+        private static List<Modifier> InstanceModifiers { get; } =
+        [
+            new(ModifierName.PreventOverflow)
+            {
+                Options = new
+                {
+                    boundary = "clippingParents",
+                    rootBoundary = "viewport",
+                    padding = 8,
+                    altAxis = true
+                }
+            },
+            new(ModifierName.Flip)
+            {
+                Options = new
+                {
+                    fallbackPlacements = new[] { "top-start", "top", "top-end", "bottom-start", "bottom", "bottom-end" }
+                }
+            },
+            new(ModifierName.Offset)
+            {
+                Options = new
+                {
+                    offset = new[] { 0, 8 }
+                }
+            }
+        ];
+
         private bool IsOpen { get; set; }
         private bool _isDisposed;
-        private string _menuStyle = "";
 
         protected override void OnInitialized()
         {
@@ -36,51 +70,32 @@ namespace HITSBlazor.Components.Tables.TableActionMenu
         {
             if (IsOpen)
             {
-                await CalculateMenuPosition();
-
+                await CreateOrUpdatePopper();
                 await RegisterClickOutside();
             }
             else
             {
+                await DestroyPopper();
                 await UnregisterClickOutside();
             }
         }
 
-        private async Task CalculateMenuPosition()
+        private async Task CreateOrUpdatePopper()
         {
-            try
-            {
-                var shouldShowAbove = await JSRuntime.InvokeAsync<bool>(
-                    "menuDropdown.shouldShowAbove",
-                    new
-                    {
-                        triggerElement = _triggerRef,
-                        minHeight = 18 + (32 * ActionIds.Count) + ActionIds.Count - 1 + 10
-                    }
-                );
-
-                var styleBuilder = new System.Text.StringBuilder();
-
-                if (shouldShowAbove)
+            _popperInstance = await PopperService.CreatePopperAsync(
+                reference: _triggerRef,
+                popper: _menuRef,
+                options: new Options
                 {
-                    styleBuilder.Append("bottom: 100%; ");
-                    styleBuilder.Append(ShowToRight ? "right: 0; " : "left: 0; ");
-                    styleBuilder.Append("margin-bottom: 5px; ");
+                    Placement = Placement.BottomStart,
+                    Strategy = Strategy.Absolute,
+                    Modifiers = [.. InstanceModifiers]
                 }
-                else
-                {
-                    styleBuilder.Append("top: 100%; ");
-                    styleBuilder.Append(ShowToRight ? "right: 0; " : "left: 0; ");
-                    styleBuilder.Append("margin-top: 5px; ");
-                }
+            );
 
-                _menuStyle = styleBuilder.ToString();
-                StateHasChanged();
-            }
-            catch (Exception)
-            {
-                _menuStyle = "top: 100%; left: 0; margin-top: 5px;";
-            }
+            await Task.Delay(1);
+
+            await JSRuntime.InvokeVoidAsync("menuDropdown.startMenuAnimation", _menuRef);
         }
 
         private async Task RegisterClickOutside()
@@ -91,9 +106,9 @@ namespace HITSBlazor.Components.Tables.TableActionMenu
             {
                 await JSRuntime.InvokeVoidAsync(
                     "menuDropdown.registerClickOutside",
-                    _containerRef,
-                    _dotNetRef,
-                    ItemId.ToString()
+                    _triggerRef,
+                    _menuRef,
+                    _dotNetRef
                 );
             }
             catch { }
@@ -111,14 +126,36 @@ namespace HITSBlazor.Components.Tables.TableActionMenu
             catch { }
         }
 
+        private async Task DestroyPopper()
+        {
+            if (_popperInstance != null)
+            {
+                try
+                {
+                    await _popperInstance.Destroy();
+                }
+                catch (JSException ex)
+                {
+                    Console.WriteLine($"Error destroying popper: {ex.Message}");
+                }
+                _popperInstance = null;
+            }
+        }
+
         private async Task ToggleMenu()
         {
             IsOpen = !IsOpen;
 
             if (IsOpen)
-                await JSRuntime.InvokeVoidAsync("menuDropdown.closeOtherMenus", ItemId.ToString());
+            {
+                await JSRuntime.InvokeVoidAsync("menuDropdown.closeOtherMenus", ItemId.ToString(), _dotNetRef);
+            }
+            else
+            {
+                await DestroyPopper();
+            }
 
-            await Task.CompletedTask;
+            await InvokeAsync(StateHasChanged);
         }
 
         [JSInvokable]
@@ -127,9 +164,8 @@ namespace HITSBlazor.Components.Tables.TableActionMenu
             if (_isDisposed) return;
 
             IsOpen = false;
-            _menuStyle = "";
-            StateHasChanged();
-            await Task.CompletedTask;
+            await DestroyPopper();
+            await InvokeAsync(StateHasChanged);
         }
 
         private static string GetActionText(TableAction action) => action switch
@@ -162,7 +198,6 @@ namespace HITSBlazor.Components.Tables.TableActionMenu
         private async Task HandleActionClick(TableAction action, object item)
         {
             IsOpen = false;
-            _menuStyle = "";
 
             await OnAction.InvokeAsync(new() { Action = action, Item = item });
         }
@@ -174,6 +209,10 @@ namespace HITSBlazor.Components.Tables.TableActionMenu
 
             try
             {
+                if (_popperInstance != null)
+                {
+                    _ = _popperInstance.Destroy();
+                }
                 _ = UnregisterClickOutside();
             }
             catch { }

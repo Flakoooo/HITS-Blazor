@@ -1,23 +1,24 @@
+using ApexCharts;
+using HITSBlazor.Services;
+using HITSBlazor.Services.Auth;
+using HITSBlazor.Services.Companies;
+using HITSBlazor.Services.IdeaRatings;
+using HITSBlazor.Services.Ideas;
+using HITSBlazor.Services.IdeaSkills;
+using HITSBlazor.Services.Markets;
+using HITSBlazor.Services.Modal;
+using HITSBlazor.Services.Notifications;
+using HITSBlazor.Services.Profiles;
+using HITSBlazor.Services.Projects;
+using HITSBlazor.Services.Skills;
+using HITSBlazor.Services.Teams;
+using HITSBlazor.Services.Tests;
+using HITSBlazor.Services.UserSkills;
+using HITSBlazor.Utils.Properties;
+using KristofferStrube.Blazor.Popper;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
-using HITSBlazor.Utils.Properties;
-using HITSBlazor.Services.Auth;
-using HITSBlazor.Services;
-using HITSBlazor.Services.Notifications;
-using HITSBlazor.Services.Ideas;
-using HITSBlazor.Services.Skills;
-using HITSBlazor.Services.Companies;
-using HITSBlazor.Services.Modal;
-using HITSBlazor.Services.Markets;
-using HITSBlazor.Services.Projects;
-using HITSBlazor.Services.IdeaSkills;
-using HITSBlazor.Services.IdeaRatings;
-using HITSBlazor.Services.Profiles;
-using HITSBlazor.Services.Tests;
-using ApexCharts;
-using HITSBlazor.Services.UserSkills;
-using HITSBlazor.Services.Teams;
 
 
 
@@ -57,6 +58,7 @@ namespace HITSBlazor
             );
 #endif
             builder.Services.AddApexCharts();
+            builder.Services.AddScoped<Popper>();
 
             // Utils
             builder.Services.AddScoped<GlobalNotificationService>();
