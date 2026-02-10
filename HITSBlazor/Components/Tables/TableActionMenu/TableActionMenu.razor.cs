@@ -37,23 +37,27 @@ namespace HITSBlazor.Components.Tables.TableActionMenu
                 Options = new
                 {
                     boundary = "clippingParents",
-                    rootBoundary = "viewport",
+                    rootBoundary = RootBoundary.Document,
                     padding = 8,
-                    altAxis = true
+                    altAxis = true,
+                    tether = false
                 }
             },
             new(ModifierName.Flip)
             {
                 Options = new
                 {
-                    fallbackPlacements = new[] { "top-start", "top", "top-end", "bottom-start", "bottom", "bottom-end" }
+                    fallbackPlacements = new[] { "top-start", "top-end", "bottom-start", "bottom-end" },
+                    boundary = "clippingParents"
                 }
             },
             new(ModifierName.Offset)
             {
                 Options = new
                 {
-                    offset = new[] { 0, 8 }
+                    offset = new[] { 0, 8 },
+                    boundary = "clippingParents",
+                    rootBoundary = RootBoundary.Document
                 }
             }
         ];
@@ -82,6 +86,10 @@ namespace HITSBlazor.Components.Tables.TableActionMenu
 
         private async Task CreateOrUpdatePopper()
         {
+            await DestroyPopper();
+
+            await JSRuntime.InvokeVoidAsync("menuDropdown.ensureMenuVisible", _menuRef);
+
             _popperInstance = await PopperService.CreatePopperAsync(
                 reference: _triggerRef,
                 popper: _menuRef,
@@ -93,7 +101,9 @@ namespace HITSBlazor.Components.Tables.TableActionMenu
                 }
             );
 
-            await Task.Delay(1);
+            await _popperInstance.Update();
+
+            await Task.Delay(16);
 
             await JSRuntime.InvokeVoidAsync("menuDropdown.startMenuAnimation", _menuRef);
         }
@@ -152,7 +162,11 @@ namespace HITSBlazor.Components.Tables.TableActionMenu
             }
             else
             {
+                await JSRuntime.InvokeVoidAsync("menuDropdown.hideMenu", _menuRef);
+
                 await DestroyPopper();
+
+                await InvokeAsync(StateHasChanged);
             }
 
             await InvokeAsync(StateHasChanged);
@@ -164,7 +178,11 @@ namespace HITSBlazor.Components.Tables.TableActionMenu
             if (_isDisposed) return;
 
             IsOpen = false;
+
+            await JSRuntime.InvokeVoidAsync("menuDropdown.hideMenu", _menuRef);
+
             await DestroyPopper();
+
             await InvokeAsync(StateHasChanged);
         }
 
@@ -198,6 +216,9 @@ namespace HITSBlazor.Components.Tables.TableActionMenu
         private async Task HandleActionClick(TableAction action, object item)
         {
             IsOpen = false;
+
+            await JSRuntime.InvokeVoidAsync("menuDropdown.hideMenu", _menuRef);
+            await DestroyPopper();
 
             await OnAction.InvokeAsync(new() { Action = action, Item = item });
         }

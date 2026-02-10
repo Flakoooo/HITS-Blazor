@@ -28,7 +28,9 @@
 
 .team-modal-tables {
     max-height: 430px;
-    overflow: scroll;
+    overflow-y: auto;
+    overflow-x: visible;
+    position: relative;
 }
 
 .tead-modal-table-label {

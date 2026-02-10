@@ -4,7 +4,6 @@
     function registerClickOutside(triggerRef, menuRef, dotNetRef) {
         setTimeout(() => {
             const handler = (e) => {
-                // Если кликнули ВНЕ триггера и ВНЕ самого меню
                 if (triggerRef && !triggerRef.contains(e.target) && menuRef && !menuRef.contains(e.target)) {
                     dotNetRef.invokeMethodAsync('CloseDropdown');
                     document.removeEventListener('click', handler);
@@ -22,16 +21,41 @@
         });
     }
 
+    function ensureMenuVisible(menuRef) {
+        if (!menuRef) return;
+
+        menuRef.style.display = 'block';
+        menuRef.style.visibility = 'visible';
+        menuRef.style.opacity = '0';
+
+        menuRef.offsetHeight;
+    }
+
     function startMenuAnimation(menuRef) {
         if (!menuRef) return;
 
-        menuRef.classList.remove('show');
+        menuRef.classList.remove('is-visible');
 
         requestAnimationFrame(() => {
             requestAnimationFrame(() => {
-                menuRef.classList.add('show');
+                menuRef.classList.add('is-visible');
+                menuRef.style.opacity = '1';
             });
         });
+    }
+
+    function hideMenu(menuRef) {
+        if (!menuRef) return;
+
+        menuRef.classList.remove('is-visible');
+
+        menuRef.style.display = 'none';
+        menuRef.style.visibility = 'hidden';
+        menuRef.style.opacity = '0';
+
+        menuRef.style.transform = '';
+        menuRef.style.top = '';
+        menuRef.style.left = '';
     }
 
     return {
@@ -40,10 +64,12 @@
             closeOtherMenus(id);
             openMenus.set(id, dotNet);
         },
+        ensureMenuVisible: ensureMenuVisible,
         startMenuAnimation: startMenuAnimation,
         cleanupAll: () => {
             openMenus.forEach(dotNet => dotNet.invokeMethodAsync('CloseDropdown'));
             openMenus.clear();
-        }
+        },
+        hideMenu: hideMenu
     };
 })();
