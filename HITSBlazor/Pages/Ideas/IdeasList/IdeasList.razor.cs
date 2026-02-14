@@ -24,7 +24,7 @@ namespace HITSBlazor.Pages.Ideas.IdeasList
         private ModalService ModalService { get; set; } = null!;
 
         [Parameter]
-        public Guid? IdeaId { get; set; }
+        public string IdeaId { get; set; } = string.Empty;
 
         private string? _searchText = null;
         private List<Idea> _ideas = [];
@@ -49,8 +49,8 @@ namespace HITSBlazor.Pages.Ideas.IdeasList
 
         protected override async Task OnParametersSetAsync()
         {
-            if (IdeaId is not null)
-                ShowIdea((Guid)IdeaId);
+            if (Guid.TryParse(IdeaId, out Guid guid))
+                ShowIdea(guid);
         }
 
         private async Task SearchIdea(string value)
@@ -86,7 +86,7 @@ namespace HITSBlazor.Pages.Ideas.IdeasList
             }
             else if (context.Action == MenuAction.Edit)
             {
-                Console.WriteLine($"Редактирование идеи {context.Item}");
+                await NavigationService.NavigateToAsync($"/ideas/create/{(Guid)context.Item}");
             }
             else 
             {

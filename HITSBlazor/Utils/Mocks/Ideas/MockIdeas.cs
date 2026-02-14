@@ -35,6 +35,7 @@ namespace HITSBlazor.Utils.Mocks.Ideas
             var admin = MockUsers.GetUserById(MockUsers.AdminId)!;
 
             var hits = MockCompanies.GetCompanyById(MockCompanies.HITSId)!;
+            string hitsContactPersonFullName = hits.Users.FirstOrDefault()?.FullName ?? "null null";
 
             return
             [
@@ -53,7 +54,7 @@ namespace HITSBlazor.Utils.Mocks.Ideas
                     MaxTeamSize = 7,
                     MinTeamSize = 3,
                     Customer = hits.Name,
-                    ContactPerson = hits.Name,
+                    ContactPerson = hitsContactPersonFullName,
                     Experts = null,
                     ProjectOffice = null,
                     Budget = 1,
@@ -78,7 +79,7 @@ namespace HITSBlazor.Utils.Mocks.Ideas
                     MaxTeamSize = 4,
                     MinTeamSize = 3,
                     Customer = hits.Name,
-                    ContactPerson = hits.Name,
+                    ContactPerson = hitsContactPersonFullName,
                     Experts = null,
                     ProjectOffice = null,
                     Budget = 4,
@@ -103,7 +104,7 @@ namespace HITSBlazor.Utils.Mocks.Ideas
                     MaxTeamSize = 5,
                     MinTeamSize = 5,
                     Customer = hits.Name,
-                    ContactPerson = hits.Name,
+                    ContactPerson = hitsContactPersonFullName,
                     Experts = null,
                     ProjectOffice = null,
                     Budget = 4,
@@ -128,7 +129,7 @@ namespace HITSBlazor.Utils.Mocks.Ideas
                     MaxTeamSize = 5,
                     MinTeamSize = 5,
                     Customer = hits.Name,
-                    ContactPerson = hits.Name,
+                    ContactPerson = hitsContactPersonFullName,
                     Experts = null,
                     ProjectOffice = null,
                     Budget = 4,
@@ -153,7 +154,7 @@ namespace HITSBlazor.Utils.Mocks.Ideas
                     MaxTeamSize = 5,
                     MinTeamSize = 5,
                     Customer = hits.Name,
-                    ContactPerson = hits.Name,
+                    ContactPerson = hitsContactPersonFullName,
                     Experts = null,
                     ProjectOffice = null,
                     Budget = 4,
@@ -178,7 +179,7 @@ namespace HITSBlazor.Utils.Mocks.Ideas
                     MaxTeamSize = 7,
                     MinTeamSize = 5,
                     Customer = hits.Name,
-                    ContactPerson = hits.Name,
+                    ContactPerson = hitsContactPersonFullName,
                     Experts = null,
                     ProjectOffice = null,
                     Budget = 4,
@@ -278,7 +279,7 @@ namespace HITSBlazor.Utils.Mocks.Ideas
                     MaxTeamSize = 7,
                     MinTeamSize = 5,
                     Customer = hits.Name,
-                    ContactPerson = hits.Name,
+                    ContactPerson = hitsContactPersonFullName,
                     Experts = null,
                     ProjectOffice = null,
                     Budget = 4,
@@ -303,7 +304,7 @@ namespace HITSBlazor.Utils.Mocks.Ideas
                     MaxTeamSize = 7,
                     MinTeamSize = 5,
                     Customer = hits.Name,
-                    ContactPerson = hits.Name,
+                    ContactPerson = hitsContactPersonFullName,
                     Experts = null,
                     ProjectOffice = null,
                     Budget = 4,
@@ -328,7 +329,7 @@ namespace HITSBlazor.Utils.Mocks.Ideas
                     MaxTeamSize = 7,
                     MinTeamSize = 5,
                     Customer = hits.Name,
-                    ContactPerson = hits.Name,
+                    ContactPerson = hitsContactPersonFullName,
                     Experts = null,
                     ProjectOffice = null,
                     Budget = 4,

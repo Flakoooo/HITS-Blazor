@@ -20,7 +20,7 @@
                     <div class="input-group">
                         <input type="text" 
                                placeholder="Введите название идеи" 
-                               @bind="ideasCreateModel.Name"
+                               @bind="_ideasCreateModel.Name"
                                @bind:event="oninput"
                                class="form-control rounded-end" />
                     </div>
@@ -32,7 +32,7 @@
                     </label>
                     <div class="input-group h-100">
                         <textarea placeholder="Опишите проблему, которую решает ваша идея" 
-                                  @bind="ideasCreateModel.Problem"
+                                  @bind="_ideasCreateModel.Problem"
                                   @bind:event="oninput"
                                   class="form-control rounded-end">
                         </textarea>
@@ -45,7 +45,7 @@
                     </label>
                     <div class="input-group h-100">
                         <textarea placeholder="Опишите, что вы предлагаете для решения проблемы" 
-                                  @bind="ideasCreateModel.Solution"
+                                  @bind="_ideasCreateModel.Solution"
                                   @bind:event="oninput"
                                   class="form-control rounded-end">
                         </textarea>
@@ -58,7 +58,7 @@
                     </label>
                     <div class="input-group h-100">
                         <textarea placeholder="Опишите ожидаемый результат" 
-                                  @bind="ideasCreateModel.Result"
+                                  @bind="_ideasCreateModel.Result"
                                   @bind:event="oninput"
                                   class="form-control rounded-end">
                         </textarea>
@@ -71,7 +71,7 @@
                     </label>
                     <div class="input-group h-100">
                         <textarea placeholder="Укажите список требуемых для выполнения проекта ресурсов" 
-                                  @bind="ideasCreateModel.Description"
+                                  @bind="_ideasCreateModel.Description"
                                   @bind:event="oninput"
                                   class="form-control rounded-end">
                         </textarea>
@@ -89,7 +89,7 @@
                                    max="30" 
                                    min="2" 
                                    placeholder="Минимальное количество: 2" 
-                                   @bind="ideasCreateModel.MinTeamSize"
+                                   @bind="_ideasCreateModel.MinTeamSize"
                                    @bind:event="oninput"
                                    class="form-control rounded-end" />
                         </div>
@@ -100,7 +100,7 @@
                                    max="30" 
                                    min="2" 
                                    placeholder="Максимальное количество: 30" 
-                                   @bind="ideasCreateModel.MaxTeamSize"
+                                   @bind="_ideasCreateModel.MaxTeamSize"
                                    @bind:event="oninput"
                                    class="form-control rounded-end" />
                         </div>
@@ -111,7 +111,7 @@
             <div>
                 <span class="fs-6 text-primary">Стек технологий*</span>
                 <i class="bi bi-patch-question hint"></i>
-                @if (isLoading)
+                @if (_isLoading)
                 {
                     <div class="mt-2 w-100 d-flex gap-3">
                         @for (int p = 0; p < 4; ++p)
@@ -124,25 +124,25 @@
                 {
                     <div class="mt-2 w-100 stack-categories">
                         <SkillDropdown SkillType="SkillType.Language" 
-                                       AllSkills="@LanguageSkills"
-                                       @bind-SelectedSkills="@SelectedLanguageSkills"
+                                       AllSkills="@_languageSkills"
+                                       @bind-SelectedSkills="@_selectedLanguageSkills"
                                        SearchFunction="@SearchSkillsAsync" />
                         <SkillDropdown SkillType="SkillType.Framework"
-                                       AllSkills="@FrameworkSkills"
-                                       @bind-SelectedSkills="@SelectedFrameworkSkills"
+                                       AllSkills="@_frameworkSkills"
+                                       @bind-SelectedSkills="@_selectedFrameworkSkills"
                                        SearchFunction="@SearchSkillsAsync" />
                         <SkillDropdown SkillType="SkillType.Database" 
-                                       AllSkills="@DatabaseSkills"
-                                       @bind-SelectedSkills="@SelectedDatabaseSkills"
+                                       AllSkills="@_databaseSkills"
+                                       @bind-SelectedSkills="@_selectedDatabaseSkills"
                                        SearchFunction="@SearchSkillsAsync" />
                         <SkillDropdown SkillType="SkillType.Devops" 
-                                       AllSkills="@DevopsSkills"
-                                       @bind-SelectedSkills="@SelectedDevopsSkills"
+                                       AllSkills="@_devopsSkills"
+                                       @bind-SelectedSkills="@_selectedDevopsSkills"
                                        SearchFunction="@SearchSkillsAsync" />
                     </div>
                 }
             </div>
-            <CompanyDropdown AllCompanies="@Companies"
+            <CompanyDropdown AllCompanies="@_companies"
                              @bind-SelectedCompany="@SelectedCompany"
                              SearchFunction="@SearchCompaniesAsync" />
             @if (SelectedCompany is not null)
@@ -158,8 +158,8 @@
                         <label class="form-label text-primary">
                             Пригодность*
                         </label>
-                        <select @onchange="OnSuitabilityChanged" class="form-select">
-                            <option disabled selected value="">Выберите значение</option>
+                        <select value="@SuitabilityScore" @onchange="OnSuitabilityChanged" class="form-select">
+                            <option disabled value="">Выберите значение</option>
                             <option value="5">Есть заказчик, инвестор и эксперт в предметной области</option>
                             <option value="4">Есть заказчик, инвестор, но нет эксперта</option>
                             <option value="3">Есть инвестор, но нет заказчика и эксперта</option>
@@ -173,8 +173,8 @@
                         <label class="form-label text-primary">
                             Бюджет*
                         </label>
-                        <select @onchange="OnBudgetChanged" class="form-select">
-                            <option disabled selected value="">Выберите значение</option>
+                        <select value="@BudgetScore" @onchange="OnBudgetChanged" class="form-select">
+                            <option disabled value="">Выберите значение</option>
                             <option value="5">Не требуется</option>
                             <option value="4">До 30.000 руб</option>
                             <option value="3">30.000 - 50.000 руб</option>
@@ -185,25 +185,31 @@
                 </div>
             </div>
             <div class="col">
-                <span class="fs-6 text-primary">@preAssessmentText</span>
-                @if (animationTimer is not null)
+                <span class="fs-6 text-primary">@PreAssessmentText</span>
+                @if (_animationTimer is not null)
                 {
                     <Placeholder />
                 }
                 else
                 {
                     <div class="progress w-100 mt-2">
-                        <div class="progress-bar progress-bar-animated" style="@preAssessmentStyle">
+                        <div class="progress-bar progress-bar-animated" style="@PreAssessmentStyle">
                         </div>
                     </div>
                 }
             </div>
             <div class="idea-form-submit-buttons">
+                @if (string.IsNullOrWhiteSpace(IdeaId))
+                {
+                    <button type="button" class="btn d-flex btn-primary">
+                        Сохранить черновик
+                    </button>
+                    <button type="button" class="btn d-flex btn-success">
+                        Отправить на согласование
+                    </button>
+                }
                 <button type="button" class="btn d-flex btn-primary">
-                    Сохранить черновик
-                </button>
-                <button type="button" class="btn d-flex btn-success">
-                    Отправить на согласование
+                    Сохранить изменения
                 </button>
             </div>
         </div>

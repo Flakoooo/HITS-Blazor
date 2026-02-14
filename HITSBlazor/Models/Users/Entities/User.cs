@@ -14,5 +14,6 @@ namespace HITSBlazor.Models.Users.Entities
         public string StudyGroup { get; set; } = string.Empty;
 
         public RoleType? Role { get; set; }
+        public string FullName => $"{FirstName} {LastName}";
     }
 }

@@ -87,5 +87,11 @@ namespace HITSBlazor.Components.Modals.RightSideModals.IdeaModal
                     IdeaComments.Remove(comment);
             }
         }
+
+        private async Task NavigateToCreateIdea()
+        {
+            ModalService.CloseAll(ModalType.RightSide);
+            await NavigationService.NavigateToAsync($"/ideas/create/{CurrentIdea?.Id}");
+        }
     }
 }
