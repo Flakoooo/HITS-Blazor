@@ -1,6 +1,6 @@
-﻿namespace HITSBlazor.Components.Tables.TableActionMenu
+﻿namespace HITSBlazor.Components.ActionMenus.BaseActionMenu
 {
-    public enum TableAction
+    public enum MenuAction
     {
         View,
         ViewIdea,

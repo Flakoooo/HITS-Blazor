@@ -2,9 +2,7 @@ using ApexCharts;
 using HITSBlazor.Services;
 using HITSBlazor.Services.Auth;
 using HITSBlazor.Services.Companies;
-using HITSBlazor.Services.IdeaRatings;
 using HITSBlazor.Services.Ideas;
-using HITSBlazor.Services.IdeaSkills;
 using HITSBlazor.Services.Markets;
 using HITSBlazor.Services.Modal;
 using HITSBlazor.Services.Notifications;
@@ -92,8 +90,6 @@ namespace HITSBlazor
 
             //Ideas
             builder.Services.AddScoped<IIdeasService, MockIdeasService>();
-            builder.Services.AddScoped<IIdeaSkillService, MockIdeaSkillService>();
-            builder.Services.AddScoped<IIdeaRatingService, MockIdeaRatingService>();
 
             //Teams
             builder.Services.AddScoped<ITeamService, MockTeamService>();

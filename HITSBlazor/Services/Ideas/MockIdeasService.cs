@@ -1,8 +1,10 @@
-﻿using HITSBlazor.Models.Ideas.Entities;
+﻿using HITSBlazor.Models.Common.Entities;
+using HITSBlazor.Models.Ideas.Entities;
 using HITSBlazor.Models.Ideas.Enums;
 using HITSBlazor.Pages.Ideas.IdeasCreate;
 using HITSBlazor.Services.Auth;
 using HITSBlazor.Utils;
+using HITSBlazor.Utils.Mocks.Common;
 using HITSBlazor.Utils.Mocks.Ideas;
 
 namespace HITSBlazor.Services.Ideas
@@ -42,6 +44,12 @@ namespace HITSBlazor.Services.Ideas
 
         public async Task<Idea?> GetIdeaByIdAsync(Guid id) => MockIdeas.GetIdeaById(id);
 
+        public async Task<List<Skill>> GetAllIdeaSkillsAsync(Guid ideaId)
+            => MockIdeaSkills.GetIdeaSkillsByIdeaId(ideaId);
+
+        public async Task<List<Rating>> GetIdeaRatingsAsync(Guid ideaId)
+            => MockRatings.GetIdeaRatingById(ideaId);
+
         public async Task<ServiceResponse<bool>> CreateNewIdea(IdeasCreateModel ideasCreateModel)
         {
             if (_authService.CurrentUser is null)
@@ -51,6 +59,21 @@ namespace HITSBlazor.Services.Ideas
             }
 
             return ServiceResponse<bool>.Success(true);
+        }
+
+        //Comments
+        public async Task<List<Comment>> GetIdeasCommentsAsync(Guid ideaId)
+            => MockComments.GetIdeasCommentsByIdeaId(ideaId);
+
+        public async Task<bool> DeleteCommentInIdeaAsync(Comment comment)
+        {
+            if (!MockComments.DeleteIdeasComment(comment))
+            {
+                _globalNotificationService.ShowError("Не удалось удалить комментарий");
+                return false;
+            }
+
+            return true;
         }
     }
 }

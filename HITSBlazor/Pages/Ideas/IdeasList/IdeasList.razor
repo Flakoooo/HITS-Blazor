@@ -1,4 +1,5 @@
 ﻿@namespace HITSBlazor.Pages.Ideas.IdeasList
+@using HITSBlazor.Components.ActionMenus.BaseActionMenu
 @using HITSBlazor.Components.Inputs.SearchInput
 @using HITSBlazor.Components.Tables.TableActionMenu
 @using HITSBlazor.Components.Tables.TableBodyRow
@@ -68,10 +69,10 @@
                                 </TableBodyRow>
                                 <TableActionMenu ItemId="@idea.Id"
                                                  OnAction="OnIdeaAction"
-                                                 ActionIds="@(new Dictionary<TableAction, object> { 
-                                                    [TableAction.View] = idea.Id,
-                                                    [TableAction.Edit] = idea.Id,
-                                                    [TableAction.Delete] = idea.Id
+                                                 ActionIds="@(new Dictionary<MenuAction, object> { 
+                                                    [MenuAction.View] = idea.Id,
+                                                    [MenuAction.Edit] = idea.Id,
+                                                    [MenuAction.Delete] = idea.Id
                                                  })" />
                             </tr>
                         }
@@ -97,7 +98,7 @@
                     </div>
                 </div>
                 <div class="w-100 d-flex justify-content-center">
-                    <button type="button" onclick="@ResetFilters" class="btn d-flex btn-danger">
+                    <button type="button" @onclick="@ResetFilters" class="btn d-flex btn-danger">
                         <i class="bi bi-x-lg fs-5"></i>
                         Сбросить фильтры
                     </button>

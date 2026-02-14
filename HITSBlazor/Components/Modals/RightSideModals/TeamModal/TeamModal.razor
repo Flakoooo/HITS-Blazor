@@ -1,4 +1,5 @@
 ﻿@namespace HITSBlazor.Components.Modals.RightSideModals.TeamModal
+@using HITSBlazor.Components.ActionMenus.BaseActionMenu
 @using HITSBlazor.Components.Collapse
 @using HITSBlazor.Components.Modals.Components.ModalHeader
 @using HITSBlazor.Components.Placeholder
@@ -184,11 +185,11 @@
                                                     <TableActionMenu ItemId="member.Id"
                                                                      StrategyPosition="Strategy.Fixed"
                                                                      OnAction="@HandleTableMenuClick"
-                                                                     ActionIds="@(new Dictionary<TableAction, object> {
-                                                                        [TableAction.ViewProfile] = member.UserId,
-                                                                        [TableAction.SetLeader] = member.UserId,
-                                                                        [TableAction.UnsetLeader] = member.UserId,
-                                                                        [TableAction.RemoveTeamMember] = member.UserId
+                                                                     ActionIds="@(new Dictionary<MenuAction, object> {
+                                                                        [MenuAction.ViewProfile] = member.UserId,
+                                                                        [MenuAction.SetLeader] = member.UserId,
+                                                                        [MenuAction.UnsetLeader] = member.UserId,
+                                                                        [MenuAction.RemoveTeamMember] = member.UserId
                                                                      })" />
                                                 </tr>
                                             }
@@ -217,8 +218,8 @@
                                                     <TableActionMenu ItemId="invitation.Id"
                                                                      StrategyPosition="Strategy.Fixed"
                                                                      OnAction="@HandleTableMenuClick"
-                                                                     ActionIds="@(new Dictionary<TableAction, object> { 
-                                                                        [TableAction.ViewProfile] = invitation.UserId 
+                                                                     ActionIds="@(new Dictionary<MenuAction, object> { 
+                                                                        [MenuAction.ViewProfile] = invitation.UserId 
                                                                      })" />
                                                 </tr>
                                             }
@@ -247,10 +248,10 @@
                                                     <TableActionMenu ItemId="request.Id"
                                                                      StrategyPosition="Strategy.Fixed"
                                                                      OnAction="@HandleTableMenuClick"
-                                                                     ActionIds="@(new Dictionary<TableAction, object> {
-                                                                        [TableAction.ViewProfile] = request.UserId,
-                                                                        [TableAction.TeamRequestAccept] = request.Id,
-                                                                        [TableAction.TeamRequestCancel] = request.Id
+                                                                     ActionIds="@(new Dictionary<MenuAction, object> {
+                                                                        [MenuAction.ViewProfile] = request.UserId,
+                                                                        [MenuAction.TeamRequestAccept] = request.Id,
+                                                                        [MenuAction.TeamRequestCancel] = request.Id
                                                                      })" />
                                                 </tr>
                                             }
@@ -273,9 +274,9 @@
                                                     <TableActionMenu ItemId="request.Id"
                                                                      StrategyPosition="Strategy.Fixed"
                                                                      OnAction="@HandleTableMenuClick"
-                                                                     ActionIds="@(new Dictionary<TableAction, object> {
-                                                                        [TableAction.ViewIdeaMarket] = request.IdeaMarketId,
-                                                                        [TableAction.ViewLetter] = request.Letter
+                                                                     ActionIds="@(new Dictionary<MenuAction, object> {
+                                                                        [MenuAction.ViewIdeaMarket] = request.IdeaMarketId,
+                                                                        [MenuAction.ViewLetter] = request.Letter
                                                                      })" />
                                                 </tr>
                                             }
@@ -306,8 +307,8 @@
                                                     <TableActionMenu ItemId="invitation.Id"
                                                                      StrategyPosition="Strategy.Fixed"
                                                                      OnAction="@HandleTableMenuClick"
-                                                                     ActionIds="@(new Dictionary<TableAction, object> {
-                                                                        [TableAction.ViewIdea] = invitation.IdeaId
+                                                                     ActionIds="@(new Dictionary<MenuAction, object> {
+                                                                        [MenuAction.ViewIdea] = invitation.IdeaId
                                                                      })" />
                                                 </tr>
                                             }

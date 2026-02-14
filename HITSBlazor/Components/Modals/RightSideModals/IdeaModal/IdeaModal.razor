@@ -1,4 +1,6 @@
 ﻿@namespace HITSBlazor.Components.Modals.RightSideModals.IdeaModal
+@using HITSBlazor.Components.ActionMenus.BaseActionMenu
+@using HITSBlazor.Components.ActionsMenus.CommentActionMenu
 @using HITSBlazor.Components.Collapse
 @using HITSBlazor.Components.Modals.Components.ModalHeader
 @using HITSBlazor.Components.Placeholder
@@ -111,17 +113,32 @@
                 <div class="d-grid gap-3 pt-3 px-3 w-100">
                     <!--TODO: Личные сообщения имеют дополнительные функции-->
                     <!--TODO: Да и вообще, че я комментарии не реализовл то-->
-                    <div class="card rounded-3 shadow advertisement current-user-advertisement">
-                        <div class="card-header d-flex justify-content-between align-items-center advertisement-header">
-                            <span class="fs-6 text-primary">EXPERT_FULL_NAME</span>
-                            <div class="d-flex gap-2 align-items-center">
-                                <span class="text-primary">EXPERT_MESSAGE_DATE формат dd.MM.yyyy в HH:mm</span>
+                    <!-- TableActionMenu задействовать -->
+                    @foreach (var comment in IdeaComments)
+                    {
+                        var sender = comment.Sender;
+                        var isCurrentUserMessage = sender.Id == CurrentUser?.Id;
+                        <div class="card rounded-3 shadow advertisement @(isCurrentUserMessage ? "current-user-advertisement" : string.Empty)">
+                            <div class="card-header d-flex justify-content-between align-items-center advertisement-header">
+                                <span class="fs-6 text-primary">@sender.FirstName @sender.LastName</span>
+                                <div class="d-flex gap-2 align-items-center">
+                                    <span class="text-primary">@comment.CreatedAt.ToString("dd.MM.yyyy в HH:mm")</span>
+                                    @if (isCurrentUserMessage)
+                                    {
+                                        <CommentActionMenu ItemId="comment.Id"
+                                                           StrategyPosition="Strategy.Fixed" 
+                                                           OnAction="@HandleActionMenuClick"
+                                                           ActionIds="@(new Dictionary<MenuAction, object> { 
+                                                                [MenuAction.Delete] = comment
+                                                           })"/>                                      
+                                    }
+                                </div>
                             </div>
-                        </div>
-                        <div class="card-body py-2">
-                            EXPERT_MESSAGE
-                        </div>
-                    </div>
+                            <div class="card-body py-2">
+                                @comment.Text
+                            </div>
+                        </div>                        
+                    }
                 </div>
                 <form class="p-3">
                     <div class="d-flex gap-3 align-items-start">
@@ -183,7 +200,10 @@
                     </span>
                     <div class="pt-2 idea-sub-info">
                         <i class="bi bi-envelope text-secondary fs-3 opacity-25"></i>
-                        <div class="text-primary" style="cursor: pointer;">@CurrentIdea.Initiator.FirstName @CurrentIdea.Initiator.LastName</div>
+                        <div @onclick="@(() => ModalService.ShowProfileModal(CurrentIdea.Initiator.Id))" 
+                             class="text-primary data-link">
+                            @CurrentIdea.Initiator.FirstName @CurrentIdea.Initiator.LastName
+                        </div>
                     </div>
                 </div>
                 <div>

@@ -1,5 +1,5 @@
 ﻿using ApexCharts;
-using HITSBlazor.Components.Tables.TableActionMenu;
+using HITSBlazor.Components.ActionMenus.BaseActionMenu;
 using HITSBlazor.Components.Tables.TableHeader;
 using HITSBlazor.Models.Common.Entities;
 using HITSBlazor.Models.Teams.Entities;
@@ -82,32 +82,32 @@ namespace HITSBlazor.Components.Modals.RightSideModals.TeamModal
 
         private void HandleTableMenuClick(TableActionContext context)
         {
-            if (context.Action == TableAction.ViewProfile)
+            if (context.Action == MenuAction.ViewProfile)
             {
                 ModalService.ShowProfileModal((Guid)context.Item);
             }
             if (_activeTableCategory == TeamTableCategory.Members)
             {
-                if (context.Action == TableAction.SetLeader)
+                if (context.Action == MenuAction.SetLeader)
                 {
                     Console.WriteLine($"Назначение лидером {context.Item}");
                 }
-                else if (context.Action == TableAction.UnsetLeader)
+                else if (context.Action == MenuAction.UnsetLeader)
                 {
                     Console.WriteLine($"Снтие лидера {context.Item}");
                 }
-                else if (context.Action == TableAction.RemoveTeamMember)
+                else if (context.Action == MenuAction.RemoveTeamMember)
                 {
                     Console.WriteLine($"Исключение {context.Item}");
                 }
             }
             else if (_activeTableCategory == TeamTableCategory.RequestsToTeam)
             {
-                if (context.Action == TableAction.TeamRequestAccept)
+                if (context.Action == MenuAction.TeamRequestAccept)
                 {
 
                 }
-                else if (context.Action == TableAction.TeamRequestCancel)
+                else if (context.Action == MenuAction.TeamRequestCancel)
                 {
 
                 }

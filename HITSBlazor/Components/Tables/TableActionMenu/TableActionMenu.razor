@@ -1,7 +1,9 @@
 ﻿@namespace HITSBlazor.Components.Tables.TableActionMenu
+@using HITSBlazor.Components.ActionMenus.BaseActionMenu
+@inherits BaseActionMenuLogic
 
 <td class="py-3" @ref="_containerRef">
-    <div class="float-end table-row-icon">
+    <div class="float-end table-modal-icon">
         <i @ref="_triggerRef"
            @onclick="@ToggleMenu"
            class="bi bi-three-dots fs-5 @(IsOpen ? "active" : string.Empty)"
@@ -9,7 +11,7 @@
         </i>
         <div @ref="_menuRef"
              @onclick:stopPropagation
-             class="dropdown-menu table-row-modal @(IsOpen ? "is-visible" : "")">
+             class="dropdown-menu action-modal @(IsOpen ? "is-visible" : "")">
             <ul class="list-group list-group-flush">
                 @foreach (var action in ActionIds)
                 {
@@ -22,3 +24,8 @@
         </div>
     </div>
 </td>
+
+@code {
+    [Parameter]
+    public Dictionary<MenuAction, object> ActionIds { get; set; } = [];
+}

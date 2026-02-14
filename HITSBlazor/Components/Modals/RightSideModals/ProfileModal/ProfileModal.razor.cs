@@ -1,6 +1,6 @@
 ﻿using ApexCharts;
+using HITSBlazor.Components.ActionMenus.BaseActionMenu;
 using HITSBlazor.Components.Modals.CenterModals.UpdateEmailModal;
-using HITSBlazor.Components.Tables.TableActionMenu;
 using HITSBlazor.Components.Tables.TableHeader;
 using HITSBlazor.Models.Common.Entities;
 using HITSBlazor.Models.Common.Enums;
@@ -244,7 +244,7 @@ namespace HITSBlazor.Components.Modals.RightSideModals.ProfileModal
 
         private async Task OnTeamAction(TableActionContext context)
         {
-            if (context.Action == TableAction.View)
+            if (context.Action == MenuAction.View)
                 if (context.Item is Guid guid)
                     ShowTeam(guid);
         }

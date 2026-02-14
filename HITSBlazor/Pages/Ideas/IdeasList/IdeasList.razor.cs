@@ -1,4 +1,4 @@
-﻿using HITSBlazor.Components.Tables.TableActionMenu;
+﻿using HITSBlazor.Components.ActionMenus.BaseActionMenu;
 using HITSBlazor.Models.Ideas.Entities;
 using HITSBlazor.Models.Ideas.Enums;
 using HITSBlazor.Services;
@@ -79,12 +79,12 @@ namespace HITSBlazor.Pages.Ideas.IdeasList
 
         private async Task OnIdeaAction(TableActionContext context)
         {
-            if (context.Action == TableAction.View)
+            if (context.Action == MenuAction.View)
             {
                 if (context.Item is Guid guid)
                     ShowIdea(guid);
             }
-            else if (context.Action == TableAction.Edit)
+            else if (context.Action == MenuAction.Edit)
             {
                 Console.WriteLine($"Редактирование идеи {context.Item}");
             }

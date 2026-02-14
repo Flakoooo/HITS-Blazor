@@ -1,4 +1,5 @@
 ﻿@namespace HITSBlazor.Components.Modals.RightSideModals.ProfileModal
+@using HITSBlazor.Components.ActionMenus.BaseActionMenu
 @using HITSBlazor.Components.Collapse
 @using HITSBlazor.Components.InputDropdowns.SkillDropdown
 @using HITSBlazor.Components.Modals.Components.ModalHeader
@@ -12,6 +13,8 @@
 @using HITSBlazor.Services.Modal
 @using HITSBlazor.Utils.EnumStyles
 @using HITSBlazor.Utils.EnumTranslators
+
+<!-- TODO: Когда нужно будет добавлять что то в профиль, те же достижения, думаю сделать справа навигацию как выбор таблиц в модалке команд -->
 
 <div class="right-side-modal p-3 overflow-y-scroll" @onclick:stopPropagation="true">
     <div class="w-100 @(_isLoading || Profile is null ? "user-placeholder" : string.Empty)">
@@ -361,7 +364,7 @@
                                                     <TableActionMenu ItemId="@teamExp.TeamId"
                                                                      StrategyPosition="Strategy.Fixed"
                                                                      OnAction="OnTeamAction"
-                                                                     ActionIds="@(new Dictionary<TableAction, object> { [TableAction.View] = teamExp.TeamId })" />
+                                                                     ActionIds="@(new Dictionary<MenuAction, object> { [MenuAction.View] = teamExp.TeamId })" />
                                                 </tr>
                                             }
                                         </tbody>

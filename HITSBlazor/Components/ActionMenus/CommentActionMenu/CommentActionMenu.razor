@@ -1,0 +1,31 @@
+﻿@namespace HITSBlazor.Components.ActionsMenus.CommentActionMenu
+@using HITSBlazor.Components.ActionMenus.BaseActionMenu
+@inherits BaseActionMenuLogic
+
+<div @ref="_containerRef">
+    <button @ref="_triggerRef"
+            @onclick="@ToggleMenu"
+            type="button"
+            class="btn d-flex btn-primary p-1"
+            aria-expanded="@IsOpen">
+        <i class="bi bi-list fs-5 comment-modal-icon @(IsOpen ? "active" : string.Empty)"></i>
+    </button>
+    <div @ref="_menuRef"
+         @onclick:stopPropagation
+         class="dropdown-menu action-modal @(IsOpen ? "is-visible" : "")">
+        <ul class="list-group list-group-flush">
+            @foreach (var action in ActionIds)
+            {
+                <li @onclick="@(() => HandleActionClick(action.Key, action.Value))"
+                    class="list-group-item list-group-item-action px-2 py-1 @GetActionStyle(action.Key)">
+                    @GetActionText(action.Key)
+                </li>
+            }
+        </ul>
+    </div>
+</div> 
+
+@code {
+    [Parameter]
+    public Dictionary<MenuAction, object> ActionIds { get; set; } = [];
+}

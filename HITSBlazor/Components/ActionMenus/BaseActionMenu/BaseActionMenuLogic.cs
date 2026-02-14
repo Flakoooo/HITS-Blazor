@@ -2,9 +2,9 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 
-namespace HITSBlazor.Components.Tables.TableActionMenu
+namespace HITSBlazor.Components.ActionMenus.BaseActionMenu
 {
-    public partial class TableActionMenu : IDisposable
+    public abstract class BaseActionMenuLogic : ComponentBase, IDisposable
     {
         [Parameter]
         public Guid ItemId { get; set; }
@@ -13,24 +13,21 @@ namespace HITSBlazor.Components.Tables.TableActionMenu
         public Strategy StrategyPosition { get; set; } = Strategy.Absolute;
 
         [Parameter]
-        public Dictionary<TableAction, object> ActionIds { get; set; } = [];
-
-        [Parameter]
         public EventCallback<TableActionContext> OnAction { get; set; }
 
         [Inject]
-        private IJSRuntime JSRuntime { get; set; } = null!;
+        protected IJSRuntime JSRuntime { get; set; } = null!;
 
         [Inject]
-        private Popper PopperService { get; set; } = null!;
+        protected Popper PopperService { get; set; } = null!;
 
-        private ElementReference _containerRef;
-        private ElementReference _triggerRef;
-        private ElementReference _menuRef;
-        private DotNetObjectReference<TableActionMenu>? _dotNetRef;
-        private Instance? _popperInstance;
+        protected ElementReference _containerRef;
+        protected ElementReference _triggerRef;
+        protected ElementReference _menuRef;
+        protected DotNetObjectReference<BaseActionMenuLogic>? _dotNetRef;
+        protected Instance? _popperInstance;
 
-        private static List<Modifier> InstanceModifiers { get; } =
+        protected static List<Modifier> InstanceModifiers { get; } =
         [
             new(ModifierName.PreventOverflow)
             {
@@ -62,8 +59,8 @@ namespace HITSBlazor.Components.Tables.TableActionMenu
             }
         ];
 
-        private bool IsOpen { get; set; }
-        private bool _isDisposed;
+        protected bool IsOpen { get; set; }
+        protected bool _isDisposed;
 
         protected override void OnInitialized()
         {
@@ -84,7 +81,7 @@ namespace HITSBlazor.Components.Tables.TableActionMenu
             }
         }
 
-        private async Task CreateOrUpdatePopper()
+        protected async Task CreateOrUpdatePopper()
         {
             await DestroyPopper();
 
@@ -108,7 +105,7 @@ namespace HITSBlazor.Components.Tables.TableActionMenu
             await JSRuntime.InvokeVoidAsync("menuDropdown.startMenuAnimation", _menuRef);
         }
 
-        private async Task RegisterClickOutside()
+        protected async Task RegisterClickOutside()
         {
             if (_isDisposed || _dotNetRef == null) return;
 
@@ -124,7 +121,7 @@ namespace HITSBlazor.Components.Tables.TableActionMenu
             catch { }
         }
 
-        private async Task UnregisterClickOutside()
+        protected async Task UnregisterClickOutside()
         {
             try
             {
@@ -136,7 +133,7 @@ namespace HITSBlazor.Components.Tables.TableActionMenu
             catch { }
         }
 
-        private async Task DestroyPopper()
+        protected async Task DestroyPopper()
         {
             if (_popperInstance != null)
             {
@@ -152,7 +149,7 @@ namespace HITSBlazor.Components.Tables.TableActionMenu
             }
         }
 
-        private async Task ToggleMenu()
+        protected async Task ToggleMenu()
         {
             IsOpen = !IsOpen;
 
@@ -186,34 +183,34 @@ namespace HITSBlazor.Components.Tables.TableActionMenu
             await InvokeAsync(StateHasChanged);
         }
 
-        private static string GetActionText(TableAction action) => action switch
+        protected static string GetActionText(MenuAction action) => action switch
         {
-            TableAction.View => "Просмотреть",
-            TableAction.ViewIdea or TableAction.ViewIdeaMarket => "Открыть идею",
-            TableAction.ViewProfile => "Перейти на профиль",
-            TableAction.ViewLetter => "Просмотреть письмо",
-            TableAction.Edit => "Редактировать",
-            TableAction.TeamRequestAccept => "Принять",
-            TableAction.SetLeader => "Назначить лидером",
-            TableAction.Delete => "Удалить",
-            TableAction.TeamRequestCancel => "Отклонить",
-            TableAction.UnsetLeader => "Снять роль лидера",
-            TableAction.RemoveTeamMember => "Исключить",
-                _ => action.ToString()
+            MenuAction.View => "Просмотреть",
+            MenuAction.ViewIdea or MenuAction.ViewIdeaMarket => "Открыть идею",
+            MenuAction.ViewProfile => "Перейти на профиль",
+            MenuAction.ViewLetter => "Просмотреть письмо",
+            MenuAction.Edit => "Редактировать",
+            MenuAction.TeamRequestAccept => "Принять",
+            MenuAction.SetLeader => "Назначить лидером",
+            MenuAction.Delete => "Удалить",
+            MenuAction.TeamRequestCancel => "Отклонить",
+            MenuAction.UnsetLeader => "Снять роль лидера",
+            MenuAction.RemoveTeamMember => "Исключить",
+            _ => action.ToString()
         };
 
-        private static string GetActionStyle(TableAction action) => action switch
+        protected static string GetActionStyle(MenuAction action) => action switch
         {
-            TableAction.TeamRequestAccept => "text-success",
-            TableAction.SetLeader => "text-primary",
-            TableAction.Delete 
-            or TableAction.TeamRequestCancel 
-            or TableAction.UnsetLeader
-            or TableAction.RemoveTeamMember => "text-danger",
+            MenuAction.TeamRequestAccept => "text-success",
+            MenuAction.SetLeader => "text-primary",
+            MenuAction.Delete
+            or MenuAction.TeamRequestCancel
+            or MenuAction.UnsetLeader
+            or MenuAction.RemoveTeamMember => "text-danger",
             _ => string.Empty
         };
 
-        private async Task HandleActionClick(TableAction action, object item)
+        protected async Task HandleActionClick(MenuAction action, object item)
         {
             IsOpen = false;
 
