@@ -226,7 +226,7 @@ namespace HITSBlazor.Pages.Ideas.IdeasCreate
                 _ideasCreateModel.Status = ideaStatusType;
                 _ideasCreateModel.Customer = SelectedCompany.Name;
                 _ideasCreateModel.ContactPerson = SelectedContactPerson.FullName;
-                await IdeasService.CreateNewIdea(_ideasCreateModel);
+                await IdeasService.CreateNewIdeaAsync(_ideasCreateModel);
             }
         }
 

@@ -12,7 +12,8 @@ namespace HITSBlazor.Services.Ideas
         Task<Idea?> GetIdeaByIdAsync(Guid id);
         Task<List<Skill>> GetAllIdeaSkillsAsync(Guid ideaId);
         Task<List<Rating>> GetIdeaRatingsAsync(Guid ideaId);
-        Task<ServiceResponse<bool>> CreateNewIdea(IdeasCreateModel ideasCreateModel);
+        Task<ServiceResponse<bool>> CreateNewIdeaAsync(IdeasCreateModel ideasCreateModel);
+        Task<bool> DeleteIdeaAsync(Idea idea);
 
 
         //Comments

@@ -86,11 +86,15 @@ namespace HITSBlazor.Pages.Ideas.IdeasList
             }
             else if (context.Action == MenuAction.Edit)
             {
-                await NavigationService.NavigateToAsync($"/ideas/create/{(Guid)context.Item}");
+                if (context.Item is Guid guid)
+                    await NavigationService.NavigateToAsync($"/ideas/create/{guid}");
             }
-            else 
+            else if (context.Action == MenuAction.Delete)
             {
-                Console.WriteLine($"Удаление идеи {context.Item}");
+                if (context.Item is not Idea idea || !await IdeasService.DeleteIdeaAsync(idea)) 
+                    return;
+
+                _ideas.Remove(idea);
             }
         }
     }

@@ -50,7 +50,7 @@ namespace HITSBlazor.Services.Ideas
         public async Task<List<Rating>> GetIdeaRatingsAsync(Guid ideaId)
             => MockRatings.GetIdeaRatingById(ideaId);
 
-        public async Task<ServiceResponse<bool>> CreateNewIdea(IdeasCreateModel ideasCreateModel)
+        public async Task<ServiceResponse<bool>> CreateNewIdeaAsync(IdeasCreateModel ideasCreateModel)
         {
             if (_authService.CurrentUser is null)
             {
@@ -59,6 +59,18 @@ namespace HITSBlazor.Services.Ideas
             }
 
             return ServiceResponse<bool>.Success(true);
+        }
+
+        public async Task<bool> DeleteIdeaAsync(Idea idea)
+        {
+            if (!MockIdeas.DeleteIdea(idea))
+            {
+                _globalNotificationService.ShowError("Не удалось удалить идею");
+                return false;
+            }
+
+            _cachedIdeas.Remove(idea);
+            return true;
         }
 
         //Comments

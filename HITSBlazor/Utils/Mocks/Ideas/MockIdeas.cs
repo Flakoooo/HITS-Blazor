@@ -349,5 +349,7 @@ namespace HITSBlazor.Utils.Mocks.Ideas
 
         public static List<Idea> GetIdeasByInitiatorId(Guid initiatorId)
             => [.. _ideas.Where(i => i.Initiator.Id == initiatorId)];
+
+        public static bool DeleteIdea(Idea idea) => _ideas.Remove(idea);
     }
 }
