@@ -1,6 +1,6 @@
 ﻿@namespace HITSBlazor.Components.Tables.TableActionMenu
 @using HITSBlazor.Components.ActionMenus.BaseActionMenu
-@inherits BaseActionMenuLogic
+@inherits BaseActionMenuComponent
 
 <td class="py-3" @ref="_containerRef">
     <div class="float-end table-modal-icon">
@@ -24,8 +24,3 @@
         </div>
     </div>
 </td>
-
-@code {
-    [Parameter]
-    public Dictionary<MenuAction, object> ActionIds { get; set; } = [];
-}

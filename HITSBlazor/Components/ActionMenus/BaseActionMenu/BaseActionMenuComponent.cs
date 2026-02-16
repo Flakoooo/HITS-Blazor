@@ -1,10 +1,11 @@
-﻿using KristofferStrube.Blazor.Popper;
+﻿using HITSBlazor.Services.ActionMenus;
+using KristofferStrube.Blazor.Popper;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 
 namespace HITSBlazor.Components.ActionMenus.BaseActionMenu
 {
-    public abstract class BaseActionMenuLogic : ComponentBase, IDisposable
+    public abstract class BaseActionMenuComponent : ComponentBase, IDisposable
     {
         [Parameter]
         public Guid ItemId { get; set; }
@@ -15,17 +16,24 @@ namespace HITSBlazor.Components.ActionMenus.BaseActionMenu
         [Parameter]
         public EventCallback<TableActionContext> OnAction { get; set; }
 
+        [Parameter]
+        public Dictionary<MenuAction, object> ActionIds { get; set; } = [];
+
         [Inject]
         protected IJSRuntime JSRuntime { get; set; } = null!;
 
         [Inject]
         protected Popper PopperService { get; set; } = null!;
 
+        [Inject]
+        protected ActionMenuService MenuService { get; set; } = null!;
+
         protected ElementReference _containerRef;
         protected ElementReference _triggerRef;
         protected ElementReference _menuRef;
-        protected DotNetObjectReference<BaseActionMenuLogic>? _dotNetRef;
+        protected DotNetObjectReference<BaseActionMenuComponent>? _dotNetRef;
         protected Instance? _popperInstance;
+        protected string _menuId = Guid.NewGuid().ToString();
 
         protected static List<Modifier> InstanceModifiers { get; } =
         [
@@ -72,20 +80,26 @@ namespace HITSBlazor.Components.ActionMenus.BaseActionMenu
             if (IsOpen)
             {
                 await CreateOrUpdatePopper();
-                await RegisterClickOutside();
+
+                await MenuService.RegisterCurrentMenuAsync(
+                    _menuId,
+                    _triggerRef,
+                    _menuRef,
+                    _dotNetRef!);
             }
             else
             {
                 await DestroyPopper();
-                await UnregisterClickOutside();
+
+                await MenuService.UnregisterCurrentMenuAsync(_menuId, _dotNetRef!);
+                await MenuService.HideMenuAsync(_menuRef);
             }
         }
 
         protected async Task CreateOrUpdatePopper()
         {
             await DestroyPopper();
-
-            await JSRuntime.InvokeVoidAsync("menuDropdown.ensureMenuVisible", _menuRef);
+            await MenuService.EnsureMenuVisibleAsync(_menuRef);
 
             _popperInstance = await PopperService.CreatePopperAsync(
                 reference: _triggerRef,
@@ -99,10 +113,8 @@ namespace HITSBlazor.Components.ActionMenus.BaseActionMenu
             );
 
             await _popperInstance.Update();
-
             await Task.Delay(16);
-
-            await JSRuntime.InvokeVoidAsync("menuDropdown.startMenuAnimation", _menuRef);
+            await MenuService.StartMenuAnimationAsync(_menuRef);
         }
 
         protected async Task RegisterClickOutside()
@@ -153,17 +165,11 @@ namespace HITSBlazor.Components.ActionMenus.BaseActionMenu
         {
             IsOpen = !IsOpen;
 
-            if (IsOpen)
+            if (!IsOpen)
             {
-                await JSRuntime.InvokeVoidAsync("menuDropdown.closeOtherMenus", ItemId.ToString(), _dotNetRef);
-            }
-            else
-            {
-                await JSRuntime.InvokeVoidAsync("menuDropdown.hideMenu", _menuRef);
-
                 await DestroyPopper();
-
-                await InvokeAsync(StateHasChanged);
+                await MenuService.UnregisterCurrentMenuAsync(_menuId, _dotNetRef!);
+                await MenuService.HideMenuAsync(_menuRef);
             }
 
             await InvokeAsync(StateHasChanged);
@@ -175,10 +181,10 @@ namespace HITSBlazor.Components.ActionMenus.BaseActionMenu
             if (_isDisposed) return;
 
             IsOpen = false;
-
-            await JSRuntime.InvokeVoidAsync("menuDropdown.hideMenu", _menuRef);
-
             await DestroyPopper();
+
+            await MenuService.UnregisterCurrentMenuAsync(_menuId, _dotNetRef!);
+            await MenuService.HideMenuAsync(_menuRef);
 
             await InvokeAsync(StateHasChanged);
         }
@@ -213,9 +219,10 @@ namespace HITSBlazor.Components.ActionMenus.BaseActionMenu
         protected async Task HandleActionClick(MenuAction action, object item)
         {
             IsOpen = false;
-
-            await JSRuntime.InvokeVoidAsync("menuDropdown.hideMenu", _menuRef);
             await DestroyPopper();
+
+            await MenuService.UnregisterCurrentMenuAsync(_menuId, _dotNetRef!);
+            await MenuService.HideMenuAsync(_menuRef);
 
             await OnAction.InvokeAsync(new() { Action = action, Item = item });
         }
@@ -231,7 +238,8 @@ namespace HITSBlazor.Components.ActionMenus.BaseActionMenu
                 {
                     _ = _popperInstance.Destroy();
                 }
-                _ = UnregisterClickOutside();
+
+                _ = MenuService.UnregisterCurrentMenuAsync(_menuId, _dotNetRef!);
             }
             catch { }
 

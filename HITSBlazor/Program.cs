@@ -1,5 +1,6 @@
 using ApexCharts;
 using HITSBlazor.Services;
+using HITSBlazor.Services.ActionMenus;
 using HITSBlazor.Services.Auth;
 using HITSBlazor.Services.Companies;
 using HITSBlazor.Services.Ideas;
@@ -61,6 +62,7 @@ namespace HITSBlazor
             // Utils
             builder.Services.AddScoped<GlobalNotificationService>();
             builder.Services.AddScoped<ModalService>();
+            builder.Services.AddScoped<ActionMenuService>();
             builder.Services.AddScoped<NavigationService>();
 
             // Auth

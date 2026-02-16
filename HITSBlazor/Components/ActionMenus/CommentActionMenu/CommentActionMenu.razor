@@ -1,6 +1,6 @@
 ﻿@namespace HITSBlazor.Components.ActionsMenus.CommentActionMenu
 @using HITSBlazor.Components.ActionMenus.BaseActionMenu
-@inherits BaseActionMenuLogic
+@inherits BaseActionMenuComponent
 
 <div @ref="_containerRef">
     <button @ref="_triggerRef"
@@ -23,9 +23,4 @@
             }
         </ul>
     </div>
-</div> 
-
-@code {
-    [Parameter]
-    public Dictionary<MenuAction, object> ActionIds { get; set; } = [];
-}
+</div>
