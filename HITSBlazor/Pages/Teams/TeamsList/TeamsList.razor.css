@@ -7,11 +7,30 @@
     justify-content: flex-start;
 }
 
-.teams-header {
+.teams-table-lables {
+    position: sticky;
+    top: 0;
+    right: auto;
+    bottom: auto;
+    left: auto;
+    z-index: 1;
+}
+
+.teams-table-row-icon {
+    width: 24px;
+    min-width: 24px;
+    max-width: 24px;
+    height: 24px;
+    min-height: 24px;
+    max-height: 24px;
+    border-radius: 50%;
+    width: 100%;
+    cursor: pointer;
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
     align-items: center;
-    justify-content: space-between;
-    gap: 16px;
+    justify-content: center;
+    transition: all .2s ease-out;
 }
+

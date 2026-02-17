@@ -5,6 +5,7 @@ using Microsoft.JSInterop;
 
 namespace HITSBlazor.Components.ActionMenus.BaseActionMenu
 {
+    //TODO: Подумать над тем, чтобы убрать сервис, вероятно он излишен
     public abstract class BaseActionMenuComponent : ComponentBase, IDisposable
     {
         [Parameter]

@@ -1,4 +1,5 @@
 ﻿using HITSBlazor.Models.Common.Entities;
+using HITSBlazor.Models.Ideas.Entities;
 using HITSBlazor.Models.Teams.Entities;
 using HITSBlazor.Models.Teams.Enums;
 using HITSBlazor.Models.Users.Entities;
@@ -130,5 +131,7 @@ namespace HITSBlazor.Utils.Mocks.Teams
             => _teams.FirstOrDefault(t => t.Id == id);
 
         public static List<Team> GetAllTeams() => _teams;
+
+        public static bool DeleteTeam(Team team) => _teams.Remove(team);
     }
 }

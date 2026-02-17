@@ -1,14 +1,21 @@
 ﻿@namespace HITSBlazor.Pages.Teams.TeamsList
+@using HITSBlazor.Components.ActionMenus.BaseActionMenu
+@using HITSBlazor.Components.Inputs.SearchInput
+@using HITSBlazor.Components.Tables.TableActionMenu
+@using HITSBlazor.Components.Tables.TableBodyRow
+@using HITSBlazor.Components.Tables.TableHeader
 
 <div class="bg-white teams-list page-content-with-header">
     <div class="w-100 bg-white p-3">
-        <div class="teams-header w-100">
+        <div class="list-page-header w-100">
             <span class="fs-2 text-primary">
-                Список команд: TEAM_COUNT
+                Список команд: @_teams.Count
             </span>
             <div class="d-flex gap-3">
-                <!-- TODO: реализовать переход на создание команды -->
-                <button type="button" class="btn d-flex btn-primary">
+                <!-- TODO: кто то явно не может видеть сздание команд -->
+                <button type="button" 
+                        @onclick="@(() => NavigationService.NavigateToAsync("teams/create"))" 
+                        class="btn d-flex btn-primary">
                     <i class="bi bi-plus-lg fs-5"></i>
                     Создать команду
                 </button>
@@ -16,13 +23,91 @@
         </div>
         <div class="py-2 d-flex justify-content-between">
             <div class="w-50">
-                <div class="input-group">
-
-                </div>
+                <SearchInput ValueChanged="@((value) => SearchIdea(value))"/>
             </div>
         </div>
         <div class="w-100 d-flex">
+            <div class="w-100">
+                <table class="table table-hover mb-0">
+                    <!-- TODO: Посмотреть, возможно ли связка с существующим компонентом -->
+                    <!-- TODO: Реализовать сортировку по полям, bi-chevron-down переводить в bi-chevron-up, как то сделать анимацию нажатия -->
+                    <thead>
+                        <tr class="teams-table-lables">
+                            <th class="py-3 col fw-semibold text-secondary">
+                                <div class="justify-content-center align-items-center text-center d-flex">
+                                    Приватность
+                                    <i class="teams-table-row-icon ms-1 bi bi-chevron-down text-secondary"></i>
+                                </div>
+                            </th>
+                            <th class="py-3 col fw-semibold text-secondary col-3">
+                                <div class="d-flex">
+                                    Название
+                                    <i class="teams-table-row-icon ms-1 bi bi-chevron-down text-secondary"></i>
+                                </div>
+                            </th>
+                            <th class="py-3 col fw-semibold text-secondary">
+                                <div class="justify-content-center align-items-center text-center d-flex">
+                                    Статус
+                                    <i class="teams-table-row-icon ms-1 bi bi-chevron-down text-secondary"></i>
+                                </div>
+                            </th>
+                            <th class="py-3 col fw-semibold text-secondary">
+                                <div class="justify-content-center align-items-center text-center d-flex">
+                                    Участники
+                                    <i class="teams-table-row-icon ms-1 bi bi-chevron-down text-secondary"></i>
+                                </div>
+                            </th>
+                            <th class="py-3 col fw-semibold text-secondary">
+                                <div class="justify-content-center align-items-center text-center d-flex">
+                                    Дата создания
+                                    <i class="teams-table-row-icon ms-1 bi bi-chevron-down text-secondary"></i>
+                                </div>
+                            </th>
+                            <th></th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var team in _teams)
+                        {
+                            <!-- TODO: реализовать компонент для вывода состояния статуса, так как у них стиль одинаков -->
+                            <tr>
+                                <TableBodyRow IsCentered="true">
+                                    <div class="px-2 py-1 rounded-4 @(team.Closed ? "bg-danger-subtle text-danger" : "bg-success-subtle text-success")">
+                                        @(team.Closed ? "Закрыта" : "Открыта")
+                                    </div>
+                                </TableBodyRow>
+                                <TableBodyRow>
+                                    <div class="data-link" @onclick="@(() => ShowTeam(team.Id))">
+                                        @team.Name
+                                    </div>
+                                </TableBodyRow>
+                                <TableBodyRow IsCentered="true">
+                                    <div class="px-2 py-1 rounded-4 @(team.HasActiveProject ? "bg-warning-subtle text-warning" : "bg-primary-subtle text-primary")">
+                                        @(team.HasActiveProject ? "В работе" : "В поисках")
+                                    </div>
+                                </TableBodyRow>
+                                <TableBodyRow IsCentered="true">
+                                    @team.MembersCount
+                                </TableBodyRow>
+                                <TableBodyRow IsCentered="true">
+                                    @team.CreatedAt.ToString("dd.MM.yyyy")
+                                </TableBodyRow>
+                                <TableActionMenu ItemId="@team.Id"
+                                                 OnAction="OnTeamAction"
+                                                 ActionIds="@(new Dictionary<MenuAction, object> { 
+                                                    [MenuAction.View] = team.Id,
+                                                    [MenuAction.Edit] = team.Id,
+                                                    [MenuAction.Delete] = team
+                                                 })" />
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div class="list-page-filter w-25 bg-white p-2 ms-2 border-start">
 
+            </div>
         </div>
     </div>
 </div>
