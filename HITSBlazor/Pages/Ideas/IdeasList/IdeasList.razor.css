@@ -2,18 +2,3 @@
     overflow-y: scroll;
     align-items: stretch;
 }
-
-.idea-filter-choices {
-    max-height: 192px;
-    overflow-y: scroll;
-}
-
-.idea-filet-choice {
-    cursor: pointer;
-    display: flex;
-    flex-direction: row;
-    flex-wrap: nowrap;
-    align-items: center;
-    justify-content: space-between;
-    transition: background-color;
-}

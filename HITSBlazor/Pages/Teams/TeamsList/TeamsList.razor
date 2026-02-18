@@ -1,113 +1,250 @@
 ﻿@namespace HITSBlazor.Pages.Teams.TeamsList
 @using HITSBlazor.Components.ActionMenus.BaseActionMenu
 @using HITSBlazor.Components.Inputs.SearchInput
+@using HITSBlazor.Components.Placeholder
 @using HITSBlazor.Components.Tables.TableActionMenu
 @using HITSBlazor.Components.Tables.TableBodyRow
 @using HITSBlazor.Components.Tables.TableHeader
 
 <div class="bg-white teams-list page-content-with-header">
-    <div class="w-100 bg-white p-3">
-        <div class="list-page-header w-100">
-            <span class="fs-2 text-primary">
-                Список команд: @_teams.Count
-            </span>
-            <div class="d-flex gap-3">
-                <!-- TODO: кто то явно не может видеть сздание команд -->
-                <button type="button" 
-                        @onclick="@(() => NavigationService.NavigateToAsync("teams/create"))" 
-                        class="btn d-flex btn-primary">
-                    <i class="bi bi-plus-lg fs-5"></i>
-                    Создать команду
-                </button>
-            </div>
-        </div>
-        <div class="py-2 d-flex justify-content-between">
-            <div class="w-50">
-                <SearchInput ValueChanged="@((value) => SearchIdea(value))"/>
-            </div>
-        </div>
-        <div class="w-100 d-flex">
-            <div class="w-100">
-                <table class="table table-hover mb-0">
-                    <!-- TODO: Посмотреть, возможно ли связка с существующим компонентом -->
-                    <!-- TODO: Реализовать сортировку по полям, bi-chevron-down переводить в bi-chevron-up, как то сделать анимацию нажатия -->
-                    <thead>
-                        <tr class="teams-table-lables">
-                            <th class="py-3 col fw-semibold text-secondary">
-                                <div class="justify-content-center align-items-center text-center d-flex">
-                                    Приватность
-                                    <i class="teams-table-row-icon ms-1 bi bi-chevron-down text-secondary"></i>
-                                </div>
-                            </th>
-                            <th class="py-3 col fw-semibold text-secondary col-3">
-                                <div class="d-flex">
-                                    Название
-                                    <i class="teams-table-row-icon ms-1 bi bi-chevron-down text-secondary"></i>
-                                </div>
-                            </th>
-                            <th class="py-3 col fw-semibold text-secondary">
-                                <div class="justify-content-center align-items-center text-center d-flex">
-                                    Статус
-                                    <i class="teams-table-row-icon ms-1 bi bi-chevron-down text-secondary"></i>
-                                </div>
-                            </th>
-                            <th class="py-3 col fw-semibold text-secondary">
-                                <div class="justify-content-center align-items-center text-center d-flex">
-                                    Участники
-                                    <i class="teams-table-row-icon ms-1 bi bi-chevron-down text-secondary"></i>
-                                </div>
-                            </th>
-                            <th class="py-3 col fw-semibold text-secondary">
-                                <div class="justify-content-center align-items-center text-center d-flex">
-                                    Дата создания
-                                    <i class="teams-table-row-icon ms-1 bi bi-chevron-down text-secondary"></i>
-                                </div>
-                            </th>
-                            <th></th>
-                            <th></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var team in _teams)
+    @if (_isLoading)
+    {
+        <div class="w-100">
+            <table class="table mb-0">
+                <thead>
+                    <tr>
+                        @for (int i = 0; i < 6; ++i)
                         {
-                            <!-- TODO: реализовать компонент для вывода состояния статуса, так как у них стиль одинаков -->
-                            <tr>
-                                <TableBodyRow IsCentered="true">
-                                    <div class="px-2 py-1 rounded-4 @(team.Closed ? "bg-danger-subtle text-danger" : "bg-success-subtle text-success")">
-                                        @(team.Closed ? "Закрыта" : "Открыта")
-                                    </div>
-                                </TableBodyRow>
-                                <TableBodyRow>
-                                    <div class="data-link" @onclick="@(() => ShowTeam(team.Id))">
-                                        @team.Name
-                                    </div>
-                                </TableBodyRow>
-                                <TableBodyRow IsCentered="true">
-                                    <div class="px-2 py-1 rounded-4 @(team.HasActiveProject ? "bg-warning-subtle text-warning" : "bg-primary-subtle text-primary")">
-                                        @(team.HasActiveProject ? "В работе" : "В поисках")
-                                    </div>
-                                </TableBodyRow>
-                                <TableBodyRow IsCentered="true">
-                                    @team.MembersCount
-                                </TableBodyRow>
-                                <TableBodyRow IsCentered="true">
-                                    @team.CreatedAt.ToString("dd.MM.yyyy")
-                                </TableBodyRow>
-                                <TableActionMenu ItemId="@team.Id"
-                                                 OnAction="OnTeamAction"
-                                                 ActionIds="@(new Dictionary<MenuAction, object> { 
-                                                    [MenuAction.View] = team.Id,
-                                                    [MenuAction.Edit] = team.Id,
-                                                    [MenuAction.Delete] = team
-                                                 })" />
-                            </tr>
+                            <th>
+                                <Placeholder />
+                            </th>
                         }
-                    </tbody>
-                </table>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (int i = 0; i < 5; ++i)
+                    {
+                        <tr>
+                            <td style="height: 67px">
+                                <div class="h-100 d-flex align-items-center">
+                                    <Placeholder />
+                                </div>
+                            </td>
+                            @for (int j = 0; j < 5; ++j)
+                            {
+                                <td>
+                                    <div class="h-100 d-flex align-items-center">
+                                        <Placeholder Height="PlaceholderHeight.Small" />
+                                    </div>
+                                </td>                        
+                            }
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <div class="w-100 bg-white p-3">
+            <div class="list-page-header w-100">
+                <span class="fs-2 text-primary">
+                    Список команд: @_teams.Count
+                </span>
+                <div class="d-flex gap-3">
+                    <!-- TODO: кто то явно не может видеть сздание команд -->
+                    <button type="button" 
+                            @onclick="@(() => NavigationService.NavigateToAsync("teams/create"))" 
+                            class="btn d-flex btn-primary">
+                        <i class="bi bi-plus-lg fs-5"></i>
+                        Создать команду
+                    </button>
+                </div>
             </div>
-            <div class="list-page-filter w-25 bg-white p-2 ms-2 border-start">
-
+            <div class="py-2 d-flex justify-content-between">
+                <div class="w-50">
+                    <SearchInput ValueChanged="@((value) => SearchTeam(value))"/>
+                </div>
+            </div>
+            <div class="w-100 d-flex">
+                <div class="w-100">
+                    <table class="table table-hover mb-0">
+                        <!-- TODO: Посмотреть, возможно ли связка с существующим компонентом -->
+                        <!-- TODO: Реализовать сортировку по полям, bi-chevron-down переводить в bi-chevron-up, как то сделать анимацию нажатия -->
+                        <thead>
+                            <tr class="teams-table-lables">
+                                <th class="py-3 col fw-semibold text-secondary">
+                                    <div class="justify-content-center align-items-center text-center d-flex">
+                                        Приватность
+                                        <i class="teams-table-row-icon ms-1 bi bi-chevron-down text-secondary"></i>
+                                    </div>
+                                </th>
+                                <th class="py-3 col fw-semibold text-secondary col-3">
+                                    <div class="d-flex">
+                                        Название
+                                        <i class="teams-table-row-icon ms-1 bi bi-chevron-down text-secondary"></i>
+                                    </div>
+                                </th>
+                                <th class="py-3 col fw-semibold text-secondary">
+                                    <div class="justify-content-center align-items-center text-center d-flex">
+                                        Статус
+                                        <i class="teams-table-row-icon ms-1 bi bi-chevron-down text-secondary"></i>
+                                    </div>
+                                </th>
+                                <th class="py-3 col fw-semibold text-secondary">
+                                    <div class="justify-content-center align-items-center text-center d-flex">
+                                        Участники
+                                        <i class="teams-table-row-icon ms-1 bi bi-chevron-down text-secondary"></i>
+                                    </div>
+                                </th>
+                                <th class="py-3 col fw-semibold text-secondary">
+                                    <div class="justify-content-center align-items-center text-center d-flex">
+                                        Дата создания
+                                        <i class="teams-table-row-icon ms-1 bi bi-chevron-down text-secondary"></i>
+                                    </div>
+                                </th>
+                                <th></th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var team in _teams)
+                            {
+                                <!-- TODO: реализовать компонент для вывода состояния статуса, так как у них стиль одинаков -->
+                                <tr>
+                                    <TableBodyRow IsCentered="true">
+                                        <div class="px-2 py-1 rounded-4 @(team.Closed ? "bg-danger-subtle text-danger" : "bg-success-subtle text-success")">
+                                            @(team.Closed ? "Закрыта" : "Открыта")
+                                        </div>
+                                    </TableBodyRow>
+                                    <TableBodyRow>
+                                        <div class="data-link" @onclick="@(() => ShowTeam(team.Id))">
+                                            @team.Name
+                                        </div>
+                                    </TableBodyRow>
+                                    <TableBodyRow IsCentered="true">
+                                        <div class="px-2 py-1 rounded-4 @(team.HasActiveProject ? "bg-warning-subtle text-warning" : "bg-primary-subtle text-primary")">
+                                            @(team.HasActiveProject ? "В работе" : "В поисках")
+                                        </div>
+                                    </TableBodyRow>
+                                    <TableBodyRow IsCentered="true">
+                                        @team.MembersCount
+                                    </TableBodyRow>
+                                    <TableBodyRow IsCentered="true">
+                                        @team.CreatedAt.ToString("dd.MM.yyyy")
+                                    </TableBodyRow>
+                                    <TableActionMenu ItemId="@team.Id"
+                                                     OnAction="OnTeamAction"
+                                                     ActionIds="@(new Dictionary<MenuAction, object> { 
+                                                        [MenuAction.View] = team.Id,
+                                                        [MenuAction.Edit] = team.Id,
+                                                        [MenuAction.Delete] = team
+                                                     })" />
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+                <div class="list-page-filter w-25 bg-white p-2 ms-2 border-start">
+                    <div class="w-100">
+                        <span class="fs-6 fw-semibold">Приватность</span>
+                        <div class="list-page-filter-choices">
+                            <div class="list-page-filter-choice px-2 py-1 rounded-1">
+                                <div class="d-flex">
+                                    <input type="radio" name="Приватность" class="form-check-input" value="false" />
+                                    <span class="form-check-label ms-2">Открытая команда</span>
+                                </div>
+                            </div>
+                            <div class="list-page-filter-choice px-2 py-1 rounded-1">
+                                <div class="d-flex">
+                                    <input type="radio" name="Приватность" class="form-check-input" value="true" />
+                                    <span class="form-check-label ms-2">Закрытая команда</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="w-100">
+                        <span class="fs-6 fw-semibold">Опросы</span>
+                        <div class="list-page-filter-choices">
+                            <div class="list-page-filter-choice px-2 py-1 rounded-1">
+                                <div class="d-flex">
+                                    <input type="radio" name="Опросы" class="form-check-input" value="false" />
+                                    <span class="form-check-label ms-2">Опрос не пройден</span>
+                                </div>
+                            </div>
+                            <div class="list-page-filter-choice px-2 py-1 rounded-1">
+                                <div class="d-flex">
+                                    <input type="radio" name="Опросы" class="form-check-input" value="true" />
+                                    <span class="form-check-label ms-2">Опрос пройден</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="w-100">
+                        <span class="fs-6 fw-semibold">Статус</span>
+                        <div class="list-page-filter-choices">
+                            <div class="list-page-filter-choice px-2 py-1 rounded-1">
+                                <div class="d-flex">
+                                    <input type="radio" name="Статус" class="form-check-input" value="false" />
+                                    <span class="form-check-label ms-2">В поисках</span>
+                                </div>
+                            </div>
+                            <div class="list-page-filter-choice px-2 py-1 rounded-1">
+                                <div class="d-flex">
+                                    <input type="radio" name="Статус" class="form-check-input" value="true" />
+                                    <span class="form-check-label ms-2">В работе</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="w-100">
+                        <span class="fs-6 fw-semibold">Компетенции</span>
+                        <div class="list-page-filter-choices">
+                            <div class="list-page-filter-choice px-2 py-1 rounded-1">
+                                <div class="d-flex">
+                                    <input type="radio" name="Компетенции" class="form-check-input" value="false" />
+                                    <span class="form-check-label ms-2">Искать везде</span>
+                                </div>
+                            </div>
+                            <div class="list-page-filter-choice px-2 py-1 rounded-1">
+                                <div class="d-flex">
+                                    <input type="radio" name="Компетенции" class="form-check-input" value="true" />
+                                    <span class="form-check-label ms-2">Искать по вакансиям</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="w-100">
+                        <span class="fs-6 fw-semibold">Стек технологий</span>
+                        <div class="w-100">
+                            <div class="input-group">
+                                <input type="text" placeholder="Найти" class="form-control my-1 rounded-end" />
+                            </div>
+                        </div>
+                        <div class="list-page-filter-choices">
+                            @foreach (var skill in _skills)
+                            {
+                                <div class="list-page-filter-choice px-2 py-1 rounded-1">
+                                    <div class="d-flex">
+                                        <input class="form-check-input" type="checkbox" name="Стек технологий" value="@skill.Name" />
+                                        <span class="form-check-label ms-2">@skill.Name</span>
+                                    </div>
+                                    @if (_userSkills.Contains(skill))
+                                    {
+                                        <i class="icon bi bi-star-fill text-warning"></i>
+                                    }
+                                </div>
+                            }
+                        </div>
+                    </div>
+                    <div class="w-100 d-flex justify-content-center">
+                        <button type="button" class="btn d-flex btn-danger">
+                            <i class="icon bi bi-x-lg fs-5"></i>
+                            Сбросить фильтры
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
+    }
 </div>

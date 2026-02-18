@@ -1,33 +1,40 @@
 ﻿using HITSBlazor.Models.Common.Entities;
 using HITSBlazor.Models.Common.Enums;
-using HITSBlazor.Utils;
 using HITSBlazor.Utils.Mocks.Common;
 
 namespace HITSBlazor.Services.Skills
 {
     public class MockSkillService : ISkillService
     {
-        private List<Skill> _skills = [];
+        private List<Skill> _cachedSkills = [];
+        private DateTime _lastRefreshTime;
+        private readonly TimeSpan _cacheLifetime = TimeSpan.FromMinutes(5);
 
-        public async Task<ServiceResponse<List<Skill>>> GetSkillsAsync()
+        private async Task RefreshCacheAsync()
         {
-            _skills = MockSkills.GetAllSkills();
+            _cachedSkills = MockSkills.GetAllSkills();
+            _lastRefreshTime = DateTime.UtcNow;
+        }
 
-            return ServiceResponse<List<Skill>>.Success(_skills);
+        public async Task<List<Skill>> GetSkillsAsync(
+            string? searchText = null
+        )
+        {
+            if (_cachedSkills.Count == 0 || DateTime.UtcNow - _lastRefreshTime > _cacheLifetime)
+                await RefreshCacheAsync();
+
+            var query = _cachedSkills.AsEnumerable();
+
+            if (!string.IsNullOrWhiteSpace(searchText))
+                query = query.Where(i => i.Name.Contains(searchText, StringComparison.CurrentCultureIgnoreCase));
+
+            return [.. query];
         }
 
         public async Task<List<Skill>> GetSkillsByTypeAsync(SkillType skillType)
-        {
-            if (_skills.Count == 0) await GetSkillsAsync();
-
-            return [.. _skills.Where(s => s.Type == skillType)];
-        }
+            => [.. _cachedSkills.Where(s => s.Type == skillType)];
 
         public async Task<List<Skill>> GetSkillByTypeAndByNameAsync(SkillType skillType, string name)
-        {
-            if (_skills.Count == 0) await GetSkillsAsync();
-
-            return [.. _skills.Where(s => s.Type == skillType && s.Name.Contains(name, StringComparison.CurrentCultureIgnoreCase))]; ;
-        }
+            => [.. _cachedSkills.Where(s => s.Type == skillType && s.Name.Contains(name, StringComparison.CurrentCultureIgnoreCase))];
     }
 }
