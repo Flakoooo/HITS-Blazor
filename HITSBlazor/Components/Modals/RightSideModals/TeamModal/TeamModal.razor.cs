@@ -31,14 +31,14 @@ namespace HITSBlazor.Components.Modals.RightSideModals.TeamModal
         private TeamTableCategory _activeTableCategory = TeamTableCategory.Members;
         private TeamInfoCategory _activeInfoCategory = TeamInfoCategory.Info;
 
-        private static IReadOnlyList<TableHeaderItem> MembersTableHeader { get; } =
+        private static List<TableHeaderItem> MembersTableHeader { get; } =
         [
             new() { Text = "Почта", ColumnClass = "col-5" },
             new() { Text = "Имя", ColumnClass = "col-3" },
             new() { Text = "Фамилия", ColumnClass = "col-3" }
         ];
 
-        private static IReadOnlyList<TableHeaderItem> NewMembersTableHeader { get; } =
+        private static List<TableHeaderItem> NewMembersTableHeader { get; } =
         [
             new() { Text = "Статус", InCentered = true, ColumnClass = "col-1" },
             new() { Text = "Почта", InCentered = true, ColumnClass = "col-3" },
@@ -46,12 +46,12 @@ namespace HITSBlazor.Components.Modals.RightSideModals.TeamModal
             new() { Text = "Фамилия", InCentered = true, ColumnClass = "col-3" }
         ];
 
-        private static IReadOnlyList<TableHeaderItem> RequestsToIdeasTableHeader { get; } =
+        private static List<TableHeaderItem> RequestsToIdeasTableHeader { get; } =
         [
             new() { Text = "Название", ColumnClass = "col-7" },
             new() { Text = "Статус", InCentered = true, ColumnClass = "col-4" }
         ];
-        private static IReadOnlyList<TableHeaderItem> InvitationsToIdeasTableHeader { get; } =
+        private static List<TableHeaderItem> InvitationsToIdeasTableHeader { get; } =
         [
             new() { Text = "Статус",InCentered = true },
             new() { Text = "Название", ColumnClass = "col-5" },

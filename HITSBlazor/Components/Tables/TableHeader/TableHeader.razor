@@ -7,6 +7,10 @@
             <th class="py-3 col fw-semibold text-secondary @item.ColumnClass">
                 <div class="@GetItemClass(item.InCentered) d-flex">
                     @item.Text
+                    @if (!string.IsNullOrWhiteSpace(item.OrderBy))
+                    {
+                        <i @onclick="@(() => SetOrderState(item))" class="teams-table-row-icon ms-1 bi @GetSortIcon(item) text-secondary"></i>
+                    }
                 </div>
             </th>
         }

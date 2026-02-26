@@ -1,4 +1,5 @@
 ﻿using HITSBlazor.Components.ActionMenus.BaseActionMenu;
+using HITSBlazor.Components.Tables.TableHeader;
 using HITSBlazor.Models.Common.Entities;
 using HITSBlazor.Models.Teams.Entities;
 using HITSBlazor.Services;
@@ -38,13 +39,29 @@ namespace HITSBlazor.Pages.Teams.TeamsList
         [Parameter]
         public Guid? TeamId { get; set; }
 
+        private static List<TableHeaderItem> TeamTableHeader { get; } =
+        [
+            new() { Text = "Приватность",   InCentered = true,  OrderBy = nameof(Team.Closed)           },
+            new() { Text = "Название",  ColumnClass = "col-3",  OrderBy = nameof(Team.Name)             },
+            new() { Text = "Статус",        InCentered = true,  OrderBy = nameof(Team.HasActiveProject) },
+            new() { Text = "Участники",     InCentered = true,  OrderBy = nameof(Team.MembersCount)     },
+            new() { Text = "Дата создания", InCentered = true,  OrderBy = nameof(Team.CreatedAt)        }
+        ];
+
         private bool _isLoading = true;
 
         private List<Team> _teams = [];
         private List<Skill> _skills = [];
-        private List<Skill> _userSkills = [];
+        private HashSet<Guid> _userSkillIds = [];
+        private HashSet<Guid> _selectedSkillIds = [];
 
         private string? _searchTeamText = null;
+        private string? _orderTeamBy = null;
+        private bool? _sortTeamState = null;
+        private bool? _privacyState = null;
+        private bool? _surveyState = null;
+        private bool? _hasActiveProjectState = null;
+        private bool? _skillsState = null;
         private string? _searchSkillText = null;
 
         protected override async Task OnInitializedAsync()
@@ -52,9 +69,10 @@ namespace HITSBlazor.Pages.Teams.TeamsList
             _isLoading = true;
 
             await LoadTeamsAsync();
-            await LoadSkillsAsync();
             if (AuthService.CurrentUser is not null)
-                _userSkills = await UserSkillService.GetUserSkillsAsync(AuthService.CurrentUser.Id);
+                _userSkillIds = [.. (await UserSkillService.GetUserSkillsAsync(AuthService.CurrentUser.Id)).Select(s => s.Id)];
+
+            await LoadSkillsAsync();
 
             _isLoading = false;
         }
@@ -67,17 +85,26 @@ namespace HITSBlazor.Pages.Teams.TeamsList
 
         private async Task LoadTeamsAsync()
         {
-            _teams = await TeamService.GetTeamsAsync(
-                searchText: _searchTeamText
+            var filter = new TeamsFilter(
+                SearchText: _searchTeamText,
+                Privacy: _privacyState,
+                Survey: _surveyState,
+                HasActiveProject: _hasActiveProjectState,
+                SearchSkillIds: _selectedSkillIds,
+                OrderBy: _orderTeamBy,
+                ByDescending: _sortTeamState
             );
+            _teams = await TeamService.GetTeamsAsync(filter);
             StateHasChanged();
         }
 
         private async Task LoadSkillsAsync()
         {
-            _skills = await SkillService.GetSkillsAsync(
-                searchText: _searchSkillText
-            );
+            _skills = await SkillService.GetSkillsAsync(searchText: _searchSkillText);
+
+            _skills = [.. _skills
+                .OrderByDescending(s => _userSkillIds.Contains(s.Id))
+                .ThenBy(s => s.Name)];
             StateHasChanged();
         }
 
@@ -87,13 +114,41 @@ namespace HITSBlazor.Pages.Teams.TeamsList
             await LoadTeamsAsync();
         }
 
-        private async Task SearchSkill(string value)
+        private async Task SearchSkill(ChangeEventArgs e)
         {
-            _searchSkillText = value;
+            _searchSkillText = e.Value?.ToString();
             await LoadSkillsAsync();
         }
 
+        private async Task SelectedSkillsChanged(Guid skillId, bool isChecked)
+        {
+            if (isChecked) _selectedSkillIds.Add(skillId);
+            else           _selectedSkillIds.Remove(skillId);
+
+            await LoadTeamsAsync();
+        }
+
+        private async Task SortTeam(string? value, bool? state)
+        {
+            _orderTeamBy = value;
+            _sortTeamState = state;
+            await LoadTeamsAsync();
+        }
+
         private void ShowTeam(Guid teamId) => ModalService.ShowTeamModal(teamId);
+
+        private async Task ResetFilters()
+        {
+            _sortTeamState = null;
+            _privacyState = null;
+            _surveyState = null;
+            _hasActiveProjectState = null;
+            _skillsState = null;
+            _searchSkillText = null;
+            _selectedSkillIds = [];
+
+            await LoadTeamsAsync();
+        }
 
         private async Task OnTeamAction(TableActionContext context)
         {

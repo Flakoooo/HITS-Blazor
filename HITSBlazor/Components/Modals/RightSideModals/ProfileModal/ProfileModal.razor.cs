@@ -66,7 +66,7 @@ namespace HITSBlazor.Components.Modals.RightSideModals.ProfileModal
         private HashSet<Skill> SelectedDatabaseSkills { get; set; } = [];
         private HashSet<Skill> SelectedDevopsSkills { get; set; } = [];
 
-        private static IReadOnlyList<TableHeaderItem> HeaderItems { get; } =
+        private static List<TableHeaderItem> HeaderItems { get; } =
         [
             new TableHeaderItem { Text = "Команда"                              },
             new TableHeaderItem { Text = "Дата вступления", InCentered = true   },

@@ -2,7 +2,7 @@
 
 namespace HITSBlazor.Models.Common.Entities
 {
-    public class Skill
+    public class Skill : IEquatable<Skill>
     {
         public Guid Id { get; set; }
         public string Name { get; set; } = string.Empty;
@@ -11,5 +11,11 @@ namespace HITSBlazor.Models.Common.Entities
         public Guid? CreatorId { get; set; }
         public Guid? UpdaterId { get; set; }
         public Guid? DeleterId { get; set; }
+
+        public bool Equals(Skill? other) => other is not null && Id.Equals(other.Id);
+
+        public override bool Equals(object? obj) => Equals(obj as Skill);
+
+        public override int GetHashCode() => Id.GetHashCode();
     }
 }

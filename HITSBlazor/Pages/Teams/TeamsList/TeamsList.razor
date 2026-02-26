@@ -1,6 +1,7 @@
 ﻿@namespace HITSBlazor.Pages.Teams.TeamsList
 @using HITSBlazor.Components.ActionMenus.BaseActionMenu
 @using HITSBlazor.Components.Inputs.SearchInput
+@using HITSBlazor.Components.Inputs.TeamRadioFilter
 @using HITSBlazor.Components.Placeholder
 @using HITSBlazor.Components.Tables.TableActionMenu
 @using HITSBlazor.Components.Tables.TableBodyRow
@@ -69,44 +70,7 @@
             <div class="w-100 d-flex">
                 <div class="w-100">
                     <table class="table table-hover mb-0">
-                        <!-- TODO: Посмотреть, возможно ли связка с существующим компонентом -->
-                        <!-- TODO: Реализовать сортировку по полям, bi-chevron-down переводить в bi-chevron-up, как то сделать анимацию нажатия -->
-                        <thead>
-                            <tr class="teams-table-lables">
-                                <th class="py-3 col fw-semibold text-secondary">
-                                    <div class="justify-content-center align-items-center text-center d-flex">
-                                        Приватность
-                                        <i class="teams-table-row-icon ms-1 bi bi-chevron-down text-secondary"></i>
-                                    </div>
-                                </th>
-                                <th class="py-3 col fw-semibold text-secondary col-3">
-                                    <div class="d-flex">
-                                        Название
-                                        <i class="teams-table-row-icon ms-1 bi bi-chevron-down text-secondary"></i>
-                                    </div>
-                                </th>
-                                <th class="py-3 col fw-semibold text-secondary">
-                                    <div class="justify-content-center align-items-center text-center d-flex">
-                                        Статус
-                                        <i class="teams-table-row-icon ms-1 bi bi-chevron-down text-secondary"></i>
-                                    </div>
-                                </th>
-                                <th class="py-3 col fw-semibold text-secondary">
-                                    <div class="justify-content-center align-items-center text-center d-flex">
-                                        Участники
-                                        <i class="teams-table-row-icon ms-1 bi bi-chevron-down text-secondary"></i>
-                                    </div>
-                                </th>
-                                <th class="py-3 col fw-semibold text-secondary">
-                                    <div class="justify-content-center align-items-center text-center d-flex">
-                                        Дата создания
-                                        <i class="teams-table-row-icon ms-1 bi bi-chevron-down text-secondary"></i>
-                                    </div>
-                                </th>
-                                <th></th>
-                                <th></th>
-                            </tr>
-                        </thead>
+                        <TableHeader TableActionMenuIsEnable="true" Items="TeamTableHeader" OrderChanged="@((value) => SortTeam(value.Item1, value.Item2))" />
                         <tbody>
                             @foreach (var team in _teams)
                             {
@@ -146,79 +110,38 @@
                     </table>
                 </div>
                 <div class="list-page-filter w-25 bg-white p-2 ms-2 border-start">
-                    <div class="w-100">
-                        <span class="fs-6 fw-semibold">Приватность</span>
-                        <div class="list-page-filter-choices">
-                            <div class="list-page-filter-choice px-2 py-1 rounded-1">
-                                <div class="d-flex">
-                                    <input type="radio" name="Приватность" class="form-check-input" value="false" />
-                                    <span class="form-check-label ms-2">Открытая команда</span>
-                                </div>
-                            </div>
-                            <div class="list-page-filter-choice px-2 py-1 rounded-1">
-                                <div class="d-flex">
-                                    <input type="radio" name="Приватность" class="form-check-input" value="true" />
-                                    <span class="form-check-label ms-2">Закрытая команда</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="w-100">
-                        <span class="fs-6 fw-semibold">Опросы</span>
-                        <div class="list-page-filter-choices">
-                            <div class="list-page-filter-choice px-2 py-1 rounded-1">
-                                <div class="d-flex">
-                                    <input type="radio" name="Опросы" class="form-check-input" value="false" />
-                                    <span class="form-check-label ms-2">Опрос не пройден</span>
-                                </div>
-                            </div>
-                            <div class="list-page-filter-choice px-2 py-1 rounded-1">
-                                <div class="d-flex">
-                                    <input type="radio" name="Опросы" class="form-check-input" value="true" />
-                                    <span class="form-check-label ms-2">Опрос пройден</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="w-100">
-                        <span class="fs-6 fw-semibold">Статус</span>
-                        <div class="list-page-filter-choices">
-                            <div class="list-page-filter-choice px-2 py-1 rounded-1">
-                                <div class="d-flex">
-                                    <input type="radio" name="Статус" class="form-check-input" value="false" />
-                                    <span class="form-check-label ms-2">В поисках</span>
-                                </div>
-                            </div>
-                            <div class="list-page-filter-choice px-2 py-1 rounded-1">
-                                <div class="d-flex">
-                                    <input type="radio" name="Статус" class="form-check-input" value="true" />
-                                    <span class="form-check-label ms-2">В работе</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="w-100">
-                        <span class="fs-6 fw-semibold">Компетенции</span>
-                        <div class="list-page-filter-choices">
-                            <div class="list-page-filter-choice px-2 py-1 rounded-1">
-                                <div class="d-flex">
-                                    <input type="radio" name="Компетенции" class="form-check-input" value="false" />
-                                    <span class="form-check-label ms-2">Искать везде</span>
-                                </div>
-                            </div>
-                            <div class="list-page-filter-choice px-2 py-1 rounded-1">
-                                <div class="d-flex">
-                                    <input type="radio" name="Компетенции" class="form-check-input" value="true" />
-                                    <span class="form-check-label ms-2">Искать по вакансиям</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    <TeamRadioFilter 
+                        Label="Приватность"
+                        Value1Text="Открытая команда"
+                        Value2Text="Закрытая команда"
+                        @bind-Value="_privacyState"
+                        OnFilterChanged="@LoadTeamsAsync" />
+
+                    <TeamRadioFilter 
+                        Label="Опросы"
+                        Value1Text="Опрос не пройден"
+                        Value2Text="Опрос пройден"
+                        @bind-Value="_surveyState"
+                        OnFilterChanged="@LoadTeamsAsync" />
+
+                    <TeamRadioFilter 
+                        Label="Статус"
+                        Value1Text="В поисках"
+                        Value2Text="В работе"
+                        @bind-Value="_hasActiveProjectState"
+                        OnFilterChanged="@LoadTeamsAsync" />
+
+                    <TeamRadioFilter 
+                        Label="Компетенции"
+                        Value1Text="Искать везде"
+                        Value2Text="Искать по вакансиям"
+                        @bind-Value="_skillsState"
+                        OnFilterChanged="@LoadTeamsAsync" />
                     <div class="w-100">
                         <span class="fs-6 fw-semibold">Стек технологий</span>
                         <div class="w-100">
                             <div class="input-group">
-                                <input type="text" placeholder="Найти" class="form-control my-1 rounded-end" />
+                                <input @oninput="SearchSkill" type="text" placeholder="Найти" class="form-control my-1 rounded-end" />
                             </div>
                         </div>
                         <div class="list-page-filter-choices">
@@ -226,10 +149,15 @@
                             {
                                 <div class="list-page-filter-choice px-2 py-1 rounded-1">
                                     <div class="d-flex">
-                                        <input class="form-check-input" type="checkbox" name="Стек технологий" value="@skill.Name" />
+                                        <input type="checkbox" 
+                                               checked="@_selectedSkillIds.Contains(skill.Id)"
+                                               @onchange="@(e => SelectedSkillsChanged(skill.Id, (bool)e.Value!))"
+                                               name="Стек технологий" 
+                                               value="@skill.Name"
+                                               class="form-check-input" />
                                         <span class="form-check-label ms-2">@skill.Name</span>
                                     </div>
-                                    @if (_userSkills.Contains(skill))
+                                    @if (_userSkillIds.Contains(skill.Id))
                                     {
                                         <i class="icon bi bi-star-fill text-warning"></i>
                                     }
@@ -238,7 +166,7 @@
                         </div>
                     </div>
                     <div class="w-100 d-flex justify-content-center">
-                        <button type="button" class="btn d-flex btn-danger">
+                        <button type="button" @onclick="@ResetFilters" class="btn d-flex btn-danger">
                             <i class="icon bi bi-x-lg fs-5"></i>
                             Сбросить фильтры
                         </button>

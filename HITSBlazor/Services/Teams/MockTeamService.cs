@@ -1,6 +1,5 @@
-﻿using HITSBlazor.Models.Ideas.Entities;
+﻿using HITSBlazor.Models.Common.Entities;
 using HITSBlazor.Models.Teams.Entities;
-using HITSBlazor.Utils.Mocks.Ideas;
 using HITSBlazor.Utils.Mocks.Teams;
 
 namespace HITSBlazor.Services.Teams
@@ -19,17 +18,45 @@ namespace HITSBlazor.Services.Teams
             _lastRefreshTime = DateTime.UtcNow;
         }
 
-        public async Task<List<Team>> GetTeamsAsync(
-            string? searchText = null
-        )
+        public async Task<List<Team>> GetTeamsAsync(TeamsFilter filter)
         {
             if (_cachedTeams.Count == 0 || DateTime.UtcNow - _lastRefreshTime > _cacheLifetime)
                 await RefreshCacheAsync();
 
             var query = _cachedTeams.AsEnumerable();
 
-            if (!string.IsNullOrWhiteSpace(searchText))
-                query = query.Where(i => i.Name.Contains(searchText, StringComparison.CurrentCultureIgnoreCase));
+            if (!string.IsNullOrWhiteSpace(filter.SearchText))
+                query = query.Where(t => t.Name.Contains(filter.SearchText, StringComparison.CurrentCultureIgnoreCase));
+
+            if (filter.Privacy.HasValue)
+                query = query.Where(t => t.Closed == filter.Privacy);
+            
+            if (filter.Survey.HasValue)
+                query = query.Where(t => t.StatusQuest == filter.Survey);
+            
+            if (filter.HasActiveProject.HasValue)
+                query = query.Where(t => t.HasActiveProject == filter.HasActiveProject);
+            
+            if (filter.SearchSkillIds?.Count > 0)
+                query = query.Where(t => t.Skills.Any(s => filter.SearchSkillIds.Contains(s.Id)));
+
+            if (!string.IsNullOrWhiteSpace(filter.OrderBy) && filter.ByDescending.HasValue)
+            {
+                query = (filter.OrderBy, filter.ByDescending.Value) switch
+                {
+                    (nameof(Team.Closed), true) => query.OrderByDescending(t => t.Closed),
+                    (nameof(Team.Closed), false) => query.OrderBy(t => t.Closed),
+                    (nameof(Team.Name), true) => query.OrderByDescending(t => t.Name),
+                    (nameof(Team.Name), false) => query.OrderBy(t => t.Name),
+                    (nameof(Team.HasActiveProject), true) => query.OrderByDescending(t => t.HasActiveProject),
+                    (nameof(Team.HasActiveProject), false) => query.OrderBy(t => t.HasActiveProject),
+                    (nameof(Team.MembersCount), true) => query.OrderByDescending(t => t.MembersCount),
+                    (nameof(Team.MembersCount), false) => query.OrderBy(t => t.MembersCount),
+                    (nameof(Team.CreatedAt), true) => query.OrderByDescending(t => t.CreatedAt),
+                    (nameof(Team.CreatedAt), false) => query.OrderBy(t => t.CreatedAt),
+                    _ => query
+                };
+            }
 
             return [.. query];
         }
@@ -41,7 +68,7 @@ namespace HITSBlazor.Services.Teams
         {
             if (!MockTeams.DeleteTeam(team))
             {
-                _globalNotificationService.ShowError("Не удалось удалить идею");
+                _globalNotificationService.ShowError("Не удалось удалить команду");
                 return false;
             }
 

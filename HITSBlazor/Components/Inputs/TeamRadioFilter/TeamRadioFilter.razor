@@ -1,0 +1,56 @@
+﻿@namespace HITSBlazor.Components.Inputs.TeamRadioFilter
+
+<div class="w-100">
+    <span class="fs-6 fw-semibold">@Label</span>
+    <div class="list-page-filter-choices">
+        <div class="list-page-filter-choice px-2 py-1 rounded-1">
+            <div @onclick="() => TogglePrivacy(false)" class="d-flex">
+                <input type="radio" 
+                       name="@Label"
+                       checked="@CheckState(false)"
+                       class="form-check-input" />
+                <span class="form-check-label ms-2">@Value1Text</span>
+            </div>
+        </div>
+        <div class="list-page-filter-choice px-2 py-1 rounded-1">
+            <div class="d-flex" @onclick="() => TogglePrivacy(true)">
+                <input type="radio"
+                       name="@Label"
+                       checked="@CheckState(true)"
+                       class="form-check-input" />
+                <span class="form-check-label ms-2">@Value2Text</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public bool? Value { get; set; }
+
+    [Parameter]
+    public string Label { get; set; } = string.Empty;
+
+    [Parameter]
+    public string Value1Text { get; set; } = string.Empty;
+
+    [Parameter]
+    public string Value2Text { get; set; } = string.Empty;
+
+    [Parameter]
+    public EventCallback<bool?> ValueChanged { get; set; }
+
+    [Parameter]
+    public EventCallback OnFilterChanged { get; set; }
+
+    private bool CheckState(bool state) => Value == state;
+
+    private async Task TogglePrivacy(bool value)
+    {
+        Value = Value == value ? null : value;
+
+        await ValueChanged.InvokeAsync(Value);
+        await OnFilterChanged.InvokeAsync();
+        StateHasChanged();
+    }
+}
