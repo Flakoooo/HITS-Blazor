@@ -1,5 +1,4 @@
 ﻿using HITSBlazor.Components.LeftSideNavigation;
-using HITSBlazor.Components.Modals.CenterModals.SelectActiveRoleModal;
 using HITSBlazor.Models.Users.Enums;
 using HITSBlazor.Services.Auth;
 using HITSBlazor.Services.Markets;
@@ -10,6 +9,7 @@ using Microsoft.AspNetCore.Components.Routing;
 
 namespace HITSBlazor.Services
 {
+    //TODO: думаю URL страниц как то унифицировать, рпвильное ли вообще слово?
     public class NavigationService
     {
         private readonly NavigationManager _navigationManager;
@@ -149,7 +149,7 @@ namespace HITSBlazor.Services
 
             var userRole = (RoleType) role;
 
-            var ideasRoles = new List<RoleType>
+            var ideasRoles = new HashSet<RoleType>
             {
                 RoleType.Initiator,
                 RoleType.Member,
@@ -173,23 +173,19 @@ namespace HITSBlazor.Services
                             Id = 0,
                             Icon = "bi-list",
                             Title = "Список идей",
-                            AllowedRoles = ideasRoles,
                             Url = "/list"
                         }
                     ],
-                    AllowedRoles = ideasRoles,
                     BaseUrl = "ideas"
                 };
 
-                var createIdeaRoles = new List<RoleType> { RoleType.Initiator, RoleType.Admin };
-                if (createIdeaRoles.Contains(userRole))
+                if (userRole == RoleType.Initiator || userRole == RoleType.Admin)
                 {
                     var subNav = new NavigationSubItem
                     {
                         Id = nav.SubItems.Count,
                         Icon = "bi-plus-lg",
                         Title = "Создать идею",
-                        AllowedRoles = createIdeaRoles,
                         Url = "/create"
                     };
 
@@ -199,7 +195,7 @@ namespace HITSBlazor.Services
                 menuItems.Add(nav);
             }
 
-            var teamRoles = new List<RoleType>
+            var teamRoles = new HashSet<RoleType>
             {
                 RoleType.Initiator,
                 RoleType.TeamOwner,
@@ -210,7 +206,7 @@ namespace HITSBlazor.Services
                 RoleType.TeamLeader
             };
 
-            var checkTeamsRoles = new List<RoleType> 
+            var checkTeamsRoles = new HashSet<RoleType> 
             { 
                 RoleType.ProjectOffice, 
                 RoleType.Admin, 
@@ -234,23 +230,19 @@ namespace HITSBlazor.Services
                             Id = 0,
                             Icon = "bi-list",
                             Title = "Список команд",
-                            AllowedRoles = teamRoles,
                             Url = "/list"
                         }
                     ],
-                    AllowedRoles = teamRoles,
                     BaseUrl = "teams"
                 };
 
-                var createTeamRoles = new List<RoleType> { RoleType.TeamOwner, RoleType.Admin };
-                if (createTeamRoles.Contains(userRole))
+                if (userRole == RoleType.TeamOwner || userRole == RoleType.Admin)
                 {
                     var subNav = new NavigationSubItem
                     {
                         Id = nav.SubItems.Count,
                         Icon = "bi-plus-lg",
                         Title = "Создать команду",
-                        AllowedRoles = createTeamRoles,
                         Url = "/create"
                     };
 
@@ -268,7 +260,6 @@ namespace HITSBlazor.Services
                     Icon = "bi-shop-window",
                     Title = "Реестр бирж",
                     SubItems = [],
-                    AllowedRoles = teamRoles,
                     BaseUrl = "market"
                 };
 
@@ -279,7 +270,6 @@ namespace HITSBlazor.Services
                         Id = nav.SubItems.Count,
                         Icon = "bi-list",
                         Title = "Список бирж",
-                        AllowedRoles = checkTeamsRoles,
                         Url = "/list"
                     };
 
@@ -295,7 +285,6 @@ namespace HITSBlazor.Services
                         Id = count,
                         Icon = "bi-basket3",
                         Title = market.Name,
-                        AllowedRoles = teamRoles,
                         Url = $"/{market.Id}"
                     };
 
@@ -306,9 +295,7 @@ namespace HITSBlazor.Services
                 menuItems.Add(nav);
             }
 
-            var adminRoles = new List<RoleType> { RoleType.Admin, RoleType.Teacher };
-
-            if (adminRoles.Contains(userRole))
+            if (userRole == RoleType.Teacher || userRole == RoleType.Admin)
             {
                 var nav = new NavigationItem
                 {
@@ -322,11 +309,9 @@ namespace HITSBlazor.Services
                             Id = 0,
                             Icon = "bi-person-gear",
                             Title = "Пользователи",
-                            AllowedRoles = adminRoles,
                             Url = "/users"
                         }
                     ],
-                    AllowedRoles = adminRoles,
                     BaseUrl = "admin"
                 };
 
@@ -339,7 +324,6 @@ namespace HITSBlazor.Services
                             Id = 1,
                             Icon = "bi-person-add",
                             Title = "Добавить пользователей",
-                            AllowedRoles = [RoleType.Admin],
                             Url = "/add-users"
                         },
                         new()
@@ -347,7 +331,6 @@ namespace HITSBlazor.Services
                             Id = 2,
                             Icon = "bi-building",
                             Title = "Компании",
-                            AllowedRoles = [RoleType.Admin],
                             Url = "/companies"
                         },
                         new()
@@ -355,7 +338,6 @@ namespace HITSBlazor.Services
                             Id = 3,
                             Icon = "bi-people",
                             Title = "Группы пользователей",
-                            AllowedRoles = [RoleType.Admin],
                             Url = "/users-groups"
                         },
                         new()
@@ -363,7 +345,6 @@ namespace HITSBlazor.Services
                             Id = 4,
                             Icon = "bi-person-badge",
                             Title = "Справочник компетенций",
-                            AllowedRoles = [RoleType.Admin],
                             Url = "/skills"
                         },
                         new()
@@ -371,7 +352,6 @@ namespace HITSBlazor.Services
                             Id = 5,
                             Icon = "bi-tags",
                             Title = "Справочник тегов",
-                            AllowedRoles = [RoleType.Admin],
                             Url = "/tags"
                         }
                     };
@@ -390,7 +370,6 @@ namespace HITSBlazor.Services
                     Icon = "bi-briefcase",
                     Title = "Реестр проектов",
                     SubItems = [],
-                    AllowedRoles = teamRoles,
                     BaseUrl = "projects"
                 };
 
@@ -401,7 +380,6 @@ namespace HITSBlazor.Services
                         Id = nav.SubItems.Count,
                         Icon = "bi-list",
                         Title = "Список проектов",
-                        AllowedRoles = checkTeamsRoles,
                         Url = "/list"
                     };
 
@@ -410,34 +388,36 @@ namespace HITSBlazor.Services
 
                 if (_authService.CurrentUser?.Id is not null)
                 {
-                    var activeProjects = await _projectService.GetAllActiveProjects(_authService.CurrentUser.Id);
-                    var projectAllowedRoles = new List<RoleType> 
-                    { 
+                    var projectAllowedRoles = new HashSet<RoleType>
+                    {
                         RoleType.Initiator,
                         RoleType.Member,
                         RoleType.TeamOwner,
                         RoleType.TeamLeader
                     };
-                    int count = nav.SubItems.Count;
-                    foreach (var project in activeProjects)
+                    if (projectAllowedRoles.Contains(userRole))
                     {
-                        var subItem2 = new NavigationSubItem
+                        var activeProjects = await _projectService.GetAllActiveProjects(_authService.CurrentUser.Id);
+                        int count = nav.SubItems.Count;
+                        foreach (var project in activeProjects)
                         {
-                            Id = count,
-                            Icon = "bi-kanban",
-                            Title = project.Name,
-                            AllowedRoles = projectAllowedRoles,
-                            Url = $"/{project.Id}"
-                        };
+                            var subItem2 = new NavigationSubItem
+                            {
+                                Id = count,
+                                Icon = "bi-kanban",
+                                Title = project.Name,
+                                Url = $"/{project.Id}"
+                            };
 
-                        nav.SubItems.Add(subItem2);
-                        ++count;
+                            nav.SubItems.Add(subItem2);
+                            ++count;
+                        }
                     }
                 }
 
             }
 
-            var questRoles = new List<RoleType>
+            var questRoles = new HashSet<RoleType>
             {
                 RoleType.ProjectOffice,
                 RoleType.Initiator,
@@ -455,14 +435,13 @@ namespace HITSBlazor.Services
                     Icon = "bi-patch-question",
                     Title = "Управление опросами",
                     SubItems = [],
-                    AllowedRoles = questRoles,
                     BaseUrl = "questionnaire"
                 };
 
                 menuItems.Add(nav);
             }
 
-            var testRoles = new List<RoleType>
+            var testRoles = new HashSet<RoleType>
             {
                 RoleType.Admin,
                 RoleType.Member,
@@ -478,7 +457,6 @@ namespace HITSBlazor.Services
                     Icon = "bi-clipboard",
                     Title = "Тесты",
                     SubItems = [],
-                    AllowedRoles = testRoles,
                     BaseUrl = "tests"
                 };
 

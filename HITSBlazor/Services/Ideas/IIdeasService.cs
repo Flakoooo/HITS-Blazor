@@ -2,17 +2,18 @@
 using HITSBlazor.Models.Ideas.Entities;
 using HITSBlazor.Models.Ideas.Enums;
 using HITSBlazor.Pages.Ideas.IdeasCreate;
-using HITSBlazor.Utils;
 
 namespace HITSBlazor.Services.Ideas
 {
     public interface IIdeasService
     {
-        Task<List<Idea>> GetIdeasAsync(string? searchText = null, IdeaStatusType[]? statusTypes = null);
+        //Ideas
+        Task<List<Idea>> GetIdeasAsync(string? searchText = null, HashSet<IdeaStatusType>? statusTypes = null);
         Task<Idea?> GetIdeaByIdAsync(Guid id);
         Task<List<Skill>> GetAllIdeaSkillsAsync(Guid ideaId);
         Task<List<Rating>> GetIdeaRatingsAsync(Guid ideaId);
-        Task<ServiceResponse<bool>> CreateNewIdeaAsync(IdeasCreateModel ideasCreateModel);
+        Task<bool> CreateNewIdeaAsync(IdeasCreateModel ideasCreateModel);
+        Task<bool> UpdateIdeaAsync(Guid ideaId, IdeasCreateModel ideasCreateModel);
         Task<bool> DeleteIdeaAsync(Idea idea);
 
 

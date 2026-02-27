@@ -1,5 +1,7 @@
 ﻿using HITSBlazor.Models.Ideas.Entities;
 using HITSBlazor.Models.Ideas.Enums;
+using HITSBlazor.Models.Users.Entities;
+using HITSBlazor.Pages.Ideas.IdeasCreate;
 using HITSBlazor.Utils.Mocks.Common;
 using HITSBlazor.Utils.Mocks.Users;
 
@@ -342,13 +344,75 @@ namespace HITSBlazor.Utils.Mocks.Ideas
             ];
         }
 
-        public static List<Idea> GetAllIdeas() => _ideas;
+        public static List<Idea> GetAllIdeas() => [.. _ideas];
 
         public static Idea? GetIdeaById(Guid id)
             => _ideas.FirstOrDefault(i => i.Id == id);
 
         public static List<Idea> GetIdeasByInitiatorId(Guid initiatorId)
             => [.. _ideas.Where(i => i.Initiator.Id == initiatorId)];
+
+        public static bool CreateNewIdea(IdeasCreateModel model, User initiator)
+        {
+            var createdDate = DateTime.UtcNow;
+            var idea = new Idea()
+            {
+                Id = Guid.NewGuid(),
+                Initiator = initiator,
+                CreatedAt = createdDate,
+                ModifiedAt = createdDate,
+
+                Name = model.Name,
+                Problem = model.Problem,
+                Description = model.Description,
+                Solution = model.Solution,
+                Result = model.Result,
+                Status = model.Status,
+                MaxTeamSize = model.MaxTeamSize,
+                MinTeamSize = model.MinTeamSize,
+
+                //TODO: Сделать реализацию групп экспертов и проектного офиса
+                ProjectOffice = null,
+                Experts = null,
+                Customer = model.Customer,
+                ContactPerson = model.ContactPerson,
+
+                Suitability = model.Suitability,
+                Budget = model.Budget,
+                PreAssessment = Math.Round((model.Suitability + model.Budget) / 2.0, 2),
+                Rating = null,
+
+                IsChecked = false,
+                IsActive = true
+            };
+            _ideas.Add(idea);
+
+            return true;
+        }
+
+        public static bool UpdateIdea(Guid ideaId, IdeasCreateModel model)
+        {
+            var idea = _ideas.FirstOrDefault(i => i.Id == ideaId);
+            if (idea is null) return false;
+
+            idea.Name = model.Name;
+            idea.Problem = model.Problem;
+            idea.Description = model.Description;
+            idea.Solution = model.Solution;
+            idea.Result = model.Result;
+
+            idea.MaxTeamSize = model.MaxTeamSize;
+            idea.MinTeamSize = model.MinTeamSize;
+
+            idea.Customer = model.Customer;
+            idea.ContactPerson = model.ContactPerson;
+
+            idea.Suitability = model.Suitability;
+            idea.Budget = model.Budget;
+            idea.PreAssessment = Math.Round((model.Suitability + model.Budget) / 2.0, 2);
+
+            return true;
+        }
 
         public static bool DeleteIdea(Idea idea) => _ideas.Remove(idea);
     }

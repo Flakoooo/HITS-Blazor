@@ -2,6 +2,7 @@
 using HITSBlazor.Models.Common.Enums;
 using HITSBlazor.Models.Ideas.Enums;
 using HITSBlazor.Models.Users.Entities;
+using HITSBlazor.Services;
 using HITSBlazor.Services.Companies;
 using HITSBlazor.Services.Ideas;
 using HITSBlazor.Services.Skills;
@@ -24,6 +25,9 @@ namespace HITSBlazor.Pages.Ideas.IdeasCreate
 
         [Inject]
         private IIdeasService IdeasService { get; set; } = null!;
+
+        [Inject]
+        private NavigationService Navigation { get; set; } = null!;
 
         [Parameter]
         public string IdeaId { get; set; } = string.Empty;
@@ -226,8 +230,17 @@ namespace HITSBlazor.Pages.Ideas.IdeasCreate
                 _ideasCreateModel.Status = ideaStatusType;
                 _ideasCreateModel.Customer = SelectedCompany.Name;
                 _ideasCreateModel.ContactPerson = SelectedContactPerson.FullName;
-                await IdeasService.CreateNewIdeaAsync(_ideasCreateModel);
+                if (await IdeasService.CreateNewIdeaAsync(_ideasCreateModel))
+                    await Navigation.NavigateToAsync("ideas/list");
             }
+        }
+
+        private async Task UpdateIdea()
+        {
+            if (!Guid.TryParse(IdeaId, out Guid guid)) return;
+
+            if (await IdeasService.UpdateIdeaAsync(guid, _ideasCreateModel))
+                await Navigation.NavigateToAsync("ideas/list");
         }
 
         private void StartDotAnimation()

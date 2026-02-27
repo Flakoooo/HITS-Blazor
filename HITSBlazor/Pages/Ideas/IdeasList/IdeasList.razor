@@ -4,6 +4,7 @@
 @using HITSBlazor.Components.Tables.TableActionMenu
 @using HITSBlazor.Components.Tables.TableBodyRow
 @using HITSBlazor.Models.Ideas.Enums
+@using HITSBlazor.Models.Users.Enums
 @using HITSBlazor.Utils.EnumStyles
 @using HITSBlazor.Utils.EnumTranslators
 
@@ -14,7 +15,8 @@
         <div class="w-100 list-page-header">
             <span class="fs-2 text-primary">Список идей: @_ideas.Count</span>
             <div class="d-flex gap-3">
-                @if (showCreateIdeaButton)
+                @if (AuthService.CurrentUser?.Role == RoleType.Initiator || 
+                     AuthService.CurrentUser?.Role == RoleType.Admin)
                 {
                     <button type="button" @onclick="@(() => NavigationService.NavigateToAsync("ideas/create"))" 
                             class="btn d-flex btn-primary">

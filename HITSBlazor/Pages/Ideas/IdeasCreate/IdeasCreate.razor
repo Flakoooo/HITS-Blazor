@@ -4,6 +4,7 @@
 @using HITSBlazor.Components.Placeholder
 @using HITSBlazor.Models.Common.Entities
 @using HITSBlazor.Models.Common.Enums
+@using HITSBlazor.Models.Ideas.Enums
 
 <PageTitle>Портал ВШЦТ</PageTitle>
 
@@ -201,16 +202,17 @@
             <div class="idea-form-submit-buttons">
                 @if (string.IsNullOrWhiteSpace(IdeaId))
                 {
-                    <button type="button" class="btn d-flex btn-primary">
+                    <button type="button" @onclick="@(() => CreateIdea(IdeaStatusType.New))" class="btn d-flex btn-primary">
                         Сохранить черновик
                     </button>
-                    <button type="button" class="btn d-flex btn-success">
+                    <button type="button" @onclick="@(() => CreateIdea(IdeaStatusType.OnApproval))" class="btn d-flex btn-success">
                         Отправить на согласование
                     </button>
                 }
                 else
                 {
-                    <button type="button" class="btn d-flex btn-primary">
+                    //TODO: просто обновить
+                    <button type="button" onclick="@UpdateIdea" class="btn d-flex btn-primary">
                         Сохранить изменения
                     </button>
                 }

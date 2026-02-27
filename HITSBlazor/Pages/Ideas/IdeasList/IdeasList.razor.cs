@@ -2,6 +2,7 @@
 using HITSBlazor.Models.Ideas.Entities;
 using HITSBlazor.Models.Ideas.Enums;
 using HITSBlazor.Services;
+using HITSBlazor.Services.Auth;
 using HITSBlazor.Services.Ideas;
 using HITSBlazor.Services.Modal;
 using Microsoft.AspNetCore.Authorization;
@@ -14,6 +15,9 @@ namespace HITSBlazor.Pages.Ideas.IdeasList
     [Route("/ideas/list/{IdeaId}")]
     public partial class IdeasList
     {
+        [Inject]
+        private IAuthService AuthService { get; set; } = null!;
+
         [Inject]
         private IIdeasService IdeasService { get; set; } = null!;
 
@@ -37,7 +41,7 @@ namespace HITSBlazor.Pages.Ideas.IdeasList
         {
             _ideas = await IdeasService.GetIdeasAsync(
                 searchText: _searchText,
-                statusTypes: SelectedStatuses.Count > 0 ? [.. SelectedStatuses] : null
+                statusTypes: SelectedStatuses
             );
             StateHasChanged();
         }

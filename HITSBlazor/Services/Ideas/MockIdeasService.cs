@@ -3,7 +3,6 @@ using HITSBlazor.Models.Ideas.Entities;
 using HITSBlazor.Models.Ideas.Enums;
 using HITSBlazor.Pages.Ideas.IdeasCreate;
 using HITSBlazor.Services.Auth;
-using HITSBlazor.Utils;
 using HITSBlazor.Utils.Mocks.Common;
 using HITSBlazor.Utils.Mocks.Ideas;
 
@@ -26,14 +25,14 @@ namespace HITSBlazor.Services.Ideas
 
         public async Task<List<Idea>> GetIdeasAsync(
             string? searchText = null,
-            IdeaStatusType[]? statusTypes = null
+            HashSet<IdeaStatusType>? statusTypes = null
         )
         {
             if (_cachedIdeas.Count == 0 || DateTime.UtcNow - _lastRefreshTime > _cacheLifetime)
                 await RefreshCacheAsync();
 
             var query = _cachedIdeas.AsEnumerable();
-            if (statusTypes != null && statusTypes.Length > 0)
+            if (statusTypes?.Count > 0)
                 query = query.Where(i => statusTypes.Contains(i.Status));
 
             if (!string.IsNullOrWhiteSpace(searchText))
@@ -50,15 +49,46 @@ namespace HITSBlazor.Services.Ideas
         public async Task<List<Rating>> GetIdeaRatingsAsync(Guid ideaId)
             => MockRatings.GetIdeaRatingById(ideaId);
 
-        public async Task<ServiceResponse<bool>> CreateNewIdeaAsync(IdeasCreateModel ideasCreateModel)
+        public async Task<bool> CreateNewIdeaAsync(IdeasCreateModel ideasCreateModel)
         {
             if (_authService.CurrentUser is null)
             {
                 _globalNotificationService.ShowError("Пользователь не найден");
-                return ServiceResponse<bool>.Failure("Пользователь не найден");
+                return false;
             }
 
-            return ServiceResponse<bool>.Success(true);
+            if (!MockIdeas.CreateNewIdea(ideasCreateModel, _authService.CurrentUser))
+            {
+                _globalNotificationService.ShowError("Не удалось создать идею");
+                return false;
+            }
+
+            if (ideasCreateModel.Status == IdeaStatusType.New)
+                _globalNotificationService.ShowSuccess("Черновик идеи сохранен");
+            else if (ideasCreateModel.Status == IdeaStatusType.OnApproval)
+                _globalNotificationService.ShowSuccess("Идея отправлена на согласование");
+
+            return true;
+        }
+
+        public async Task<bool> UpdateIdeaAsync(Guid ideaId, IdeasCreateModel ideasCreateModel)
+        {
+            var idea = MockIdeas.GetIdeaById(ideaId);
+            if (idea is null)
+            {
+                _globalNotificationService.ShowError("Редактируемая идея не найдена");
+                return false;
+            }
+
+            if (!MockIdeas.UpdateIdea(ideaId, ideasCreateModel))
+            {
+                _globalNotificationService.ShowError("Не удалось обновить идею");
+                return false;
+            }
+
+            _globalNotificationService.ShowSuccess("Идея изменена");
+
+            return true;
         }
 
         public async Task<bool> DeleteIdeaAsync(Idea idea)
