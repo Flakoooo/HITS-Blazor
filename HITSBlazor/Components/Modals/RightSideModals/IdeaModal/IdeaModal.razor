@@ -5,6 +5,8 @@
 @using HITSBlazor.Components.Modals.Components.ModalHeader
 @using HITSBlazor.Components.Placeholder
 @using HITSBlazor.Models.Common.Entities
+@using HITSBlazor.Models.Ideas.Enums
+@using HITSBlazor.Models.Users.Enums
 @using HITSBlazor.Services.Modal
 @using HITSBlazor.Utils.EnumStyles
 @using HITSBlazor.Utils.EnumTranslators
@@ -62,30 +64,44 @@
                 }
             </ul>
         }
-        <div class="bg-white d-flex rounded-3 @(isLoading ? "p-2 gap-2" : "p-3 gap-3 flex-wrap")">
-            @if (isLoading || CurrentIdea is null)
-            {
-                @for (int i = 0; i < 3; ++i)
+        @if (CheckIdeaButtonsAccess())
+        {
+            <div class="bg-white d-flex rounded-3 @(isLoading ? "p-2 gap-2" : "p-3 gap-3 flex-wrap")">
+                @if (isLoading || CurrentIdea is null)
                 {
-                    <Placeholder Width="w-25" Height="PlaceholderHeight.Small" />
+                    @for (int i = 0; i < 3; ++i)
+                    {
+                        <Placeholder Width="w-25" Height="PlaceholderHeight.Small" />
+                    }
                 }
-            }
-            else
-            {
-                <button @onclick="NavigateToCreateIdea" type="button" class="btn d-flex btn-light">
-                    Редактировать
-                </button>
-                <button type="button" class="btn d-flex btn-success">
-                    Отправить на согласование
-                </button>
-                <button type="button" class="btn d-flex btn-danger">
-                    Отправить на доработку
-                </button>
-                <button type="button" class="btn d-flex btn-success">
-                    Отправить на утверждение
-                </button>
-            }
-        </div>
+                else
+                {
+                    @if (
+                        CurrentUser?.Role == RoleType.Admin || 
+                        (CurrentUser?.Role == RoleType.Initiator && CurrentUser?.Id == CurrentIdea.Initiator.Id)
+                    )
+                    {
+                        <button @onclick="NavigateToCreateIdea" type="button" class="btn d-flex btn-light">
+                            Редактировать
+                        </button>
+                        <button @onclick="@(() => UpdateIdeaStatus(IdeaStatusType.OnApproval))" type="button" class="btn d-flex btn-success">
+                            Отправить на согласование
+                        </button>
+                    }
+
+                    @if (CurrentUser?.Role == RoleType.Admin || CurrentUser?.Role == RoleType.ProjectOffice)
+                    {
+                        <button @onclick="@(() => UpdateIdeaStatus(IdeaStatusType.OnEditing))" type="button" class="btn d-flex btn-danger">
+                            Отправить на доработку
+                        </button>
+                        <button @onclick="@(() => UpdateIdeaStatus(IdeaStatusType.OnConfirmation))" type="button" class="btn d-flex btn-success">
+                            Отправить на утверждение
+                        </button>   
+                    }
+                    <!-- но, что делают эксперты? они могут согласовать идею, поставить рейтинг, но как? -->
+                }
+            </div>
+        }
         <div class="bg-white rounded-3 @(isLoading ? "pb-2" : string.Empty)">
             @if (isLoading)
             {
@@ -181,6 +197,7 @@
         }
         else
         {
+            <!-- при утверждении идеи писать Утвердили 0/N -->
             <span class="p-2 bg-primary rounded-top fs-4 text-center text-white">
                 @CurrentIdea.Status.GetTranslation()
             </span>

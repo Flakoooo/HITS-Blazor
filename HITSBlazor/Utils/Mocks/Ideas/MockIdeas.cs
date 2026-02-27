@@ -414,6 +414,16 @@ namespace HITSBlazor.Utils.Mocks.Ideas
             return true;
         }
 
+        public static Idea? UpdateIdeaStatus(Guid ideaId, IdeaStatusType ideaStatus)
+        {
+            var idea = _ideas.FirstOrDefault(i => i.Id == ideaId);
+            if (idea is null) return null;
+
+            idea.Status = ideaStatus;
+            idea.ModifiedAt = DateTime.UtcNow;
+            return idea;
+        }
+
         public static bool DeleteIdea(Idea idea) => _ideas.Remove(idea);
     }
 }

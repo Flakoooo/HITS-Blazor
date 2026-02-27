@@ -1,12 +1,15 @@
 ﻿using HITSBlazor.Components.ActionMenus.BaseActionMenu;
 using HITSBlazor.Models.Common.Entities;
 using HITSBlazor.Models.Ideas.Entities;
+using HITSBlazor.Models.Ideas.Enums;
 using HITSBlazor.Models.Users.Entities;
+using HITSBlazor.Models.Users.Enums;
 using HITSBlazor.Services;
 using HITSBlazor.Services.Auth;
 using HITSBlazor.Services.Ideas;
 using HITSBlazor.Services.Modal;
 using Microsoft.AspNetCore.Components;
+using System.Linq;
 
 namespace HITSBlazor.Components.Modals.RightSideModals.IdeaModal
 {
@@ -78,6 +81,36 @@ namespace HITSBlazor.Components.Modals.RightSideModals.IdeaModal
                 Data = skills
             }
         ];
+
+        private bool CheckIdeaButtonsAccess()
+        {
+            if (CurrentUser?.Role is null) return false;
+
+            var userRole = (RoleType)CurrentUser.Role;
+
+            if (userRole == RoleType.Admin) return true;
+
+            if (
+                userRole == RoleType.Initiator && CurrentUser.Id == CurrentIdea?.Initiator.Id && 
+                (CurrentIdea?.Status == IdeaStatusType.New || CurrentIdea?.Status == IdeaStatusType.OnEditing)
+            ) return true;
+
+            if (
+                userRole == RoleType.ProjectOffice &&
+                (CurrentIdea?.Status == IdeaStatusType.OnApproval || CurrentIdea?.Status == IdeaStatusType.Confirmed)
+            ) return true;
+
+            if (userRole == RoleType.Expert && CurrentIdea?.Status == IdeaStatusType.OnConfirmation) return true;
+
+            return false;
+        }
+
+        private async Task UpdateIdeaStatus(IdeaStatusType ideaStatus)
+        {
+            if (CurrentIdea is null) return;
+
+            await IdeasService.UpdateIdeaStatusAsync(CurrentIdea.Id, ideaStatus);
+        }
 
         private async Task HandleActionMenuClick(TableActionContext context)
         {

@@ -3,6 +3,7 @@ using HITSBlazor.Models.Ideas.Entities;
 using HITSBlazor.Models.Ideas.Enums;
 using HITSBlazor.Pages.Ideas.IdeasCreate;
 using HITSBlazor.Services.Auth;
+using HITSBlazor.Utils.EnumTranslators;
 using HITSBlazor.Utils.Mocks.Common;
 using HITSBlazor.Utils.Mocks.Ideas;
 
@@ -86,7 +87,25 @@ namespace HITSBlazor.Services.Ideas
                 return false;
             }
 
+            _cachedIdeas = [];
+            _lastRefreshTime = DateTime.MinValue;
             _globalNotificationService.ShowSuccess("Идея изменена");
+
+            return true;
+        }
+
+        public async Task<bool> UpdateIdeaStatusAsync(Guid ideaId, IdeaStatusType ideaStatus)
+        {
+            var updatedIdea = MockIdeas.UpdateIdeaStatus(ideaId, ideaStatus);
+            if (updatedIdea is null)
+            {
+                _globalNotificationService.ShowError($"Не удалось сменить статус идеи на {ideaStatus.GetTranslation()}");
+                return false;
+            }
+
+            var index = _cachedIdeas.FindIndex(i => i.Id == ideaId);
+            _cachedIdeas[index].Status = updatedIdea.Status;
+            _cachedIdeas[index].ModifiedAt = updatedIdea.ModifiedAt;
 
             return true;
         }

@@ -33,8 +33,6 @@ namespace HITSBlazor.Pages.Ideas.IdeasList
         private string? _searchText = null;
         private List<Idea> _ideas = [];
 
-        private bool showCreateIdeaButton = true;
-
         private HashSet<IdeaStatusType> SelectedStatuses { get; set; } = [];
 
         private async Task LoadIdeasAsync()
