@@ -1,10 +1,14 @@
-﻿@using HITSBlazor.Components.InputDropdowns.CompanyDropdown
+﻿@using HITSBlazor.Components.Button
+@using HITSBlazor.Components.InputDropdowns.CompanyDropdown
 @using HITSBlazor.Components.InputDropdowns.ContactPersonDropdown
 @using HITSBlazor.Components.InputDropdowns.SkillDropdown
+@using HITSBlazor.Components.Inputs.Select
 @using HITSBlazor.Components.Placeholder
+@using HITSBlazor.Components.ProgressBar
 @using HITSBlazor.Models.Common.Entities
 @using HITSBlazor.Models.Common.Enums
 @using HITSBlazor.Models.Ideas.Enums
+@using HITSBlazor.Services.Ideas
 
 <PageTitle>Портал ВШЦТ</PageTitle>
 
@@ -155,66 +159,41 @@
             }
             <div class="row">
                 <div class="col">
-                    <div class="w-100">
-                        <label class="form-label text-primary">
-                            Пригодность*
-                        </label>
-                        <select value="@SuitabilityScore" @onchange="OnSuitabilityChanged" class="form-select">
-                            <option disabled value="">Выберите значение</option>
-                            <option value="5">Есть заказчик, инвестор и эксперт в предметной области</option>
-                            <option value="4">Есть заказчик, инвестор, но нет эксперта</option>
-                            <option value="3">Есть инвестор, но нет заказчика и эксперта</option>
-                            <option value="2">Есть заказчик, но нет инвестора и эксперта</option>
-                            <option value="1">Нет ни заказчика, ни инвестора, ни эксперта</option>
-                        </select>
-                    </div>
+                    <Select Label="Пригодность"
+                            Value="@SuitabilityScore"
+                            Options="IdeasRatingCategories.SuitabilityOptions"
+                            OnValueSelected="@((value) => OnSuitabilityChanged(value))" />
                 </div>
                 <div class="col">
-                    <div class="w-100">
-                        <label class="form-label text-primary">
-                            Бюджет*
-                        </label>
-                        <select value="@BudgetScore" @onchange="OnBudgetChanged" class="form-select">
-                            <option disabled value="">Выберите значение</option>
-                            <option value="5">Не требуется</option>
-                            <option value="4">До 30.000 руб</option>
-                            <option value="3">30.000 - 50.000 руб</option>
-                            <option value="2">50.000 - 100.000 руб</option>
-                            <option value="1">Свыше 100.000 руб</option>
-                        </select>
-                    </div>
+                    <Select Label="Бюджет" 
+                            Value="@BudgetScore" 
+                            Options="IdeasRatingCategories.BudgetOptions"
+                            OnValueSelected="@((value) => OnBudgetChanged(value))" />
                 </div>
             </div>
             <div class="col">
-                <span class="fs-6 text-primary">@PreAssessmentText</span>
-                @if (_animationTimer is not null)
-                {
-                    <Placeholder />
-                }
-                else
-                {
-                    <div class="progress w-100 mt-2">
-                        <div class="progress-bar progress-bar-animated" style="@PreAssessmentStyle">
-                        </div>
-                    </div>
-                }
+                <ProgressBar Text="Предварительная оценка" 
+                             Score="_preAssessmentScore" 
+                             CategoryCounts="5" />
             </div>
             <div class="idea-form-submit-buttons">
                 @if (string.IsNullOrWhiteSpace(IdeaId))
                 {
-                    <button type="button" @onclick="@(() => CreateIdea(IdeaStatusType.New))" class="btn d-flex btn-primary">
-                        Сохранить черновик
-                    </button>
-                    <button type="button" @onclick="@(() => CreateIdea(IdeaStatusType.OnApproval))" class="btn d-flex btn-success">
-                        Отправить на согласование
-                    </button>
+                    <Button BtnType="ButtonType.Button" 
+                            Variant="ButtonVariant.Primary"
+                            Text="Сохранить черновик"
+                            OnButtonClick="@(() => CreateIdea(IdeaStatusType.New))" />
+                    <Button BtnType="ButtonType.Button"
+                            Variant="ButtonVariant.Success"
+                            Text="Отправить на согласование"
+                            OnButtonClick="@(() => CreateIdea(IdeaStatusType.OnApproval))" />
                 }
                 else
                 {
-                    //TODO: просто обновить
-                    <button type="button" onclick="@UpdateIdea" class="btn d-flex btn-primary">
-                        Сохранить изменения
-                    </button>
+                    <Button BtnType="ButtonType.Button"
+                            Variant="ButtonVariant.Primary"
+                            Text="Сохранить изменения"
+                            OnButtonClick="UpdateIdea" />
                 }
             </div>
         </div>

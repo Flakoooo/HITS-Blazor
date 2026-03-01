@@ -15,7 +15,7 @@ namespace HITSBlazor.Pages.Ideas.IdeasCreate
     [Authorize]
     [Route("/ideas/create")]
     [Route("/ideas/create/{IdeaId}")]
-    public partial class IdeasCreate : IDisposable
+    public partial class IdeasCreate
     {
         [Inject]
         private ISkillService SkillService { get; set; } = null!;
@@ -33,8 +33,6 @@ namespace HITSBlazor.Pages.Ideas.IdeasCreate
         public string IdeaId { get; set; } = string.Empty;
 
         private bool _isLoading = true;
-        private int _dotCount = 0;
-        private Timer? _animationTimer;
 
         private IdeasCreateModel _ideasCreateModel = new();
 
@@ -64,9 +62,6 @@ namespace HITSBlazor.Pages.Ideas.IdeasCreate
                     _suitabilityScore = value;
                     if (int.TryParse(value, out int suitability))
                         _ideasCreateModel.Suitability = suitability;
-                    
-                    if (!string.IsNullOrWhiteSpace(BudgetScore))
-                        StopAnimation();
                 }
             }
         }
@@ -82,50 +77,15 @@ namespace HITSBlazor.Pages.Ideas.IdeasCreate
                     _budgetScore = value;
                     if (int.TryParse(value, out int budget))
                         _ideasCreateModel.Budget = budget;
-
-                    if (!string.IsNullOrWhiteSpace(SuitabilityScore))
-                        StopAnimation();
                 }
             }
         }
 
-        private double PreAssessmentScore => 
-            (int.TryParse(SuitabilityScore, out int s) && int.TryParse(BudgetScore, out int b)) 
-                ? Math.Round((s + b) / 2.0, 2)
-                : 0.0;
-
-        private string PreAssessmentText => 
-            _animationTimer != null
-                ? $"Предварительная оценка: вычисление{new string('.', _dotCount)}"
-                : $"Предварительная оценка: {PreAssessmentScore:F2}";
-
-        private string PreAssessmentStyle
-        {
-            get
-            {
-                if (_animationTimer != null || PreAssessmentScore == 0)
-                    return string.Empty;
-
-                var score = PreAssessmentScore;
-                var width = score * 20;
-                var color = score switch
-                {
-                    <= 3.0 => "rgb(220, 53, 69)",
-                    < 4.0 => "rgb(253, 126, 20)",
-                    < 5.0 => "rgb(255, 193, 7)",
-                    >= 5.0 => "rgb(25, 135, 84)",
-                    _ => "rgb(220, 53, 69)"
-                };
-
-                return $"width: {width}%; background-color: {color};";
-            }
-        }
+        private double? _preAssessmentScore = null;
 
         protected override async Task OnInitializedAsync()
         {
             _isLoading = true;
-
-            StartDotAnimation();
 
             _languageSkills = await SkillService.GetSkillsByTypeAsync(SkillType.Language);
             _frameworkSkills = await SkillService.GetSkillsByTypeAsync(SkillType.Framework);
@@ -217,11 +177,25 @@ namespace HITSBlazor.Pages.Ideas.IdeasCreate
             return [];
         }
 
-        private void OnSuitabilityChanged(ChangeEventArgs e) 
-            => SuitabilityScore = e.Value?.ToString() ?? "";
+        private void OnSuitabilityChanged(string value)
+        {
+            SuitabilityScore = value;
+            UpdatePreAssessmentScore();
+        }
 
-        private void OnBudgetChanged(ChangeEventArgs e) 
-            => BudgetScore = e.Value?.ToString() ?? "";
+        private void OnBudgetChanged(string value)
+        {
+            BudgetScore = value;
+            UpdatePreAssessmentScore();
+        }
+
+        private void UpdatePreAssessmentScore()
+        {
+            _preAssessmentScore = (int.TryParse(SuitabilityScore, out int s) && int.TryParse(BudgetScore, out int b))
+                ? Math.Round((s + b) / 2.0, 2)
+                : null;
+            StateHasChanged();
+        }
 
         private async Task CreateIdea(IdeaStatusType ideaStatusType)
         {
@@ -241,28 +215,6 @@ namespace HITSBlazor.Pages.Ideas.IdeasCreate
 
             if (await IdeasService.UpdateIdeaAsync(guid, _ideasCreateModel))
                 await Navigation.NavigateToAsync("ideas/list");
-        }
-
-        private void StartDotAnimation()
-        {
-            _animationTimer?.Dispose();
-
-            _animationTimer = new Timer(_ =>
-            {
-                _dotCount = (_dotCount + 1) % 4;
-                InvokeAsync(StateHasChanged);
-            }, null, 0, 300);
-        }
-
-        private void StopAnimation()
-        {
-            _animationTimer?.Dispose();
-            _animationTimer = null;
-        }
-
-        public void Dispose()
-        {
-            StopAnimation();
         }
     }
 }

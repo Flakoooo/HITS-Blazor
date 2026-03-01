@@ -1,0 +1,15 @@
+﻿@namespace HITSBlazor.Components.Inputs.Select
+@using System.Threading.Tasks
+
+<div class="w-100">
+    <label class="form-label text-primary">
+        @Label*
+    </label>
+    <select value="@Value" @onchange="OnOptionChanged" class="form-select">
+        <option disabled value="">Выберите значение</option>
+        @foreach (var option in Options)
+        {
+            <option value="@option.Key">@option.Value</option>
+        }
+    </select>
+</div>

@@ -1,12 +1,16 @@
 ﻿@namespace HITSBlazor.Components.Modals.RightSideModals.IdeaModal
 @using HITSBlazor.Components.ActionMenus.BaseActionMenu
 @using HITSBlazor.Components.ActionsMenus.CommentActionMenu
+@using HITSBlazor.Components.Button
 @using HITSBlazor.Components.Collapse
+@using HITSBlazor.Components.Inputs.Select
 @using HITSBlazor.Components.Modals.Components.ModalHeader
 @using HITSBlazor.Components.Placeholder
+@using HITSBlazor.Components.ProgressBar
 @using HITSBlazor.Models.Common.Entities
 @using HITSBlazor.Models.Ideas.Enums
 @using HITSBlazor.Models.Users.Enums
+@using HITSBlazor.Services.Ideas
 @using HITSBlazor.Services.Modal
 @using HITSBlazor.Utils.EnumStyles
 @using HITSBlazor.Utils.EnumTranslators
@@ -64,6 +68,52 @@
                 }
             </ul>
         }
+        <!-- тут калькулятор экспертов -->
+        <div class="idea-modal-rating bg-white rounded-3 p-3 d-grid w-100">
+            <div class="w-100 row row-cols-2">
+                <div class="w-50 col-2 mb-2">
+                    @if (isLoading)
+                    {
+                        @for (int i = 0; i < 5; ++i)
+                        {
+                            <Placeholder Height="PlaceholderHeight.Small" />
+                        }
+                    }
+                    else
+                    {
+                        <Select Label="Рыночная ценность*" Options="IdeasRatingCategories.MarketValueOptions" />
+                        <Select Label="Уникальность*" Options="IdeasRatingCategories.OriginalityOptions" />
+                        <Select Label="Реализуемость*" Options="IdeasRatingCategories.TechnicalRealizabilityOptions" />
+                        <Select Label="Пригодность*" Options="IdeasRatingCategories.SuitabilityOptions" />
+                        <Select Label="Бюджет*" Options="IdeasRatingCategories.BudgetOptions" />
+                    }
+                </div>
+            </div>
+            @if (isLoading)
+            {
+                <Placeholder />
+            }
+            else
+            {
+                <ProgressBar Text="Рейтинг" 
+                             Score="0"
+                             CategoryCounts="5" />
+                <div class="d-flex gap-3">
+                    <Button BtnType="ButtonType.Button" 
+                            Variant="ButtonVariant.Primary" 
+                            IsLoading="isRatingSaving"
+                            OnButtonClick="ConfirmRating"
+                            Text="Утвердить"
+                            LoadingText="Утверждение"/>
+                    <Button BtnType="ButtonType.Button" 
+                            Variant="@(isRatingSaved ? ButtonVariant.Success : ButtonVariant.Primary)" 
+                            IsLoading="isRatingConfirming"
+                            OnButtonClick="SaveRating"
+                            Text="Сохранить форму"
+                            LoadingText="Сохранение"/>
+                </div>
+            }
+        </div>
         @if (CheckIdeaButtonsAccess())
         {
             <div class="bg-white d-flex rounded-3 @(isLoading ? "p-2 gap-2" : "p-3 gap-3 flex-wrap")">
@@ -81,24 +131,27 @@
                         (CurrentUser?.Role == RoleType.Initiator && CurrentUser?.Id == CurrentIdea.Initiator.Id)
                     )
                     {
-                        <button @onclick="NavigateToCreateIdea" type="button" class="btn d-flex btn-light">
-                            Редактировать
-                        </button>
-                        <button @onclick="@(() => UpdateIdeaStatus(IdeaStatusType.OnApproval))" type="button" class="btn d-flex btn-success">
-                            Отправить на согласование
-                        </button>
+                        <Button BtnType="ButtonType.Button" 
+                                Variant="ButtonVariant.Light" 
+                                OnButtonClick="NavigateToCreateIdea"
+                                Text="Редактировать" />
+                        <Button BtnType="ButtonType.Button" 
+                                Variant="ButtonVariant.Success" 
+                                OnButtonClick="@(() => UpdateIdeaStatus(IdeaStatusType.OnApproval))"
+                                Text="Отправить на согласование" />
                     }
 
                     @if (CurrentUser?.Role == RoleType.Admin || CurrentUser?.Role == RoleType.ProjectOffice)
                     {
-                        <button @onclick="@(() => UpdateIdeaStatus(IdeaStatusType.OnEditing))" type="button" class="btn d-flex btn-danger">
-                            Отправить на доработку
-                        </button>
-                        <button @onclick="@(() => UpdateIdeaStatus(IdeaStatusType.OnConfirmation))" type="button" class="btn d-flex btn-success">
-                            Отправить на утверждение
-                        </button>   
+                        <Button BtnType="ButtonType.Button" 
+                                Variant="ButtonVariant.Danger" 
+                                OnButtonClick="@(() => UpdateIdeaStatus(IdeaStatusType.OnEditing))"
+                                Text="Отправить на доработку" />
+                        <Button BtnType="ButtonType.Button" 
+                                Variant="ButtonVariant.Success" 
+                                OnButtonClick="@(() => UpdateIdeaStatus(IdeaStatusType.OnConfirmation))"
+                                Text="Отправить на утверждение" />
                     }
-                    <!-- но, что делают эксперты? они могут согласовать идею, поставить рейтинг, но как? -->
                 }
             </div>
         }
@@ -127,9 +180,6 @@
                     <span class="fs-6 px-3">Комментарии</span>
                 </div>
                 <div class="d-grid gap-3 pt-3 px-3 w-100">
-                    <!--TODO: Личные сообщения имеют дополнительные функции-->
-                    <!--TODO: Да и вообще, че я комментарии не реализовл то-->
-                    <!-- TableActionMenu задействовать -->
                     @foreach (var comment in IdeaComments)
                     {
                         var sender = comment.Sender;
@@ -156,7 +206,7 @@
                         </div>                        
                     }
                 </div>
-                <form class="p-3">
+                <div class="p-3">
                     <div class="d-flex gap-3 align-items-start">
                         <div class="w-100">
                             <div class="input-group">
@@ -166,11 +216,11 @@
                                 <input type="text" placeholder="Добавить комментарий" class="form-control rounded-end" />
                             </div>
                         </div>
-                        <button type="submit" class="btn d-flex btn-primary">
-                            Отправить
-                        </button>
+                        <Button BtnType="ButtonType.Button" 
+                                Variant="ButtonVariant.Primary"
+                                Text="Отправить" />
                     </div>
-                </form>
+                </div>
             }
         </div>
     </div>
@@ -199,7 +249,11 @@
         {
             <!-- при утверждении идеи писать Утвердили 0/N -->
             <span class="p-2 bg-primary rounded-top fs-4 text-center text-white">
-                @CurrentIdea.Status.GetTranslation()
+                @(
+                    CurrentIdea.Status == IdeaStatusType.OnConfirmation 
+                        ? $"Утвердили {IdeaRatings.Where(r => r.IsConfirmed == true).Count()}/{IdeaRatings.Count()}" 
+                        : CurrentIdea.Status.GetTranslation()
+                )
             </span>
             <div class="w-100 pb-3 px-3 idea-info">
                 <div>
@@ -230,7 +284,7 @@
                     @foreach (var rating in IdeaRatings)
                     {
                         <div class="pt-2 idea-sub-info">
-                            <i class="text-secondary fs-3 bi @(rating.RatingValue is null ? "bi-clock-history opacity-25" : "bi-check-lg opacity-50 text-success")"></i>
+                            <i class="text-secondary fs-3 bi @(rating.IsConfirmed == true ? "bi-check-lg opacity-50 text-success" : "bi-clock-history opacity-25")"></i>
                             <span class="fs-6 text-primary">@rating.ExpertFirstName @rating.ExpertLastName</span>
                             <span class="fs-6 @rating.RatingValue.GetStyle()">@rating.RatingValue</span>
                         </div>
@@ -245,9 +299,9 @@
                         <span class="fs-6 text-primary">@CurrentUser?.Role.GetTranslation()</span>
                     </div>
                 </div>
-                <button type="button" class="btn d-flex btn-primary">
-                    Поделиться идеей
-                </button>
+                <Button BtnType="ButtonType.Button" 
+                        Variant="ButtonVariant.Primary"
+                        Text="Поделиться идеей" />
             </div>
         }
     </div>

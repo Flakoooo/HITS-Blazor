@@ -26,6 +26,15 @@
     gap: 8px;
 }
 
+.idea-modal-rating {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: flex-start;
+    justify-content: stretch;
+    gap: 8px
+}
+
 .advertisement {
     width: 400px;
 }

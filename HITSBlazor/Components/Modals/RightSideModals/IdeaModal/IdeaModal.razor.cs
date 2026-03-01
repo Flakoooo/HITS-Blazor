@@ -4,6 +4,7 @@ using HITSBlazor.Models.Ideas.Entities;
 using HITSBlazor.Models.Ideas.Enums;
 using HITSBlazor.Models.Users.Entities;
 using HITSBlazor.Models.Users.Enums;
+using HITSBlazor.Pages.Ideas.IdeasCreate;
 using HITSBlazor.Services;
 using HITSBlazor.Services.Auth;
 using HITSBlazor.Services.Ideas;
@@ -31,6 +32,9 @@ namespace HITSBlazor.Components.Modals.RightSideModals.IdeaModal
         public Guid IdeaId { get; set; }
 
         private bool isLoading = true;
+        private bool isRatingSaving = false;
+        private bool isRatingSaved = false;
+        private bool isRatingConfirming = false;
 
         private User? CurrentUser { get; set; } = null;
         private Idea? CurrentIdea { get; set; } = null;
@@ -40,11 +44,32 @@ namespace HITSBlazor.Components.Modals.RightSideModals.IdeaModal
 
         private List<IdeaModalItem> ideaData = [];
 
+        private Rating? _expertRating = null;
+
+        private string _marketValue = string.Empty;
+        private string MarketValue
+        {
+            get => _marketValue.ToString();
+            set 
+            {
+                if (_marketValue != value)
+                {
+                    _marketValue = value;
+                    if (int.TryParse(value, out int suitability))
+                        _expertRating?.MarketValue = suitability;
+                }
+            }
+        }
+
         protected override async Task OnInitializedAsync()
         {
             isLoading = true;
 
             CurrentUser = AuthService.CurrentUser;
+
+            if (CurrentUser?.Role == RoleType.Expert)
+                _expertRating = new Rating();
+
             CurrentIdea = await IdeasService.GetIdeaByIdAsync(IdeaId);
             IdeaSkills = await IdeasService.GetAllIdeaSkillsAsync(IdeaId);
             ideaData = GetIdeaData(CurrentIdea, IdeaSkills);
@@ -81,6 +106,24 @@ namespace HITSBlazor.Components.Modals.RightSideModals.IdeaModal
                 Data = skills
             }
         ];
+
+        private void ConfirmRating()
+        {
+            isRatingConfirming = true;
+
+
+
+            isRatingConfirming = false;
+        }
+
+        private void SaveRating()
+        {
+            isRatingSaving = true;
+
+
+
+            isRatingSaving = false;
+        }
 
         private bool CheckIdeaButtonsAccess()
         {
