@@ -35,7 +35,7 @@ namespace HITSBlazor.Components.Modals.CenterModals.UpdateEmailModal
             _isLoading = true;
 
             if (await ProfileService.UpdateEmailConfirmAsync(_verificationGuid, _verificationCode))
-                ModalService.Close(ModalType.Center);
+                await ModalService.Close(ModalType.Center);
 
             _isLoading = false;
         }

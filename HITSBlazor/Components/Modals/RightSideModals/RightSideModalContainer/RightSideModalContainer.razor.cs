@@ -46,10 +46,10 @@ namespace HITSBlazor.Components.Modals.RightSideModals.RightSideModalContainer
             StateHasChanged();
         }
 
-        private void CloseModalIfAllowed()
+        private async Task CloseModalIfAllowed()
         {
             if (!_isBlockCloseModal)
-                ModalService.Close(ModalType.RightSide);
+                await ModalService.Close(ModalType.RightSide);
         }
 
         private async void StartModalCloseAnimation()

@@ -74,7 +74,7 @@ namespace HITSBlazor.Services.Modal
             }
         }
 
-        public async void Close(ModalType type)
+        public async Task Close(ModalType type)
         {
             switch (type)
             {

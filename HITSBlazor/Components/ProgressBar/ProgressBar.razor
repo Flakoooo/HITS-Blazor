@@ -1,8 +1,8 @@
 ﻿@namespace HITSBlazor.Components.ProgressBar
 @using HITSBlazor.Components.Placeholder
 
-<span class="fs-6 text-primary">@Text: @(Score is null ? "вычисление" : Score)@($"{new string('.', _dotCount)}")</span>
-@if (_animationTimer is not null || Score is null)
+<span class="fs-6 text-primary">@Text: @(Score.HasValue ? Score.Value : "вычисление")@($"{new string('.', _dotCount)}")</span>
+@if (!Score.HasValue)
 {
     <Placeholder />
 }

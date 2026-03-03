@@ -19,6 +19,8 @@ namespace HITSBlazor.Services.Ideas
         private DateTime _lastRefreshTime;
         private readonly TimeSpan _cacheLifetime = TimeSpan.FromMinutes(5);
 
+        public event Action? OnIdeasStateChanged;
+
         private async Task RefreshCacheAsync()
         {
             _cachedIdeas = MockIdeas.GetAllIdeas();
@@ -74,6 +76,7 @@ namespace HITSBlazor.Services.Ideas
             var index = _cachedIdeas.FindIndex(i => i.Id == ideaId);
             _cachedIdeas[index].IsChecked = true;
 
+            OnIdeasStateChanged?.Invoke();
             return true;
         }
 
@@ -112,6 +115,7 @@ namespace HITSBlazor.Services.Ideas
             _cachedIdeas[index].Status = updatedIdea.Status;
             _cachedIdeas[index].ModifiedAt = updatedIdea.ModifiedAt;
 
+            OnIdeasStateChanged?.Invoke();
             return true;
         }
 
@@ -137,9 +141,28 @@ namespace HITSBlazor.Services.Ideas
 
         public async Task<bool> SendRatingAsync(RatingRequest request, bool isConfirmed)
         {
-            return isConfirmed 
-                ? MockRatings.UpdateOrConfirmRating(request, isConfirmed) 
-                : MockRatings.UpdateOrConfirmRating(request);
+            if (isConfirmed)
+            {
+                if (!MockRatings.UpdateOrConfirmRating(request, isConfirmed))
+                {
+                    _globalNotificationService.ShowError("Не удалось утвердить оценку");
+                    return false;
+                }
+
+                _globalNotificationService.ShowSuccess("Рейтинг успешно подтвержден");
+            }
+            else
+            {
+                if (!MockRatings.UpdateOrConfirmRating(request))
+                {
+                    _globalNotificationService.ShowError("Не удалось сохранить оценку");
+                    return false;
+                }
+
+                _globalNotificationService.ShowSuccess("Рейтинг успешно сохранен");
+            }
+
+            return true;
         }
 
         //Comments

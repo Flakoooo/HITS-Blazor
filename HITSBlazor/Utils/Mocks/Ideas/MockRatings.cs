@@ -79,9 +79,33 @@ namespace HITSBlazor.Utils.Mocks.Ideas
             rating.TechnicalRealizability = request.TechnicalRealizability;
             rating.Suitability = request.Suitability;
             rating.Budget = request.Budget;
-            rating.RatingValue = request.Rating;
 
-            if (isConfirmed) rating.IsConfirmed = true;
+            if (
+                rating.Budget.HasValue &&
+                rating.Suitability.HasValue &&
+                rating.TechnicalRealizability.HasValue &&
+                rating.Originality.HasValue &&
+                rating.MarketValue.HasValue
+            )
+            {
+                rating.RatingValue = Formulas.CalculcateRating(
+                    [
+                        rating.Budget.Value,
+                        rating.Suitability.Value,
+                        rating.TechnicalRealizability.Value,
+                        rating.Originality.Value,
+                        rating.MarketValue.Value
+                    ]
+                );
+            }
+
+            if (isConfirmed)
+            {
+                rating.IsConfirmed = true;
+                var allIdeaRatings = _ratings.Where(r => r.IdeaId == rating.IdeaId);
+                if (allIdeaRatings.Count() == allIdeaRatings.Count(r => r.IsConfirmed))
+                    MockIdeas.GetIdeaById(rating.IdeaId)?.Status = IdeaStatusType.Confirmed;
+            }    
 
             return true;
         }

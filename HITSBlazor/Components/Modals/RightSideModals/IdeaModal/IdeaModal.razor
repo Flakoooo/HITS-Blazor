@@ -68,7 +68,7 @@
                 }
             </ul>
         }
-        @if (CurrentIdea?.Status == IdeaStatusType.OnConfirmation)
+        @if (CurrentIdea?.Status == IdeaStatusType.OnConfirmation && !isRatingConfirmed)
         {
             <div class="idea-modal-rating bg-white rounded-3 p-3 d-grid w-100">
                 <div class="w-100 row row-cols-2">
@@ -107,18 +107,18 @@
                 else
                 {
                     <ProgressBar Text="Рейтинг" 
-                                 Score="_expertRating?.Rating"
+                                 Score="_expertRatingValue"
                                  CategoryCounts="5" />
                     <div class="d-flex gap-3">
                         <Button BtnType="ButtonType.Button" 
                                 Variant="ButtonVariant.Primary" 
-                                IsLoading="isRatingSaving"
+                                IsLoading="isRatingConfirming"
                                 OnButtonClick="ConfirmRating"
                                 Text="Утвердить"
                                 LoadingText="Утверждение"/>
                         <Button BtnType="ButtonType.Button" 
                                 Variant="@(isRatingSaved ? ButtonVariant.Success : ButtonVariant.Primary)" 
-                                IsLoading="isRatingConfirming"
+                                IsLoading="isRatingSaving"
                                 OnButtonClick="SaveRating"
                                 Text="Сохранить форму"
                                 LoadingText="Сохранение"/>
@@ -296,9 +296,11 @@
                     @foreach (var rating in IdeaRatings)
                     {
                         <div class="pt-2 idea-sub-info">
-                            <i class="text-secondary fs-3 bi @(rating.IsConfirmed == true ? "bi-check-lg opacity-50 text-success" : "bi-clock-history opacity-25")"></i>
+                            <i class="text-secondary fs-3 bi @(rating.IsConfirmed ? "bi-check-lg opacity-50 text-success" : "bi-clock-history opacity-25")"></i>
                             <span class="fs-6 text-primary">@rating.ExpertFirstName @rating.ExpertLastName</span>
-                            <span class="fs-6 @rating.RatingValue.GetStyle()">@rating.RatingValue</span>
+                            <span class="fs-6 @(rating.IsConfirmed ? rating.RatingValue.GetStyle() : string.Empty)">
+                                @(rating.IsConfirmed ? rating.RatingValue : string.Empty)
+                            </span>
                         </div>
                     }
                 </div>

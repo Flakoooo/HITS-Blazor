@@ -8,6 +8,5 @@
         public int? TechnicalRealizability { get; set; }
         public int? Suitability { get; set; }
         public int? Budget { get; set; }
-        public double? Rating { get; set; }
     }
 }

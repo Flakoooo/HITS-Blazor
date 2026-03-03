@@ -34,6 +34,7 @@ namespace HITSBlazor.Components.Modals.RightSideModals.IdeaModal
         private bool isRatingSaving = false;
         private bool isRatingSaved = false;
         private bool isRatingConfirming = false;
+        private bool isRatingConfirmed = false;
 
         private User? CurrentUser { get; set; } = null;
         private Idea? CurrentIdea { get; set; } = null;
@@ -111,14 +112,13 @@ namespace HITSBlazor.Components.Modals.RightSideModals.IdeaModal
             }
         }
 
+        private double? _expertRatingValue;
+
         protected override async Task OnInitializedAsync()
         {
             isLoading = true;
 
-            CurrentUser = AuthService.CurrentUser;
-
-            if (CurrentUser?.Role == RoleType.Expert || CurrentUser?.Role == RoleType.Admin)
-                _expertRating = new RatingRequest();
+            CurrentUser = AuthService.CurrentUser; 
 
             CurrentIdea = await IdeasService.GetIdeaByIdAsync(IdeaId);
             IdeaSkills = await IdeasService.GetAllIdeaSkillsAsync(IdeaId);
@@ -126,35 +126,45 @@ namespace HITSBlazor.Components.Modals.RightSideModals.IdeaModal
             IdeaRatings = await IdeasService.GetIdeaRatingsAsync(IdeaId);
             IdeaComments = await IdeasService.GetIdeasCommentsAsync(IdeaId);
 
+            if (CurrentIdea?.Status == IdeaStatusType.OnConfirmation)
+            {
+                if (CurrentUser?.Role == RoleType.Expert || CurrentUser?.Role == RoleType.Admin)
+                {
+                    _expertRating = new RatingRequest();
+                    var rating = IdeaRatings.FirstOrDefault(r => r.ExpertId == CurrentUser.Id);
+                    if (rating is not null)
+                    {
+                        if (rating.IsConfirmed) isRatingConfirmed = true;
+                        else
+                        {
+                            _expertRating.Id = rating.Id;
+                            _expertRating.MarketValue = rating.MarketValue;
+                            _expertRating.Originality = rating.Originality;
+                            _expertRating.TechnicalRealizability = rating.TechnicalRealizability;
+                            _expertRating.Suitability = rating.Suitability;
+                            _expertRating.Budget = rating.Budget;
+
+                            UpdateRatingScore();
+                        }
+                    }
+                }
+            }
+
+            if (CurrentIdea is not null)
+            {
+                await IdeasService.UpdateCheckedIdeaAsync(CurrentIdea.Id);
+                CurrentIdea.IsChecked = true;
+            }
+
             isLoading = false;
         }
 
         private static List<IdeaModalItem> GetIdeaData(Idea? idea, List<Skill> skills) => [
-            new IdeaModalItem
-            {
-                Title = "Проблема",
-                Data = idea?.Problem
-            },
-            new IdeaModalItem
-            {
-                Title = "Предлагаемое решение",
-                Data = idea?.Solution
-            },
-            new IdeaModalItem
-            {
-                Title = "Ожидаемый результат",
-                Data = idea?.Result
-            },
-            new IdeaModalItem
-            {
-                Title = "Описание необходимых ресурсов для реализации",
-                Data = idea?.Description
-            },
-            new IdeaModalItem
-            {
-                Title = "Стек технологий",
-                Data = skills
-            }
+            new IdeaModalItem { Title = "Проблема",                                     Data = idea?.Problem        },
+            new IdeaModalItem { Title = "Предлагаемое решение",                         Data = idea?.Solution       },
+            new IdeaModalItem { Title = "Ожидаемый результат",                          Data = idea?.Result         },
+            new IdeaModalItem { Title = "Описание необходимых ресурсов для реализации", Data = idea?.Description    },
+            new IdeaModalItem { Title = "Стек технологий",                              Data = skills               }
         ];
 
         private void UpdateRatingScore()
@@ -169,7 +179,7 @@ namespace HITSBlazor.Components.Modals.RightSideModals.IdeaModal
                 !_expertRating.Budget.HasValue
             ) return;
 
-            _expertRating.Rating = Formulas.CalculcateRating(
+            _expertRatingValue = Formulas.CalculcateRating(
                 [
                     _expertRating.MarketValue.Value, 
                     _expertRating.Originality.Value, 
@@ -182,22 +192,29 @@ namespace HITSBlazor.Components.Modals.RightSideModals.IdeaModal
             StateHasChanged();
         }
 
-        private void ConfirmRating()
+        private async Task ConfirmRating()
         {
             isRatingConfirming = true;
 
-
+            if (_expertRating is not null && await IdeasService.SendRatingAsync(_expertRating, true))
+            {
+                isRatingConfirmed = true;
+                IdeaRatings.FirstOrDefault(r => r.Id == _expertRating.Id)?.IsConfirmed = true;
+                if (IdeaRatings.Count() == IdeaRatings.Count(r => r.IsConfirmed))
+                    CurrentIdea?.Status = IdeaStatusType.Confirmed;
+            }    
 
             isRatingConfirming = false;
         }
 
-        private void SaveRating()
+        private async Task SaveRating()
         {
             isRatingSaving = true;
 
+            if (_expertRating is not null && await IdeasService.SendRatingAsync(_expertRating))
+                isRatingSaved = true;
 
             isRatingSaving = false;
-            isRatingSaved = true;
         }
 
         private bool CheckIdeaButtonsAccess()
@@ -213,12 +230,7 @@ namespace HITSBlazor.Components.Modals.RightSideModals.IdeaModal
                 (CurrentIdea?.Status == IdeaStatusType.New || CurrentIdea?.Status == IdeaStatusType.OnEditing)
             ) return true;
 
-            if (
-                userRole == RoleType.ProjectOffice &&
-                (CurrentIdea?.Status == IdeaStatusType.OnApproval || CurrentIdea?.Status == IdeaStatusType.Confirmed)
-            ) return true;
-
-            if (userRole == RoleType.Expert && CurrentIdea?.Status == IdeaStatusType.OnConfirmation) return true;
+            if (userRole == RoleType.ProjectOffice && CurrentIdea?.Status == IdeaStatusType.OnApproval) return true;
 
             return false;
         }

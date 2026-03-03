@@ -23,7 +23,7 @@ namespace HITSBlazor.Components.Modals.CenterModals.SelectActiveRoleModal
         private async void SetUserRole(RoleType role)
         {
             await AuthService.SetUserRoleAsync(role);
-            ModalService.Close(ModalType.Center);
+            await ModalService.Close(ModalType.Center);
         }
     }
 }

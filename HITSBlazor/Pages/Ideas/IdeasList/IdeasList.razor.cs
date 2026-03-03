@@ -13,7 +13,7 @@ namespace HITSBlazor.Pages.Ideas.IdeasList
     [Authorize]
     [Route("/ideas/list")]
     [Route("/ideas/list/{IdeaId}")]
-    public partial class IdeasList
+    public partial class IdeasList : IDisposable
     {
         [Inject]
         private IAuthService AuthService { get; set; } = null!;
@@ -46,13 +46,15 @@ namespace HITSBlazor.Pages.Ideas.IdeasList
 
         protected override async Task OnInitializedAsync()
         {
+            IdeasService.OnIdeasStateChanged += UpdateUIState;
+            ModalService.OnCloseSideModalContainer += IdeaModalHasClosed;
             await LoadIdeasAsync();
         }
 
         protected override async Task OnParametersSetAsync()
         {
             if (Guid.TryParse(IdeaId, out Guid guid))
-                await ShowIdea(guid);
+                ModalService.ShowIdeaModal(guid);
         }
 
         private async Task SearchIdea(string value)
@@ -71,17 +73,14 @@ namespace HITSBlazor.Pages.Ideas.IdeasList
             await LoadIdeasAsync();
         }
 
-        private async void ResetFilters()
+        private async Task ResetFilters()
         {
             SelectedStatuses.Clear();
             await LoadIdeasAsync();
         }
 
         private async Task ShowIdea(Guid ideaId)
-        {
-            await IdeasService.UpdateCheckedIdeaAsync(ideaId);
-            ModalService.ShowIdeaModal(ideaId);
-        }
+            => await NavigationService.NavigateToAsync($"/ideas/list/{ideaId}");
 
         private async Task OnIdeaAction(TableActionContext context)
         {
@@ -102,6 +101,17 @@ namespace HITSBlazor.Pages.Ideas.IdeasList
 
                 _ideas.Remove(idea);
             }
+        }
+
+        private void UpdateUIState() => StateHasChanged();
+
+        private async void IdeaModalHasClosed() 
+            => await NavigationService.NavigateToAsync($"/ideas/list");
+
+        public void Dispose()
+        {
+            IdeasService.OnIdeasStateChanged -= UpdateUIState;
+            ModalService.OnCloseSideModalContainer -= IdeaModalHasClosed;
         }
     }
 }

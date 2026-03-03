@@ -46,10 +46,10 @@ namespace HITSBlazor.Components.Modals.CenterModals.CenterModalContainer
             StateHasChanged();
         }
 
-        private void CloseModalIfAllowed()
+        private async Task CloseModalIfAllowed()
         {
             if (!_isBlockCloseModal)
-                ModalService.Close(ModalType.Center);
+                await ModalService.Close(ModalType.Center);
         }
 
         private async void StartModalCloseAnimation()

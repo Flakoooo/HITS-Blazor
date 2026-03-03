@@ -8,6 +8,8 @@ namespace HITSBlazor.Services.Ideas
 {
     public interface IIdeasService
     {
+        event Action? OnIdeasStateChanged;
+
         //Ideas
         Task<List<Idea>> GetIdeasAsync(string? searchText = null, HashSet<IdeaStatusType>? statusTypes = null);
         Task<Idea?> GetIdeaByIdAsync(Guid id);

@@ -11,6 +11,6 @@ namespace HITSBlazor.Components.Modals.Components.ModalHeader
         [Parameter]
         public string Title { get; set; } = string.Empty;
 
-        private void CloseModal() => ModalService.Close(ModalType.RightSide);
+        private async Task CloseModal() => await ModalService.Close(ModalType.RightSide);
     }
 }
