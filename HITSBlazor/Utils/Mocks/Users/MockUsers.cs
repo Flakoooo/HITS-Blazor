@@ -292,5 +292,8 @@ namespace HITSBlazor.Utils.Mocks.Users
             => [.. _users.Select(u => u.Email)];
 
         public static List<User> GetAllUsers() => _users;
+
+        public static List<User> GetUsersByRole(RoleType role) 
+            => [.. _users.Where(u => u.Roles.Contains(role))];
     }
 }

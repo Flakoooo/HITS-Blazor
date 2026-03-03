@@ -52,31 +52,27 @@ namespace HITSBlazor.Pages.Ideas.IdeasCreate
         private User? SelectedContactPerson { get; set; } = null;
 
 
-        private string _suitabilityScore = string.Empty;
         private string SuitabilityScore { 
-            get => _suitabilityScore; 
+            get => _ideasCreateModel.Suitability.ToString(); 
             set 
             {
-                if (_suitabilityScore != value)
+                if (int.TryParse(value, out int intValue) && _ideasCreateModel.Suitability != intValue)
                 {
-                    _suitabilityScore = value;
-                    if (int.TryParse(value, out int suitability))
-                        _ideasCreateModel.Suitability = suitability;
+                    _ideasCreateModel.Suitability = intValue;
+                    UpdatePreAssessmentScore();
                 }
             }
         }
 
 
-        private string _budgetScore = string.Empty;
         private string BudgetScore { 
-            get => _budgetScore;
+            get => _ideasCreateModel.Budget.ToString();
             set
             {
-                if (_budgetScore != value)
+                if (int.TryParse(value, out int intValue) && _ideasCreateModel.Budget != intValue)
                 {
-                    _budgetScore = value;
-                    if (int.TryParse(value, out int budget))
-                        _ideasCreateModel.Budget = budget;
+                    _ideasCreateModel.Budget = intValue;
+                    UpdatePreAssessmentScore();
                 }
             }
         }
@@ -177,22 +173,10 @@ namespace HITSBlazor.Pages.Ideas.IdeasCreate
             return [];
         }
 
-        private void OnSuitabilityChanged(string value)
-        {
-            SuitabilityScore = value;
-            UpdatePreAssessmentScore();
-        }
-
-        private void OnBudgetChanged(string value)
-        {
-            BudgetScore = value;
-            UpdatePreAssessmentScore();
-        }
-
         private void UpdatePreAssessmentScore()
         {
             _preAssessmentScore = (int.TryParse(SuitabilityScore, out int s) && int.TryParse(BudgetScore, out int b))
-                ? Math.Round((s + b) / 2.0, 2)
+                ? Formulas.CalculcateRating([s, b])
                 : null;
             StateHasChanged();
         }

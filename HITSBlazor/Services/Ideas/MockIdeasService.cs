@@ -1,4 +1,5 @@
-﻿using HITSBlazor.Models.Common.Entities;
+﻿using HITSBlazor.Components.Modals.RightSideModals.IdeaModal;
+using HITSBlazor.Models.Common.Entities;
 using HITSBlazor.Models.Ideas.Entities;
 using HITSBlazor.Models.Ideas.Enums;
 using HITSBlazor.Pages.Ideas.IdeasCreate;
@@ -44,12 +45,6 @@ namespace HITSBlazor.Services.Ideas
 
         public async Task<Idea?> GetIdeaByIdAsync(Guid id) => MockIdeas.GetIdeaById(id);
 
-        public async Task<List<Skill>> GetAllIdeaSkillsAsync(Guid ideaId)
-            => MockIdeaSkills.GetIdeaSkillsByIdeaId(ideaId);
-
-        public async Task<List<Rating>> GetIdeaRatingsAsync(Guid ideaId)
-            => MockRatings.GetIdeaRatingById(ideaId);
-
         public async Task<bool> CreateNewIdeaAsync(IdeasCreateModel ideasCreateModel)
         {
             if (_authService.CurrentUser is null)
@@ -68,6 +63,16 @@ namespace HITSBlazor.Services.Ideas
                 _globalNotificationService.ShowSuccess("Черновик идеи сохранен");
             else if (ideasCreateModel.Status == IdeaStatusType.OnApproval)
                 _globalNotificationService.ShowSuccess("Идея отправлена на согласование");
+
+            return true;
+        }
+
+        public async Task<bool> UpdateCheckedIdeaAsync(Guid ideaId)
+        {
+            if (!MockIdeas.CheckIdea(ideaId)) return false;
+
+            var index = _cachedIdeas.FindIndex(i => i.Id == ideaId);
+            _cachedIdeas[index].IsChecked = true;
 
             return true;
         }
@@ -120,6 +125,21 @@ namespace HITSBlazor.Services.Ideas
 
             _cachedIdeas.Remove(idea);
             return true;
+        }
+
+        //Skills
+        public async Task<List<Skill>> GetAllIdeaSkillsAsync(Guid ideaId)
+            => MockIdeaSkills.GetIdeaSkillsByIdeaId(ideaId);
+
+        //Ratings
+        public async Task<List<Rating>> GetIdeaRatingsAsync(Guid ideaId)
+            => MockRatings.GetIdeaRatingById(ideaId);
+
+        public async Task<bool> SendRatingAsync(RatingRequest request, bool isConfirmed)
+        {
+            return isConfirmed 
+                ? MockRatings.UpdateOrConfirmRating(request, isConfirmed) 
+                : MockRatings.UpdateOrConfirmRating(request);
         }
 
         //Comments

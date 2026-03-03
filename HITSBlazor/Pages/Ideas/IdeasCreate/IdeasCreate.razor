@@ -160,15 +160,13 @@
             <div class="row">
                 <div class="col">
                     <Select Label="Пригодность"
-                            Value="@SuitabilityScore"
-                            Options="IdeasRatingCategories.SuitabilityOptions"
-                            OnValueSelected="@((value) => OnSuitabilityChanged(value))" />
+                            @bind-Value="@SuitabilityScore"
+                            Options="IdeasRatingCategories.SuitabilityOptions" />
                 </div>
                 <div class="col">
                     <Select Label="Бюджет" 
-                            Value="@BudgetScore" 
-                            Options="IdeasRatingCategories.BudgetOptions"
-                            OnValueSelected="@((value) => OnBudgetChanged(value))" />
+                            @bind-Value="@BudgetScore" 
+                            Options="IdeasRatingCategories.BudgetOptions" />
                 </div>
             </div>
             <div class="col">

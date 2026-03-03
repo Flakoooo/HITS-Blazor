@@ -52,7 +52,7 @@ namespace HITSBlazor.Pages.Ideas.IdeasList
         protected override async Task OnParametersSetAsync()
         {
             if (Guid.TryParse(IdeaId, out Guid guid))
-                ShowIdea(guid);
+                await ShowIdea(guid);
         }
 
         private async Task SearchIdea(string value)
@@ -77,14 +77,18 @@ namespace HITSBlazor.Pages.Ideas.IdeasList
             await LoadIdeasAsync();
         }
 
-        private void ShowIdea(Guid ideaId) => ModalService.ShowIdeaModal(ideaId);
+        private async Task ShowIdea(Guid ideaId)
+        {
+            await IdeasService.UpdateCheckedIdeaAsync(ideaId);
+            ModalService.ShowIdeaModal(ideaId);
+        }
 
         private async Task OnIdeaAction(TableActionContext context)
         {
             if (context.Action == MenuAction.View)
             {
                 if (context.Item is Guid guid)
-                    ShowIdea(guid);
+                    await ShowIdea(guid);
             }
             else if (context.Action == MenuAction.Edit)
             {

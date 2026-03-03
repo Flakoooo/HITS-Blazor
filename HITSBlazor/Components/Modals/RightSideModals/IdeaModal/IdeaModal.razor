@@ -68,52 +68,64 @@
                 }
             </ul>
         }
-        <!-- тут калькулятор экспертов -->
-        <div class="idea-modal-rating bg-white rounded-3 p-3 d-grid w-100">
-            <div class="w-100 row row-cols-2">
-                <div class="w-50 col-2 mb-2">
-                    @if (isLoading)
-                    {
-                        @for (int i = 0; i < 5; ++i)
+        @if (CurrentIdea?.Status == IdeaStatusType.OnConfirmation)
+        {
+            <div class="idea-modal-rating bg-white rounded-3 p-3 d-grid w-100">
+                <div class="w-100 row row-cols-2">
+                    <div class="w-50 col-2 mb-2">
+                        @if (isLoading)
                         {
-                            <Placeholder Height="PlaceholderHeight.Small" />
+                            @for (int i = 0; i < 5; ++i)
+                            {
+                                <Placeholder Height="PlaceholderHeight.Small" />
+                            }
                         }
-                    }
-                    else
-                    {
-                        <Select Label="Рыночная ценность*" Options="IdeasRatingCategories.MarketValueOptions" />
-                        <Select Label="Уникальность*" Options="IdeasRatingCategories.OriginalityOptions" />
-                        <Select Label="Реализуемость*" Options="IdeasRatingCategories.TechnicalRealizabilityOptions" />
-                        <Select Label="Пригодность*" Options="IdeasRatingCategories.SuitabilityOptions" />
-                        <Select Label="Бюджет*" Options="IdeasRatingCategories.BudgetOptions" />
-                    }
+                        else
+                        {
+                            <Select Label="Рыночная ценность" 
+                                    @bind-Value="@MarketValue"
+                                    Options="IdeasRatingCategories.MarketValueOptions" />
+                            <Select Label="Уникальность" 
+                                    @bind-Value="@Originality"
+                                    Options="IdeasRatingCategories.OriginalityOptions" />
+                            <Select Label="Реализуемость" 
+                                    @bind-Value="@TechnicalRealizability"
+                                    Options="IdeasRatingCategories.TechnicalRealizabilityOptions" />
+                            <Select Label="Пригодность" 
+                                    @bind-Value="@Suitability"
+                                    Options="IdeasRatingCategories.SuitabilityOptions" />
+                            <Select Label="Бюджет" 
+                                    @bind-Value="@Budget"
+                                    Options="IdeasRatingCategories.BudgetOptions" />
+                        }
+                    </div>
                 </div>
-            </div>
-            @if (isLoading)
-            {
-                <Placeholder />
-            }
-            else
-            {
-                <ProgressBar Text="Рейтинг" 
-                             Score="0"
-                             CategoryCounts="5" />
-                <div class="d-flex gap-3">
-                    <Button BtnType="ButtonType.Button" 
-                            Variant="ButtonVariant.Primary" 
-                            IsLoading="isRatingSaving"
-                            OnButtonClick="ConfirmRating"
-                            Text="Утвердить"
-                            LoadingText="Утверждение"/>
-                    <Button BtnType="ButtonType.Button" 
-                            Variant="@(isRatingSaved ? ButtonVariant.Success : ButtonVariant.Primary)" 
-                            IsLoading="isRatingConfirming"
-                            OnButtonClick="SaveRating"
-                            Text="Сохранить форму"
-                            LoadingText="Сохранение"/>
-                </div>
-            }
-        </div>
+                @if (isLoading)
+                {
+                    <Placeholder />
+                }
+                else
+                {
+                    <ProgressBar Text="Рейтинг" 
+                                 Score="_expertRating?.Rating"
+                                 CategoryCounts="5" />
+                    <div class="d-flex gap-3">
+                        <Button BtnType="ButtonType.Button" 
+                                Variant="ButtonVariant.Primary" 
+                                IsLoading="isRatingSaving"
+                                OnButtonClick="ConfirmRating"
+                                Text="Утвердить"
+                                LoadingText="Утверждение"/>
+                        <Button BtnType="ButtonType.Button" 
+                                Variant="@(isRatingSaved ? ButtonVariant.Success : ButtonVariant.Primary)" 
+                                IsLoading="isRatingConfirming"
+                                OnButtonClick="SaveRating"
+                                Text="Сохранить форму"
+                                LoadingText="Сохранение"/>
+                    </div>
+                }
+            </div>            
+        }
         @if (CheckIdeaButtonsAccess())
         {
             <div class="bg-white d-flex rounded-3 @(isLoading ? "p-2 gap-2" : "p-3 gap-3 flex-wrap")">

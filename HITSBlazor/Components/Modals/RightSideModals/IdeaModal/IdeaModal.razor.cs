@@ -4,13 +4,12 @@ using HITSBlazor.Models.Ideas.Entities;
 using HITSBlazor.Models.Ideas.Enums;
 using HITSBlazor.Models.Users.Entities;
 using HITSBlazor.Models.Users.Enums;
-using HITSBlazor.Pages.Ideas.IdeasCreate;
 using HITSBlazor.Services;
 using HITSBlazor.Services.Auth;
 using HITSBlazor.Services.Ideas;
 using HITSBlazor.Services.Modal;
+using HITSBlazor.Utils;
 using Microsoft.AspNetCore.Components;
-using System.Linq;
 
 namespace HITSBlazor.Components.Modals.RightSideModals.IdeaModal
 {
@@ -44,19 +43,70 @@ namespace HITSBlazor.Components.Modals.RightSideModals.IdeaModal
 
         private List<IdeaModalItem> ideaData = [];
 
-        private Rating? _expertRating = null;
+        private RatingRequest? _expertRating = null;
 
-        private string _marketValue = string.Empty;
+
         private string MarketValue
         {
-            get => _marketValue.ToString();
+            get => _expertRating?.MarketValue.ToString() ?? string.Empty;
             set 
             {
-                if (_marketValue != value)
+                if (int.TryParse(value, out int intValue) && _expertRating?.MarketValue != intValue)
                 {
-                    _marketValue = value;
-                    if (int.TryParse(value, out int suitability))
-                        _expertRating?.MarketValue = suitability;
+                    _expertRating?.MarketValue = intValue;
+                    UpdateRatingScore();
+                }
+            }
+        }
+
+        private string Originality
+        {
+            get => _expertRating?.Originality.ToString() ?? string.Empty;
+            set
+            {
+                if (int.TryParse(value, out int intValue) && _expertRating?.Originality != intValue)
+                {
+                    _expertRating?.Originality = intValue;
+                    UpdateRatingScore();
+                }
+            }
+        }
+
+        private string TechnicalRealizability
+        {
+            get => _expertRating?.TechnicalRealizability.ToString() ?? string.Empty;
+            set
+            {
+                if (int.TryParse(value, out int intValue) && _expertRating?.TechnicalRealizability != intValue)
+                {
+                    _expertRating?.TechnicalRealizability = intValue;
+                    UpdateRatingScore();
+                }
+            }
+        }
+
+        private string Suitability
+        {
+            get => _expertRating?.Suitability.ToString() ?? string.Empty;
+            set
+            {
+                if (int.TryParse(value, out int intValue) && _expertRating?.Suitability != intValue)
+                {
+                    _expertRating?.Suitability = intValue;
+                    UpdateRatingScore();
+                }
+            }
+        }
+
+        private string Budget
+        {
+            get => _expertRating?.Budget.ToString() ?? string.Empty;
+            set
+            {
+                if (int.TryParse(value, out int intValue) && _expertRating?.Budget != intValue)
+                {
+                    _expertRating?.Budget = intValue;
+                    UpdateRatingScore();
                 }
             }
         }
@@ -67,8 +117,8 @@ namespace HITSBlazor.Components.Modals.RightSideModals.IdeaModal
 
             CurrentUser = AuthService.CurrentUser;
 
-            if (CurrentUser?.Role == RoleType.Expert)
-                _expertRating = new Rating();
+            if (CurrentUser?.Role == RoleType.Expert || CurrentUser?.Role == RoleType.Admin)
+                _expertRating = new RatingRequest();
 
             CurrentIdea = await IdeasService.GetIdeaByIdAsync(IdeaId);
             IdeaSkills = await IdeasService.GetAllIdeaSkillsAsync(IdeaId);
@@ -107,6 +157,31 @@ namespace HITSBlazor.Components.Modals.RightSideModals.IdeaModal
             }
         ];
 
+        private void UpdateRatingScore()
+        {
+            if (_expertRating is null) return;
+
+            if (
+                !_expertRating.MarketValue.HasValue || 
+                !_expertRating.Originality.HasValue || 
+                !_expertRating.TechnicalRealizability.HasValue ||
+                !_expertRating.Suitability.HasValue ||
+                !_expertRating.Budget.HasValue
+            ) return;
+
+            _expertRating.Rating = Formulas.CalculcateRating(
+                [
+                    _expertRating.MarketValue.Value, 
+                    _expertRating.Originality.Value, 
+                    _expertRating.TechnicalRealizability.Value,
+                    _expertRating.Suitability.Value,
+                    _expertRating.Budget.Value
+                ]
+            );
+
+            StateHasChanged();
+        }
+
         private void ConfirmRating()
         {
             isRatingConfirming = true;
@@ -121,8 +196,8 @@ namespace HITSBlazor.Components.Modals.RightSideModals.IdeaModal
             isRatingSaving = true;
 
 
-
             isRatingSaving = false;
+            isRatingSaved = true;
         }
 
         private bool CheckIdeaButtonsAccess()

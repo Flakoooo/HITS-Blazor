@@ -1,9 +1,11 @@
-﻿using HITSBlazor.Models.Ideas.Entities;
+﻿using HITSBlazor.Models.Common.Entities;
+using HITSBlazor.Models.Ideas.Entities;
 using HITSBlazor.Models.Ideas.Enums;
 using HITSBlazor.Models.Users.Entities;
 using HITSBlazor.Pages.Ideas.IdeasCreate;
 using HITSBlazor.Utils.Mocks.Common;
 using HITSBlazor.Utils.Mocks.Users;
+using Newtonsoft.Json.Linq;
 
 namespace HITSBlazor.Utils.Mocks.Ideas
 {
@@ -20,9 +22,11 @@ namespace HITSBlazor.Utils.Mocks.Ideas
         public static Guid PWTechnologyId { get; } = Guid.NewGuid();
         public static Guid EMetricsViewerId { get; } = Guid.NewGuid();
         public static Guid CalculatorId { get; } = Guid.NewGuid();
+        public static Guid TestIdeaId { get; } = Guid.NewGuid();
         public static Guid ChatBotId { get; } = Guid.NewGuid();
         public static Guid ArmatureId { get; } = Guid.NewGuid();
 
+        private static readonly Random _random = new();
         private static readonly List<Idea> _ideas = CreateIdeas();
 
         private static List<Idea> CreateIdeas()
@@ -39,8 +43,11 @@ namespace HITSBlazor.Utils.Mocks.Ideas
             var hits = MockCompanies.GetCompanyById(MockCompanies.HITSId)!;
             string hitsContactPersonFullName = hits.Users.FirstOrDefault()?.FullName ?? "null null";
 
-            return
-            [
+            var projectOfficeGroup = MockUsersGroups.GetGroupById(MockUsersGroups.ProjectOfficeId)!;
+            var expertGtoup = MockUsersGroups.GetGroupById(MockUsersGroups.ExpertsId)!;
+
+            var ideas = new List<Idea>()
+            {
                 new Idea
                 {
                     Id = RefactorId,
@@ -57,14 +64,7 @@ namespace HITSBlazor.Utils.Mocks.Ideas
                     MinTeamSize = 3,
                     Customer = hits.Name,
                     ContactPerson = hitsContactPersonFullName,
-                    Experts = null,
-                    ProjectOffice = null,
-                    Budget = 1,
-                    Suitability = 1,
-                    PreAssessment = 1,
-                    Rating = null,
-                    IsChecked = true,
-                    IsActive = false
+                    IsChecked = true
                 },
                 new Idea
                 {
@@ -82,14 +82,7 @@ namespace HITSBlazor.Utils.Mocks.Ideas
                     MinTeamSize = 3,
                     Customer = hits.Name,
                     ContactPerson = hitsContactPersonFullName,
-                    Experts = null,
-                    ProjectOffice = null,
-                    Budget = 4,
-                    Suitability = 3,
-                    PreAssessment = 4,
-                    Rating = 2,
-                    IsChecked = false,
-                    IsActive = false
+                    IsChecked = false
                 },
                 new Idea
                 {
@@ -107,14 +100,7 @@ namespace HITSBlazor.Utils.Mocks.Ideas
                     MinTeamSize = 5,
                     Customer = hits.Name,
                     ContactPerson = hitsContactPersonFullName,
-                    Experts = null,
-                    ProjectOffice = null,
-                    Budget = 4,
-                    Suitability = 3,
-                    PreAssessment = 4,
-                    Rating = 4,
-                    IsChecked = false,
-                    IsActive = false
+                    IsChecked = false
                 },
                 new Idea
                 {
@@ -132,14 +118,7 @@ namespace HITSBlazor.Utils.Mocks.Ideas
                     MinTeamSize = 5,
                     Customer = hits.Name,
                     ContactPerson = hitsContactPersonFullName,
-                    Experts = null,
-                    ProjectOffice = null,
-                    Budget = 4,
-                    Suitability = 3,
-                    PreAssessment = 4,
-                    Rating = 4,
-                    IsChecked = false,
-                    IsActive = false
+                    IsChecked = false
                 },
                 new Idea
                 {
@@ -157,14 +136,7 @@ namespace HITSBlazor.Utils.Mocks.Ideas
                     MinTeamSize = 5,
                     Customer = hits.Name,
                     ContactPerson = hitsContactPersonFullName,
-                    Experts = null,
-                    ProjectOffice = null,
-                    Budget = 4,
-                    Suitability = 3,
-                    PreAssessment = 4,
-                    Rating = 4,
-                    IsChecked = true,
-                    IsActive = false
+                    IsChecked = true
                 },
                 new Idea
                 {
@@ -182,14 +154,7 @@ namespace HITSBlazor.Utils.Mocks.Ideas
                     MinTeamSize = 5,
                     Customer = hits.Name,
                     ContactPerson = hitsContactPersonFullName,
-                    Experts = null,
-                    ProjectOffice = null,
-                    Budget = 4,
-                    Suitability = 3,
-                    PreAssessment = 4,
-                    Rating = 4,
-                    IsChecked = false,
-                    IsActive = true
+                    IsChecked = false
                 },
                 new Idea
                 {
@@ -207,14 +172,7 @@ namespace HITSBlazor.Utils.Mocks.Ideas
                     MinTeamSize = 5,
                     Customer = "null",
                     ContactPerson = $"{anton.FirstName} {anton.LastName}",
-                    Experts = null,
-                    ProjectOffice = null,
-                    Budget = 4,
-                    Suitability = 3,
-                    PreAssessment = 4,
-                    Rating = 4,
-                    IsChecked = false,
-                    IsActive = true
+                    IsChecked = false
                 },
                 new Idea
                 {
@@ -232,14 +190,7 @@ namespace HITSBlazor.Utils.Mocks.Ideas
                     MinTeamSize = 5,
                     Customer = "null",
                     ContactPerson = $"{lubov.FirstName} {lubov.LastName}",
-                    Experts = null,
-                    ProjectOffice = null,
-                    Budget = 4,
-                    Suitability = 3,
-                    PreAssessment = 4,
-                    Rating = 4,
-                    IsChecked = false,
-                    IsActive = true
+                    IsChecked = false
                 },
                 new Idea
                 {
@@ -257,18 +208,11 @@ namespace HITSBlazor.Utils.Mocks.Ideas
                     MinTeamSize = 5,
                     Customer = "null",
                     ContactPerson = $"{dmitry.FirstName} {dmitry.LastName}",
-                    Experts = null,
-                    ProjectOffice = null,
-                    Budget = 4,
-                    Suitability = 3,
-                    PreAssessment = 4,
-                    Rating = 4,
-                    IsChecked = false,
-                    IsActive = true
+                    IsChecked = false
                 },
                 new Idea
                 {
-                    Id = CalculatorId,
+                    Id = TestIdeaId,
                     Initiator = kirill,
                     Name = "Идея для проверки",
                     Problem = "null",
@@ -282,14 +226,7 @@ namespace HITSBlazor.Utils.Mocks.Ideas
                     MinTeamSize = 5,
                     Customer = hits.Name,
                     ContactPerson = hitsContactPersonFullName,
-                    Experts = null,
-                    ProjectOffice = null,
-                    Budget = 4,
-                    Suitability = 3,
-                    PreAssessment = 4,
-                    Rating = 4,
-                    IsChecked = false,
-                    IsActive = true
+                    IsChecked = false
                 },
                 new Idea
                 {
@@ -307,14 +244,7 @@ namespace HITSBlazor.Utils.Mocks.Ideas
                     MinTeamSize = 5,
                     Customer = hits.Name,
                     ContactPerson = hitsContactPersonFullName,
-                    Experts = null,
-                    ProjectOffice = null,
-                    Budget = 4,
-                    Suitability = 3,
-                    PreAssessment = 4,
-                    Rating = 4,
-                    IsChecked = false,
-                    IsActive = true
+                    IsChecked = false
                 },
                 new Idea
                 {
@@ -332,16 +262,31 @@ namespace HITSBlazor.Utils.Mocks.Ideas
                     MinTeamSize = 5,
                     Customer = hits.Name,
                     ContactPerson = hitsContactPersonFullName,
-                    Experts = null,
-                    ProjectOffice = null,
-                    Budget = 4,
-                    Suitability = 3,
-                    PreAssessment = 4,
-                    Rating = 4,
-                    IsChecked = false,
-                    IsActive = true
+                    IsChecked = false
                 }
-            ];
+            };
+
+            foreach (var idea in ideas)
+            {
+                idea.Experts = expertGtoup.WithUsers(
+                        MockUsersGroups.GetRandomGroupUsersById(MockUsersGroups.ExpertsId, _random.Next(1, 3))
+                );
+                idea.ProjectOffice = projectOfficeGroup.WithUsers(
+                    MockUsersGroups.GetRandomGroupUsersById(MockUsersGroups.ProjectOfficeId, 1)
+                );
+
+                idea.Budget = _random.Next(1, 6);
+                idea.Suitability = _random.Next(1, 6);
+
+                idea.PreAssessment = Formulas.CalculcateRating(
+                    [idea.Budget, idea.Suitability]
+                );
+
+                idea.Rating = MockRatings.CreateRatingByIdea(idea);
+                idea.IsActive = true;
+            }
+
+            return ideas;
         }
 
         public static List<Idea> GetAllIdeas() => [.. _ideas];
@@ -355,6 +300,7 @@ namespace HITSBlazor.Utils.Mocks.Ideas
         public static bool CreateNewIdea(IdeasCreateModel model, User initiator)
         {
             var createdDate = DateTime.UtcNow;
+
             var idea = new Idea()
             {
                 Id = Guid.NewGuid(),
@@ -371,15 +317,18 @@ namespace HITSBlazor.Utils.Mocks.Ideas
                 MaxTeamSize = model.MaxTeamSize,
                 MinTeamSize = model.MinTeamSize,
 
-                //TODO: Сделать реализацию групп экспертов и проектного офиса
-                ProjectOffice = null,
-                Experts = null,
+                ProjectOffice = MockUsersGroups.GetGroupById(MockUsersGroups.ProjectOfficeId)!.WithUsers(
+                    MockUsersGroups.GetRandomGroupUsersById(MockUsersGroups.ProjectOfficeId, 1)
+                ),
+                Experts = MockUsersGroups.GetGroupById(MockUsersGroups.ExpertsId)!.WithUsers(
+                    MockUsersGroups.GetRandomGroupUsersById(MockUsersGroups.ExpertsId, _random.Next(1, 3))
+                ),
                 Customer = model.Customer,
                 ContactPerson = model.ContactPerson,
 
                 Suitability = model.Suitability,
                 Budget = model.Budget,
-                PreAssessment = Math.Round((model.Suitability + model.Budget) / 2.0, 2),
+                PreAssessment = Formulas.CalculcateRating([model.Suitability, model.Budget]),
                 Rating = null,
 
                 IsChecked = false,
@@ -387,6 +336,15 @@ namespace HITSBlazor.Utils.Mocks.Ideas
             };
             _ideas.Add(idea);
 
+            return true;
+        }
+
+        public static bool CheckIdea(Guid ideaId)
+        {
+            var idea = _ideas.FirstOrDefault(i => i.Id == ideaId);
+            if (idea is null) return false;
+
+            idea.IsChecked = true;
             return true;
         }
 
@@ -409,7 +367,7 @@ namespace HITSBlazor.Utils.Mocks.Ideas
 
             idea.Suitability = model.Suitability;
             idea.Budget = model.Budget;
-            idea.PreAssessment = Math.Round((model.Suitability + model.Budget) / 2.0, 2);
+            idea.PreAssessment = Formulas.CalculcateRating([model.Suitability, model.Budget]);
 
             return true;
         }

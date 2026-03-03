@@ -11,12 +11,12 @@ namespace HITSBlazor.Components.Inputs.Select
         public string Value { get; set; } = string.Empty;
 
         [Parameter]
-        public List<KeyValuePair<int, string>> Options { get; set; } = [];
+        public EventCallback<string> ValueChanged { get; set; }
 
         [Parameter]
-        public EventCallback<string> OnValueSelected { get; set; }
+        public List<KeyValuePair<int, string>> Options { get; set; } = [];
 
         private async Task OnOptionChanged(ChangeEventArgs e)
-            => await OnValueSelected.InvokeAsync(e.Value?.ToString() ?? "");
+            => await ValueChanged.InvokeAsync(e.Value?.ToString() ?? "");
     }
 }

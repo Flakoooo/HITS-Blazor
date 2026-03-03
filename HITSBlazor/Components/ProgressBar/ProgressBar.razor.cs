@@ -28,20 +28,19 @@ namespace HITSBlazor.Components.ProgressBar
 
         private void UpdateProgressBar()
         {
-            if (_animationTimer != null && Score is null)
+            if (_animationTimer is not null || Score is null)
             {
                 _progressStyle = string.Empty;
             }
             else
             {
-                var width = (Score / CategoryCounts) * 100;
+                var width = (int)(Score.Value / CategoryCounts * 100);
                 var color = width switch
                 {
                     <= 60 => "rgb(220, 53, 69)",
                     <= 75 => "rgb(253, 126, 20)",
                     <= 90 => "rgb(255, 193, 7)",
-                    >= 91 => "rgb(25, 135, 84)",
-                    _ => "rgb(220, 53, 69)"
+                    >= 91 => "rgb(25, 135, 84)"
                 };
 
                 StopAnimation();
