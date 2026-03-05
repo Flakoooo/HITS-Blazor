@@ -13,16 +13,20 @@
                            @oninput="@(async e => await OnSearch(e))"
                            value="@SelectedContactPersonName"
                            placeholder="Выберите контактное лицо"
-                           class="form-control rounded-end"
+                           class="form-control rounded-end @(_showError ? "is-invalid" : string.Empty)"
                            style="color: #000 !important;"
                            @onclick="OpenDropdown"
                            @onfocus="OpenDropdown"
                            @onkeydown="OnInputKeyDown" />
+                    @if (_showError)
+                    {
+                        <span class="invalid-feedback">@ErrorMessage</span>
+                    }
                 </div>
             </div>
 
             <i class="bi @(IsOpen ? "bi-chevron-up" : "bi-chevron-down")"
-               style="position: absolute; bottom: auto; left: auto; top: 11px; right: 12px; z-index: 100; cursor: pointer;"
+               style="position: absolute; bottom: auto; left: auto; top: 11px; right: @(_showError ? "32" : "12")px; z-index: 100; cursor: pointer;"
                @onclick="ToggleDropdown"></i>
 
             @if (IsOpen && FilteredContactPersons.Any())

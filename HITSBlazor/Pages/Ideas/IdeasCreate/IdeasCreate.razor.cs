@@ -198,10 +198,18 @@ namespace HITSBlazor.Pages.Ideas.IdeasCreate
             if (string.IsNullOrWhiteSpace(_ideasCreateModel.Description)) isInvalid = true;
             if (string.IsNullOrWhiteSpace(_ideasCreateModel.Solution)) isInvalid = true;
             if (string.IsNullOrWhiteSpace(_ideasCreateModel.Result)) isInvalid = true;
+
             if (_ideasCreateModel.MaxTeamSize is > 30 or < 2) isInvalid = true;
             if (_ideasCreateModel.MinTeamSize is > 30 or < 2) isInvalid = true;
+
+            if (_selectedLanguageSkills.Count == 0) isInvalid = true;
+            if (_selectedFrameworkSkills.Count == 0) isInvalid = true;
+            if (_selectedDatabaseSkills.Count == 0) isInvalid = true;
+            if (_selectedDevopsSkills.Count == 0) isInvalid = true;
+
             if (SelectedCompany is null) isInvalid = true;
             if (SelectedContactPerson is null) isInvalid = true;
+
             if (_ideasCreateModel.Suitability is > 5 or < 1) isInvalid = true;
             if (_ideasCreateModel.Budget is > 5 or < 1) isInvalid = true;
 
@@ -218,7 +226,7 @@ namespace HITSBlazor.Pages.Ideas.IdeasCreate
                 return;
             }
 
-            GlobalNotificationService.ShowError("Заплните все необходимые поля");
+            GlobalNotificationService.ShowError("Заполните все необходимые поля");
             _submitted = true;
         }
 

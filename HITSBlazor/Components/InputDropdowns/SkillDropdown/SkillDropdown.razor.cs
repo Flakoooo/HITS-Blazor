@@ -4,6 +4,7 @@ using HITSBlazor.Utils.EnumTranslators;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
+using Newtonsoft.Json.Linq;
 
 namespace HITSBlazor.Components.InputDropdowns.SkillDropdown
 {
@@ -18,11 +19,26 @@ namespace HITSBlazor.Components.InputDropdowns.SkillDropdown
         [Parameter] public EventCallback<HashSet<Skill>> SelectedSkillsChanged { get; set; }
         [Parameter] public Func<SkillType, string, Task<List<Skill>>>? SearchFunction { get; set; }
 
+        [Parameter]
+        public bool NeedValidation { get; set; } = false;
+
+        [Parameter]
+        public string? ErrorMessage { get; set; } = " не выбраны";
+
+        private bool _showError = false;
+
         private ElementReference inputRef;
         private bool IsOpen { get; set; }
         private string searchText = "";
         private List<Skill> FilteredSkills { get; set; } = [];
         private DotNetObjectReference<SkillDropdown>? dotNetHelper;
+
+        protected override void OnParametersSet()
+        {
+            ErrorMessage = $"{SkillType.GetTranslation()} не выбраны";
+            _showError = NeedValidation && SelectedSkills.Count == 0;
+            StateHasChanged();
+        }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {

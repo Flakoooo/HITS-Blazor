@@ -1,5 +1,4 @@
-﻿using HITSBlazor.Models.Common.Entities;
-using HITSBlazor.Models.Users.Entities;
+﻿using HITSBlazor.Models.Users.Entities;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
@@ -18,6 +17,14 @@ namespace HITSBlazor.Components.InputDropdowns.ContactPersonDropdown
 
         [Parameter] public Func<string, Task<List<User>>>? SearchFunction { get; set; }
 
+        [Parameter]
+        public bool NeedValidation { get; set; } = false;
+
+        [Parameter]
+        public string? ErrorMessage { get; set; } = "Поле не заполнено";
+
+        private bool _showError = false;
+
         private ElementReference inputRef;
         private bool IsOpen { get; set; }
         private string searchText = "";
@@ -28,6 +35,12 @@ namespace HITSBlazor.Components.InputDropdowns.ContactPersonDropdown
             SelectedContactPerson != null ?
             $"{SelectedContactPerson.FirstName} {SelectedContactPerson.LastName}" :
             string.Empty;
+
+        protected override void OnParametersSet()
+        {
+            _showError = NeedValidation && SelectedContactPerson is null;
+            StateHasChanged();
+        }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {

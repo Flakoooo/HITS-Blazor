@@ -84,30 +84,36 @@
                     <div class="mt-2 w-100 stack-categories">
                         <SkillDropdown SkillType="SkillType.Language" 
                                        AllSkills="@_languageSkills"
+                                       NeedValidation="_submitted"
                                        @bind-SelectedSkills="@_selectedLanguageSkills"
                                        SearchFunction="@SearchSkillsAsync" />
                         <SkillDropdown SkillType="SkillType.Framework"
                                        AllSkills="@_frameworkSkills"
+                                       NeedValidation="_submitted"
                                        @bind-SelectedSkills="@_selectedFrameworkSkills"
                                        SearchFunction="@SearchSkillsAsync" />
                         <SkillDropdown SkillType="SkillType.Database" 
                                        AllSkills="@_databaseSkills"
+                                       NeedValidation="_submitted"
                                        @bind-SelectedSkills="@_selectedDatabaseSkills"
                                        SearchFunction="@SearchSkillsAsync" />
                         <SkillDropdown SkillType="SkillType.Devops" 
                                        AllSkills="@_devopsSkills"
+                                       NeedValidation="_submitted"
                                        @bind-SelectedSkills="@_selectedDevopsSkills"
                                        SearchFunction="@SearchSkillsAsync" />
                     </div>
                 }
             </div>
             <CompanyDropdown AllCompanies="@_companies"
+                             NeedValidation="_submitted"
                              @bind-SelectedCompany="@SelectedCompany"
                              SearchFunction="@SearchCompaniesAsync" />
             @if (SelectedCompany is not null)
             {
                 <ContactPersonDropdown CompanyId="@SelectedCompany.Id"
                                        AllContactPersons="@SelectedCompany.Users"
+                                       NeedValidation="_submitted"
                                        @bind-SelectedContactPerson="@SelectedContactPerson"
                                        SearchFunction="@SearchContactPersonsAsync" />
             }
