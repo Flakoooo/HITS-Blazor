@@ -107,3 +107,10 @@ input[type="checkbox"] {
     font-size: .875em;
     color: #dc3545;
 }
+
+.hint {
+    cursor: pointer;
+    display: inline-block;
+    vertical-align: middle;
+    color: #007bff;
+}

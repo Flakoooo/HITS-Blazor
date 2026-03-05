@@ -17,7 +17,7 @@ namespace HITSBlazor.Services.Ideas
         private readonly IAuthService _authService = authService;
         private readonly GlobalNotificationService _globalNotificationService = globalNotificationService;
 
-        private Dictionary<IdeasQueryType, CacheEntry<List<Idea>>> _cache = [];
+        private readonly Dictionary<IdeasQueryType, CacheEntry<List<Idea>>> _cache = [];
         private readonly TimeSpan _cacheLifetime = TimeSpan.FromMinutes(5);
 
         public event Action? OnIdeasStateChanged;

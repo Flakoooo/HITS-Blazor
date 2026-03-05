@@ -14,12 +14,7 @@ namespace HITSBlazor.Pages.Ideas.IdeasCreate
         public int MaxTeamSize { get; set; }
         public int MinTeamSize { get; set; }
 
-        //Может просто Id компании?
-        //public Guid CompanyId { get; set; }
         public string Customer { get; set; } = string.Empty;
-
-        //Может просто Id пользователя?
-        //public Guid ContactPersonId { get; set; }
         public string ContactPerson { get; set; } = string.Empty;
 
         public int Suitability { get; set; }

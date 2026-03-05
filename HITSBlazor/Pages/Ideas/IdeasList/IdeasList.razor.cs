@@ -47,7 +47,7 @@ namespace HITSBlazor.Pages.Ideas.IdeasList
                 queryType = IdeasQueryType.OnConfirmation;
 
             _ideas = await IdeasService.GetIdeasAsync(
-                    queryType,
+                    queryType: queryType,
                     searchText: _searchText,
                     statusTypes: SelectedStatuses
                 );
@@ -56,6 +56,7 @@ namespace HITSBlazor.Pages.Ideas.IdeasList
 
         protected override async Task OnInitializedAsync()
         {
+            AuthService.OnActiveRoleChanged += UserRoleHasChanged;
             IdeasService.OnIdeasStateChanged += UpdateUIState;
             ModalService.OnCloseSideModalContainer += IdeaModalHasClosed;
 
@@ -134,11 +135,36 @@ namespace HITSBlazor.Pages.Ideas.IdeasList
 
         private void UpdateUIState() => StateHasChanged();
 
+        private async void UserRoleHasChanged(RoleType? role)
+        {
+            if (role is RoleType.Expert)
+                _unapprovedIdeasByCurrentUser = true;
+            else
+                _unapprovedIdeasByCurrentUser = false;
+
+            var currentUser = AuthService.CurrentUser;
+            if (currentUser?.Role == RoleType.Member)
+            {
+                SelectedStatuses.Add(IdeaStatusType.Confirmed);
+                SelectedStatuses.Add(IdeaStatusType.OnMarket);
+            }
+            else if (currentUser?.Role == RoleType.ProjectOffice)
+            {
+                SelectedStatuses.Add(IdeaStatusType.OnApproval);
+                SelectedStatuses.Add(IdeaStatusType.Confirmed);
+            }
+            else SelectedStatuses.Clear();
+
+            await LoadIdeasAsync();
+            StateHasChanged();
+        }
+
         private async void IdeaModalHasClosed() 
             => await NavigationService.NavigateToAsync($"/ideas/list");
 
         public void Dispose()
         {
+            AuthService.OnActiveRoleChanged -= UserRoleHasChanged;
             IdeasService.OnIdeasStateChanged -= UpdateUIState;
             ModalService.OnCloseSideModalContainer -= IdeaModalHasClosed;
         }

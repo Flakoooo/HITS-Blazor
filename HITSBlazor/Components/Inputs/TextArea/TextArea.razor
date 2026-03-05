@@ -1,0 +1,22 @@
+﻿@namespace HITSBlazor.Components.Inputs.TextArea
+
+<div class="d-flex flex-column w-100 h-100">
+    @if (!string.IsNullOrWhiteSpace(Label))
+    {
+        <label class="form-label text-primary">
+            @($"{Label}{(Hint ? " " : "")}")
+            @if (Hint)
+            {
+                <i class="bi bi-patch-question hint"></i>
+            }
+        </label>
+    }
+    <div class="input-group h-100">
+        <textarea value="@Value"
+                  placeholder="@Placeholder"
+                  @oninput="@OnInputChanged"
+                  class="form-control rounded-end">
+        </textarea>
+        <span class="invalid-feedback">Поле не заполнено</span>
+    </div>
+</div>

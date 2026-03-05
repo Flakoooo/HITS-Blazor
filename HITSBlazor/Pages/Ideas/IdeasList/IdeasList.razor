@@ -1,6 +1,6 @@
 ﻿@namespace HITSBlazor.Pages.Ideas.IdeasList
 @using HITSBlazor.Components.ActionMenus.BaseActionMenu
-@using HITSBlazor.Components.Inputs.SearchInput
+@using HITSBlazor.Components.Inputs.Input
 @using HITSBlazor.Components.Tables.TableActionMenu
 @using HITSBlazor.Components.Tables.TableBodyRow
 @using HITSBlazor.Models.Ideas.Enums
@@ -27,7 +27,7 @@
         </div>
         <div class="py-2 d-flex justify-content-between">
             <div class="w-50">
-                <SearchInput ValueChanged="@((value) => SearchIdea(value))"/>
+                <Input IconStyle="bi-search" Placeholder="Поиск" ValueChanged="@((value) => SearchIdea(value))" />
             </div>
         </div>
         <!-- TODO: если идей нет, то сообщить пользователю, что идеи не найдены, н это как ИДЕЯ -->

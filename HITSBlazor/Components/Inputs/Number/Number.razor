@@ -1,0 +1,16 @@
+﻿@namespace HITSBlazor.Components.Inputs.Number
+
+<div class="w-100">
+    <div class="input-group">
+        <input type="number"
+               min="@MinValue"
+               max="@MaxValue"
+               value="@Value"
+               placeholder="@Placeholder"
+               @oninput="@OnInputChanged"
+               class="form-control rounded-end" />
+        <span class="invalid-feedback">
+            Значение должно быть от @MinValue до @MaxValue
+        </span>
+    </div>
+</div>

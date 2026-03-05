@@ -1,0 +1,28 @@
+﻿@namespace HITSBlazor.Components.Inputs.Input
+
+<div class="w-100">
+    @if (!string.IsNullOrWhiteSpace(Label))
+    {
+        <label class="form-label text-primary">
+            @($"{Label}{(Hint ? " " : "")}")
+            @if (Hint)
+            {
+                <i class="bi bi-patch-question hint"></i>
+            }
+        </label>
+    }
+    <div class="input-group">
+        @if (!string.IsNullOrWhiteSpace(IconStyle))
+        {
+            <span class="input-group-text fs-6">
+                <i class="bi @IconStyle"></i>
+            </span>
+        }
+        <input type="text"
+               value="@Value"
+               placeholder="@Placeholder"
+               @oninput="@OnInputChanged"
+               class="form-control rounded-end" />
+        <span class="invalid-feedback">Поле не заполнено</span>
+    </div>
+</div>

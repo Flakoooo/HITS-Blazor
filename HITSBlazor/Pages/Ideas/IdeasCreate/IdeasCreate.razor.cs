@@ -53,7 +53,9 @@ namespace HITSBlazor.Pages.Ideas.IdeasCreate
 
 
         private string SuitabilityScore { 
-            get => _ideasCreateModel.Suitability.ToString(); 
+            get => _ideasCreateModel.Suitability > 0 
+                ? _ideasCreateModel.Suitability.ToString() 
+                : string.Empty; 
             set 
             {
                 if (int.TryParse(value, out int intValue) && _ideasCreateModel.Suitability != intValue)
@@ -66,7 +68,9 @@ namespace HITSBlazor.Pages.Ideas.IdeasCreate
 
 
         private string BudgetScore { 
-            get => _ideasCreateModel.Budget.ToString();
+            get => _ideasCreateModel.Budget > 0 
+                ? _ideasCreateModel.Budget.ToString() 
+                : string.Empty;
             set
             {
                 if (int.TryParse(value, out int intValue) && _ideasCreateModel.Budget != intValue)

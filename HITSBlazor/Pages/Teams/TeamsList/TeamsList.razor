@@ -1,6 +1,6 @@
 ﻿@namespace HITSBlazor.Pages.Teams.TeamsList
 @using HITSBlazor.Components.ActionMenus.BaseActionMenu
-@using HITSBlazor.Components.Inputs.SearchInput
+@using HITSBlazor.Components.Inputs.Input
 @using HITSBlazor.Components.Inputs.TeamRadioFilter
 @using HITSBlazor.Components.Placeholder
 @using HITSBlazor.Components.Tables.TableActionMenu
@@ -64,7 +64,7 @@
             </div>
             <div class="py-2 d-flex justify-content-between">
                 <div class="w-50">
-                    <SearchInput ValueChanged="@((value) => SearchTeam(value))"/>
+                    <Input IconStyle="bi-search" Placeholder="Поиск" ValueChanged="@((value) => SearchTeam(value))" />
                 </div>
             </div>
             <div class="w-100 d-flex">

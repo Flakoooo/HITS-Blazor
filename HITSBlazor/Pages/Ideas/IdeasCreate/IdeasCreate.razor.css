@@ -14,10 +14,3 @@
 .idea-form-submit-buttons {
     gap: 16px;
 }
-
-.hint {
-    cursor: pointer;
-    display: inline-block;
-    vertical-align: middle;
-    color: #007bff;
-}

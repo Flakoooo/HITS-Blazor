@@ -48,7 +48,7 @@ namespace HITSBlazor.Utils.Mocks.Ideas
 
             var ideas = new List<Idea>()
             {
-                new Idea
+                new() 
                 {
                     Id = RefactorId,
                     Initiator = kirill,
@@ -66,7 +66,7 @@ namespace HITSBlazor.Utils.Mocks.Ideas
                     ContactPerson = hitsContactPersonFullName,
                     IsChecked = true
                 },
-                new Idea
+                new()
                 {
                     Id = MyNewIdeaId,
                     Initiator = ivan,
@@ -84,7 +84,7 @@ namespace HITSBlazor.Utils.Mocks.Ideas
                     ContactPerson = hitsContactPersonFullName,
                     IsChecked = false
                 },
-                new Idea
+                new()
                 {
                     Id = Idea2Id,
                     Initiator = manager,
@@ -102,7 +102,7 @@ namespace HITSBlazor.Utils.Mocks.Ideas
                     ContactPerson = hitsContactPersonFullName,
                     IsChecked = false
                 },
-                new Idea
+                new()
                 {
                     Id = FoldingBedId,
                     Initiator = kirill,
@@ -120,7 +120,7 @@ namespace HITSBlazor.Utils.Mocks.Ideas
                     ContactPerson = hitsContactPersonFullName,
                     IsChecked = false
                 },
-                new Idea
+                new()
                 {
                     Id = Strawberry1Id,
                     Initiator = ivan,
@@ -138,7 +138,7 @@ namespace HITSBlazor.Utils.Mocks.Ideas
                     ContactPerson = hitsContactPersonFullName,
                     IsChecked = true
                 },
-                new Idea
+                new()
                 {
                     Id = HelperId,
                     Initiator = kirill,
@@ -156,7 +156,7 @@ namespace HITSBlazor.Utils.Mocks.Ideas
                     ContactPerson = hitsContactPersonFullName,
                     IsChecked = false
                 },
-                new Idea
+                new()
                 {
                     Id = PWTechnologyId,
                     Initiator = anton,
@@ -174,7 +174,7 @@ namespace HITSBlazor.Utils.Mocks.Ideas
                     ContactPerson = $"{anton.FirstName} {anton.LastName}",
                     IsChecked = false
                 },
-                new Idea
+                new()
                 {
                     Id = EMetricsViewerId,
                     Initiator = lubov,
@@ -192,7 +192,7 @@ namespace HITSBlazor.Utils.Mocks.Ideas
                     ContactPerson = $"{lubov.FirstName} {lubov.LastName}",
                     IsChecked = false
                 },
-                new Idea
+                new()
                 {
                     Id = CalculatorId,
                     Initiator = dmitry,
@@ -210,7 +210,7 @@ namespace HITSBlazor.Utils.Mocks.Ideas
                     ContactPerson = $"{dmitry.FirstName} {dmitry.LastName}",
                     IsChecked = false
                 },
-                new Idea
+                new()
                 {
                     Id = TestIdeaId,
                     Initiator = kirill,
@@ -228,7 +228,7 @@ namespace HITSBlazor.Utils.Mocks.Ideas
                     ContactPerson = hitsContactPersonFullName,
                     IsChecked = false
                 },
-                new Idea
+                new()
                 {
                     Id = ChatBotId,
                     Initiator = alex,
@@ -246,7 +246,7 @@ namespace HITSBlazor.Utils.Mocks.Ideas
                     ContactPerson = hitsContactPersonFullName,
                     IsChecked = false
                 },
-                new Idea
+                new()
                 {
                     Id = ArmatureId,
                     Initiator = admin,

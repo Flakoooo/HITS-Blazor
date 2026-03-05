@@ -2,7 +2,10 @@
 @using HITSBlazor.Components.InputDropdowns.CompanyDropdown
 @using HITSBlazor.Components.InputDropdowns.ContactPersonDropdown
 @using HITSBlazor.Components.InputDropdowns.SkillDropdown
+@using HITSBlazor.Components.Inputs.Input
+@using HITSBlazor.Components.Inputs.Number
 @using HITSBlazor.Components.Inputs.Select
+@using HITSBlazor.Components.Inputs.TextArea
 @using HITSBlazor.Components.Placeholder
 @using HITSBlazor.Components.ProgressBar
 @using HITSBlazor.Models.Common.Entities
@@ -15,110 +18,46 @@
 <!-- TODO: Реализовать валидацию -->
 <div class="new-idea page-content-with-header">
     <form class="p-3 bg-white w-100 h-100 overflow-auto idea-form">
-        <span class="fs-2 text-primary">Создание идеи</span>
+        <span class="fs-2 text-primary">
+            @(string.IsNullOrWhiteSpace(IdeaId) ? "Создание" : "Редактирование") идеи
+        </span>
         <div class="w-75 d-flex flex-column gap-3">
             <div class="d-flex flex-column gap-3">
-                <div class="w-100">
-                    <label class="form-label text-primary">
-                        Название идеи*
-                        <i class="bi bi-patch-question hint"></i>
-                    </label>
-                    <div class="input-group">
-                        <input type="text" 
-                               placeholder="Введите название идеи" 
-                               @bind="_ideasCreateModel.Name"
-                               @bind:event="oninput"
-                               class="form-control rounded-end" />
-                        <span class="invalid-feedback">Поле не заполнено</span>
-                    </div>
-                </div>
-                <div class="d-flex flex-column w-100 h-100">
-                    <label class="form-label text-primary">
-                        Проблема*
-                        <i class="bi bi-patch-question hint"></i>
-                    </label>
-                    <div class="input-group h-100">
-                        <textarea placeholder="Опишите проблему, которую решает ваша идея" 
-                                  @bind="_ideasCreateModel.Problem"
-                                  @bind:event="oninput"
-                                  class="form-control rounded-end">
-                        </textarea>
-                        <span class="invalid-feedback">Поле не заполнено</span>
-                    </div>
-                </div>
-                <div class="d-flex flex-column w-100 h-100">
-                    <label class="form-label text-primary">
-                        Предлагаемое решение*
-                        <i class="bi bi-patch-question hint"></i>
-                    </label>
-                    <div class="input-group h-100">
-                        <textarea placeholder="Опишите, что вы предлагаете для решения проблемы" 
-                                  @bind="_ideasCreateModel.Solution"
-                                  @bind:event="oninput"
-                                  class="form-control rounded-end">
-                        </textarea>
-                        <span class="invalid-feedback">Поле не заполнено</span>
-                    </div>
-                </div>
-                <div class="d-flex flex-column w-100 h-100">
-                    <label class="form-label text-primary">
-                        Ожидаемый результат*
-                        <i class="bi bi-patch-question hint"></i>
-                    </label>
-                    <div class="input-group h-100">
-                        <textarea placeholder="Опишите ожидаемый результат" 
-                                  @bind="_ideasCreateModel.Result"
-                                  @bind:event="oninput"
-                                  class="form-control rounded-end">
-                        </textarea>
-                        <span class="invalid-feedback">Поле не заполнено</span>
-                    </div>
-                </div>
-                <div class="d-flex flex-column w-100 h-100">
-                    <label class="form-label text-primary">
-                        Описание необходимых ресурсов для реализации*
-                        <i class="bi bi-patch-question hint"></i>
-                    </label>
-                    <div class="input-group h-100">
-                        <textarea placeholder="Укажите список требуемых для выполнения проекта ресурсов" 
-                                  @bind="_ideasCreateModel.Description"
-                                  @bind:event="oninput"
-                                  class="form-control rounded-end">
-                        </textarea>
-                        <span class="invalid-feedback">Поле не заполнено</span>
-                    </div>
-                </div>
+                <Input Label="Название идеи*" 
+                       Hint="true" 
+                       Placeholder="Введите название идеи"
+                       @bind-Value="@_ideasCreateModel.Name" />
+                <TextArea Label="Проблема*"
+                          Hint="true"
+                          Placeholder="Опишите проблему, которую решает ваша идея"
+                          @bind-Value="@_ideasCreateModel.Problem" />
+                <TextArea Label="Предлагаемое решение*"
+                          Hint="true"
+                          Placeholder="Опишите, что вы предлагаете для решения проблемы"
+                          @bind-Value="@_ideasCreateModel.Solution" />
+                <TextArea Label="Ожидаемый результат*"
+                          Hint="true"
+                          Placeholder="Опишите ожидаемый результат"
+                          @bind-Value="@_ideasCreateModel.Result" />
+                <TextArea Label="Описание необходимых ресурсов для реализации*"
+                          Hint="true"
+                          Placeholder="Укажите список требуемых для выполнения проекта ресурсов"
+                          @bind-Value="@_ideasCreateModel.Description" />
                 <div>
                     <span class="fs-6 text-primary">
                         Желаемое количество участников в команде*
                     </span>
                     <i class="bi bi-patch-question hint"></i>
-                <div class="mt-2 d-flex gap-3">
-                    <div class="w-100">
-                        <div class="input-group">
-                            <input type="number" 
-                                   max="30" 
-                                   min="2" 
-                                   placeholder="Минимальное количество: 2" 
-                                   @bind="_ideasCreateModel.MinTeamSize"
-                                   @bind:event="oninput"
-                                   class="form-control rounded-end" />
-                            <span class="invalid-feedback">Значение должно быть от 2 до 30</span>
-                        </div>
+                    <div class="mt-2 d-flex gap-3">
+                        <Number MinValue="2" 
+                                MaxValue="30" 
+                                Placeholder="Минимальное количество: 2" 
+                                @bind-Value="_ideasCreateModel.MinTeamSize" />
+                        <Number MinValue="2"
+                                MaxValue="30"
+                                Placeholder="Максимальное количество: 30"
+                                @bind-Value="_ideasCreateModel.MaxTeamSize" />
                     </div>
-                    <div class="w-100">
-                        <div class="input-group">
-                            <input type="number" 
-                                   max="30" 
-                                   min="2" 
-                                   placeholder="Максимальное количество: 30" 
-                                   @bind="_ideasCreateModel.MaxTeamSize"
-                                   @bind:event="oninput"
-                                   class="form-control rounded-end" />
-                            <span class="invalid-feedback">Значение должно быть от 2 до 30</span>
-                        </div>
-                    </div>
-                </div>
                 </div>
             </div>
             <div>
