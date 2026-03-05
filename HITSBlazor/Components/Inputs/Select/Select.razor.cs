@@ -16,6 +16,20 @@ namespace HITSBlazor.Components.Inputs.Select
         [Parameter]
         public List<KeyValuePair<int, string>> Options { get; set; } = [];
 
+        [Parameter]
+        public bool NeedValidation { get; set; } = false;
+
+        [Parameter]
+        public string? ErrorMessage { get; set; } = "Поле не заполнено";
+
+        private bool _showError = false;
+
+        protected override void OnParametersSet()
+        {
+            _showError = NeedValidation && string.IsNullOrWhiteSpace(Value);
+            StateHasChanged();
+        }
+
         private async Task OnOptionChanged(ChangeEventArgs e)
             => await ValueChanged.InvokeAsync(e.Value?.ToString() ?? "");
     }

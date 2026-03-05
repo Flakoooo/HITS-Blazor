@@ -4,12 +4,15 @@
     <label class="form-label text-primary">
         @Label*
     </label>
-    <select value="@Value" @onchange="OnOptionChanged" class="form-select">
+    <select value="@Value" @onchange="OnOptionChanged" class="form-select @(_showError ? "is-invalid" : string.Empty)">
         <option disabled value="">Выберите значение</option>
         @foreach (var option in Options)
         {
             <option value="@option.Key">@option.Value</option>
         }
     </select>
-    <span class="invalid-feedback">Поле не заполнено</span>
+    @if (_showError)
+    {
+        <span class="invalid-feedback">@ErrorMessage</span>
+    }
 </div>

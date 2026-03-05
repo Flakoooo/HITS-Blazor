@@ -32,9 +32,19 @@ namespace HITSBlazor.Services.Skills
         }
 
         public async Task<List<Skill>> GetSkillsByTypeAsync(SkillType skillType)
-            => [.. _cachedSkills.Where(s => s.Type == skillType)];
+        {
+            if (_cachedSkills.Count == 0 || DateTime.UtcNow - _lastRefreshTime > _cacheLifetime)
+                await RefreshCacheAsync();
+
+            return [.. _cachedSkills.Where(s => s.Type == skillType)];
+        }
 
         public async Task<List<Skill>> GetSkillByTypeAndByNameAsync(SkillType skillType, string name)
-            => [.. _cachedSkills.Where(s => s.Type == skillType && s.Name.Contains(name, StringComparison.CurrentCultureIgnoreCase))];
+        {
+            if (_cachedSkills.Count == 0 || DateTime.UtcNow - _lastRefreshTime > _cacheLifetime)
+                await RefreshCacheAsync();
+
+            return [.. _cachedSkills.Where(s => s.Type == skillType && s.Name.Contains(name, StringComparison.CurrentCultureIgnoreCase))];
+        }
     }
 }

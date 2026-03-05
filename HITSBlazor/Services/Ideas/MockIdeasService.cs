@@ -96,6 +96,8 @@ namespace HITSBlazor.Services.Ideas
             else if (ideasCreateModel.Status == IdeaStatusType.OnApproval)
                 _globalNotificationService.ShowSuccess("Идея отправлена на согласование");
 
+            _cache.Clear();
+
             return true;
         }
 

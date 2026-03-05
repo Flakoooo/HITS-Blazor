@@ -19,6 +19,20 @@ namespace HITSBlazor.Components.Inputs.TextArea
         [Parameter]
         public EventCallback<string> ValueChanged { get; set; }
 
+        [Parameter]
+        public bool NeedValidation { get; set; } = false;
+
+        [Parameter]
+        public string? ErrorMessage { get; set; } = "Поле не заполнено";
+
+        private bool _showError = false;
+
+        protected override void OnParametersSet()
+        {
+            _showError = NeedValidation && string.IsNullOrWhiteSpace(Value);
+            StateHasChanged();
+        }
+
         private async Task OnInputChanged(ChangeEventArgs e)
         {
             if (ValueChanged.HasDelegate)

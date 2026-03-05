@@ -30,18 +30,22 @@
                        @bind-Value="@_ideasCreateModel.Name" />
                 <TextArea Label="Проблема*"
                           Hint="true"
+                          NeedValidation="_submitted"
                           Placeholder="Опишите проблему, которую решает ваша идея"
                           @bind-Value="@_ideasCreateModel.Problem" />
                 <TextArea Label="Предлагаемое решение*"
                           Hint="true"
+                          NeedValidation="_submitted"
                           Placeholder="Опишите, что вы предлагаете для решения проблемы"
                           @bind-Value="@_ideasCreateModel.Solution" />
                 <TextArea Label="Ожидаемый результат*"
                           Hint="true"
+                          NeedValidation="_submitted"
                           Placeholder="Опишите ожидаемый результат"
                           @bind-Value="@_ideasCreateModel.Result" />
                 <TextArea Label="Описание необходимых ресурсов для реализации*"
                           Hint="true"
+                          NeedValidation="_submitted"
                           Placeholder="Укажите список требуемых для выполнения проекта ресурсов"
                           @bind-Value="@_ideasCreateModel.Description" />
                 <div>
@@ -52,10 +56,12 @@
                     <div class="mt-2 d-flex gap-3">
                         <Number MinValue="2" 
                                 MaxValue="30" 
+                                NeedValidation="_submitted"
                                 Placeholder="Минимальное количество: 2" 
                                 @bind-Value="_ideasCreateModel.MinTeamSize" />
                         <Number MinValue="2"
                                 MaxValue="30"
+                                NeedValidation="_submitted"
                                 Placeholder="Максимальное количество: 30"
                                 @bind-Value="_ideasCreateModel.MaxTeamSize" />
                     </div>
@@ -109,11 +115,13 @@
                 <div class="col">
                     <Select Label="Пригодность"
                             @bind-Value="@SuitabilityScore"
+                            NeedValidation="_submitted"
                             Options="IdeasRatingCategories.SuitabilityOptions" />
                 </div>
                 <div class="col">
                     <Select Label="Бюджет" 
                             @bind-Value="@BudgetScore" 
+                            NeedValidation="_submitted"
                             Options="IdeasRatingCategories.BudgetOptions" />
                 </div>
             </div>

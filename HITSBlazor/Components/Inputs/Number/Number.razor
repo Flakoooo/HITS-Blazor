@@ -8,9 +8,10 @@
                value="@Value"
                placeholder="@Placeholder"
                @oninput="@OnInputChanged"
-               class="form-control rounded-end" />
-        <span class="invalid-feedback">
-            Значение должно быть от @MinValue до @MaxValue
-        </span>
+               class="form-control rounded-end @(_showError ? "is-invalid" : string.Empty)" />
+        @if (_showError)
+        {
+            <span class="invalid-feedback">@ErrorMessage</span>
+        }
     </div>
 </div>

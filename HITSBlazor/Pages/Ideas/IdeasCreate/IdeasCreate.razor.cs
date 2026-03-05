@@ -29,6 +29,9 @@ namespace HITSBlazor.Pages.Ideas.IdeasCreate
         [Inject]
         private NavigationService Navigation { get; set; } = null!;
 
+        [Inject]
+        private GlobalNotificationService GlobalNotificationService { get; set; } = null!;
+
         [Parameter]
         public string IdeaId { get; set; } = string.Empty;
 
@@ -186,21 +189,36 @@ namespace HITSBlazor.Pages.Ideas.IdeasCreate
             StateHasChanged();
         }
 
+        //TODO: реализовать слегка подробное отображение ошибки валидации в уведомлении
         private async Task CreateIdea(IdeaStatusType ideaStatusType)
         {
-            if (SelectedCompany is not null && SelectedContactPerson is not null)
+            bool isInvalid = false;
+            if (string.IsNullOrWhiteSpace(_ideasCreateModel.Name)) isInvalid = true;
+            if (string.IsNullOrWhiteSpace(_ideasCreateModel.Problem)) isInvalid = true;
+            if (string.IsNullOrWhiteSpace(_ideasCreateModel.Description)) isInvalid = true;
+            if (string.IsNullOrWhiteSpace(_ideasCreateModel.Solution)) isInvalid = true;
+            if (string.IsNullOrWhiteSpace(_ideasCreateModel.Result)) isInvalid = true;
+            if (_ideasCreateModel.MaxTeamSize is > 30 or < 2) isInvalid = true;
+            if (_ideasCreateModel.MinTeamSize is > 30 or < 2) isInvalid = true;
+            if (SelectedCompany is null) isInvalid = true;
+            if (SelectedContactPerson is null) isInvalid = true;
+            if (_ideasCreateModel.Suitability is > 5 or < 1) isInvalid = true;
+            if (_ideasCreateModel.Budget is > 5 or < 1) isInvalid = true;
+
+            if (!isInvalid)
             {
                 _ideasCreateModel.Status = ideaStatusType;
-                _ideasCreateModel.Customer = SelectedCompany.Name;
-                _ideasCreateModel.ContactPerson = SelectedContactPerson.FullName;
+                _ideasCreateModel.Customer = SelectedCompany!.Name;
+                _ideasCreateModel.ContactPerson = SelectedContactPerson!.FullName;
 
                 var result = await IdeasService.CreateNewIdeaAsync(_ideasCreateModel);
                 _submitted = true;
-                Console.WriteLine(_submitted);
 
                 if (result) await Navigation.NavigateToAsync("ideas/list");
+                return;
             }
 
+            GlobalNotificationService.ShowError("Заплните все необходимые поля");
             _submitted = true;
         }
 

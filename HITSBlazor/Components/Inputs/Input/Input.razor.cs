@@ -32,7 +32,7 @@ namespace HITSBlazor.Components.Inputs.Input
 
         protected override void OnParametersSet()
         {
-            _showError = NeedValidation && Value.Length == 0;
+            _showError = NeedValidation && string.IsNullOrWhiteSpace(Value);
             StateHasChanged();
         }
 

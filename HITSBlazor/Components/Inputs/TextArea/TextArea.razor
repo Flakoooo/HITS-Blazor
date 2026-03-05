@@ -15,8 +15,11 @@
         <textarea value="@Value"
                   placeholder="@Placeholder"
                   @oninput="@OnInputChanged"
-                  class="form-control rounded-end">
+                  class="form-control rounded-end @(_showError ? "is-invalid" : string.Empty)">
         </textarea>
-        <span class="invalid-feedback">Поле не заполнено</span>
+        @if (_showError)
+        {
+            <span class="invalid-feedback">@ErrorMessage</span>
+        }
     </div>
 </div>
