@@ -68,7 +68,7 @@
                 }
             </ul>
         }
-        @if (CurrentIdea?.Status == IdeaStatusType.OnConfirmation && !isRatingConfirmed)
+        @if (CheckIdeaRatingAccess() && !isRatingConfirmed)
         {
             <div class="idea-modal-rating bg-white rounded-3 p-3 d-grid w-100">
                 <div class="w-100 row row-cols-2">
@@ -126,7 +126,7 @@
                 }
             </div>            
         }
-        @if (CheckIdeaButtonsAccess())
+        @if (isLoading || CheckInitiatorAccess() || CheckProjectOfficeAccess())
         {
             <div class="bg-white d-flex rounded-3 @(isLoading ? "p-2 gap-2" : "p-3 gap-3 flex-wrap")">
                 @if (isLoading || CurrentIdea is null)
@@ -138,10 +138,7 @@
                 }
                 else
                 {
-                    @if (
-                        CurrentUser?.Role == RoleType.Admin || 
-                        (CurrentUser?.Role == RoleType.Initiator && CurrentUser?.Id == CurrentIdea.Initiator.Id)
-                    )
+                    @if (CheckInitiatorAccess())
                     {
                         <Button BtnType="ButtonType.Button" 
                                 Variant="ButtonVariant.Light" 
@@ -153,7 +150,7 @@
                                 Text="Отправить на согласование" />
                     }
 
-                    @if (CurrentUser?.Role == RoleType.Admin || CurrentUser?.Role == RoleType.ProjectOffice)
+                    @if (CheckProjectOfficeAccess())
                     {
                         <Button BtnType="ButtonType.Button" 
                                 Variant="ButtonVariant.Danger" 
@@ -259,11 +256,10 @@
         }
         else
         {
-            <!-- при утверждении идеи писать Утвердили 0/N -->
             <span class="p-2 bg-primary rounded-top fs-4 text-center text-white">
                 @(
                     CurrentIdea.Status == IdeaStatusType.OnConfirmation 
-                        ? $"Утвердили {IdeaRatings.Where(r => r.IsConfirmed == true).Count()}/{IdeaRatings.Count()}" 
+                        ? $"Утвердили {IdeaRatings.Where(r => r.IsConfirmed).Count()}/{IdeaRatings.Count()}" 
                         : CurrentIdea.Status.GetTranslation()
                 )
             </span>

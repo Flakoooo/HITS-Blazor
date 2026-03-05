@@ -15,8 +15,7 @@
         <div class="w-100 list-page-header">
             <span class="fs-2 text-primary">Список идей: @_ideas.Count</span>
             <div class="d-flex gap-3">
-                @if (AuthService.CurrentUser?.Role == RoleType.Initiator || 
-                     AuthService.CurrentUser?.Role == RoleType.Admin)
+                @if (AuthService.CurrentUser?.Role is RoleType.Initiator or RoleType.Admin)
                 {
                     <button type="button" @onclick="@(() => NavigationService.NavigateToAsync("ideas/create"))" 
                             class="btn d-flex btn-primary">
@@ -31,6 +30,7 @@
                 <SearchInput ValueChanged="@((value) => SearchIdea(value))"/>
             </div>
         </div>
+        <!-- TODO: если идей нет, то сообщить пользователю, что идеи не найдены, н это как ИДЕЯ -->
         <div class="w-100 d-flex">
             <div class="w-100">
                 <table class="table table-hover mb-0">
@@ -99,6 +99,23 @@
                         }
                     </div>
                 </div>
+                @if (AuthService.CurrentUser?.Role is RoleType.Admin or RoleType.Expert)
+                {
+                    <div class="w-100">
+                        <span class="fs-6 fw-semibold">Экспертиза</span>
+                        <div class="list-page-filter-choices">
+                            <div class="px-2 py-1 rounded-1 list-page-filter-choice">
+                                <div class="d-flex">
+                                    <input type="checkbox"
+                                           checked="@_unapprovedIdeasByCurrentUser"
+                                           @onchange="@(e => FindOnConfirmation((bool)e.Value!))"
+                                           class="form-check-input" />
+                                    <span class="form-check-label ms-2">Неутвержденные идеи</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
                 <div class="w-100 d-flex justify-content-center">
                     <button type="button" @onclick="@ResetFilters" class="btn d-flex btn-danger">
                         <i class="bi bi-x-lg fs-5"></i>

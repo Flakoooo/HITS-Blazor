@@ -12,6 +12,7 @@
 
 <PageTitle>Портал ВШЦТ</PageTitle>
 
+<!-- TODO: Реализовать валидацию -->
 <div class="new-idea page-content-with-header">
     <form class="p-3 bg-white w-100 h-100 overflow-auto idea-form">
         <span class="fs-2 text-primary">Создание идеи</span>
@@ -28,6 +29,7 @@
                                @bind="_ideasCreateModel.Name"
                                @bind:event="oninput"
                                class="form-control rounded-end" />
+                        <span class="invalid-feedback">Поле не заполнено</span>
                     </div>
                 </div>
                 <div class="d-flex flex-column w-100 h-100">
@@ -41,6 +43,7 @@
                                   @bind:event="oninput"
                                   class="form-control rounded-end">
                         </textarea>
+                        <span class="invalid-feedback">Поле не заполнено</span>
                     </div>
                 </div>
                 <div class="d-flex flex-column w-100 h-100">
@@ -54,6 +57,7 @@
                                   @bind:event="oninput"
                                   class="form-control rounded-end">
                         </textarea>
+                        <span class="invalid-feedback">Поле не заполнено</span>
                     </div>
                 </div>
                 <div class="d-flex flex-column w-100 h-100">
@@ -67,6 +71,7 @@
                                   @bind:event="oninput"
                                   class="form-control rounded-end">
                         </textarea>
+                        <span class="invalid-feedback">Поле не заполнено</span>
                     </div>
                 </div>
                 <div class="d-flex flex-column w-100 h-100">
@@ -80,6 +85,7 @@
                                   @bind:event="oninput"
                                   class="form-control rounded-end">
                         </textarea>
+                        <span class="invalid-feedback">Поле не заполнено</span>
                     </div>
                 </div>
                 <div>
@@ -97,6 +103,7 @@
                                    @bind="_ideasCreateModel.MinTeamSize"
                                    @bind:event="oninput"
                                    class="form-control rounded-end" />
+                            <span class="invalid-feedback">Значение должно быть от 2 до 30</span>
                         </div>
                     </div>
                     <div class="w-100">
@@ -108,6 +115,7 @@
                                    @bind="_ideasCreateModel.MaxTeamSize"
                                    @bind:event="oninput"
                                    class="form-control rounded-end" />
+                            <span class="invalid-feedback">Значение должно быть от 2 до 30</span>
                         </div>
                     </div>
                 </div>

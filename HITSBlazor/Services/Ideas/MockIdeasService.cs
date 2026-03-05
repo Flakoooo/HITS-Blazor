@@ -2,8 +2,10 @@
 using HITSBlazor.Models.Common.Entities;
 using HITSBlazor.Models.Ideas.Entities;
 using HITSBlazor.Models.Ideas.Enums;
+using HITSBlazor.Models.Users.Enums;
 using HITSBlazor.Pages.Ideas.IdeasCreate;
 using HITSBlazor.Services.Auth;
+using HITSBlazor.Utils;
 using HITSBlazor.Utils.EnumTranslators;
 using HITSBlazor.Utils.Mocks.Common;
 using HITSBlazor.Utils.Mocks.Ideas;
@@ -15,27 +17,55 @@ namespace HITSBlazor.Services.Ideas
         private readonly IAuthService _authService = authService;
         private readonly GlobalNotificationService _globalNotificationService = globalNotificationService;
 
-        private List<Idea> _cachedIdeas = [];
-        private DateTime _lastRefreshTime;
+        private Dictionary<IdeasQueryType, CacheEntry<List<Idea>>> _cache = [];
         private readonly TimeSpan _cacheLifetime = TimeSpan.FromMinutes(5);
 
         public event Action? OnIdeasStateChanged;
 
-        private async Task RefreshCacheAsync()
+        private List<Idea> GetCurrentIdeas(IdeasQueryType queryType)
         {
-            _cachedIdeas = MockIdeas.GetAllIdeas();
-            _lastRefreshTime = DateTime.UtcNow;
+            return queryType switch
+            {
+                IdeasQueryType.All => MockIdeas.GetAllIdeas(),
+                IdeasQueryType.Initiator => _authService.CurrentUser is not null
+                    ? MockIdeas.GetIdeasByInitiatorId(_authService.CurrentUser.Id)
+                    : [],
+                IdeasQueryType.OnConfirmation => MockIdeas.GetIdeasOnCofirmation(),
+                _ => [],
+            };
         }
 
+        private async Task<bool> CanAccessAsync(IdeasQueryType queryType) 
+            => _authService.CurrentUser is not null && queryType switch 
+            {
+                IdeasQueryType.All => true,
+                IdeasQueryType.Initiator => _authService.CurrentUser.Role is RoleType.Initiator or RoleType.Admin,
+                IdeasQueryType.OnConfirmation => _authService.CurrentUser.Role is RoleType.Expert or RoleType.Admin,
+                _ => false
+            };
+
         public async Task<List<Idea>> GetIdeasAsync(
+            IdeasQueryType queryType,
             string? searchText = null,
             HashSet<IdeaStatusType>? statusTypes = null
         )
         {
-            if (_cachedIdeas.Count == 0 || DateTime.UtcNow - _lastRefreshTime > _cacheLifetime)
-                await RefreshCacheAsync();
+            if (!await CanAccessAsync(queryType)) return [];
 
-            var query = _cachedIdeas.AsEnumerable();
+            List<Idea> ideas;
+
+            if (_cache.TryGetValue(queryType, out var cache) && !cache.IsExpired(_cacheLifetime))
+            {
+                ideas = cache.Data;
+            }
+            else
+            {
+                ideas = GetCurrentIdeas(queryType);
+                _cache[queryType] = new CacheEntry<List<Idea>>(ideas);
+            }
+
+            var query = ideas.AsEnumerable();
+
             if (statusTypes?.Count > 0)
                 query = query.Where(i => statusTypes.Contains(i.Status));
 
@@ -73,8 +103,11 @@ namespace HITSBlazor.Services.Ideas
         {
             if (!MockIdeas.CheckIdea(ideaId)) return false;
 
-            var index = _cachedIdeas.FindIndex(i => i.Id == ideaId);
-            _cachedIdeas[index].IsChecked = true;
+            foreach (var cache in _cache.Values)
+            {
+                var index = cache.Data.FindIndex(i => i.Id == ideaId);
+                if (index >= 0) cache.Data[index].IsChecked = true;
+            }
 
             OnIdeasStateChanged?.Invoke();
             return true;
@@ -95,8 +128,7 @@ namespace HITSBlazor.Services.Ideas
                 return false;
             }
 
-            _cachedIdeas = [];
-            _lastRefreshTime = DateTime.MinValue;
+            _cache.Clear();
             _globalNotificationService.ShowSuccess("Идея изменена");
 
             return true;
@@ -111,9 +143,15 @@ namespace HITSBlazor.Services.Ideas
                 return false;
             }
 
-            var index = _cachedIdeas.FindIndex(i => i.Id == ideaId);
-            _cachedIdeas[index].Status = updatedIdea.Status;
-            _cachedIdeas[index].ModifiedAt = updatedIdea.ModifiedAt;
+            foreach (var cache in _cache)
+            {
+                var index = cache.Value.Data.FindIndex(i => i.Id == ideaId);
+                if (index >= 0)
+                {
+                    cache.Value.Data[index].Status = updatedIdea.Status;
+                    cache.Value.Data[index].ModifiedAt = updatedIdea.ModifiedAt;
+                }
+            }
 
             OnIdeasStateChanged?.Invoke();
             return true;
@@ -127,7 +165,8 @@ namespace HITSBlazor.Services.Ideas
                 return false;
             }
 
-            _cachedIdeas.Remove(idea);
+            foreach (var cache in _cache) cache.Value.Data.Remove(idea);
+
             return true;
         }
 
@@ -145,7 +184,7 @@ namespace HITSBlazor.Services.Ideas
             {
                 if (!MockRatings.UpdateOrConfirmRating(request, isConfirmed))
                 {
-                    _globalNotificationService.ShowError("Не удалось утвердить оценку");
+                    _globalNotificationService.ShowError("Не удалось подтвердить рейтинг");
                     return false;
                 }
 
@@ -155,7 +194,7 @@ namespace HITSBlazor.Services.Ideas
             {
                 if (!MockRatings.UpdateOrConfirmRating(request))
                 {
-                    _globalNotificationService.ShowError("Не удалось сохранить оценку");
+                    _globalNotificationService.ShowError("Не удалось сохранить рейтинг");
                     return false;
                 }
 

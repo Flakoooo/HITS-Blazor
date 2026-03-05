@@ -126,26 +126,23 @@ namespace HITSBlazor.Components.Modals.RightSideModals.IdeaModal
             IdeaRatings = await IdeasService.GetIdeaRatingsAsync(IdeaId);
             IdeaComments = await IdeasService.GetIdeasCommentsAsync(IdeaId);
 
-            if (CurrentIdea?.Status == IdeaStatusType.OnConfirmation)
+            if (CheckIdeaRatingAccess())
             {
-                if (CurrentUser?.Role == RoleType.Expert || CurrentUser?.Role == RoleType.Admin)
+                _expertRating = new RatingRequest();
+                var rating = IdeaRatings.FirstOrDefault(r => r.ExpertId == CurrentUser?.Id);
+                if (rating is not null)
                 {
-                    _expertRating = new RatingRequest();
-                    var rating = IdeaRatings.FirstOrDefault(r => r.ExpertId == CurrentUser.Id);
-                    if (rating is not null)
+                    if (rating.IsConfirmed) isRatingConfirmed = true;
+                    else
                     {
-                        if (rating.IsConfirmed) isRatingConfirmed = true;
-                        else
-                        {
-                            _expertRating.Id = rating.Id;
-                            _expertRating.MarketValue = rating.MarketValue;
-                            _expertRating.Originality = rating.Originality;
-                            _expertRating.TechnicalRealizability = rating.TechnicalRealizability;
-                            _expertRating.Suitability = rating.Suitability;
-                            _expertRating.Budget = rating.Budget;
+                        _expertRating.Id = rating.Id;
+                        _expertRating.MarketValue = rating.MarketValue;
+                        _expertRating.Originality = rating.Originality;
+                        _expertRating.TechnicalRealizability = rating.TechnicalRealizability;
+                        _expertRating.Suitability = rating.Suitability;
+                        _expertRating.Budget = rating.Budget;
 
-                            UpdateRatingScore();
-                        }
+                        UpdateRatingScore();
                     }
                 }
             }
@@ -217,20 +214,34 @@ namespace HITSBlazor.Components.Modals.RightSideModals.IdeaModal
             isRatingSaving = false;
         }
 
-        private bool CheckIdeaButtonsAccess()
+        private bool CheckIdeaRatingAccess()
         {
-            if (CurrentUser?.Role is null) return false;
+            if (CurrentUser is null) return false;
 
-            var userRole = (RoleType)CurrentUser.Role;
+            return CurrentIdea?.Status == IdeaStatusType.OnConfirmation 
+                && IdeaRatings.Select(r => r.ExpertId).Contains(CurrentUser.Id);
+        }
 
-            if (userRole == RoleType.Admin) return true;
+        private bool CheckInitiatorAccess()
+        {
+            if (CurrentUser?.Role == RoleType.Admin) return true;
 
-            if (
-                userRole == RoleType.Initiator && CurrentUser.Id == CurrentIdea?.Initiator.Id && 
-                (CurrentIdea?.Status == IdeaStatusType.New || CurrentIdea?.Status == IdeaStatusType.OnEditing)
-            ) return true;
+            if (CurrentIdea?.Status is IdeaStatusType.New or IdeaStatusType.OnEditing)
+            {
+                if (CurrentUser?.Role == RoleType.Initiator && CurrentUser?.Id == CurrentIdea?.Initiator.Id) return true;
+            }
 
-            if (userRole == RoleType.ProjectOffice && CurrentIdea?.Status == IdeaStatusType.OnApproval) return true;
+            return false;
+        }
+
+        private bool CheckProjectOfficeAccess()
+        {
+            if (CurrentUser?.Role == RoleType.Admin) return true;
+
+            if (CurrentIdea?.Status == IdeaStatusType.OnApproval)
+            {
+                if (CurrentUser?.Id == CurrentIdea.ProjectOffice?.Id) return true;
+            }
 
             return false;
         }
@@ -239,7 +250,8 @@ namespace HITSBlazor.Components.Modals.RightSideModals.IdeaModal
         {
             if (CurrentIdea is null) return;
 
-            await IdeasService.UpdateIdeaStatusAsync(CurrentIdea.Id, ideaStatus);
+            if (await IdeasService.UpdateIdeaStatusAsync(CurrentIdea.Id, ideaStatus))
+                CurrentIdea.Status = ideaStatus;
         }
 
         private async Task HandleActionMenuClick(TableActionContext context)

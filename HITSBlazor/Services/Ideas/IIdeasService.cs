@@ -11,7 +11,11 @@ namespace HITSBlazor.Services.Ideas
         event Action? OnIdeasStateChanged;
 
         //Ideas
-        Task<List<Idea>> GetIdeasAsync(string? searchText = null, HashSet<IdeaStatusType>? statusTypes = null);
+        Task<List<Idea>> GetIdeasAsync(
+            IdeasQueryType queryType, 
+            string? searchText = null, 
+            HashSet<IdeaStatusType>? statusTypes = null
+        );
         Task<Idea?> GetIdeaByIdAsync(Guid id);
         Task<bool> CreateNewIdeaAsync(IdeasCreateModel ideasCreateModel);
         Task<bool> UpdateCheckedIdeaAsync(Guid ideaId);

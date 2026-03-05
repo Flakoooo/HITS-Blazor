@@ -1,6 +1,7 @@
 ﻿using HITSBlazor.Components.ActionMenus.BaseActionMenu;
 using HITSBlazor.Models.Ideas.Entities;
 using HITSBlazor.Models.Ideas.Enums;
+using HITSBlazor.Models.Users.Enums;
 using HITSBlazor.Services;
 using HITSBlazor.Services.Auth;
 using HITSBlazor.Services.Ideas;
@@ -34,13 +35,22 @@ namespace HITSBlazor.Pages.Ideas.IdeasList
         private List<Idea> _ideas = [];
 
         private HashSet<IdeaStatusType> SelectedStatuses { get; set; } = [];
+        private bool _unapprovedIdeasByCurrentUser = false;
 
         private async Task LoadIdeasAsync()
         {
+            IdeasQueryType queryType = IdeasQueryType.All;
+
+            if (AuthService.CurrentUser?.Role is RoleType.Initiator)
+                queryType = IdeasQueryType.Initiator;
+            else if (_unapprovedIdeasByCurrentUser)
+                queryType = IdeasQueryType.OnConfirmation;
+
             _ideas = await IdeasService.GetIdeasAsync(
-                searchText: _searchText,
-                statusTypes: SelectedStatuses
-            );
+                    queryType,
+                    searchText: _searchText,
+                    statusTypes: SelectedStatuses
+                );
             StateHasChanged();
         }
 
@@ -48,6 +58,19 @@ namespace HITSBlazor.Pages.Ideas.IdeasList
         {
             IdeasService.OnIdeasStateChanged += UpdateUIState;
             ModalService.OnCloseSideModalContainer += IdeaModalHasClosed;
+
+            var currentUser = AuthService.CurrentUser;
+            if (currentUser?.Role == RoleType.Member)
+            {
+                SelectedStatuses.Add(IdeaStatusType.Confirmed);
+                SelectedStatuses.Add(IdeaStatusType.OnMarket);
+            }
+            else if (currentUser?.Role == RoleType.ProjectOffice)
+            {
+                SelectedStatuses.Add(IdeaStatusType.OnApproval);
+                SelectedStatuses.Add(IdeaStatusType.Confirmed);
+            }
+
             await LoadIdeasAsync();
         }
 
@@ -70,6 +93,12 @@ namespace HITSBlazor.Pages.Ideas.IdeasList
             else
                 SelectedStatuses.Remove(status);
 
+            await LoadIdeasAsync();
+        }
+
+        private async Task FindOnConfirmation(bool isChecked)
+        {
+            _unapprovedIdeasByCurrentUser = isChecked;
             await LoadIdeasAsync();
         }
 

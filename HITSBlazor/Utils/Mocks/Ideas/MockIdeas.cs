@@ -297,6 +297,9 @@ namespace HITSBlazor.Utils.Mocks.Ideas
         public static List<Idea> GetIdeasByInitiatorId(Guid initiatorId)
             => [.. _ideas.Where(i => i.Initiator.Id == initiatorId)];
 
+        public static List<Idea> GetIdeasOnCofirmation()
+            => [.. _ideas.Where(i => i.Status == IdeaStatusType.OnConfirmation)];
+
         public static bool CreateNewIdea(IdeasCreateModel model, User initiator)
         {
             var createdDate = DateTime.UtcNow;
