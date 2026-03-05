@@ -35,6 +35,7 @@ namespace HITSBlazor.Pages.Ideas.IdeasCreate
         private bool _isLoading = true;
 
         private IdeasCreateModel _ideasCreateModel = new();
+        private bool _submitted = false;
 
         private List<Skill> _languageSkills = [];
         private List<Skill> _frameworkSkills = [];
@@ -192,9 +193,15 @@ namespace HITSBlazor.Pages.Ideas.IdeasCreate
                 _ideasCreateModel.Status = ideaStatusType;
                 _ideasCreateModel.Customer = SelectedCompany.Name;
                 _ideasCreateModel.ContactPerson = SelectedContactPerson.FullName;
-                if (await IdeasService.CreateNewIdeaAsync(_ideasCreateModel))
-                    await Navigation.NavigateToAsync("ideas/list");
+
+                var result = await IdeasService.CreateNewIdeaAsync(_ideasCreateModel);
+                _submitted = true;
+                Console.WriteLine(_submitted);
+
+                if (result) await Navigation.NavigateToAsync("ideas/list");
             }
+
+            _submitted = true;
         }
 
         private async Task UpdateIdea()

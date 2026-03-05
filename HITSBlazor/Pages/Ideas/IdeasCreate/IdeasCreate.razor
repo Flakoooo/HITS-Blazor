@@ -17,7 +17,7 @@
 
 <!-- TODO: Реализовать валидацию -->
 <div class="new-idea page-content-with-header">
-    <form class="p-3 bg-white w-100 h-100 overflow-auto idea-form">
+    <div class="p-3 bg-white w-100 h-100 overflow-auto idea-form">
         <span class="fs-2 text-primary">
             @(string.IsNullOrWhiteSpace(IdeaId) ? "Создание" : "Редактирование") идеи
         </span>
@@ -25,6 +25,7 @@
             <div class="d-flex flex-column gap-3">
                 <Input Label="Название идеи*" 
                        Hint="true" 
+                       NeedValidation="_submitted"
                        Placeholder="Введите название идеи"
                        @bind-Value="@_ideasCreateModel.Name" />
                 <TextArea Label="Проблема*"
@@ -142,6 +143,6 @@
                 }
             </div>
         </div>
-    </form>
+    </div>
 </div>
 
