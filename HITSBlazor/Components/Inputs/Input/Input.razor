@@ -1,13 +1,14 @@
 ﻿@namespace HITSBlazor.Components.Inputs.Input
+@using HITSBlazor.Components.Hint
 
 <div class="w-100">
     @if (!string.IsNullOrWhiteSpace(Label))
     {
         <label class="form-label text-primary">
-            @($"{Label}{(Hint ? " " : "")}")
-            @if (Hint)
+            @($"{Label}{(!string.IsNullOrWhiteSpace(HintText) ? " " : "")}")
+            @if (!string.IsNullOrWhiteSpace(HintText))
             {
-                <i class="bi bi-patch-question hint"></i>
+                <Hint Text="@HintText" />
             }
         </label>
     }

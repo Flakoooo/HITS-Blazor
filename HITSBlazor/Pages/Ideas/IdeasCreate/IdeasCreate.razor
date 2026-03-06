@@ -1,4 +1,5 @@
 ﻿@using HITSBlazor.Components.Button
+@using HITSBlazor.Components.Hint
 @using HITSBlazor.Components.InputDropdowns.CompanyDropdown
 @using HITSBlazor.Components.InputDropdowns.ContactPersonDropdown
 @using HITSBlazor.Components.InputDropdowns.SkillDropdown
@@ -15,36 +16,35 @@
 
 <PageTitle>Портал ВШЦТ</PageTitle>
 
-<!-- TODO: Реализовать валидацию -->
 <div class="new-idea page-content-with-header">
-    <div class="p-3 bg-white w-100 h-100 overflow-auto idea-form">
+    <div class="p-3 bg-white w-100 h-100 idea-form">
         <span class="fs-2 text-primary">
             @(string.IsNullOrWhiteSpace(IdeaId) ? "Создание" : "Редактирование") идеи
         </span>
         <div class="w-75 d-flex flex-column gap-3">
             <div class="d-flex flex-column gap-3">
-                <Input Label="Название идеи*" 
-                       Hint="true" 
+                <Input Label="Название идеи*"
+                       HintText="@_hints[nameof(IdeasCreateModel.Name)]"
                        NeedValidation="_submitted"
                        Placeholder="Введите название идеи"
                        @bind-Value="@_ideasCreateModel.Name" />
                 <TextArea Label="Проблема*"
-                          Hint="true"
+                          HintText="@_hints[nameof(IdeasCreateModel.Problem)]"
                           NeedValidation="_submitted"
                           Placeholder="Опишите проблему, которую решает ваша идея"
                           @bind-Value="@_ideasCreateModel.Problem" />
                 <TextArea Label="Предлагаемое решение*"
-                          Hint="true"
+                          HintText="@_hints[nameof(IdeasCreateModel.Solution)]"
                           NeedValidation="_submitted"
                           Placeholder="Опишите, что вы предлагаете для решения проблемы"
                           @bind-Value="@_ideasCreateModel.Solution" />
                 <TextArea Label="Ожидаемый результат*"
-                          Hint="true"
+                          HintText="@_hints[nameof(IdeasCreateModel.Result)]"
                           NeedValidation="_submitted"
                           Placeholder="Опишите ожидаемый результат"
                           @bind-Value="@_ideasCreateModel.Result" />
                 <TextArea Label="Описание необходимых ресурсов для реализации*"
-                          Hint="true"
+                          HintText="@_hints[nameof(IdeasCreateModel.Description)]"
                           NeedValidation="_submitted"
                           Placeholder="Укажите список требуемых для выполнения проекта ресурсов"
                           @bind-Value="@_ideasCreateModel.Description" />
@@ -52,7 +52,7 @@
                     <span class="fs-6 text-primary">
                         Желаемое количество участников в команде*
                     </span>
-                    <i class="bi bi-patch-question hint"></i>
+                    <Hint Text="@_hints["TeamSize"]" />
                     <div class="mt-2 d-flex gap-3">
                         <Number MinValue="2" 
                                 MaxValue="30" 
@@ -69,7 +69,7 @@
             </div>
             <div>
                 <span class="fs-6 text-primary">Стек технологий*</span>
-                <i class="bi bi-patch-question hint"></i>
+                <Hint Text="@_hints["Skills"]" />
                 @if (_isLoading)
                 {
                     <div class="mt-2 w-100 d-flex gap-3">
@@ -81,6 +81,7 @@
                 }
                 else 
                 {
+                    <!-- TODO: Реализовать ДОБАВЛЕНИЕ навыка НА РАССМОТРЕНИИ, с помощью + -->
                     <div class="mt-2 w-100 stack-categories">
                         <SkillDropdown SkillType="SkillType.Language" 
                                        AllSkills="@_languageSkills"

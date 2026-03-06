@@ -8,7 +8,7 @@ namespace HITSBlazor.Components.Inputs.TextArea
         public string? Label { get; set; }
 
         [Parameter]
-        public bool Hint { get; set; } = false;
+        public string HintText { get; set; } = string.Empty;
 
         [Parameter]
         public string Placeholder { get; set; } = string.Empty;

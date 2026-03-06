@@ -1,0 +1,10 @@
+﻿@namespace HITSBlazor.Components.Hint
+
+<span class="hint-container" @ref="_containerRef">
+    <span class="hint-trigger" @onmouseenter="ShowTooltip" @onmouseleave="HideTooltip">
+        <i class="bi bi-patch-question hint-icon"></i>
+        <span class="hint-tooltip @_placement @(_isVisible ? "visible" : string.Empty)" @ref="_tooltipRef">
+            @((MarkupString)Text)
+        </span>
+    </span>
+</span>

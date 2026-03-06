@@ -53,7 +53,11 @@ namespace HITSBlazor.Components.ActionMenus.BaseActionMenu
             {
                 Options = new
                 {
-                    fallbackPlacements = new[] { "top-start", "top-end", "bottom-start", "bottom-end" },
+                    fallbackPlacements = new[] 
+                    { 
+                        Placement.TopStart, Placement.TopEnd,
+                        Placement.BottomStart, Placement.BottomEnd 
+                    },
                     boundary = "clippingParents"
                 }
             },

@@ -99,10 +99,3 @@ input[type="checkbox"] {
     align-items: center;
     justify-content: center;
 }
-
-.hint {
-    cursor: pointer;
-    display: inline-block;
-    vertical-align: middle;
-    color: #007bff;
-}
