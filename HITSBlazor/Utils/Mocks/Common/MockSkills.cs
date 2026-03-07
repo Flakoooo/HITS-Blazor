@@ -63,5 +63,23 @@ namespace HITSBlazor.Utils.Mocks.Common
             => _skills.FirstOrDefault(s => s.Id == id);
 
         public static List<Skill> GetAllSkills() => [.. _skills];
+
+        public static Skill CreateSkill(string name, SkillType type, bool isConfirmed, Guid creatorId)
+        {
+            var newSkill = new Skill
+            {
+                Id = Guid.NewGuid(),
+                Name = name,
+                Type = type,
+                Confirmed = isConfirmed,
+                CreatorId = creatorId,
+                UpdaterId = null,
+                DeleterId = null
+            };
+
+            _skills.Add(newSkill);
+
+            return newSkill;
+        }
     }
 }

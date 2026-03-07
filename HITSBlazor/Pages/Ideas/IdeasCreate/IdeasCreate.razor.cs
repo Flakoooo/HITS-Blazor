@@ -67,7 +67,7 @@ namespace HITSBlazor.Pages.Ideas.IdeasCreate
                 "В стеке технологий необходимо указать минимальный набор технологий, которые должны быть использованы командой для реализации. Избегайте в одной идее конкурирующих между собой технологий. Например нельзя указать одновременно MYSQL и PostgreSQL или нельзя указать одновременно VueJS и ReactJS.<br/>" +
                 "<br/>Желательно выбирать технологии, которыми Вы лучше всего владеете на практике и легко сможете дать оценку и консультацию команде студентов." +
                 "<br/>Если в списке отсутствует нужная Вам технология, то можно самостоятельно добавить ее - нажать на поле стека и вписать название технологии (для добавления нажать на \"+\")."
-            };
+        };
 
         private IdeasCreateModel _ideasCreateModel = new();
         private bool _submitted = false;
@@ -128,6 +128,7 @@ namespace HITSBlazor.Pages.Ideas.IdeasCreate
             _databaseSkills = await SkillService.GetSkillsByTypeAsync(SkillType.Database);
             _devopsSkills = await SkillService.GetSkillsByTypeAsync(SkillType.Devops);
 
+            //TODO: Сервис компаний чекнуть
             ServiceResponse<List<Company>> companies = await CompanyService.GetAllCompanies();
             if (companies.IsSuccess)
                 _companies = companies.Response ?? [];
@@ -172,23 +173,6 @@ namespace HITSBlazor.Pages.Ideas.IdeasCreate
             _selectedFrameworkSkills = [.. ideaSkills.Where(s => s.Type == SkillType.Framework)];
             _selectedDatabaseSkills = [.. ideaSkills.Where(s => s.Type == SkillType.Database)];
             _selectedDevopsSkills = [.. ideaSkills.Where(s => s.Type == SkillType.Devops)];
-        }
-
-        private async Task<List<Skill>> SearchSkillsAsync(SkillType skillType, string searchText)
-        {
-            if (string.IsNullOrWhiteSpace(searchText))
-            {
-                return skillType switch
-                {
-                    SkillType.Language => _languageSkills,
-                    SkillType.Framework => _frameworkSkills,
-                    SkillType.Database => _databaseSkills,
-                    SkillType.Devops => _devopsSkills,
-                    _ => []
-                };
-            }
-
-            return await SkillService.GetSkillByTypeAndByNameAsync(skillType, searchText);
         }
 
         private async Task<List<Company>> SearchCompaniesAsync(string searchText)

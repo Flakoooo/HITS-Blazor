@@ -81,28 +81,19 @@
                 }
                 else 
                 {
-                    <!-- TODO: Реализовать ДОБАВЛЕНИЕ навыка НА РАССМОТРЕНИИ, с помощью + -->
                     <div class="mt-2 w-100 stack-categories">
                         <SkillDropdown SkillType="SkillType.Language" 
-                                       AllSkills="@_languageSkills"
                                        NeedValidation="_submitted"
-                                       @bind-SelectedSkills="@_selectedLanguageSkills"
-                                       SearchFunction="@SearchSkillsAsync" />
+                                       @bind-SelectedSkills="@_selectedLanguageSkills" />
                         <SkillDropdown SkillType="SkillType.Framework"
-                                       AllSkills="@_frameworkSkills"
                                        NeedValidation="_submitted"
-                                       @bind-SelectedSkills="@_selectedFrameworkSkills"
-                                       SearchFunction="@SearchSkillsAsync" />
-                        <SkillDropdown SkillType="SkillType.Database" 
-                                       AllSkills="@_databaseSkills"
+                                       @bind-SelectedSkills="@_selectedFrameworkSkills" />
+                        <SkillDropdown SkillType="SkillType.Database"
                                        NeedValidation="_submitted"
-                                       @bind-SelectedSkills="@_selectedDatabaseSkills"
-                                       SearchFunction="@SearchSkillsAsync" />
-                        <SkillDropdown SkillType="SkillType.Devops" 
-                                       AllSkills="@_devopsSkills"
+                                       @bind-SelectedSkills="@_selectedDatabaseSkills" />
+                        <SkillDropdown SkillType="SkillType.Devops"
                                        NeedValidation="_submitted"
-                                       @bind-SelectedSkills="@_selectedDevopsSkills"
-                                       SearchFunction="@SearchSkillsAsync" />
+                                       @bind-SelectedSkills="@_selectedDevopsSkills" />
                     </div>
                 }
             </div>

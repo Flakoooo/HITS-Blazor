@@ -24,11 +24,22 @@
                 </div>
             </div>
 
-            <i class="bi @(IsOpen ? "bi-chevron-up" : "bi-chevron-down")"
-               style="position: absolute; bottom: auto; left: auto; top: 11px; right: @(_showError ? "32" : "12")px; z-index: 100; cursor: pointer;"
-               @onclick="ToggleDropdown"></i>
+            @if (!_isOpen)
+            {
+                <i class="bi bi-chevron-down skill-dropdown-icon"
+                   style="right: @(_showError ? "32" : "12")px;"
+                   @onclick="ToggleDropdown"></i>
+            }
 
-            @if (IsOpen)
+            <!-- TODO: Если навык имее ттакое же название, то убирать -->
+            @if (_isOpen && _skillCreateAllowed)
+            {
+                <i class="bi bi-plus-lg skill-dropdown-icon"
+                   style="right: @(_showError ? "32" : "12")px;"
+                   @onclick="CreateNewUnconfirmedSkill"></i>
+            }
+
+            @if (_isOpen)
             {
                 <div class="list-group w-100 dropdown-list"
                      style="top: 42px; right: auto; z-index: 10000; max-height: 173px; overflow-y: scroll; position: absolute; bottom: auto; left: auto;"

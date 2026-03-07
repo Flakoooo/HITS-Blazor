@@ -1,11 +1,14 @@
 ﻿using HITSBlazor.Models.Common.Entities;
 using HITSBlazor.Models.Common.Enums;
+using HITSBlazor.Services.Auth;
 using HITSBlazor.Utils.Mocks.Common;
 
 namespace HITSBlazor.Services.Skills
 {
-    public class MockSkillService : ISkillService
+    public class MockSkillService(IAuthService authService) : ISkillService
     {
+        private IAuthService _authService = authService;
+
         private List<Skill> _cachedSkills = [];
         private DateTime _lastRefreshTime;
         private readonly TimeSpan _cacheLifetime = TimeSpan.FromMinutes(5);
@@ -45,6 +48,21 @@ namespace HITSBlazor.Services.Skills
                 await RefreshCacheAsync();
 
             return [.. _cachedSkills.Where(s => s.Type == skillType && s.Name.Contains(name, StringComparison.CurrentCultureIgnoreCase))];
+        }
+
+        public async Task<Skill?> CreateNewSkillAsync(string name, SkillType type, bool isConfirmed)
+        {
+            if (_authService.CurrentUser is null)
+                return null;
+
+            var newSkill = MockSkills.CreateSkill(name, type, isConfirmed, _authService.CurrentUser.Id);
+            if (newSkill is not null)
+            {
+                if (!_cachedSkills.Contains(newSkill))
+                    _cachedSkills.Add(newSkill);
+            }
+
+            return newSkill;
         }
     }
 }

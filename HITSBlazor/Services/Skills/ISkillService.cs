@@ -9,5 +9,7 @@ namespace HITSBlazor.Services.Skills
 
         Task<List<Skill>> GetSkillsByTypeAsync(SkillType skillType);
         Task<List<Skill>> GetSkillByTypeAndByNameAsync(SkillType skillType, string name);
+
+        Task<Skill?> CreateNewSkillAsync(string name, SkillType type, bool isConfirmed);
     }
 }

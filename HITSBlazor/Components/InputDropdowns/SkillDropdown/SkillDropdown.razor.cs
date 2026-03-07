@@ -1,23 +1,31 @@
-﻿using HITSBlazor.Models.Common.Entities;
+﻿using ApexCharts;
+using HITSBlazor.Models.Common.Entities;
 using HITSBlazor.Models.Common.Enums;
+using HITSBlazor.Services.Skills;
 using HITSBlazor.Utils.EnumTranslators;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
-using Newtonsoft.Json.Linq;
 
 namespace HITSBlazor.Components.InputDropdowns.SkillDropdown
 {
+    //TODO: Перенести поиск навыков сюда, а также получение навыков
     public partial class SkillDropdown : IAsyncDisposable
     {
         [Inject]
         private IJSRuntime JSRuntime { get; set; } = null!;
 
-        [Parameter] public SkillType SkillType { get; set; }
-        [Parameter] public List<Skill> AllSkills { get; set; } = [];
-        [Parameter] public HashSet<Skill> SelectedSkills { get; set; } = [];
-        [Parameter] public EventCallback<HashSet<Skill>> SelectedSkillsChanged { get; set; }
-        [Parameter] public Func<SkillType, string, Task<List<Skill>>>? SearchFunction { get; set; }
+        [Inject]
+        private ISkillService SkillService { get; set; } = null!;
+
+        [Parameter] 
+        public SkillType SkillType { get; set; }
+
+        [Parameter] 
+        public HashSet<Skill> SelectedSkills { get; set; } = [];
+
+        [Parameter] 
+        public EventCallback<HashSet<Skill>> SelectedSkillsChanged { get; set; }
 
         [Parameter]
         public bool NeedValidation { get; set; } = false;
@@ -25,13 +33,21 @@ namespace HITSBlazor.Components.InputDropdowns.SkillDropdown
         [Parameter]
         public string? ErrorMessage { get; set; } = " не выбраны";
 
-        private bool _showError = false;
-
         private ElementReference inputRef;
-        private bool IsOpen { get; set; }
-        private string searchText = "";
-        private List<Skill> FilteredSkills { get; set; } = [];
         private DotNetObjectReference<SkillDropdown>? dotNetHelper;
+
+        private bool _showError = false;
+        private bool _isOpen = false;
+        private bool _skillCreateAllowed = false;
+        private string _searchText = string.Empty;
+
+        public List<Skill> AllSkills { get; set; } = [];
+        private List<Skill> FilteredSkills { get; set; } = [];
+
+        protected override async Task OnInitializedAsync()
+        {
+            AllSkills = await SkillService.GetSkillsByTypeAsync(SkillType);
+        }
 
         protected override void OnParametersSet()
         {
@@ -57,31 +73,44 @@ namespace HITSBlazor.Components.InputDropdowns.SkillDropdown
 
         private async Task OpenDropdown()
         {
-            if (!IsOpen)
-                IsOpen = true;
+            if (!_isOpen) _isOpen = true;
         }
 
-        private void ToggleDropdown() => IsOpen = !IsOpen;
+        private void ToggleDropdown() => _isOpen = !_isOpen;
+
+        private async Task CreateNewUnconfirmedSkill()
+        {
+            var newSkill = await SkillService.CreateNewSkillAsync(_searchText, SkillType, false);
+            if (newSkill is null) return;
+
+            SelectedSkills.Add(newSkill);
+            if (!AllSkills.Contains(newSkill)) AllSkills.Add(newSkill);
+        }
 
         [JSInvokable]
         public void CloseDropdown()
         {
-            IsOpen = false;
+            _isOpen = false;
             InvokeAsync(StateHasChanged);
         }
 
         private async Task OnSearch(ChangeEventArgs e)
         {
-            searchText = (e.Value?.ToString() ?? "").Trim();
+            _searchText = (e.Value?.ToString() ?? "").Trim();
 
-            if (SearchFunction != null)
-                FilteredSkills = await SearchFunction(SkillType, searchText);
+            if (string.IsNullOrWhiteSpace(_searchText))
+                FilteredSkills = AllSkills;
+            else
+                FilteredSkills = await SkillService.GetSkillByTypeAndByNameAsync(SkillType, _searchText);
+
+            _skillCreateAllowed = !string.IsNullOrWhiteSpace(_searchText) 
+                && !FilteredSkills.Any(s => s.Name.Equals(_searchText, StringComparison.CurrentCultureIgnoreCase));
         }
 
         private void OnInputKeyDown(KeyboardEventArgs e)
         {
             if (e.Key == "Escape")
-                IsOpen = false;
+                _isOpen = false;
         }
 
         private async Task OnItemClick(Skill skill)

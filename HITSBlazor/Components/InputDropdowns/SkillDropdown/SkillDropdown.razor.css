@@ -1,0 +1,8 @@
+﻿.skill-dropdown-icon {
+    position: absolute;
+    bottom: auto;
+    left: auto;
+    top: 11px;
+    z-index: 100;
+    cursor: pointer
+}
