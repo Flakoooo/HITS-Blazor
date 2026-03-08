@@ -7,7 +7,7 @@ namespace HITSBlazor.Services.Skills
 {
     public class MockSkillService(IAuthService authService) : ISkillService
     {
-        private IAuthService _authService = authService;
+        private readonly IAuthService _authService = authService;
 
         private List<Skill> _cachedSkills = [];
         private DateTime _lastRefreshTime;
@@ -20,7 +20,8 @@ namespace HITSBlazor.Services.Skills
         }
 
         public async Task<List<Skill>> GetSkillsAsync(
-            string? searchText = null
+            string? searchText,
+            SkillType? skillType
         )
         {
             if (_cachedSkills.Count == 0 || DateTime.UtcNow - _lastRefreshTime > _cacheLifetime)
@@ -28,26 +29,13 @@ namespace HITSBlazor.Services.Skills
 
             var query = _cachedSkills.AsEnumerable();
 
+            if (skillType.HasValue)
+                query = query.Where(s => s.Type == skillType);
+
             if (!string.IsNullOrWhiteSpace(searchText))
-                query = query.Where(i => i.Name.Contains(searchText, StringComparison.CurrentCultureIgnoreCase));
+                query = query.Where(s => s.Name.Contains(searchText, StringComparison.CurrentCultureIgnoreCase));
 
             return [.. query];
-        }
-
-        public async Task<List<Skill>> GetSkillsByTypeAsync(SkillType skillType)
-        {
-            if (_cachedSkills.Count == 0 || DateTime.UtcNow - _lastRefreshTime > _cacheLifetime)
-                await RefreshCacheAsync();
-
-            return [.. _cachedSkills.Where(s => s.Type == skillType)];
-        }
-
-        public async Task<List<Skill>> GetSkillByTypeAndByNameAsync(SkillType skillType, string name)
-        {
-            if (_cachedSkills.Count == 0 || DateTime.UtcNow - _lastRefreshTime > _cacheLifetime)
-                await RefreshCacheAsync();
-
-            return [.. _cachedSkills.Where(s => s.Type == skillType && s.Name.Contains(name, StringComparison.CurrentCultureIgnoreCase))];
         }
 
         public async Task<Skill?> CreateNewSkillAsync(string name, SkillType type, bool isConfirmed)

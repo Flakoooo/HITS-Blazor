@@ -17,7 +17,7 @@ namespace HITSBlazor.Services.Ideas
             HashSet<IdeaStatusType>? statusTypes = null
         );
         Task<Idea?> GetIdeaByIdAsync(Guid id);
-        Task<bool> CreateNewIdeaAsync(IdeasCreateModel ideasCreateModel);
+        Task<Idea?> CreateNewIdeaAsync(IdeasCreateModel ideasCreateModel);
         Task<bool> UpdateCheckedIdeaAsync(Guid ideaId);
         Task<bool> UpdateIdeaAsync(Guid ideaId, IdeasCreateModel ideasCreateModel);
         Task<bool> UpdateIdeaStatusAsync(Guid ideaId, IdeaStatusType ideaStatus);
@@ -25,6 +25,7 @@ namespace HITSBlazor.Services.Ideas
 
         //Skills
         Task<List<Skill>> GetAllIdeaSkillsAsync(Guid ideaId);
+        Task CreateOrUpdateIdeasSkills(Guid ideaId, List<Skill> skills);
 
         //Ratings
         Task<List<Rating>> GetIdeaRatingsAsync(Guid ideaId);

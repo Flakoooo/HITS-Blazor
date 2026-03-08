@@ -1,5 +1,4 @@
-﻿using ApexCharts;
-using HITSBlazor.Models.Common.Entities;
+﻿using HITSBlazor.Models.Common.Entities;
 using HITSBlazor.Models.Common.Enums;
 using HITSBlazor.Services.Skills;
 using HITSBlazor.Utils.EnumTranslators;
@@ -9,7 +8,6 @@ using Microsoft.JSInterop;
 
 namespace HITSBlazor.Components.InputDropdowns.SkillDropdown
 {
-    //TODO: Перенести поиск навыков сюда, а также получение навыков
     public partial class SkillDropdown : IAsyncDisposable
     {
         [Inject]
@@ -27,33 +25,18 @@ namespace HITSBlazor.Components.InputDropdowns.SkillDropdown
         [Parameter] 
         public EventCallback<HashSet<Skill>> SelectedSkillsChanged { get; set; }
 
-        [Parameter]
-        public bool NeedValidation { get; set; } = false;
-
-        [Parameter]
-        public string? ErrorMessage { get; set; } = " не выбраны";
-
         private ElementReference inputRef;
         private DotNetObjectReference<SkillDropdown>? dotNetHelper;
 
-        private bool _showError = false;
         private bool _isOpen = false;
         private bool _skillCreateAllowed = false;
         private string _searchText = string.Empty;
 
-        public List<Skill> AllSkills { get; set; } = [];
-        private List<Skill> FilteredSkills { get; set; } = [];
+        private List<Skill> _skills = [];
 
         protected override async Task OnInitializedAsync()
         {
-            AllSkills = await SkillService.GetSkillsByTypeAsync(SkillType);
-        }
-
-        protected override void OnParametersSet()
-        {
-            ErrorMessage = $"{SkillType.GetTranslation()} не выбраны";
-            _showError = NeedValidation && SelectedSkills.Count == 0;
-            StateHasChanged();
+            await LoadSkillsAsync();
         }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -63,9 +46,16 @@ namespace HITSBlazor.Components.InputDropdowns.SkillDropdown
                 dotNetHelper = DotNetObjectReference.Create(this);
                 await JSRuntime.InvokeVoidAsync("listDropdown.registerClickOutside",
                     inputRef, dotNetHelper);
-
-                FilteredSkills = [.. AllSkills];
             }
+        }
+
+        private async Task LoadSkillsAsync()
+        {
+            _skills = await SkillService.GetSkillsAsync(
+                searchText: _searchText,
+                skillType: SkillType
+            );
+            StateHasChanged();
         }
 
         private string GetPlaceholder()
@@ -84,7 +74,6 @@ namespace HITSBlazor.Components.InputDropdowns.SkillDropdown
             if (newSkill is null) return;
 
             SelectedSkills.Add(newSkill);
-            if (!AllSkills.Contains(newSkill)) AllSkills.Add(newSkill);
         }
 
         [JSInvokable]
@@ -98,13 +87,10 @@ namespace HITSBlazor.Components.InputDropdowns.SkillDropdown
         {
             _searchText = (e.Value?.ToString() ?? "").Trim();
 
-            if (string.IsNullOrWhiteSpace(_searchText))
-                FilteredSkills = AllSkills;
-            else
-                FilteredSkills = await SkillService.GetSkillByTypeAndByNameAsync(SkillType, _searchText);
+            await LoadSkillsAsync();
 
             _skillCreateAllowed = !string.IsNullOrWhiteSpace(_searchText) 
-                && !FilteredSkills.Any(s => s.Name.Equals(_searchText, StringComparison.CurrentCultureIgnoreCase));
+                && !_skills.Any(s => s.Name.Equals(_searchText, StringComparison.CurrentCultureIgnoreCase));
         }
 
         private void OnInputKeyDown(KeyboardEventArgs e)

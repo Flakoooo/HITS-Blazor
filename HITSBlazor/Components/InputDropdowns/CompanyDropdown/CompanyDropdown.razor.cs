@@ -1,4 +1,5 @@
 ﻿using HITSBlazor.Models.Common.Entities;
+using HITSBlazor.Services.Companies;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
@@ -10,10 +11,12 @@ namespace HITSBlazor.Components.InputDropdowns.CompanyDropdown
         [Inject]
         private IJSRuntime JSRuntime { get; set; } = null!;
 
+        [Inject]
+        private ICompanyService CompanyService { get; set; } = null!;
+
         [Parameter] public string Placeholder { get; set; } = "Выберите заказчика";
         [Parameter] public string RadioGroupName { get; set; } = "company";
 
-        [Parameter] public List<Company> AllCompanies { get; set; } = [];
         [Parameter] public Company? SelectedCompany { get; set; }
         [Parameter] public EventCallback<Company?> SelectedCompanyChanged { get; set; }
 
@@ -25,15 +28,21 @@ namespace HITSBlazor.Components.InputDropdowns.CompanyDropdown
         [Parameter]
         public string? ErrorMessage { get; set; } = "Поле не заполнено";
 
-        private bool _showError = false;
-
         private ElementReference inputRef;
-        private bool IsOpen { get; set; }
-        private string searchText = "";
-        private List<Company> FilteredCompanies { get; set; } = [];
         private DotNetObjectReference<CompanyDropdown>? dotNetHelper;
 
+        private bool _isOpen = false;
+        private bool _showError = false;
+
+        private List<Company> _companies = [];
+        private string _searchText = string.Empty;
+
         private string SelectedCompanyName => SelectedCompany?.Name ?? string.Empty;
+
+        protected override async Task OnInitializedAsync()
+        {
+            await LoadCompaniesAsync();
+        }
 
         protected override void OnParametersSet()
         {
@@ -47,41 +56,41 @@ namespace HITSBlazor.Components.InputDropdowns.CompanyDropdown
             {
                 dotNetHelper = DotNetObjectReference.Create(this);
                 await JSRuntime.InvokeVoidAsync("listDropdown.registerClickOutside", inputRef, dotNetHelper);
-                FilteredCompanies = [.. AllCompanies];
             }
+        }
+
+        private async Task LoadCompaniesAsync()
+        {
+            _companies = await CompanyService.GetCompaniesAsync(
+                searchText: _searchText
+            );
+            StateHasChanged();
         }
 
         private async Task OpenDropdown()
         {
-            if (!IsOpen)
-            {
-                IsOpen = true;
-                if (string.IsNullOrWhiteSpace(searchText))
-                    FilteredCompanies = [.. AllCompanies];
-            }
+            if (!_isOpen) _isOpen = true;
         }
 
-        private void ToggleDropdown() => IsOpen = !IsOpen;
+        private void ToggleDropdown() => _isOpen = !_isOpen;
 
         [JSInvokable]
         public void CloseDropdown()
         {
-            IsOpen = false;
+            _isOpen = false;
             InvokeAsync(StateHasChanged);
         }
 
         private async Task OnSearch(ChangeEventArgs e)
         {
-            searchText = (e.Value?.ToString() ?? "").Trim();
-
-            if (SearchFunction != null)
-                FilteredCompanies = await SearchFunction(searchText);
+            _searchText = (e.Value?.ToString() ?? "").Trim();
+            await LoadCompaniesAsync();
         }
 
         private void OnInputKeyDown(KeyboardEventArgs e)
         {
             if (e.Key == "Escape")
-                IsOpen = false;
+                _isOpen = false;
         }
 
         private async Task OnElementChange(Company company)

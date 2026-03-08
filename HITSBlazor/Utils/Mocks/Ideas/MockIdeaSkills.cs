@@ -29,5 +29,16 @@ namespace HITSBlazor.Utils.Mocks.Ideas
 
         public static List<Skill> GetIdeaSkillsByIdeaId(Guid ideaId)
             => _ideaSkills.FirstOrDefault(isk => isk.IdeaId == ideaId)?.Skills ?? [];
+
+        public static bool CreateOrUpdateIdeasSkills(Guid ideaId, List<Skill> skills)
+        {
+            var ideasSkills = _ideaSkills.FirstOrDefault(isk => isk.IdeaId == ideaId);
+            if (ideasSkills is null)
+                _ideaSkills.Add(new IdeaSkills { IdeaId = ideaId, Skills = skills });
+            else
+                ideasSkills.Skills = skills;
+
+            return true;
+        }
     }
 }

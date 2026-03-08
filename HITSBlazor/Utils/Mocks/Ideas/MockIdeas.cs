@@ -269,7 +269,7 @@ namespace HITSBlazor.Utils.Mocks.Ideas
             foreach (var idea in ideas)
             {
                 idea.Experts = expertGtoup.WithUsers(
-                        MockUsersGroups.GetRandomGroupUsersById(MockUsersGroups.ExpertsId, _random.Next(1, 3))
+                    MockUsersGroups.GetRandomGroupUsersById(MockUsersGroups.ExpertsId, _random.Next(1, 3))
                 );
                 idea.ProjectOffice = projectOfficeGroup.WithUsers(
                     MockUsersGroups.GetRandomGroupUsersById(MockUsersGroups.ProjectOfficeId, 1)
@@ -300,7 +300,7 @@ namespace HITSBlazor.Utils.Mocks.Ideas
         public static List<Idea> GetIdeasOnCofirmation()
             => [.. _ideas.Where(i => i.Status == IdeaStatusType.OnConfirmation)];
 
-        public static bool CreateNewIdea(IdeasCreateModel model, User initiator)
+        public static Idea? CreateNewIdea(IdeasCreateModel model, User initiator)
         {
             var createdDate = DateTime.UtcNow;
 
@@ -332,14 +332,14 @@ namespace HITSBlazor.Utils.Mocks.Ideas
                 Suitability = model.Suitability,
                 Budget = model.Budget,
                 PreAssessment = Formulas.CalculcateRating([model.Suitability, model.Budget]),
-                Rating = null,
 
                 IsChecked = false,
                 IsActive = true
             };
+            idea.Rating = MockRatings.CreateRatingByIdea(idea);
             _ideas.Add(idea);
 
-            return true;
+            return idea;
         }
 
         public static bool CheckIdea(Guid ideaId)

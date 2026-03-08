@@ -12,31 +12,22 @@
                            @ref="inputRef"
                            @oninput="@(async e => await OnSearch(e))"
                            placeholder="@GetPlaceholder()"
-                           class="form-control @(_showError ? "is-invalid" : string.Empty)"
+                           class="form-control"
                            style="color: #000 !important;"
                            @onclick="OpenDropdown"
                            @onfocus="OpenDropdown"
                            @onkeydown="OnInputKeyDown" />
-                    @if (_showError)
-                    {
-                        <span class="invalid-feedback">@ErrorMessage</span>
-                    }
                 </div>
             </div>
 
             @if (!_isOpen)
             {
-                <i class="bi bi-chevron-down skill-dropdown-icon"
-                   style="right: @(_showError ? "32" : "12")px;"
-                   @onclick="ToggleDropdown"></i>
+                <i class="skill-dropdown-icon bi bi-chevron-down" @onclick="ToggleDropdown"></i>
             }
 
-            <!-- TODO: Если навык имее ттакое же название, то убирать -->
             @if (_isOpen && _skillCreateAllowed)
             {
-                <i class="bi bi-plus-lg skill-dropdown-icon"
-                   style="right: @(_showError ? "32" : "12")px;"
-                   @onclick="CreateNewUnconfirmedSkill"></i>
+                <i class="skill-dropdown-icon bi bi-plus-lg" @onclick="CreateNewUnconfirmedSkill"></i>
             }
 
             @if (_isOpen)
@@ -45,7 +36,7 @@
                      style="top: 42px; right: auto; z-index: 10000; max-height: 173px; overflow-y: scroll; position: absolute; bottom: auto; left: auto;"
                      @onclick:stopPropagation>
 
-                    @foreach (var skill in FilteredSkills)
+                    @foreach (var skill in _skills)
                     {
                         <div @onclick="@(() => OnItemClick(skill))"
                              class="d-flex list-group-item list-group-item-action focusable-item"

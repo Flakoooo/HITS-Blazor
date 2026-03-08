@@ -197,7 +197,7 @@ namespace HITSBlazor.Components.Modals.RightSideModals.IdeaModal
             {
                 isRatingConfirmed = true;
                 IdeaRatings.FirstOrDefault(r => r.Id == _expertRating.Id)?.IsConfirmed = true;
-                if (IdeaRatings.Count() == IdeaRatings.Count(r => r.IsConfirmed))
+                if (IdeaRatings.Count == IdeaRatings.Count(r => r.IsConfirmed))
                     CurrentIdea?.Status = IdeaStatusType.Confirmed;
             }    
 

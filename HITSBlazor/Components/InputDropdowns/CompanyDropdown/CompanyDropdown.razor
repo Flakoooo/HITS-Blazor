@@ -27,17 +27,23 @@
                 </div>
             </div>
 
-            <i class="bi @(IsOpen ? "bi-chevron-up" : "bi-chevron-down")"
-               style="position: absolute; bottom: auto; left: auto; top: 11px; right: @(_showError ? "32" : "12")px; z-index: 100; cursor: pointer;"
-               @onclick="ToggleDropdown"></i>
+            @if (!_isOpen)
+            {
+                <i class="skill-dropdown-icon bi bi-chevron-down" @onclick="ToggleDropdown"></i>
+            }
 
-            @if (IsOpen)
+            @if (_isOpen && _companyCreateAllowed)
+            {
+                <i class="skill-dropdown-icon bi bi-plus-lg" @onclick="CreateNewCompany"></i>
+            }
+
+            @if (_isOpen)
             {
                 <div class="list-group w-100 dropdown-list"
                      style="top: 42px; right: auto; z-index: 6; max-height: 173px; overflow-y: scroll; position: absolute; bottom: auto; left: auto;"
                      @onclick:stopPropagation>
 
-                    @foreach (var company in FilteredCompanies)
+                    @foreach (var company in _companies)
                     {
                         <div @onclick="@(() => OnElementChange(company))"
                              class="d-flex list-group-item list-group-item-action"

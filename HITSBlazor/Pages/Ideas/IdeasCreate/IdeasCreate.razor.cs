@@ -37,7 +37,7 @@ namespace HITSBlazor.Pages.Ideas.IdeasCreate
 
         private bool _isLoading = true;
 
-        private Dictionary<string, string> _hints = new Dictionary<string, string>()
+        private readonly Dictionary<string, string> _hints = new()
         {
             [nameof(IdeasCreateModel.Name)] = "Здесь Вы должны написать название для вашей идеи",
             [nameof(IdeasCreateModel.Problem)] = 
@@ -72,17 +72,12 @@ namespace HITSBlazor.Pages.Ideas.IdeasCreate
         private IdeasCreateModel _ideasCreateModel = new();
         private bool _submitted = false;
 
-        private List<Skill> _languageSkills = [];
-        private List<Skill> _frameworkSkills = [];
-        private List<Skill> _databaseSkills = [];
-        private List<Skill> _devopsSkills = [];
+        private HashSet<Skill> SelectedLanguageSkills { get; set; } = [];
+        private HashSet<Skill> SelectedFrameworkSkills { get; set; } = [];
+        private HashSet<Skill> SelectedDatabaseSkills { get; set; } = [];
+        private HashSet<Skill> SelectedDevopsSkills { get; set; } = [];
 
-        private HashSet<Skill> _selectedLanguageSkills = [];
-        private HashSet<Skill> _selectedFrameworkSkills = [];
-        private HashSet<Skill> _selectedDatabaseSkills = [];
-        private HashSet<Skill> _selectedDevopsSkills = [];
-
-        private List<Company> _companies = [];
+        private List<Company> Companies { get; set; } = [];
 
         private Company? SelectedCompany { get; set; } = null;
         private User? SelectedContactPerson { get; set; } = null;
@@ -122,11 +117,6 @@ namespace HITSBlazor.Pages.Ideas.IdeasCreate
         protected override async Task OnInitializedAsync()
         {
             _isLoading = true;
-
-            _languageSkills = await SkillService.GetSkillsByTypeAsync(SkillType.Language);
-            _frameworkSkills = await SkillService.GetSkillsByTypeAsync(SkillType.Framework);
-            _databaseSkills = await SkillService.GetSkillsByTypeAsync(SkillType.Database);
-            _devopsSkills = await SkillService.GetSkillsByTypeAsync(SkillType.Devops);
 
             //TODO: Сервис компаний чекнуть
             ServiceResponse<List<Company>> companies = await CompanyService.GetAllCompanies();
@@ -169,10 +159,10 @@ namespace HITSBlazor.Pages.Ideas.IdeasCreate
             BudgetScore = idea.Budget.ToString();
 
             var ideaSkills = await IdeasService.GetAllIdeaSkillsAsync(guid);
-            _selectedLanguageSkills = [.. ideaSkills.Where(s => s.Type == SkillType.Language)];
-            _selectedFrameworkSkills = [.. ideaSkills.Where(s => s.Type == SkillType.Framework)];
-            _selectedDatabaseSkills = [.. ideaSkills.Where(s => s.Type == SkillType.Database)];
-            _selectedDevopsSkills = [.. ideaSkills.Where(s => s.Type == SkillType.Devops)];
+            SelectedLanguageSkills = [.. ideaSkills.Where(s => s.Type == SkillType.Language)];
+            SelectedFrameworkSkills = [.. ideaSkills.Where(s => s.Type == SkillType.Framework)];
+            SelectedDatabaseSkills = [.. ideaSkills.Where(s => s.Type == SkillType.Database)];
+            SelectedDevopsSkills = [.. ideaSkills.Where(s => s.Type == SkillType.Devops)];
         }
 
         private async Task<List<Company>> SearchCompaniesAsync(string searchText)
@@ -218,32 +208,38 @@ namespace HITSBlazor.Pages.Ideas.IdeasCreate
             if (_ideasCreateModel.MaxTeamSize is > 30 or < 2) isInvalid = true;
             if (_ideasCreateModel.MinTeamSize is > 30 or < 2) isInvalid = true;
 
-            if (_selectedLanguageSkills.Count == 0) isInvalid = true;
-            if (_selectedFrameworkSkills.Count == 0) isInvalid = true;
-            if (_selectedDatabaseSkills.Count == 0) isInvalid = true;
-            if (_selectedDevopsSkills.Count == 0) isInvalid = true;
-
             if (SelectedCompany is null) isInvalid = true;
             if (SelectedContactPerson is null) isInvalid = true;
 
             if (_ideasCreateModel.Suitability is > 5 or < 1) isInvalid = true;
             if (_ideasCreateModel.Budget is > 5 or < 1) isInvalid = true;
 
-            if (!isInvalid)
+            if (isInvalid)
             {
-                _ideasCreateModel.Status = ideaStatusType;
-                _ideasCreateModel.Customer = SelectedCompany!.Name;
-                _ideasCreateModel.ContactPerson = SelectedContactPerson!.FullName;
-
-                var result = await IdeasService.CreateNewIdeaAsync(_ideasCreateModel);
+                GlobalNotificationService.ShowError("Заполните все необходимые поля");
                 _submitted = true;
-
-                if (result) await Navigation.NavigateToAsync("ideas/list");
                 return;
             }
 
-            GlobalNotificationService.ShowError("Заполните все необходимые поля");
+            _ideasCreateModel.Status = ideaStatusType;
+            _ideasCreateModel.Customer = SelectedCompany!.Name;
+            _ideasCreateModel.ContactPerson = SelectedContactPerson!.FullName;
+
+            var result = await IdeasService.CreateNewIdeaAsync(_ideasCreateModel);
             _submitted = true;
+
+            if (result is null) return;
+
+            await IdeasService.CreateOrUpdateIdeasSkills(
+                result.Id, 
+                [
+                    .. SelectedLanguageSkills,
+                    .. SelectedFrameworkSkills,
+                    .. SelectedDatabaseSkills,
+                    .. SelectedDevopsSkills
+                ]
+            );
+            await Navigation.NavigateToAsync("ideas/list");
         }
 
         private async Task UpdateIdea()

@@ -77,18 +77,19 @@ namespace HITSBlazor.Services.Ideas
 
         public async Task<Idea?> GetIdeaByIdAsync(Guid id) => MockIdeas.GetIdeaById(id);
 
-        public async Task<bool> CreateNewIdeaAsync(IdeasCreateModel ideasCreateModel)
+        public async Task<Idea?> CreateNewIdeaAsync(IdeasCreateModel ideasCreateModel)
         {
             if (_authService.CurrentUser is null)
             {
                 _globalNotificationService.ShowError("Пользователь не найден");
-                return false;
+                return null;
             }
 
-            if (!MockIdeas.CreateNewIdea(ideasCreateModel, _authService.CurrentUser))
+            var newIdea = MockIdeas.CreateNewIdea(ideasCreateModel, _authService.CurrentUser);
+            if (newIdea is null)
             {
                 _globalNotificationService.ShowError("Не удалось создать идею");
-                return false;
+                return null;
             }
 
             if (ideasCreateModel.Status == IdeaStatusType.New)
@@ -98,7 +99,7 @@ namespace HITSBlazor.Services.Ideas
 
             _cache.Clear();
 
-            return true;
+            return newIdea;
         }
 
         public async Task<bool> UpdateCheckedIdeaAsync(Guid ideaId)
@@ -175,6 +176,9 @@ namespace HITSBlazor.Services.Ideas
         //Skills
         public async Task<List<Skill>> GetAllIdeaSkillsAsync(Guid ideaId)
             => MockIdeaSkills.GetIdeaSkillsByIdeaId(ideaId);
+
+        public async Task CreateOrUpdateIdeasSkills(Guid ideaId, List<Skill> skills)
+            => MockIdeaSkills.CreateOrUpdateIdeasSkills(ideaId, skills);
 
         //Ratings
         public async Task<List<Rating>> GetIdeaRatingsAsync(Guid ideaId)

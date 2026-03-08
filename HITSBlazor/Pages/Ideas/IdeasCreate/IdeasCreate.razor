@@ -68,7 +68,7 @@
                 </div>
             </div>
             <div>
-                <span class="fs-6 text-primary">Стек технологий*</span>
+                <span class="fs-6 text-primary">Стек технологий</span>
                 <Hint Text="@_hints["Skills"]" />
                 @if (_isLoading)
                 {
@@ -83,24 +83,18 @@
                 {
                     <div class="mt-2 w-100 stack-categories">
                         <SkillDropdown SkillType="SkillType.Language" 
-                                       NeedValidation="_submitted"
-                                       @bind-SelectedSkills="@_selectedLanguageSkills" />
+                                       @bind-SelectedSkills="@SelectedLanguageSkills" />
                         <SkillDropdown SkillType="SkillType.Framework"
-                                       NeedValidation="_submitted"
-                                       @bind-SelectedSkills="@_selectedFrameworkSkills" />
+                                       @bind-SelectedSkills="@SelectedFrameworkSkills" />
                         <SkillDropdown SkillType="SkillType.Database"
-                                       NeedValidation="_submitted"
-                                       @bind-SelectedSkills="@_selectedDatabaseSkills" />
+                                       @bind-SelectedSkills="@SelectedDatabaseSkills" />
                         <SkillDropdown SkillType="SkillType.Devops"
-                                       NeedValidation="_submitted"
-                                       @bind-SelectedSkills="@_selectedDevopsSkills" />
+                                       @bind-SelectedSkills="@SelectedDevopsSkills" />
                     </div>
                 }
             </div>
-            <CompanyDropdown AllCompanies="@_companies"
-                             NeedValidation="_submitted"
-                             @bind-SelectedCompany="@SelectedCompany"
-                             SearchFunction="@SearchCompaniesAsync" />
+            <CompanyDropdown NeedValidation="_submitted"
+                             @bind-SelectedCompany="@SelectedCompany" />
             @if (SelectedCompany is not null)
             {
                 <ContactPersonDropdown CompanyId="@SelectedCompany.Id"
