@@ -1,0 +1,35 @@
+﻿@namespace HITSBlazor.Components.Typography
+@using HITSBlazor.Utils
+
+<span class="@GetClass()">@ChildContent</span>
+
+@code {
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    [Parameter]
+    public int? FontSize { get; set; }
+
+    [Parameter]
+    public ElementStyle? TextColor { get; set; }
+
+    [Parameter]
+    public string CustomClass { get; set; } = string.Empty;
+
+    private string GetClass()
+    {
+        Console.WriteLine("я работаю");
+        var classes = new List<string>();
+
+        if (FontSize.HasValue)
+            classes.Add($"fs-{FontSize.Value}");
+
+        if (TextColor.HasValue)
+            classes.Add($"text-{TextColor.Value.ToString().ToLower()}");
+
+        if (!string.IsNullOrWhiteSpace(CustomClass))
+            classes.Add(CustomClass);
+
+        return string.Join(" ", classes);
+    }
+}

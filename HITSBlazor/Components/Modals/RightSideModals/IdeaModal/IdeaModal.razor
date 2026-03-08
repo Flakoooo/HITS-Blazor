@@ -7,11 +7,13 @@
 @using HITSBlazor.Components.Modals.Components.ModalHeader
 @using HITSBlazor.Components.Placeholder
 @using HITSBlazor.Components.ProgressBar
+@using HITSBlazor.Components.Typography
 @using HITSBlazor.Models.Common.Entities
 @using HITSBlazor.Models.Ideas.Enums
 @using HITSBlazor.Models.Users.Enums
 @using HITSBlazor.Services.Ideas
 @using HITSBlazor.Services.Modal
+@using HITSBlazor.Utils
 @using HITSBlazor.Utils.EnumStyles
 @using HITSBlazor.Utils.EnumTranslators
 
@@ -51,7 +53,9 @@
                                                 @foreach (var skill in IdeaSkills)
                                                 {
                                                     <div class="px-2 py-1 rounded d-flex gap-1 @skill.Type.GetStyle()">
-                                                        <span class="fs-6">@skill.Name</span>
+                                                        <Typography FontSize="6">
+                                                            @skill.Name
+                                                        </Typography>
                                                     </div>
                                                 }
                                             </div>
@@ -111,13 +115,13 @@
                                  CategoryCounts="5" />
                     <div class="d-flex gap-3">
                         <Button BtnType="ButtonType.Button" 
-                                Variant="ButtonVariant.Primary" 
+                                Variant="ElementStyle.Primary" 
                                 IsLoading="isRatingConfirming"
                                 OnButtonClick="ConfirmRating"
                                 Text="Утвердить"
                                 LoadingText="Утверждение"/>
                         <Button BtnType="ButtonType.Button" 
-                                Variant="@(isRatingSaved ? ButtonVariant.Success : ButtonVariant.Primary)" 
+                                Variant="@(isRatingSaved ? ElementStyle.Success : ElementStyle.Primary)" 
                                 IsLoading="isRatingSaving"
                                 OnButtonClick="SaveRating"
                                 Text="Сохранить форму"
@@ -141,11 +145,11 @@
                     @if (CheckInitiatorAccess())
                     {
                         <Button BtnType="ButtonType.Button" 
-                                Variant="ButtonVariant.Light" 
+                                Variant="ElementStyle.Light" 
                                 OnButtonClick="NavigateToCreateIdea"
                                 Text="Редактировать" />
                         <Button BtnType="ButtonType.Button" 
-                                Variant="ButtonVariant.Success" 
+                                Variant="ElementStyle.Success" 
                                 OnButtonClick="@(() => UpdateIdeaStatus(IdeaStatusType.OnApproval))"
                                 Text="Отправить на согласование" />
                     }
@@ -153,11 +157,11 @@
                     @if (CheckProjectOfficeAccess())
                     {
                         <Button BtnType="ButtonType.Button" 
-                                Variant="ButtonVariant.Danger" 
+                                Variant="ElementStyle.Danger" 
                                 OnButtonClick="@(() => UpdateIdeaStatus(IdeaStatusType.OnEditing))"
                                 Text="Отправить на доработку" />
                         <Button BtnType="ButtonType.Button" 
-                                Variant="ButtonVariant.Success" 
+                                Variant="ElementStyle.Success" 
                                 OnButtonClick="@(() => UpdateIdeaStatus(IdeaStatusType.OnConfirmation))"
                                 Text="Отправить на утверждение" />
                     }
@@ -186,7 +190,9 @@
             else
             {
                 <div class="py-2 w-100 border-bottom">
-                    <span class="fs-6 px-3">Комментарии</span>
+                    <Typography FontSize="6" CustomClass="px-3">
+                        Комментарии
+                    </Typography>
                 </div>
                 <div class="d-grid gap-3 pt-3 px-3 w-100">
                     @foreach (var comment in IdeaComments)
@@ -195,9 +201,13 @@
                         var isCurrentUserMessage = sender.Id == CurrentUser?.Id;
                         <div class="card rounded-3 shadow advertisement @(isCurrentUserMessage ? "current-user-advertisement" : string.Empty)">
                             <div class="card-header d-flex justify-content-between align-items-center advertisement-header">
-                                <span class="fs-6 text-primary">@sender.FirstName @sender.LastName</span>
+                                <Typography FontSize="6" TextColor="ElementStyle.Primary">
+                                    @sender.FullName
+                                </Typography>
                                 <div class="d-flex gap-2 align-items-center">
-                                    <span class="text-primary">@comment.CreatedAt.ToString("dd.MM.yyyy в HH:mm")</span>
+                                    <Typography TextColor="ElementStyle.Primary">
+                                        @comment.CreatedAt.ToString("dd.MM.yyyy в HH:mm")
+                                    </Typography>
                                     @if (isCurrentUserMessage)
                                     {
                                         <CommentActionMenu ItemId="comment.Id"
@@ -215,18 +225,19 @@
                         </div>                        
                     }
                 </div>
+                <!-- TODO: система комментариев не сделана -->
                 <div class="p-3">
                     <div class="d-flex gap-3 align-items-start">
                         <div class="w-100">
                             <div class="input-group">
-                                <span class="input-group-text fs-6">
+                                <Typography FontSize="6" CustomClass="input-group-text">
                                     <i class="bi bi-chat"></i>
-                                </span>
+                                </Typography>
                                 <input type="text" placeholder="Добавить комментарий" class="form-control rounded-end" />
                             </div>
                         </div>
                         <Button BtnType="ButtonType.Button" 
-                                Variant="ButtonVariant.Primary"
+                                Variant="ElementStyle.Primary"
                                 Text="Отправить" />
                     </div>
                 </div>
@@ -256,27 +267,29 @@
         }
         else
         {
-            <span class="p-2 bg-primary rounded-top fs-4 text-center text-white">
+            <Typography FontSize="4" TextColor="ElementStyle.White" CustomClass="p-2 bg-primary rounded-top text-center">
                 @(
                     CurrentIdea.Status == IdeaStatusType.OnConfirmation 
                         ? $"Утвердили {IdeaRatings.Where(r => r.IsConfirmed).Count()}/{IdeaRatings.Count()}" 
                         : CurrentIdea.Status.GetTranslation()
                 )
-            </span>
+            </Typography>
             <div class="w-100 pb-3 px-3 idea-info">
                 <div>
-                    <span class="fs-6 border-bottom text-secondary d-block">
+                    <Typography FontSize="6" TextColor="ElementStyle.Secondary" CustomClass="border-bottom d-block">
                         Заказчик
-                    </span>
+                    </Typography>
                     <div class="pt-2 idea-sub-info">
                         <i class="bi bi-person-circle text-secondary fs-3 opacity-25"></i>
-                        <span class="fs-6 text-primary">@CurrentIdea.Customer</span>
+                        <Typography FontSize="6" TextColor="ElementStyle.Primary">
+                            @CurrentIdea.Customer
+                        </Typography>
                     </div>
                 </div>
                 <div>
-                    <span class="fs-6 border-bottom text-secondary d-block">
+                    <Typography FontSize="6" TextColor="ElementStyle.Secondary" CustomClass="border-bottom d-block">
                         Инициатор
-                    </span>
+                    </Typography>
                     <div class="pt-2 idea-sub-info">
                         <i class="bi bi-envelope text-secondary fs-3 opacity-25"></i>
                         <div @onclick="@(() => ModalService.ShowProfileModal(CurrentIdea.Initiator.Id))" 
@@ -286,31 +299,36 @@
                     </div>
                 </div>
                 <div>
-                    <span class="fs-6 border-bottom text-secondary d-block">
+                    <Typography FontSize="6" TextColor="ElementStyle.Secondary" CustomClass="border-bottom d-block">
                         Эксперты
-                    </span>
+                    </Typography>
                     @foreach (var rating in IdeaRatings)
                     {
                         <div class="pt-2 idea-sub-info">
                             <i class="text-secondary fs-3 bi @(rating.IsConfirmed ? "bi-check-lg opacity-50 text-success" : "bi-clock-history opacity-25")"></i>
-                            <span class="fs-6 text-primary">@rating.ExpertFirstName @rating.ExpertLastName</span>
-                            <span class="fs-6 @(rating.IsConfirmed ? rating.RatingValue.GetStyle() : string.Empty)">
+                            <Typography FontSize="6" TextColor="ElementStyle.Primary">
+                                @rating.ExpertFullName
+                            </Typography>
+                            <!-- TODO: заменить метод на работу с Enum-->
+                            <Typography FontSize="6" CustomClass="@(rating.IsConfirmed ? rating.RatingValue.GetStyle() : string.Empty)">
                                 @(rating.IsConfirmed ? rating.RatingValue : string.Empty)
-                            </span>
+                            </Typography>
                         </div>
                     }
                 </div>
                 <div>
-                    <span class="fs-6 border-bottom text-secondary d-block">
+                    <Typography FontSize="6" TextColor="ElementStyle.Secondary" CustomClass="border-bottom d-block">
                         Режим
-                    </span>
+                    </Typography>
                     <div class="pt-2 idea-sub-info">
                         <i class="bi bi-circle-fill text-success fs-3 opacity-50"></i>
-                        <span class="fs-6 text-primary">@CurrentUser?.Role.GetTranslation()</span>
+                        <Typography FontSize="6" TextColor="ElementStyle.Primary">
+                            @CurrentUser?.Role.GetTranslation()
+                        </Typography>
                     </div>
                 </div>
                 <Button BtnType="ButtonType.Button" 
-                        Variant="ButtonVariant.Primary"
+                        Variant="ElementStyle.Primary"
                         Text="Поделиться идеей" />
             </div>
         }

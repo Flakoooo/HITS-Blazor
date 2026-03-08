@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using HITSBlazor.Utils;
+using Microsoft.AspNetCore.Components;
 
 namespace HITSBlazor.Components.Button
 {
@@ -20,7 +21,7 @@ namespace HITSBlazor.Components.Button
         public string? LoadingText { get; set; }
 
         [Parameter]
-        public ButtonVariant Variant { get; set; } = ButtonVariant.Primary;
+        public ElementStyle Variant { get; set; } = ElementStyle.Primary;
 
         [Parameter]
         public string ButtonClass { get; set; } = string.Empty;

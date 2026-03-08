@@ -9,18 +9,18 @@
 @using HITSBlazor.Components.Inputs.TextArea
 @using HITSBlazor.Components.Placeholder
 @using HITSBlazor.Components.ProgressBar
+@using HITSBlazor.Components.Typography
 @using HITSBlazor.Models.Common.Entities
 @using HITSBlazor.Models.Common.Enums
 @using HITSBlazor.Models.Ideas.Enums
 @using HITSBlazor.Services.Ideas
-
-<PageTitle>Портал ВШЦТ</PageTitle>
+@using HITSBlazor.Utils
 
 <div class="new-idea page-content-with-header">
     <div class="p-3 bg-white w-100 h-100 idea-form">
-        <span class="fs-2 text-primary">
+        <Typography FontSize="2" TextColor="ElementStyle.Primary">
             @(string.IsNullOrWhiteSpace(IdeaId) ? "Создание" : "Редактирование") идеи
-        </span>
+        </Typography>
         <div class="w-75 d-flex flex-column gap-3">
             <div class="d-flex flex-column gap-3">
                 <Input Label="Название идеи*"
@@ -49,9 +49,9 @@
                           Placeholder="Укажите список требуемых для выполнения проекта ресурсов"
                           @bind-Value="@_ideasCreateModel.Description" />
                 <div>
-                    <span class="fs-6 text-primary">
+                    <Typography FontSize="6" TextColor="ElementStyle.Primary">
                         Желаемое количество участников в команде*
-                    </span>
+                    </Typography>
                     <Hint Text="@_hints["TeamSize"]" />
                     <div class="mt-2 d-flex gap-3">
                         <Number MinValue="2" 
@@ -68,7 +68,9 @@
                 </div>
             </div>
             <div>
-                <span class="fs-6 text-primary">Стек технологий</span>
+                <Typography FontSize="6" TextColor="ElementStyle.Primary">
+                    Стек технологий
+                </Typography>
                 <Hint Text="@_hints["Skills"]" />
                 <div class="mt-2 w-100 stack-categories">
                     <SkillDropdown SkillType="SkillType.Language"
@@ -110,18 +112,18 @@
                 @if (string.IsNullOrWhiteSpace(IdeaId))
                 {
                     <Button BtnType="ButtonType.Button" 
-                            Variant="ButtonVariant.Primary"
+                            Variant="ElementStyle.Primary"
                             Text="Сохранить черновик"
                             OnButtonClick="@(() => CreateIdea(IdeaStatusType.New))" />
                     <Button BtnType="ButtonType.Button"
-                            Variant="ButtonVariant.Success"
+                            Variant="ElementStyle.Success"
                             Text="Отправить на согласование"
                             OnButtonClick="@(() => CreateIdea(IdeaStatusType.OnApproval))" />
                 }
                 else
                 {
                     <Button BtnType="ButtonType.Button"
-                            Variant="ButtonVariant.Primary"
+                            Variant="ElementStyle.Primary"
                             Text="Сохранить изменения"
                             OnButtonClick="UpdateIdea" />
                 }

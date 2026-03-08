@@ -15,5 +15,7 @@
         public int? Budget { get; set; }
         public double? RatingValue { get; set; }
         public bool IsConfirmed { get; set; }
+
+        public string ExpertFullName => $"{ExpertFirstName} {ExpertLastName}";
     }
 }

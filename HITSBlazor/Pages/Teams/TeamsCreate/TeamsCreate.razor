@@ -1,0 +1,27 @@
+﻿@namespace HITSBlazor.Pages.Teams.TeamsCreate
+@using HITSBlazor.Components.Inputs.Input
+@using HITSBlazor.Components.Inputs.TextArea
+@using HITSBlazor.Components.Typography
+@using HITSBlazor.Utils
+
+<div class="bg-white page-content-with-header">
+    <div class="team-form w-100 h-100 bg-white p-3 overflow-auto">
+        <div class="team-form-content w-75">
+            <Typography FontSize="2" Text="Создание команды" />
+            <Input Label="Название команды*" 
+                   Placeholder="Введите название команды" 
+                   NeedValidation="true" 
+                   @bind-Value="_value" />
+            <TextArea Label="Описание команды*" 
+                      Placeholder="Введите описание команды" 
+                      NeedValidation="true" 
+                      @bind-Value="_value" />
+            <div class="w-100">
+                <Typography FontSize="2" TextColor="ElementStyle.Primary">
+                    Тип команды*
+                </Typography>
+
+            </div>
+        </div>
+    </div>
+</div>

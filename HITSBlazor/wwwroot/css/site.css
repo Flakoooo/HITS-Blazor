@@ -38,10 +38,6 @@ body {
     display: none !important;
 }
 
-.page-content-with-header {
-    height: auto;
-}
-
 input[type="checkbox"] {
     cursor: pointer;
     transform: scale(1.2);

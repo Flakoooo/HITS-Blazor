@@ -1,4 +1,8 @@
-﻿.list-page-header {
+﻿.page-content-with-header {
+    height: auto;
+}
+
+.list-page-header {
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;

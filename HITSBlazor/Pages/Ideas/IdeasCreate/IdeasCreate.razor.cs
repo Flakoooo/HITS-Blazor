@@ -35,8 +35,6 @@ namespace HITSBlazor.Pages.Ideas.IdeasCreate
         [Parameter]
         public string IdeaId { get; set; } = string.Empty;
 
-        private bool _isLoading = true;
-
         private readonly Dictionary<string, string> _hints = new()
         {
             [nameof(IdeasCreateModel.Name)] = "Здесь Вы должны написать название для вашей идеи",
