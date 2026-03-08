@@ -22,17 +22,10 @@ namespace HITSBlazor.Components.InputDropdowns.CompanyDropdown
 
         [Parameter] public Func<string, Task<List<Company>>>? SearchFunction { get; set; }
 
-        [Parameter]
-        public bool NeedValidation { get; set; } = false;
-
-        [Parameter]
-        public string? ErrorMessage { get; set; } = "Поле не заполнено";
-
         private ElementReference inputRef;
         private DotNetObjectReference<CompanyDropdown>? dotNetHelper;
 
         private bool _isOpen = false;
-        private bool _showError = false;
 
         private List<Company> _companies = [];
         private string _searchText = string.Empty;
@@ -42,12 +35,6 @@ namespace HITSBlazor.Components.InputDropdowns.CompanyDropdown
         protected override async Task OnInitializedAsync()
         {
             await LoadCompaniesAsync();
-        }
-
-        protected override void OnParametersSet()
-        {
-            _showError = NeedValidation && SelectedCompany is null;
-            StateHasChanged();
         }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)

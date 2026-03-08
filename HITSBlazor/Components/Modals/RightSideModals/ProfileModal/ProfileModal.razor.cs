@@ -28,9 +28,6 @@ namespace HITSBlazor.Components.Modals.RightSideModals.ProfileModal
         private IProfileService ProfileService { get; set; } = null!;
 
         [Inject]
-        private ISkillService SkillService { get; set; } = null!;
-
-        [Inject]
         private IUserSkillService UserSkillService { get; set; } = null!;
 
         [Inject]
@@ -55,11 +52,6 @@ namespace HITSBlazor.Components.Modals.RightSideModals.ProfileModal
 
         private Profile? Profile { get; set; }
         private UserDataForm? _userDataForm;
-
-        private List<Skill> LanguageSkills { get; set; } = [];
-        private List<Skill> FrameworkSkills { get; set; } = [];
-        private List<Skill> DatabaseSkills { get; set; } = [];
-        private List<Skill> DevopsSkills { get; set; } = [];
 
         private HashSet<Skill> SelectedLanguageSkills { get; set; } = [];
         private HashSet<Skill> SelectedFrameworkSkills { get; set; } = [];
@@ -153,11 +145,6 @@ namespace HITSBlazor.Components.Modals.RightSideModals.ProfileModal
             _isSkillsLoading = true;
             StateHasChanged();
 
-            LanguageSkills = await SkillService.GetSkillsByTypeAsync(SkillType.Language);
-            FrameworkSkills = await SkillService.GetSkillsByTypeAsync(SkillType.Framework);
-            DatabaseSkills = await SkillService.GetSkillsByTypeAsync(SkillType.Database);
-            DevopsSkills = await SkillService.GetSkillsByTypeAsync(SkillType.Devops);
-
             SelectedLanguageSkills = Profile?.Skills.Where(s => s.Type == SkillType.Language).ToHashSet() ?? [];
             SelectedFrameworkSkills = Profile?.Skills.Where(s => s.Type == SkillType.Framework).ToHashSet() ?? [];
             SelectedDatabaseSkills = Profile?.Skills.Where(s => s.Type == SkillType.Database).ToHashSet() ?? [];
@@ -179,23 +166,6 @@ namespace HITSBlazor.Components.Modals.RightSideModals.ProfileModal
             Profile?.Skills = await UserSkillService.GetUserSkillsAsync(UserId);
 
             _isChangeSkills = false;
-        }
-
-        private async Task<List<Skill>> SearchSkillsAsync(SkillType skillType, string searchText)
-        {
-            if (string.IsNullOrWhiteSpace(searchText))
-            {
-                return skillType switch
-                {
-                    SkillType.Language => LanguageSkills,
-                    SkillType.Framework => FrameworkSkills,
-                    SkillType.Database => DatabaseSkills,
-                    SkillType.Devops => DevopsSkills,
-                    _ => []
-                };
-            }
-
-            return await SkillService.GetSkillByTypeAndByNameAsync(skillType, searchText);
         }
 
         private static ApexChartOptions<Skill> GetRadarChartOptions() => new()

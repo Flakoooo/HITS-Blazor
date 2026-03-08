@@ -28,6 +28,12 @@ namespace HITSBlazor.Services.Companies
             return [.. query];
         }
 
-        //TODO: Реализовать создание компании как создание навыка
+        public async Task<Company?> GetCompanyByNameAsync(string name)
+        {
+            if (_cachedCompanies.Count == 0 || DateTime.UtcNow - _lastRefreshTime > _cacheLifetime)
+                await RefreshCacheAsync();
+
+            return _cachedCompanies.FirstOrDefault(c => c.Name.Equals(name, StringComparison.CurrentCultureIgnoreCase));
+        }
     }
 }

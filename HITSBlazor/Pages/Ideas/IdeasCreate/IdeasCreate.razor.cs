@@ -114,18 +114,6 @@ namespace HITSBlazor.Pages.Ideas.IdeasCreate
 
         private double? _preAssessmentScore = null;
 
-        protected override async Task OnInitializedAsync()
-        {
-            _isLoading = true;
-
-            //TODO: Сервис компаний чекнуть
-            ServiceResponse<List<Company>> companies = await CompanyService.GetAllCompanies();
-            if (companies.IsSuccess)
-                _companies = companies.Response ?? [];
-
-            _isLoading = false;
-        }
-
         protected override async Task OnParametersSetAsync()
         {
             if (!Guid.TryParse(IdeaId, out Guid guid)) return;
@@ -147,7 +135,7 @@ namespace HITSBlazor.Pages.Ideas.IdeasCreate
                 ContactPerson = idea.ContactPerson
             };
 
-            SelectedCompany = _companies.FirstOrDefault(c => c.Name.Equals(idea.Customer));
+            SelectedCompany = await CompanyService.GetCompanyByNameAsync(idea.Customer);
             if (SelectedCompany != null)
             {
                 SelectedContactPerson = SelectedCompany.Users.FirstOrDefault(
@@ -163,28 +151,6 @@ namespace HITSBlazor.Pages.Ideas.IdeasCreate
             SelectedFrameworkSkills = [.. ideaSkills.Where(s => s.Type == SkillType.Framework)];
             SelectedDatabaseSkills = [.. ideaSkills.Where(s => s.Type == SkillType.Database)];
             SelectedDevopsSkills = [.. ideaSkills.Where(s => s.Type == SkillType.Devops)];
-        }
-
-        private async Task<List<Company>> SearchCompaniesAsync(string searchText)
-        {
-            if (string.IsNullOrWhiteSpace(searchText))
-                return _companies;
-
-            return await CompanyService.GetCompaniesByName(searchText);
-        }
-
-        private async Task<List<User>> SearchContactPersonsAsync(string searchText)
-        {
-            if (SelectedCompany is not null)
-            {
-                if (string.IsNullOrWhiteSpace(searchText))
-                    return SelectedCompany.Users;
-
-                return [.. SelectedCompany.Users.Where(u => 
-                    u.FullName.Contains(searchText, StringComparison.CurrentCultureIgnoreCase))
-                ];
-            }
-            return [];
         }
 
         private void UpdatePreAssessmentScore()

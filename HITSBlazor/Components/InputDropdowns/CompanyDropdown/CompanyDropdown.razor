@@ -4,7 +4,7 @@
 <div class="w-100" tabindex="-1">
     <div class="w-100">
         <label class="form-label mb-2 text-primary">
-            Заказчик*
+            Заказчик
             <Hint Text="Выберите заказчика (компанию), к которой Вы принадлежите или от лица которой создаётся идея" />
         </label>
         <div style="position: relative;">
@@ -15,26 +15,17 @@
                            @oninput="@(async e => await OnSearch(e))"
                            value="@SelectedCompanyName"
                            placeholder="@Placeholder"
-                           class="form-control rounded-end @(_showError ? "is-invalid" : string.Empty)"
+                           class="form-control rounded-end"
                            style="color: #000 !important;"
                            @onclick="OpenDropdown"
                            @onfocus="OpenDropdown"
                            @onkeydown="OnInputKeyDown" />
-                    @if (_showError)
-                    {
-                        <span class="invalid-feedback">@ErrorMessage</span>
-                    }
                 </div>
             </div>
 
             @if (!_isOpen)
             {
-                <i class="skill-dropdown-icon bi bi-chevron-down" @onclick="ToggleDropdown"></i>
-            }
-
-            @if (_isOpen && _companyCreateAllowed)
-            {
-                <i class="skill-dropdown-icon bi bi-plus-lg" @onclick="CreateNewCompany"></i>
+                <i class="input-dropdown-icon bi bi-chevron-down" @onclick="ToggleDropdown"></i>
             }
 
             @if (_isOpen)

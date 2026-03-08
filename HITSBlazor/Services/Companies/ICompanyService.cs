@@ -5,5 +5,6 @@ namespace HITSBlazor.Services.Companies
     public interface ICompanyService
     {
         Task<List<Company>> GetCompaniesAsync(string? searchText = null);
+        Task<Company?> GetCompanyByNameAsync(string name);
     }
 }

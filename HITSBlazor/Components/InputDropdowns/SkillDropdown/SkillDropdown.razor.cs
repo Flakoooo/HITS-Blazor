@@ -28,6 +28,7 @@ namespace HITSBlazor.Components.InputDropdowns.SkillDropdown
         private ElementReference inputRef;
         private DotNetObjectReference<SkillDropdown>? dotNetHelper;
 
+        private bool _isLoading = true;
         private bool _isOpen = false;
         private bool _skillCreateAllowed = false;
         private string _searchText = string.Empty;
@@ -36,7 +37,11 @@ namespace HITSBlazor.Components.InputDropdowns.SkillDropdown
 
         protected override async Task OnInitializedAsync()
         {
+            _isLoading = true;
+
             await LoadSkillsAsync();
+
+            _isLoading = false;
         }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)

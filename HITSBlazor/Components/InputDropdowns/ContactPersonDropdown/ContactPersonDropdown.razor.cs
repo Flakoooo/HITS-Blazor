@@ -1,4 +1,5 @@
-﻿using HITSBlazor.Models.Users.Entities;
+﻿using HITSBlazor.Models.Common.Entities;
+using HITSBlazor.Models.Users.Entities;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
@@ -10,36 +11,25 @@ namespace HITSBlazor.Components.InputDropdowns.ContactPersonDropdown
         [Inject]
         private IJSRuntime JSRuntime { get; set; } = null!;
 
-        [Parameter] public Guid CompanyId { get; set; }
-        [Parameter] public List<User> AllContactPersons { get; set; } = [];
+        [Parameter] public Company SelectedCompany { get; set; } = new();
         [Parameter] public User? SelectedContactPerson { get; set; }
         [Parameter] public EventCallback<User?> SelectedContactPersonChanged { get; set; }
 
-        [Parameter] public Func<string, Task<List<User>>>? SearchFunction { get; set; }
-
-        [Parameter]
-        public bool NeedValidation { get; set; } = false;
-
-        [Parameter]
-        public string? ErrorMessage { get; set; } = "Поле не заполнено";
-
-        private bool _showError = false;
-
         private ElementReference inputRef;
-        private bool IsOpen { get; set; }
-        private string searchText = "";
-        private List<User> FilteredContactPersons { get; set; } = [];
         private DotNetObjectReference<ContactPersonDropdown>? dotNetHelper;
 
+        private bool _isOpen = false;
+
+        private string _searchText = string.Empty;
+
+        private List<User> _contactPersons = [];
+
         private string SelectedContactPersonName =>
-            SelectedContactPerson != null ?
-            $"{SelectedContactPerson.FirstName} {SelectedContactPerson.LastName}" :
-            string.Empty;
+            SelectedContactPerson != null ? SelectedContactPerson.FullName : string.Empty;
 
         protected override void OnParametersSet()
         {
-            _showError = NeedValidation && SelectedContactPerson is null;
-            StateHasChanged();
+            _contactPersons = SelectedCompany.Users;
         }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -48,41 +38,41 @@ namespace HITSBlazor.Components.InputDropdowns.ContactPersonDropdown
             {
                 dotNetHelper = DotNetObjectReference.Create(this);
                 await JSRuntime.InvokeVoidAsync("listDropdown.registerClickOutside", inputRef, dotNetHelper);
-                FilteredContactPersons = [.. AllContactPersons];
             }
+        }
+
+        private void SearchContactPersons()
+        {
+            if (string.IsNullOrWhiteSpace(_searchText))
+                _contactPersons = SelectedCompany.Users;
+            else
+                _contactPersons = [.. SelectedCompany.Users.Where(u => u.FullName.Contains(_searchText))];
         }
 
         private async Task OpenDropdown()
         {
-            if (!IsOpen)
-            {
-                IsOpen = true;
-                if (string.IsNullOrWhiteSpace(searchText))
-                    FilteredContactPersons = [.. AllContactPersons];
-            }
+            if (!_isOpen) _isOpen = true;
         }
 
-        private void ToggleDropdown() => IsOpen = !IsOpen;
+        private void ToggleDropdown() => _isOpen = !_isOpen;
 
         [JSInvokable]
         public void CloseDropdown()
         {
-            IsOpen = false;
+            _isOpen = false;
             InvokeAsync(StateHasChanged);
         }
 
         private async Task OnSearch(ChangeEventArgs e)
         {
-            searchText = (e.Value?.ToString() ?? "").Trim();
+            _searchText = (e.Value?.ToString() ?? "").Trim();
 
-            if (SearchFunction != null)
-                FilteredContactPersons = await SearchFunction(searchText);
+            SearchContactPersons();
         }
 
         private void OnInputKeyDown(KeyboardEventArgs e)
         {
-            if (e.Key == "Escape")
-                IsOpen = false;
+            if (e.Key == "Escape") _isOpen = false;
         }
 
         private async Task OnElementChange(User contactPerson)
