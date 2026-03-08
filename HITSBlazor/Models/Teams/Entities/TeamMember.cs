@@ -11,5 +11,7 @@ namespace HITSBlazor.Models.Teams.Entities
         public string FirstName { get; set; } = string.Empty;
         public string LastName { get; set; } = string.Empty;
         public List<Skill> Skills { get; set; } = [];
+
+        public string FullName => $"{FirstName} {LastName}";
     }
 }

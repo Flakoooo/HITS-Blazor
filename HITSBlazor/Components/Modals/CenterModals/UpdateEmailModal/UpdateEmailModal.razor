@@ -1,19 +1,28 @@
 ﻿@namespace HITSBlazor.Components.Modals.CenterModals.UpdateEmailModal
+@using HITSBlazor.Components.Button
+@using HITSBlazor.Components.Inputs.Input
+@using HITSBlazor.Components.Typography
 @using HITSBlazor.Services.Modal
+@using HITSBlazor.Utils
 
 <div @onclick:stopPropagation="true"
      class="p-3 rounded-3 shadow center-modal new-email-request-modal bg-white p-3 rounded">
     <div class="d-flex align-items-center justify-content-between">
-        <span class="fs-3 text-primary text-center">Изменение почты</span>
-        <button @onclick="@(() => ModalService.Close(ModalType.Center))" type="button" class="btn d-flex btn-close"></button>
+        <Typography FontSize="3" TextColor="ElementStyle.Primary" CustomClass="text-center">
+            Доступные роли
+        </Typography>
+        <Button BtnType="ButtonType.Button"
+                ButtonClass="btn-close"
+                OnButtonClick="() => ModalService.Close(ModalType.Center)" />
     </div>
+    <!-- TODO: заменить на Input кмпонент -->
     @if (_isEmailRequestSended)
     {
         <div class="w-100">
             <div class="input-group">
-                <span class="input-group-text fs-6">
+                <Typography FontSize="6" CustomClass="input-group-text">
                     <i class="bi bi-fonts"></i>
-                </span>
+                </Typography>
                 <input type="text"
                        @bind="@_verificationCode"
                        @bind:event="oninput"
@@ -24,7 +33,9 @@
         </div>
         <div class="w-100">
             <div class="input-group">
-                <span class="input-group-text fs-6">&#64;</span>
+                <Typography FontSize="6" CustomClass="input-group-text">
+                    &#64;
+                </Typography>
                 <input type="email"
                        @bind="_emailValue"
                        @bind:event="oninput"
@@ -33,26 +44,20 @@
                        placeholder="Введите ваш новый email" />
             </div>
         </div>
-        <button type="button" 
-                @onclick="@VirificateEmailRequest"
-                disabled="@_isLoading"
-                class="btn d-flex btn-primary">
-            @if (_isLoading)
-            {
-                <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                <span>Изменение...</span>
-            }
-            else
-            {
-                <span>Изменить email</span>
-            }
-        </button>
+        <Button BtnType="ButtonType.Button" 
+                IsLoading="_isLoading" 
+                Variant="ElementStyle.Primary"
+                Text="Изменить email"
+                LoadingText="Изменение"
+                OnButtonClick="VirificateEmailRequest" />
     }
     else
     {
         <div class="w-100">
             <div class="input-group">
-                <span class="input-group-text fs-6">&#64;</span>
+                <Typography FontSize="6" CustomClass="input-group-text">
+                    &#64;
+                </Typography>
                 <input @bind="@_emailValue"
                        @bind:event="oninput"
                        type="email"
@@ -60,19 +65,11 @@
                        class="form-control rounded-end" />
             </div>
         </div>
-        <button type="button" 
-                @onclick="@SendNewEmailRequest"
-                disabled="@_isLoading" 
-                class="btn d-flex btn-primary">
-            @if (_isLoading)
-            {
-                <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                <span>Отправка...</span>
-            }
-            else
-            {
-                <span>Отправить</span>
-            }
-        </button>
+        <Button BtnType="ButtonType.Button"
+                IsLoading="_isLoading"
+                Variant="ElementStyle.Primary"
+                Text="Отправить"
+                LoadingText="Отправка"
+                OnButtonClick="SendNewEmailRequest" />
     }
 </div>

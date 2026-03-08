@@ -1,8 +1,12 @@
 ﻿@namespace HITSBlazor.Components.UserInfoField
+@using HITSBlazor.Components.Typography
+@using HITSBlazor.Utils
 
 <div class="w-100 d-flex flex-column gap-2">
     <div class="d-flex gap-1">
-        <span class="fs-6 text-primary">@Title:</span>
+        <Typography FontSize="6" TextColor="ElementStyle.Primary">
+            @Title:
+        </Typography>
         @if (IsCurrentUser && !IsEditing)
         {
             <div @onclick="@StartEdit" class="data-link text-secondary cursor-pointer">
@@ -10,6 +14,7 @@
             </div>
         }
     </div>
+    <!-- TODO: заменить на компонент Input -->
     <div class="w-100">
         <div class="input-group">
             <input @ref="_inputRef"

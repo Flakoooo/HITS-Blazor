@@ -1,5 +1,6 @@
 ﻿@namespace HITSBlazor.Components.Inputs.TextArea
 @using HITSBlazor.Components.Hint
+@using HITSBlazor.Components.Typography
 
 <div class="d-flex flex-column w-100 h-100">
     @if (!string.IsNullOrWhiteSpace(Label))
@@ -20,7 +21,7 @@
         </textarea>
         @if (_showError)
         {
-            <span class="invalid-feedback">@ErrorMessage</span>
+            <Typography CustomClass="invalid-feedback">@ErrorMessage</Typography>
         }
     </div>
 </div>

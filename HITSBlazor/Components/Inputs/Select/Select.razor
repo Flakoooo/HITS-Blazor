@@ -1,4 +1,5 @@
 ﻿@namespace HITSBlazor.Components.Inputs.Select
+@using HITSBlazor.Components.Typography
 
 <div class="w-100">
     <label class="form-label text-primary">
@@ -13,6 +14,6 @@
     </select>
     @if (_showError)
     {
-        <span class="invalid-feedback">@ErrorMessage</span>
+        <Typography CustomClass="invalid-feedback">@ErrorMessage</Typography>
     }
 </div>

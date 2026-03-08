@@ -1,5 +1,6 @@
 ﻿@namespace HITSBlazor.Components.Inputs.Input
 @using HITSBlazor.Components.Hint
+@using HITSBlazor.Components.Typography
 
 <div class="w-100">
     @if (!string.IsNullOrWhiteSpace(Label))
@@ -15,9 +16,9 @@
     <div class="input-group">
         @if (!string.IsNullOrWhiteSpace(IconStyle))
         {
-            <span class="input-group-text fs-6">
+            <Typography FontSize="6" CustomClass="input-group-text">
                 <i class="bi @IconStyle"></i>
-            </span>
+            </Typography>
         }
         <input type="text"
                value="@Value"
@@ -26,7 +27,7 @@
                class="form-control rounded-end @(_showError ? "is-invalid" : string.Empty)" />
         @if (_showError)
         {
-            <span class="invalid-feedback">@ErrorMessage</span>
+            <Typography CustomClass="invalid-feedback">@ErrorMessage</Typography>
         }
     </div>
 </div>

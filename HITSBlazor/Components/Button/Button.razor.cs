@@ -21,11 +21,27 @@ namespace HITSBlazor.Components.Button
         public string? LoadingText { get; set; }
 
         [Parameter]
-        public ElementStyle Variant { get; set; } = ElementStyle.Primary;
+        public ElementStyle? Variant { get; set; }
 
         [Parameter]
-        public string ButtonClass { get; set; } = string.Empty;
+        public string? ButtonClass { get; set; }
 
         private async Task ButtonClick() => await OnButtonClick.InvokeAsync();
+
+        private string GetClass()
+        {
+            var classes = new List<string>();
+
+            if (Variant.HasValue)
+                classes.Add($"btn-{Variant.Value.ToString().ToLower()}");
+
+            if (!string.IsNullOrWhiteSpace(ButtonClass))
+                classes.Add(ButtonClass);
+
+            if (classes.Count == 0)
+                return "btn d-flex";
+
+            return $"btn d-flex {string.Join(" ", classes)}";
+        }
     }
 }

@@ -1,7 +1,8 @@
 ﻿@namespace HITSBlazor.Components.Inputs.TeamRadioFilter
+@using HITSBlazor.Components.Typography
 
 <div class="w-100">
-    <span class="fs-6 fw-semibold">@Label</span>
+    <Typography FontSize="6" CustomClass="fw-semibold">@Label</Typography>
     <div class="list-page-filter-choices">
         <div class="list-page-filter-choice px-2 py-1 rounded-1">
             <div @onclick="() => TogglePrivacy(false)" class="d-flex">
@@ -9,7 +10,7 @@
                        name="@Label"
                        checked="@CheckState(false)"
                        class="form-check-input" />
-                <span class="form-check-label ms-2">@Value1Text</span>
+                <Typography CustomClass="form-check-label ms-2">@Value1Text</Typography>
             </div>
         </div>
         <div class="list-page-filter-choice px-2 py-1 rounded-1">
@@ -18,7 +19,7 @@
                        name="@Label"
                        checked="@CheckState(true)"
                        class="form-check-input" />
-                <span class="form-check-label ms-2">@Value2Text</span>
+                <Typography CustomClass="form-check-label ms-2">@Value2Text</Typography>
             </div>
         </div>
     </div>

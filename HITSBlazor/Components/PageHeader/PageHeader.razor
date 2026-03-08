@@ -1,5 +1,6 @@
 ﻿@namespace HITSBlazor.Components.PageHeader
 @using HITSBlazor.Components.Modals.CenterModals.SelectActiveRoleModal
+@using HITSBlazor.Components.Typography
 @using HITSBlazor.Models.Users.Entities
 @using HITSBlazor.Models.Users.Enums
 @using HITSBlazor.Services
@@ -21,8 +22,9 @@
             </div>
             <div class="d-flex gap-1 flex-column">
                 <div @onclick="ShowUserProfile" class="fw-semibold data-link" style="width: fit-content;">
-                    <span class="fs-6">@CurrentUser?.FirstName @CurrentUser?.LastName</span>
+                    <Typography FontSize="6">@CurrentUser?.FullName</Typography>
                 </div>
+                <!-- TODO: Заменить на Button -->
                 <button type="button" 
                         @onclick="ShowRoleModal"
                         class="btn d-flex btn-outline-success btn-sm rounded-4 py-1" style="width: fit-content;">

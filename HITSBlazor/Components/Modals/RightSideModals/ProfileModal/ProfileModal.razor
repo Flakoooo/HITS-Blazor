@@ -1,5 +1,6 @@
 ﻿@namespace HITSBlazor.Components.Modals.RightSideModals.ProfileModal
 @using HITSBlazor.Components.ActionMenus.BaseActionMenu
+@using HITSBlazor.Components.Button
 @using HITSBlazor.Components.Collapse
 @using HITSBlazor.Components.InputDropdowns.SkillDropdown
 @using HITSBlazor.Components.Modals.Components.ModalHeader
@@ -7,10 +8,12 @@
 @using HITSBlazor.Components.Tables.TableActionMenu
 @using HITSBlazor.Components.Tables.TableBodyRow
 @using HITSBlazor.Components.Tables.TableHeader
+@using HITSBlazor.Components.Typography
 @using HITSBlazor.Components.UserInfoField
 @using HITSBlazor.Models.Common.Entities
 @using HITSBlazor.Models.Common.Enums
 @using HITSBlazor.Services.Modal
+@using HITSBlazor.Utils
 @using HITSBlazor.Utils.EnumStyles
 @using HITSBlazor.Utils.EnumTranslators
 
@@ -89,16 +92,20 @@
                     </div>
                     <div class="w-100 bg-white border p-3 rounded-3">
                         <div class="user-info-header border-bottom pb-1">
-                            <span class="fs-5 text-primary">Информация</span>
+                            <Typography FontSize="5" TextColor="ElementStyle.Primary">
+                                Информация
+                            </Typography>
                             @if (_isCurrentUser && _editingField != null)
                             {
                                 <div class="d-flex justify-content-end gap-2">
-                                    <button @onclick="@SaveEdit" type="button" class="btn d-flex btn-success">
-                                        Сохранить
-                                    </button>
-                                    <button @onclick="@CancelEdit" type="button" class="btn d-flex btn-danger">
-                                        Отменить
-                                    </button>
+                                    <Button BtnType="ButtonType.Button" 
+                                            Variant="ElementStyle.Success"
+                                            OnButtonClick="SaveEdit"
+                                            Text="Сохранить"/>
+                                    <Button BtnType="ButtonType.Button"
+                                            Variant="ElementStyle.Danger"
+                                            OnButtonClick="CancelEdit"
+                                            Text="Отменить" />
                                 </div>                                
                             }
                         </div>
@@ -144,10 +151,12 @@
                                 OnEdit="@(() => StartEdit(nameof(_userDataForm.Telephone)))" />
 
                             <div class="d-flex gap-1">
-                                <span class="fs-6 text-primary">Дата регистрации:</span>
-                                <span class="fs-6 text-secondary">
+                                <Typography FontSize="6" TextColor="ElementStyle.Primary">
+                                    Дата регистрации:
+                                </Typography>
+                                <Typography FontSize="6" TextColor="ElementStyle.Secondary">
                                     @(Profile?.CreatedAt is null ? "-" : Profile.CreatedAt.Value.ToString("dd.MM.yyyy"))
-                                </span>
+                                </Typography>
                             </div>
                         </div>
                     </div>
@@ -155,31 +164,30 @@
                 <div class="user-info mb-3">
                     <div class="w-100 bg-white border p-3 rounded-3">
                         <div class="user-info-header border-bottom pb-1">
-                            <span class="fs-5 text-primary">Компетенции</span>
+                            <Typography FontSize="5" TextColor="ElementStyle.Primary">
+                                Компетенции
+                            </Typography>
                             @if (_isCurrentUser)
                             {
                                 @if (_isChangeSkills)
                                 {
                                     <div class="d-flex gap-2">
-                                        <button @onclick="@UpdateUserSkills"
-                                                type="button" 
-                                                class="btn d-flex btn-primary">
-                                            Сохранить
-                                        </button>
-                                        <button @onclick="@(() => _isChangeSkills = !_isChangeSkills)"
-                                                type="button" 
-                                                class="btn d-flex btn-danger">
-                                            Отменить
-                                        </button>
+                                        <Button BtnType="ButtonType.Button" 
+                                                Variant="ElementStyle.Primary" 
+                                                Text="Сохранить" 
+                                                OnButtonClick="UpdateUserSkills" />
+                                        <Button BtnType="ButtonType.Button" 
+                                                Variant="ElementStyle.Danger" 
+                                                Text="Отменить" 
+                                                OnButtonClick="() => _isChangeSkills = !_isChangeSkills" />
                                     </div>
                                 }
                                 else
                                 {
-                                    <button @onclick="@ChangeToUpdateSkills"
-                                            type="button"
-                                            class="btn d-flex btn-light">
-                                        Изменить стек
-                                    </button>
+                                    <Button BtnType="ButtonType.Button"
+                                            Variant="ElementStyle.Light"
+                                            Text="Изменить стек"
+                                            OnButtonClick="ChangeToUpdateSkills" />
                                 }
                             }
                         </div>
@@ -213,9 +221,9 @@
                             {
                                 @if (Profile?.Skills.Count == 0)
                                 {
-                                    <span class="d-flex w-100 justify-content-center mt-3 fs-6 text-secondary">
+                                    <Typography FontSize="6" TextColor="ElementStyle.Secondary" CustomClass="d-flex w-100 justify-content-center mt-3">
                                         Компетенции не выбраны
-                                    </span>
+                                    </Typography>
                                 }
                                 else
                                 {
@@ -246,7 +254,9 @@
                     </div>
                     <div class="w-100 bg-white border p-3 rounded-3">
                         <div class="user-ideas-header border-bottom">
-                            <span class="fs-5 text-primary">Идеи</span>
+                            <Typography FontSize="5" TextColor="ElementStyle.Primary">
+                                Идеи
+                            </Typography>
                         </div>
                         <div class="user-ideas-content @(ideasIsLoading ? "p-3" : "mt-3")">
                             @if (ideasIsLoading)
@@ -263,7 +273,9 @@
                             {
                                 @if (Profile?.Ideas.Count == 0)
                                 {
-                                    <span class="fs-6 text-secondary">Идей пока нет</span>
+                                    <Typography FontSize="6" TextColor="ElementStyle.Secondary">
+                                        Идей пока нет
+                                    </Typography>
                                 }
                                 else
                                 {
@@ -282,16 +294,18 @@
                                                             </div>
                                                         </div>
                                                         <div @onclick="@(() => collapse.Toggle())" class="d-flex align-items-center gap-1" style="cursor: pointer;">
-                                                            <span class="fs-6 text-primary">Описание</span>
+                                                            <Typography FontSize="6" TextColor="ElementStyle.Primary">
+                                                                Описание
+                                                            </Typography>
                                                             <i class="bi bi-caret-down text-primary"></i>
                                                         </div>
                                                     </div>
                                                 </MainContent>
                                                 <ExpandedContent>
                                                     <div class="list-group">
-                                                        <span class="fs-6 w-100 mt-1 border-top text-secondary">
+                                                        <Typography FontSize="6" TextColor="ElementStyle.Secondary" CustomClass="w-100 mt-1 border-top">
                                                             @idea.Description
-                                                        </span>
+                                                        </Typography>
                                                     </div>
                                                 </ExpandedContent>
                                             </Collapse>
@@ -303,16 +317,18 @@
                     </div>
                     <div class="w-100 bg-white border p-3 rounded-3">
                         <div class="user-ideas-header border-bottom mb-2">
-                            <span class="fs-5 text-primary">Портфолио</span>
+                            <Typography FontSize="5" TextColor="ElementStyle.Primary">
+                                Портфолио
+                            </Typography>
                         </div>
                         <div class="w-100 bg-white">
                             <div class="py-2 d-flex justify-content-between">
                                 <div class="w-50">
                                     <div class="w-100">
                                         <div class="input-group">
-                                            <span class="input-group-text fs-6">
+                                            <Typography FontSize="6" CustomClass="input-group-text">
                                                 <i class="bi bi-search"></i>
-                                            </span>
+                                            </Typography>
                                             <input type="text" placeholder="Поиск" class="form-control rounded-end" />
                                         </div>
                                     </div>
@@ -367,13 +383,19 @@
                     </div>
                     <div class="w-100 bg-white border p-3 rounded-3">
                         <div class="user-test-header border-bottom">
-                            <span class="fs-5 text-primary">Результаты тестирований</span>
+                            <Typography FontSize="5" TextColor="ElementStyle.Primary">
+                                Результаты тестирований
+                            </Typography>
                         </div>
                         <div class="user-tests-content mt-3">
-                            <span class="fs-6 text-decoration-underline">Тест Белбина:</span>
+                            <Typography FontSize="6" CustomClass="text-decoration-underline">
+                                Тест Белбина:
+                            </Typography>
                             @if (BelbinTestResult is null)
-                            {
-                                <span class="fs-6 text-secondary">Вы не прошли тест</span>                                
+                            {   
+                                <Typography FontSize="6" TextColor="ElementStyle.Secondary">
+                                    Вы не прошли тест
+                                </Typography>
                             }
                             else
                             {
@@ -381,10 +403,14 @@
                             }
                         </div>
                         <div class="user-tests-content mt-3">
-                            <span class="fs-6 text-decoration-underline">Айзенка личностный опросник:</span>
+                            <Typography FontSize="6" CustomClass="text-decoration-underline">
+                                Айзенка личностный опросник:
+                            </Typography>
                             @if (TemperTestResult is null)
                             {
-                                <span class="fs-6 text-secondary">Вы не прошли тест</span>
+                                <Typography FontSize="6" TextColor="ElementStyle.Secondary">
+                                    Вы не прошли тест
+                                </Typography>
                             }
                             else
                             {
@@ -392,10 +418,14 @@
                             }
                         </div>
                         <div class="user-tests-content mt-3">
-                            <span class="fs-6 text-decoration-underline">Опросник «Стиль мышления»:</span>
+                            <Typography FontSize="6" CustomClass="text-decoration-underline">
+                                Опросник «Стиль мышления»:
+                            </Typography>
                             @if (MindTestResult is null)
                             {
-                                <span class="fs-6 text-secondary">Вы не прошли тест</span>
+                                <Typography FontSize="6" TextColor="ElementStyle.Secondary">
+                                    Вы не прошли тест
+                                </Typography>
                             }
                             else
                             {

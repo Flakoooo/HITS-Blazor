@@ -1,13 +1,19 @@
 ﻿@namespace HITSBlazor.Components.Modals.CenterModals.SelectActiveRoleModal
+@using HITSBlazor.Components.Button
+@using HITSBlazor.Components.Typography
+@using HITSBlazor.Utils
 @using HITSBlazor.Utils.EnumTranslators
 
 <div @onclick:stopPropagation="true"
      class="center-modal p-3 rounded bg-white">
-    <span class="fs-3 text-primary text-center">Доступные роли</span>
+    <Typography FontSize="3" TextColor="ElementStyle.Primary" CustomClass="text-center">
+        Доступные роли
+    </Typography>
     @foreach (var role in Roles)
     {
-        <button type="button" @onclick="() => SetUserRole(role)" class="btn d-flex btn-primary">
-            @role.GetTranslation()
-        </button>
+        <Button BtnType="ButtonType.Button" 
+                Variant="ElementStyle.Primary" 
+                OnButtonClick="() => SetUserRole(role)" 
+                Text="@role.GetTranslation()" />
     }
 </div>

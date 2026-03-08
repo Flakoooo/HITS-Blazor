@@ -1,7 +1,10 @@
 ﻿@namespace HITSBlazor.Pages.Teams.TeamsCreate
+@using HITSBlazor.Components.Button
+@using HITSBlazor.Components.InputDropdowns.SkillDropdown
 @using HITSBlazor.Components.Inputs.Input
 @using HITSBlazor.Components.Inputs.TextArea
 @using HITSBlazor.Components.Typography
+@using HITSBlazor.Models.Common.Enums
 @using HITSBlazor.Utils
 
 <div class="bg-white page-content-with-header">
@@ -20,8 +23,59 @@
                 <Typography FontSize="2" TextColor="ElementStyle.Primary">
                     Тип команды*
                 </Typography>
-
+                <div class="my-2 d-flex gap-3">
+                    <div class="team-type w-50 p-2 rounded-3 border border-2">
+                        <div class="team-type-icon rounded-circle bg-success bg-opacity-25">
+                            <i class="fs-2 text-success bi bi-folder2-open"></i>
+                        </div>
+                        <div class="team-type-text">
+                            <Typography FontSize="4">
+                                Открытая
+                            </Typography>
+                            <Typography FontSize="6" TextColor="ElementStyle.Secondary">
+                                Любой пользователь системы может отправить заявку на присоединение в команду
+                            </Typography>
+                        </div>
+                    </div>
+                    <div class="team-type w-50 p-2 rounded-3 border border-2">
+                        <div class="team-type-icon rounded-circle bg-danger bg-opacity-25">
+                            <i class="fs-2 text-success bi bi-shield-lock"></i>
+                        </div>
+                        <div class="team-type-text">
+                            <Typography FontSize="4">
+                                Закрытая
+                            </Typography>
+                            <Typography FontSize="6" TextColor="ElementStyle.Secondary">
+                                Пользователь портала может присоединиться в команду только по приглашению
+                            </Typography>
+                        </div>
+                    </div>
+                </div>
             </div>
+            <div class="w-100 d-flex flex-column gap-3">
+                <Typography FontSize="6" TextColor="ElementStyle.Primary">
+                    Желаемые компетенции*
+                </Typography>
+                <div class="mt-2 w-100 stack-categories">
+                    <SkillDropdown SkillType="SkillType.Language"
+                                   @bind-SelectedSkills="@SelectedLanguageSkills" />
+                    <SkillDropdown SkillType="SkillType.Framework"
+                                   @bind-SelectedSkills="@SelectedFrameworkSkills" />
+                    <SkillDropdown SkillType="SkillType.Database"
+                                   @bind-SelectedSkills="@SelectedDatabaseSkills" />
+                    <SkillDropdown SkillType="SkillType.Devops"
+                                   @bind-SelectedSkills="@SelectedDevopsSkills" />
+                </div>
+            </div>
+            <div class="team w-100">
+                <!-- radio поле с выборв владельца (но наверно оно будет всегда выключено, так как создать = владелец) -->
+                <!-- radio поле с выборв лидера -->
+                <!-- combobox поле с выбором участников -->
+            </div>
+            <div>
+                <!-- Блок с какимито графиками? -->
+            </div>
+            <Button BtnType="ButtonType.Button" Variant="ElementStyle.Success" Text="Создать команду" />
         </div>
     </div>
 </div>

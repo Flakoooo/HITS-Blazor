@@ -1,6 +1,7 @@
 ﻿@namespace HITSBlazor.Components.LeftSideNavigation
 @using HITSBlazor.Components.Collapse
 @using HITSBlazor.Components.Placeholder
+@using HITSBlazor.Components.Typography
 @using HITSBlazor.Models.Users.Enums
 @using HITSBlazor.Utils.EnumTranslators
 
@@ -40,7 +41,9 @@
                                     <i class="bi @item.Icon fs-5"></i>
                                     @if (isHovered)
                                     {
-                                        <span class="fs-6 ms-2">@item.Title</span>
+                                        <Typography FontSize="6" CustomClass="ms-2">
+                                            @item.Title
+                                        </Typography>
                                     }
                                 </button>
                             </MainContent>
