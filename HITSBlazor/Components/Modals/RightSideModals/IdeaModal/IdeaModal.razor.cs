@@ -27,6 +27,9 @@ namespace HITSBlazor.Components.Modals.RightSideModals.IdeaModal
         [Inject]
         private ModalService ModalService { get; set; } = null!;
 
+        [Inject]
+        private GlobalNotificationService GlobalNotificationService { get; set; } = null!;
+
         [Parameter]
         public Guid IdeaId { get; set; }
 
@@ -246,9 +249,32 @@ namespace HITSBlazor.Components.Modals.RightSideModals.IdeaModal
             return false;
         }
 
+        //TODO: сделать подробную валидацию
         private async Task UpdateIdeaStatus(IdeaStatusType ideaStatus)
         {
             if (CurrentIdea is null) return;
+
+            if (ideaStatus == IdeaStatusType.OnConfirmation)
+            {
+                bool isValid = true;
+                if (string.IsNullOrWhiteSpace(CurrentIdea.Name)) isValid = false;
+                if (string.IsNullOrWhiteSpace(CurrentIdea.Problem)) isValid = false;
+                if (string.IsNullOrWhiteSpace(CurrentIdea.Description)) isValid = false;
+                if (string.IsNullOrWhiteSpace(CurrentIdea.Solution)) isValid = false;
+                if (string.IsNullOrWhiteSpace(CurrentIdea.Result)) isValid = false;
+
+                if (CurrentIdea.MaxTeamSize is < 2 or > 30) isValid = false;
+                if (CurrentIdea.MinTeamSize is < 2 or > 30) isValid = false;
+
+                if (CurrentIdea.Suitability is < 1 or > 5) isValid = false;
+                if (CurrentIdea.Budget is < 1 or > 5) isValid = false;
+
+                if (!isValid)
+                {
+                    GlobalNotificationService.ShowError("Идея заполнена не полностью, заполните недостающие поля");
+                    return;
+                }
+            }
 
             if (await IdeasService.UpdateIdeaStatusAsync(CurrentIdea.Id, ideaStatus))
                 CurrentIdea.Status = ideaStatus;
