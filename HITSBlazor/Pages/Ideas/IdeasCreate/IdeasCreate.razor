@@ -1,10 +1,9 @@
 ﻿@using HITSBlazor.Components.Button
 @using HITSBlazor.Components.Hint
-@using HITSBlazor.Components.InputDropdowns.CompanyDropdown
-@using HITSBlazor.Components.InputDropdowns.ContactPersonDropdown
 @using HITSBlazor.Components.InputDropdowns.SkillDropdown
 @using HITSBlazor.Components.Inputs.Input
 @using HITSBlazor.Components.Inputs.Number
+@using HITSBlazor.Components.Inputs.RadioDropdown
 @using HITSBlazor.Components.Inputs.Select
 @using HITSBlazor.Components.Inputs.TextArea
 @using HITSBlazor.Components.Placeholder
@@ -13,8 +12,10 @@
 @using HITSBlazor.Models.Common.Entities
 @using HITSBlazor.Models.Common.Enums
 @using HITSBlazor.Models.Ideas.Enums
+@using HITSBlazor.Models.Users.Entities
 @using HITSBlazor.Services.Ideas
 @using HITSBlazor.Utils
+@using HITSBlazor.Utils.Models
 
 <div class="new-idea page-content-with-header">
     <div class="p-3 bg-white w-100 h-100 idea-form">
@@ -83,11 +84,29 @@
                                    @bind-SelectedSkills="@SelectedDevopsSkills" />
                 </div>
             </div>
-            <CompanyDropdown @bind-SelectedCompany="@SelectedCompany" />
-            @if (SelectedCompany is not null)
+            @if (_isLoading)
             {
-                <ContactPersonDropdown SelectedCompany="@SelectedCompany"
-                                       @bind-SelectedContactPerson="@SelectedContactPerson" />
+                <div class="w-100">
+                    <Placeholder Width="w-25" />
+                    <Placeholder Height="PlaceholderHeight.Small"/>
+                </div>
+            }
+            else
+            {
+                <RadioDropdown T="Company"
+                               Label="Заказчик"
+                               HintText="Выберите заказчика (компанию), к которой Вы принадлежите или от лица которой создаётся идея"
+                               Placeholder="Выберите заказчика"
+                               @bind-Value="@SelectedCompany"
+                               AllValues="Companies" />
+                @if (SelectedCompany is not null)
+                {
+                    <RadioDropdown T="User"
+                                   Label="Контактное лицо"
+                                   Placeholder="Выберите контактное лицо"
+                                   @bind-Value="@SelectedContactPerson"
+                                   AllValues="SelectedCompany.Users" />
+                }
             }
             <div class="row">
                 <div class="col">

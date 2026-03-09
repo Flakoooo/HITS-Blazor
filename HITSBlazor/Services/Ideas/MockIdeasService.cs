@@ -5,10 +5,10 @@ using HITSBlazor.Models.Ideas.Enums;
 using HITSBlazor.Models.Users.Enums;
 using HITSBlazor.Pages.Ideas.IdeasCreate;
 using HITSBlazor.Services.Auth;
-using HITSBlazor.Utils;
 using HITSBlazor.Utils.EnumTranslators;
 using HITSBlazor.Utils.Mocks.Common;
 using HITSBlazor.Utils.Mocks.Ideas;
+using HITSBlazor.Utils.Models;
 
 namespace HITSBlazor.Services.Ideas
 {

@@ -1,4 +1,4 @@
-﻿namespace HITSBlazor.Utils
+﻿namespace HITSBlazor.Utils.Models
 {
     public enum ElementStyle
     {

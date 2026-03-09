@@ -8,7 +8,7 @@ using HITSBlazor.Services;
 using HITSBlazor.Services.Auth;
 using HITSBlazor.Services.Ideas;
 using HITSBlazor.Services.Modal;
-using HITSBlazor.Utils;
+using HITSBlazor.Utils.Models;
 using Microsoft.AspNetCore.Components;
 
 namespace HITSBlazor.Components.Modals.RightSideModals.IdeaModal

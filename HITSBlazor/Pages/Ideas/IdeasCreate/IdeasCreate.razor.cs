@@ -6,7 +6,7 @@ using HITSBlazor.Services;
 using HITSBlazor.Services.Companies;
 using HITSBlazor.Services.Ideas;
 using HITSBlazor.Services.Skills;
-using HITSBlazor.Utils;
+using HITSBlazor.Utils.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
 
@@ -68,6 +68,7 @@ namespace HITSBlazor.Pages.Ideas.IdeasCreate
         };
 
         private IdeasCreateModel _ideasCreateModel = new();
+        private bool _isLoading = true;
         private bool _submitted = false;
 
         private HashSet<Skill> SelectedLanguageSkills { get; set; } = [];
@@ -111,6 +112,15 @@ namespace HITSBlazor.Pages.Ideas.IdeasCreate
         }
 
         private double? _preAssessmentScore = null;
+
+        protected override async Task OnInitializedAsync()
+        {
+            _isLoading = true;
+
+            Companies = await CompanyService.GetCompaniesAsync();
+
+            _isLoading = false;
+        }
 
         protected override async Task OnParametersSetAsync()
         {
@@ -162,27 +172,30 @@ namespace HITSBlazor.Pages.Ideas.IdeasCreate
         //TODO: реализовать слегка подробное отображение ошибки валидации в уведомлении
         private async Task CreateIdea(IdeaStatusType ideaStatusType)
         {
-            bool isInvalid = false;
-            if (string.IsNullOrWhiteSpace(_ideasCreateModel.Name)) isInvalid = true;
-            if (string.IsNullOrWhiteSpace(_ideasCreateModel.Problem)) isInvalid = true;
-            if (string.IsNullOrWhiteSpace(_ideasCreateModel.Description)) isInvalid = true;
-            if (string.IsNullOrWhiteSpace(_ideasCreateModel.Solution)) isInvalid = true;
-            if (string.IsNullOrWhiteSpace(_ideasCreateModel.Result)) isInvalid = true;
-
-            if (_ideasCreateModel.MaxTeamSize is > 30 or < 2) isInvalid = true;
-            if (_ideasCreateModel.MinTeamSize is > 30 or < 2) isInvalid = true;
-
-            if (SelectedCompany is null) isInvalid = true;
-            if (SelectedContactPerson is null) isInvalid = true;
-
-            if (_ideasCreateModel.Suitability is > 5 or < 1) isInvalid = true;
-            if (_ideasCreateModel.Budget is > 5 or < 1) isInvalid = true;
-
-            if (isInvalid)
+            if (ideaStatusType == IdeaStatusType.OnConfirmation)
             {
-                GlobalNotificationService.ShowError("Заполните все необходимые поля");
-                _submitted = true;
-                return;
+                bool isInvalid = false;
+                if (string.IsNullOrWhiteSpace(_ideasCreateModel.Name)) isInvalid = true;
+                if (string.IsNullOrWhiteSpace(_ideasCreateModel.Problem)) isInvalid = true;
+                if (string.IsNullOrWhiteSpace(_ideasCreateModel.Description)) isInvalid = true;
+                if (string.IsNullOrWhiteSpace(_ideasCreateModel.Solution)) isInvalid = true;
+                if (string.IsNullOrWhiteSpace(_ideasCreateModel.Result)) isInvalid = true;
+
+                if (_ideasCreateModel.MaxTeamSize is > 30 or < 2) isInvalid = true;
+                if (_ideasCreateModel.MinTeamSize is > 30 or < 2) isInvalid = true;
+
+                if (SelectedCompany is null) isInvalid = true;
+                if (SelectedContactPerson is null) isInvalid = true;
+
+                if (_ideasCreateModel.Suitability is > 5 or < 1) isInvalid = true;
+                if (_ideasCreateModel.Budget is > 5 or < 1) isInvalid = true;
+
+                if (isInvalid)
+                {
+                    GlobalNotificationService.ShowError("Заполните все необходимые поля");
+                    _submitted = true;
+                    return;
+                }
             }
 
             _ideasCreateModel.Status = ideaStatusType;

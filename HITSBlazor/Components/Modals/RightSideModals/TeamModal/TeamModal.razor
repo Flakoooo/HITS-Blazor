@@ -13,6 +13,7 @@
 @using HITSBlazor.Utils
 @using HITSBlazor.Utils.EnumStyles
 @using HITSBlazor.Utils.EnumTranslators
+@using HITSBlazor.Utils.Models
 
 <div class="right-side-modal p-3 overflow-y-scroll" @onclick:stopPropagation="true">
     @if (_isLoading || _currentTeam is null)
@@ -97,7 +98,7 @@
                         <MainContent Context="collapse">
                             <Button BtnType="ButtonType.Button" 
                                     Text="Описание команды" 
-                                    Variant="Utils.ElementStyle.Light" 
+                                    Variant="ElementStyle.Light" 
                                     ButtonClass="collapse-controller w-100" 
                                     OnButtonClick="collapse.Toggle" />
                         </MainContent>

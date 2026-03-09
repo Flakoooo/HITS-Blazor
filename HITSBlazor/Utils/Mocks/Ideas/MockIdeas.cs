@@ -5,6 +5,7 @@ using HITSBlazor.Models.Users.Entities;
 using HITSBlazor.Pages.Ideas.IdeasCreate;
 using HITSBlazor.Utils.Mocks.Common;
 using HITSBlazor.Utils.Mocks.Users;
+using HITSBlazor.Utils.Models;
 using Newtonsoft.Json.Linq;
 
 namespace HITSBlazor.Utils.Mocks.Ideas

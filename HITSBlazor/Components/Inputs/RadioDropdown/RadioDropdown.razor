@@ -1,0 +1,64 @@
+﻿@namespace HITSBlazor.Components.Inputs.RadioDropdown
+@using HITSBlazor.Components.Hint
+@using HITSBlazor.Utils.Models
+@typeparam T where T : ViewModelBase
+
+<div class="w-100" tabindex="-1">
+    @if (!string.IsNullOrWhiteSpace(Label))
+    {
+        <label class="form-label mb-2 text-primary">
+            @Label
+            @if (!string.IsNullOrWhiteSpace(HintText))
+            {
+                <Hint Text="@HintText" />
+            }
+        </label>
+    }
+    <div style="position: relative;">
+        <div class="w-100">
+            <div class="input-group">
+                <input type="text"
+                       @ref="_inputRef"
+                       @oninput="@(async e => await OnSearch(e))"
+                       value="@Value?.GetDisplayInfo()"
+                       placeholder="@Placeholder"
+                       class="form-control rounded-end"
+                       style="color: #000 !important;"
+                       @onclick="OpenDropdown"
+                       @onfocus="OpenDropdown"
+                       @onkeydown="OnInputKeyDown" />
+            </div>
+        </div>
+
+        @if (!_isOpen)
+        {
+            <i class="input-dropdown-icon bi bi-chevron-down" @onclick="ToggleDropdown"></i>
+        }
+
+        @if (_isOpen)
+        {
+            <div class="list-group w-100 dropdown-list"
+                 style="top: 42px; right: auto; z-index: 6; max-height: 173px; overflow-y: scroll; position: absolute; bottom: auto; left: auto;"
+                 @onclick:stopPropagation>
+
+                @foreach (var value in _values)
+                {
+                    <div @onclick="@(() => OnElementChange(value))"
+                         class="d-flex list-group-item list-group-item-action"
+                         style="padding: 8px 12px; cursor: pointer; flex-direction: row; flex-wrap: nowrap; align-items: center; justify-content: flex-start;"
+                         tabindex="-1">
+                        <div class="d-flex">
+                            <input type="radio"
+                                   @onchange="@(() => OnElementChange(value))"
+                                   checked="@IsItemSelected(value)"
+                                   @onclick:stopPropagation
+                                   name="@_radioGroupName"
+                                   class="form-check-input" />
+                            <span class="form-check-label ms-2">@value.GetDisplayInfo()</span>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</div>

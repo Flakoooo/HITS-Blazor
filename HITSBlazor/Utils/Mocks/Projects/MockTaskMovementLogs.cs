@@ -3,6 +3,9 @@ using HITSBlazor.Models.Users.Entities;
 using HITSBlazor.Utils.Mocks.Users;
 using System.Globalization;
 
+using HITSTask = HITSBlazor.Models.Projects.Entities.Task;
+using HITSTaskStatus = HITSBlazor.Models.Projects.Enums.TaskStatus;
+
 namespace HITSBlazor.Utils.Mocks.Projects
 {
     public static class MockTaskMovementLogs
@@ -24,13 +27,13 @@ namespace HITSBlazor.Utils.Mocks.Projects
             var logs = new List<TaskMovementLog>();
 
             var newTaskEnd = AddWorkingDays(startDate, _random.Next(1, 3), 4);
-            logs.Add(CreateLog(authIntegrationTask, null, kirill, startDate, newTaskEnd, Models.Projects.Enums.TaskStatus.NewTask, 4.0));
+            logs.Add(CreateLog(authIntegrationTask, null, kirill, startDate, newTaskEnd, HITSTaskStatus.NewTask, 4.0));
 
             var verificationStart = newTaskEnd + ((finishDate - newTaskEnd) * 0.7);
 
             logs.AddRange([
-                CreateLog(authIntegrationTask, ivan, ivan, newTaskEnd, verificationStart, Models.Projects.Enums.TaskStatus.InProgress, 4.0),
-                CreateLog(authIntegrationTask, ivan, kirill, verificationStart, finishDate, Models.Projects.Enums.TaskStatus.OnVerification, 4.0),
+                CreateLog(authIntegrationTask, ivan, ivan, newTaskEnd, verificationStart, HITSTaskStatus.InProgress, 4.0),
+                CreateLog(authIntegrationTask, ivan, kirill, verificationStart, finishDate, HITSTaskStatus.OnVerification, 4.0),
                 new TaskMovementLog
                 {
                     Id = Guid.NewGuid(),
@@ -40,7 +43,7 @@ namespace HITSBlazor.Utils.Mocks.Projects
                     StartDate = finishDate.ToString(Settings.DateFormat),
                     EndDate = string.Empty,
                     WastedTime = string.Empty,
-                    Status = Models.Projects.Enums.TaskStatus.Done
+                    Status = HITSTaskStatus.Done
                 }
             ]);
 
@@ -86,12 +89,12 @@ namespace HITSBlazor.Utils.Mocks.Projects
         }
 
         private static TaskMovementLog CreateLog(
-            Models.Projects.Entities.Task task,
+            HITSTask task,
             User? executor,
             User user,
             DateTime start,
             DateTime end,
-            Models.Projects.Enums.TaskStatus status,
+            HITSTaskStatus status,
             double workingHours = 8.0) =>
         new()
         {

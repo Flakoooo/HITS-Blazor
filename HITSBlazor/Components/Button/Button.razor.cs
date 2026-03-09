@@ -1,4 +1,4 @@
-﻿using HITSBlazor.Utils;
+﻿using HITSBlazor.Utils.Models;
 using Microsoft.AspNetCore.Components;
 
 namespace HITSBlazor.Components.Button

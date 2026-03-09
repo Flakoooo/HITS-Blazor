@@ -4,6 +4,9 @@ using HITSBlazor.Models.Projects.Enums;
 using HITSBlazor.Utils.Mocks.Common;
 using HITSBlazor.Utils.Mocks.Users;
 
+using HITSTask = HITSBlazor.Models.Projects.Entities.Task;
+using HITSTaskStatus = HITSBlazor.Models.Projects.Enums.TaskStatus;
+
 namespace HITSBlazor.Utils.Mocks.Projects
 {
     public static class MockSprints
@@ -17,7 +20,7 @@ namespace HITSBlazor.Utils.Mocks.Projects
         public static Guid FileUploadTaskId { get; } = Guid.NewGuid();
         public static Guid TaskTemplatesTaskId { get; } = Guid.NewGuid();
 
-        private static readonly List<Models.Projects.Entities.Task> _tasks = CreateTasks();
+        private static readonly List<HITSTask> _tasks = CreateTasks();
         private static readonly List<Sprint> _sprints = CreateSprints();
 
         private static int SumSprintDate(int sprintCount, bool isFinishDate, int sprintDurationDays = 7)
@@ -26,7 +29,7 @@ namespace HITSBlazor.Utils.Mocks.Projects
             : sprintCount * (sprintDurationDays + 1);
 
 
-        private static List<Models.Projects.Entities.Task> CreateTasks()
+        private static List<HITSTask> CreateTasks()
         {
             var kirill = MockUsers.GetUserById(MockUsers.KirillId)!;
             var ivan = MockUsers.GetUserById(MockUsers.IvanId)!;
@@ -44,7 +47,7 @@ namespace HITSBlazor.Utils.Mocks.Projects
 
             return
             [
-                new Models.Projects.Entities.Task
+                new HITSTask
                 {
                     Id = Guid.NewGuid(),
                     SprintId = Sprint3Id,
@@ -56,9 +59,9 @@ namespace HITSBlazor.Utils.Mocks.Projects
                     WorkHour = 3,
                     StartDate = new DateTime(2023, 9, 25, 11, 2, 17, DateTimeKind.Utc).ToString(Settings.DateFormat),
                     Tags = [.. tags015],
-                    Status = Models.Projects.Enums.TaskStatus.NewTask
+                    Status = HITSTaskStatus.NewTask
                 },
-                new Models.Projects.Entities.Task
+                new HITSTask
                 {
                     Id = Guid.NewGuid(),
                     SprintId = Sprint3Id,
@@ -70,9 +73,9 @@ namespace HITSBlazor.Utils.Mocks.Projects
                     WorkHour = 1,
                     StartDate = new DateTime(2023, 9, 25, 11, 2, 17, DateTimeKind.Utc).ToString(Settings.DateFormat),
                     Tags = [frontendTag, uiuxTag],
-                    Status = Models.Projects.Enums.TaskStatus.NewTask
+                    Status = HITSTaskStatus.NewTask
                 },
-                new Models.Projects.Entities.Task
+                new HITSTask
                 {
                     Id = Guid.NewGuid(),
                     SprintId = Sprint3Id,
@@ -84,9 +87,9 @@ namespace HITSBlazor.Utils.Mocks.Projects
                     WorkHour = 3,
                     StartDate = new DateTime(2023, 9, 25, 11, 2, 17, DateTimeKind.Utc).ToString(Settings.DateFormat),
                     Tags = [backendTag, notificationTag],
-                    Status = Models.Projects.Enums.TaskStatus.NewTask
+                    Status = HITSTaskStatus.NewTask
                 },
-                new Models.Projects.Entities.Task
+                new HITSTask
                 {
                     Id = Guid.NewGuid(),
                     SprintId = Sprint3Id,
@@ -98,9 +101,9 @@ namespace HITSBlazor.Utils.Mocks.Projects
                     WorkHour = 3,
                     StartDate = new DateTime(2023, 9, 25, 11, 2, 17, DateTimeKind.Utc).ToString(Settings.DateFormat),
                     Tags = [backendTag, MockTags.GetTagById(MockTags.OptimizationId)!],
-                    Status = Models.Projects.Enums.TaskStatus.NewTask
+                    Status = HITSTaskStatus.NewTask
                 },
-                new Models.Projects.Entities.Task
+                new HITSTask
                 {
                     Id = Guid.NewGuid(),
                     SprintId = Sprint3Id,
@@ -112,10 +115,10 @@ namespace HITSBlazor.Utils.Mocks.Projects
                     WorkHour = 1,
                     StartDate = new DateTime(2023, 9, 25, 11, 2, 17, DateTimeKind.Utc).ToString(Settings.DateFormat),
                     Tags = [.. tags015],
-                    Status = Models.Projects.Enums.TaskStatus.OnModification,
+                    Status = HITSTaskStatus.OnModification,
                     LeaderComment = "Котята, нужно прибраться!"
                 },
-                new Models.Projects.Entities.Task
+                new HITSTask
                 {
                     Id = Guid.NewGuid(),
                     SprintId = Sprint3Id,
@@ -127,9 +130,9 @@ namespace HITSBlazor.Utils.Mocks.Projects
                     WorkHour = 3,
                     StartDate = new DateTime(2023, 9, 25, 11, 2, 17, DateTimeKind.Utc).ToString(Settings.DateFormat),
                     Tags = [backendTag, MockTags.GetTagById(MockTags.StatisticId)!],
-                    Status = Models.Projects.Enums.TaskStatus.OnModification
+                    Status = HITSTaskStatus.OnModification
                 },
-                new Models.Projects.Entities.Task
+                new HITSTask
                 {
                     Id = Guid.NewGuid(),
                     SprintId = Sprint3Id,
@@ -141,9 +144,9 @@ namespace HITSBlazor.Utils.Mocks.Projects
                     WorkHour = 3,
                     StartDate = new DateTime(2023, 9, 25, 11, 2, 17, DateTimeKind.Utc).ToString(Settings.DateFormat),
                     Tags = [frontendTag, backendTag, notificationTag],
-                    Status = Models.Projects.Enums.TaskStatus.InProgress
+                    Status = HITSTaskStatus.InProgress
                 },
-                new Models.Projects.Entities.Task
+                new HITSTask
                 {
                     Id = Guid.NewGuid(),
                     SprintId = Sprint3Id,
@@ -155,9 +158,9 @@ namespace HITSBlazor.Utils.Mocks.Projects
                     WorkHour = 3,
                     StartDate = new DateTime(2023, 9, 25, 11, 2, 17, DateTimeKind.Utc).ToString(Settings.DateFormat),
                     Tags = [frontendTag, integrationTag],
-                    Status = Models.Projects.Enums.TaskStatus.InProgress
+                    Status = HITSTaskStatus.InProgress
                 },
-                new Models.Projects.Entities.Task
+                new HITSTask
                 {
                     Id = Guid.NewGuid(),
                     SprintId = Sprint3Id,
@@ -169,9 +172,9 @@ namespace HITSBlazor.Utils.Mocks.Projects
                     WorkHour = 1,
                     StartDate = new DateTime(2023, 9, 25, 11, 2, 17, DateTimeKind.Utc).ToString(Settings.DateFormat),
                     Tags = [frontendTag, backendTag],
-                    Status = Models.Projects.Enums.TaskStatus.OnVerification
+                    Status = HITSTaskStatus.OnVerification
                 },
-                new Models.Projects.Entities.Task
+                new HITSTask
                 {
                     Id = AuthIntegrationTaskId,
                     SprintId = Sprint3Id,
@@ -184,9 +187,9 @@ namespace HITSBlazor.Utils.Mocks.Projects
                     StartDate = new DateTime(2023, 9, 25, 11, 2, 17, DateTimeKind.Utc).ToString(Settings.DateFormat),
                     FinishDate = new DateTime(2024, 1, 25, 11, 2, 17, DateTimeKind.Utc).ToString(Settings.DateFormat),
                     Tags = [backendTag, integrationTag, securityTag],
-                    Status = Models.Projects.Enums.TaskStatus.Done
+                    Status = HITSTaskStatus.Done
                 },
-                new Models.Projects.Entities.Task
+                new HITSTask
                 {
                     Id = BlackThemeTaskId,
                     SprintId = Sprint3Id,
@@ -199,9 +202,9 @@ namespace HITSBlazor.Utils.Mocks.Projects
                     StartDate = new DateTime(2023, 9, 25, 11, 2, 17, DateTimeKind.Utc).ToString(Settings.DateFormat),
                     FinishDate = new DateTime(2024, 1, 22, 11, 2, 17, DateTimeKind.Utc).ToString(Settings.DateFormat),
                     Tags = [frontendTag, MockTags.GetTagById(MockTags.DesignId)!, uiuxTag],
-                    Status = Models.Projects.Enums.TaskStatus.Done
+                    Status = HITSTaskStatus.Done
                 },
-                new Models.Projects.Entities.Task
+                new HITSTask
                 {
                     Id = FileUploadTaskId,
                     SprintId = Sprint3Id,
@@ -214,9 +217,9 @@ namespace HITSBlazor.Utils.Mocks.Projects
                     StartDate = new DateTime(2023, 9, 25, 11, 2, 17, DateTimeKind.Utc).ToString(Settings.DateFormat),
                     FinishDate = new DateTime(2024, 1, 21, 11, 2, 17, DateTimeKind.Utc).ToString(Settings.DateFormat),
                     Tags = [backendTag],
-                    Status = Models.Projects.Enums.TaskStatus.Done
+                    Status = HITSTaskStatus.Done
                 },
-                new Models.Projects.Entities.Task
+                new HITSTask
                 {
                     Id = TaskTemplatesTaskId,
                     SprintId = Sprint3Id,
@@ -229,9 +232,9 @@ namespace HITSBlazor.Utils.Mocks.Projects
                     StartDate = new DateTime(2023, 9, 25, 11, 2, 17, DateTimeKind.Utc).ToString(Settings.DateFormat),
                     FinishDate = new DateTime(2024, 1, 25, 11, 2, 17, DateTimeKind.Utc).ToString(Settings.DateFormat),
                     Tags = [backendTag],
-                    Status = Models.Projects.Enums.TaskStatus.Done
+                    Status = HITSTaskStatus.Done
                 },
-                new Models.Projects.Entities.Task
+                new HITSTask
                 {
                     Id = Guid.NewGuid(),
                     SprintId = Guid.Empty,
@@ -244,9 +247,9 @@ namespace HITSBlazor.Utils.Mocks.Projects
                     WorkHour = 8,
                     StartDate = new DateTime(2023, 9, 25, 11, 2, 17, DateTimeKind.Utc).ToString(Settings.DateFormat),
                     Tags = [frontendTag, uiuxTag],
-                    Status = Models.Projects.Enums.TaskStatus.InBackLog
+                    Status = HITSTaskStatus.InBackLog
                 },
-                new Models.Projects.Entities.Task
+                new HITSTask
                 {
                     Id = Guid.NewGuid(),
                     SprintId = Guid.Empty,
@@ -259,9 +262,9 @@ namespace HITSBlazor.Utils.Mocks.Projects
                     WorkHour = 4,
                     StartDate = new DateTime(2023, 9, 25, 11, 2, 17, DateTimeKind.Utc).ToString(Settings.DateFormat),
                     Tags = [backendTag, integrationTag],
-                    Status = Models.Projects.Enums.TaskStatus.InBackLog
+                    Status = HITSTaskStatus.InBackLog
                 },
-                new Models.Projects.Entities.Task
+                new HITSTask
                 {
                     Id = Guid.NewGuid(),
                     SprintId = Guid.Empty,
@@ -274,7 +277,7 @@ namespace HITSBlazor.Utils.Mocks.Projects
                     WorkHour = 2,
                     StartDate = new DateTime(2023, 9, 25, 11, 2, 17, DateTimeKind.Utc).ToString(Settings.DateFormat),
                     Tags = [backendTag, securityTag],
-                    Status = Models.Projects.Enums.TaskStatus.InBackLog
+                    Status = HITSTaskStatus.InBackLog
                 }
             ];
         }
@@ -340,7 +343,7 @@ namespace HITSBlazor.Utils.Mocks.Projects
             ];
         }
 
-        public static Models.Projects.Entities.Task? GetTaskById(Guid taskId) =>
+        public static HITSTask? GetTaskById(Guid taskId) =>
             _tasks.FirstOrDefault(t => t.Id == taskId);
     }
 }

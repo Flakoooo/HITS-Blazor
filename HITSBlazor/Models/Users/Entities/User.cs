@@ -1,8 +1,9 @@
 ﻿using HITSBlazor.Models.Users.Enums;
+using HITSBlazor.Utils.Models;
 
 namespace HITSBlazor.Models.Users.Entities
 {
-    public class User
+    public class User : ViewModelBase
     {
         public Guid Id { get; set; }
         public string Email { get; set; } = string.Empty;
@@ -13,7 +14,11 @@ namespace HITSBlazor.Models.Users.Entities
         public string Telephone { get; set; } = string.Empty;
         public string StudyGroup { get; set; } = string.Empty;
 
+
         public RoleType? Role { get; set; }
         public string FullName => $"{FirstName} {LastName}";
+        public override string GetDisplayInfo() => FullName;
+        public override object GetId() => Id;
+
     }
 }

@@ -1,6 +1,7 @@
 ﻿using HITSBlazor.Components.Modals.RightSideModals.IdeaModal;
 using HITSBlazor.Models.Ideas.Entities;
 using HITSBlazor.Models.Ideas.Enums;
+using HITSBlazor.Utils.Models;
 
 namespace HITSBlazor.Utils.Mocks.Ideas
 {
