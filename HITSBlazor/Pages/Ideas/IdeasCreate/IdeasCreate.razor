@@ -28,27 +28,27 @@
                        HintText="@_hints[nameof(IdeasCreateModel.Name)]"
                        NeedValidation="_submitted"
                        Placeholder="Введите название идеи"
-                       @bind-Value="@_ideasCreateModel.Name" />
+                       @bind-Value="@IdeasCreateModel.Name" />
                 <TextArea Label="Проблема*"
                           HintText="@_hints[nameof(IdeasCreateModel.Problem)]"
                           NeedValidation="_submitted"
                           Placeholder="Опишите проблему, которую решает ваша идея"
-                          @bind-Value="@_ideasCreateModel.Problem" />
+                          @bind-Value="@IdeasCreateModel.Problem" />
                 <TextArea Label="Предлагаемое решение*"
                           HintText="@_hints[nameof(IdeasCreateModel.Solution)]"
                           NeedValidation="_submitted"
                           Placeholder="Опишите, что вы предлагаете для решения проблемы"
-                          @bind-Value="@_ideasCreateModel.Solution" />
+                          @bind-Value="@IdeasCreateModel.Solution" />
                 <TextArea Label="Ожидаемый результат*"
                           HintText="@_hints[nameof(IdeasCreateModel.Result)]"
                           NeedValidation="_submitted"
                           Placeholder="Опишите ожидаемый результат"
-                          @bind-Value="@_ideasCreateModel.Result" />
+                          @bind-Value="@IdeasCreateModel.Result" />
                 <TextArea Label="Описание необходимых ресурсов для реализации*"
                           HintText="@_hints[nameof(IdeasCreateModel.Description)]"
                           NeedValidation="_submitted"
                           Placeholder="Укажите список требуемых для выполнения проекта ресурсов"
-                          @bind-Value="@_ideasCreateModel.Description" />
+                          @bind-Value="@IdeasCreateModel.Description" />
                 <div>
                     <Typography FontSize="6" TextColor="ElementStyle.Primary">
                         Желаемое количество участников в команде*
@@ -59,12 +59,12 @@
                                 MaxValue="30" 
                                 NeedValidation="_submitted"
                                 Placeholder="Минимальное количество: 2" 
-                                @bind-Value="_ideasCreateModel.MinTeamSize" />
+                                @bind-Value="IdeasCreateModel.MinTeamSize" />
                         <Number MinValue="2"
                                 MaxValue="30"
                                 NeedValidation="_submitted"
                                 Placeholder="Максимальное количество: 30"
-                                @bind-Value="_ideasCreateModel.MaxTeamSize" />
+                                @bind-Value="IdeasCreateModel.MaxTeamSize" />
                     </div>
                 </div>
             </div>

@@ -23,6 +23,7 @@
                        value="@Value?.GetDisplayInfo()"
                        placeholder="@Placeholder"
                        class="form-control rounded-end"
+                       disabled="@IsDisabled"
                        style="color: #000 !important;"
                        @onclick="OpenDropdown"
                        @onfocus="OpenDropdown"
@@ -35,7 +36,7 @@
             <i class="input-dropdown-icon bi bi-chevron-down" @onclick="ToggleDropdown"></i>
         }
 
-        @if (_isOpen)
+        @if (_isOpen && _values.Any())
         {
             <div class="list-group w-100 dropdown-list"
                  style="top: 42px; right: auto; z-index: 6; max-height: 173px; overflow-y: scroll; position: absolute; bottom: auto; left: auto;"

@@ -2,16 +2,20 @@
 @using HITSBlazor.Components.Button
 @using HITSBlazor.Components.InputDropdowns.SkillDropdown
 @using HITSBlazor.Components.Inputs.Input
+@using HITSBlazor.Components.Inputs.RadioDropdown
 @using HITSBlazor.Components.Inputs.TextArea
 @using HITSBlazor.Components.Typography
 @using HITSBlazor.Models.Common.Enums
+@using HITSBlazor.Models.Users.Entities
 @using HITSBlazor.Utils
 @using HITSBlazor.Utils.Models
 
 <div class="bg-white page-content-with-header">
     <div class="team-form w-100 h-100 bg-white p-3 overflow-auto">
         <div class="team-form-content w-75">
-            <Typography FontSize="2" Text="Создание команды" />
+            <Typography FontSize="2">
+                Создание команды
+            </Typography>
             <Input Label="Название команды*" 
                    Placeholder="Введите название команды" 
                    NeedValidation="true" 
@@ -25,7 +29,7 @@
                     Тип команды*
                 </Typography>
                 <div class="my-2 d-flex gap-3">
-                    <div class="team-type w-50 p-2 rounded-3 border border-2">
+                    <div class="team-type w-50 p-2 rounded-3 border border-2 @(!TeamsCreateModel.Closed ? "team-type-active border-primary border-opacity-75" : string.Empty)">
                         <div class="team-type-icon rounded-circle bg-success bg-opacity-25">
                             <i class="fs-2 text-success bi bi-folder2-open"></i>
                         </div>
@@ -38,9 +42,9 @@
                             </Typography>
                         </div>
                     </div>
-                    <div class="team-type w-50 p-2 rounded-3 border border-2">
+                    <div class="team-type w-50 p-2 rounded-3 border border-2 @(TeamsCreateModel.Closed ? "team-type-active border-primary border-opacity-75" : string.Empty)">
                         <div class="team-type-icon rounded-circle bg-danger bg-opacity-25">
-                            <i class="fs-2 text-success bi bi-shield-lock"></i>
+                            <i class="fs-2 text-danger bi bi-shield-lock"></i>
                         </div>
                         <div class="team-type-text">
                             <Typography FontSize="4">
@@ -68,20 +72,19 @@
                                    @bind-SelectedSkills="@SelectedDevopsSkills" />
                 </div>
             </div>
-            <div class="team w-100">
-                <!-- radio поле с выборв владельца (но наверно оно будет всегда выключено, так как создать = владелец) -->
-                <div class="w-100">
-                    <label class="form-label mb-2 text-primary">
-                        Владелец команды*
-                    </label>
-                    <div style="position: relative;">
-                        <div class="w-100">
-                            <div class="input-group">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!-- radio поле с выборв лидера -->
+            <div class="team w-100">             
+                <RadioDropdown T="User" 
+                               Label="Владелец команды*" 
+                               Placeholder="Выберите владельца"
+                               IsDisabled="true" 
+                               @bind-Value="TeamsCreateModel.Owner"
+                               AllValues="TeamMembers"/>
+                <RadioDropdown T="User"
+                               Label="Владелец команды*"
+                               Placeholder="Выберите владельца"
+                               IsDisabled="true"
+                               @bind-Value="TeamsCreateModel.Leader"
+                               AllValues="TeamMembers" />
                 <!-- combobox поле с выбором участников -->
             </div>
             <div>

@@ -67,7 +67,7 @@ namespace HITSBlazor.Pages.Ideas.IdeasCreate
                 "<br/>Если в списке отсутствует нужная Вам технология, то можно самостоятельно добавить ее - нажать на поле стека и вписать название технологии (для добавления нажать на \"+\")."
         };
 
-        private IdeasCreateModel _ideasCreateModel = new();
+        private IdeasCreateModel IdeasCreateModel { get; set; } = new();
         private bool _isLoading = true;
         private bool _submitted = false;
 
@@ -83,14 +83,14 @@ namespace HITSBlazor.Pages.Ideas.IdeasCreate
 
 
         private string SuitabilityScore { 
-            get => _ideasCreateModel.Suitability > 0 
-                ? _ideasCreateModel.Suitability.ToString() 
+            get => IdeasCreateModel.Suitability > 0 
+                ? IdeasCreateModel.Suitability.ToString() 
                 : string.Empty; 
             set 
             {
-                if (int.TryParse(value, out int intValue) && _ideasCreateModel.Suitability != intValue)
+                if (int.TryParse(value, out int intValue) && IdeasCreateModel.Suitability != intValue)
                 {
-                    _ideasCreateModel.Suitability = intValue;
+                    IdeasCreateModel.Suitability = intValue;
                     UpdatePreAssessmentScore();
                 }
             }
@@ -98,14 +98,14 @@ namespace HITSBlazor.Pages.Ideas.IdeasCreate
 
 
         private string BudgetScore { 
-            get => _ideasCreateModel.Budget > 0 
-                ? _ideasCreateModel.Budget.ToString() 
+            get => IdeasCreateModel.Budget > 0 
+                ? IdeasCreateModel.Budget.ToString() 
                 : string.Empty;
             set
             {
-                if (int.TryParse(value, out int intValue) && _ideasCreateModel.Budget != intValue)
+                if (int.TryParse(value, out int intValue) && IdeasCreateModel.Budget != intValue)
                 {
-                    _ideasCreateModel.Budget = intValue;
+                    IdeasCreateModel.Budget = intValue;
                     UpdatePreAssessmentScore();
                 }
             }
@@ -129,7 +129,7 @@ namespace HITSBlazor.Pages.Ideas.IdeasCreate
             var idea = await IdeasService.GetIdeaByIdAsync(guid);
             if (idea is null) return;
 
-            _ideasCreateModel = new()
+            IdeasCreateModel = new()
             {
                 Name = idea.Name,
                 Problem = idea.Problem,
@@ -175,20 +175,20 @@ namespace HITSBlazor.Pages.Ideas.IdeasCreate
             if (ideaStatusType == IdeaStatusType.OnConfirmation)
             {
                 bool isInvalid = false;
-                if (string.IsNullOrWhiteSpace(_ideasCreateModel.Name)) isInvalid = true;
-                if (string.IsNullOrWhiteSpace(_ideasCreateModel.Problem)) isInvalid = true;
-                if (string.IsNullOrWhiteSpace(_ideasCreateModel.Description)) isInvalid = true;
-                if (string.IsNullOrWhiteSpace(_ideasCreateModel.Solution)) isInvalid = true;
-                if (string.IsNullOrWhiteSpace(_ideasCreateModel.Result)) isInvalid = true;
+                if (string.IsNullOrWhiteSpace(IdeasCreateModel.Name)) isInvalid = true;
+                if (string.IsNullOrWhiteSpace(IdeasCreateModel.Problem)) isInvalid = true;
+                if (string.IsNullOrWhiteSpace(IdeasCreateModel.Description)) isInvalid = true;
+                if (string.IsNullOrWhiteSpace(IdeasCreateModel.Solution)) isInvalid = true;
+                if (string.IsNullOrWhiteSpace(IdeasCreateModel.Result)) isInvalid = true;
 
-                if (_ideasCreateModel.MaxTeamSize is > 30 or < 2) isInvalid = true;
-                if (_ideasCreateModel.MinTeamSize is > 30 or < 2) isInvalid = true;
+                if (IdeasCreateModel.MaxTeamSize is > 30 or < 2) isInvalid = true;
+                if (IdeasCreateModel.MinTeamSize is > 30 or < 2) isInvalid = true;
 
                 if (SelectedCompany is null) isInvalid = true;
                 if (SelectedContactPerson is null) isInvalid = true;
 
-                if (_ideasCreateModel.Suitability is > 5 or < 1) isInvalid = true;
-                if (_ideasCreateModel.Budget is > 5 or < 1) isInvalid = true;
+                if (IdeasCreateModel.Suitability is > 5 or < 1) isInvalid = true;
+                if (IdeasCreateModel.Budget is > 5 or < 1) isInvalid = true;
 
                 if (isInvalid)
                 {
@@ -198,11 +198,11 @@ namespace HITSBlazor.Pages.Ideas.IdeasCreate
                 }
             }
 
-            _ideasCreateModel.Status = ideaStatusType;
-            _ideasCreateModel.Customer = SelectedCompany!.Name;
-            _ideasCreateModel.ContactPerson = SelectedContactPerson!.FullName;
+            IdeasCreateModel.Status = ideaStatusType;
+            IdeasCreateModel.Customer = SelectedCompany!.Name;
+            IdeasCreateModel.ContactPerson = SelectedContactPerson!.FullName;
 
-            var result = await IdeasService.CreateNewIdeaAsync(_ideasCreateModel);
+            var result = await IdeasService.CreateNewIdeaAsync(IdeasCreateModel);
             _submitted = true;
 
             if (result is null) return;
@@ -223,7 +223,7 @@ namespace HITSBlazor.Pages.Ideas.IdeasCreate
         {
             if (!Guid.TryParse(IdeaId, out Guid guid)) return;
 
-            if (await IdeasService.UpdateIdeaAsync(guid, _ideasCreateModel))
+            if (await IdeasService.UpdateIdeaAsync(guid, IdeasCreateModel))
                 await Navigation.NavigateToAsync("ideas/list");
         }
     }

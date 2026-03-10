@@ -27,6 +27,9 @@ namespace HITSBlazor.Components.Inputs.RadioDropdown
         [Parameter]
         public List<T> AllValues { get; set; } = [];
 
+        [Parameter]
+        public bool IsDisabled { get; set; } = false;
+
         private ElementReference _inputRef;
         private DotNetObjectReference<RadioDropdown<T>>? _dotNetHelper;
 

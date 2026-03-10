@@ -43,6 +43,10 @@
     justify-content: flex-start;
 }
 
+.team-type-active {
+    background-color: rgba(13,110,253,.08);
+}
+
 .team {
     align-items: stretch;
     gap: 16px;
