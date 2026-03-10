@@ -1,4 +1,4 @@
-﻿namespace HITSBlazor.Pages.Login
+﻿namespace HITSBlazor.Pages.Auth.Login
 {
     public class LoginModel
     {

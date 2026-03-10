@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace HITSBlazor.Pages.NewPassword
+namespace HITSBlazor.Pages.Auth.NewPassword
 {
     public class NewPasswordModel
     {

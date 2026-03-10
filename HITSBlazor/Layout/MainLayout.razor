@@ -7,11 +7,10 @@
 @inherits LayoutComponentBase
 @inject IAuthService AuthService
 
-<PageTitle>Портал ВШЦТ</PageTitle>
-
 <div style="display: flex; flex-direction: row; flex-wrap: nowrap; align-items: flex-start; justify-content: flex-start;">
     @if (AuthService.IsAuthenticated)
     {
+        <PageTitle>Портал ВШЦТ</PageTitle>
         <RightSideModalContainer />
         <CenterModalContainer />
 

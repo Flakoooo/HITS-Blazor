@@ -5,7 +5,7 @@ using HITSBlazor.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
 
-namespace HITSBlazor.Pages.Register
+namespace HITSBlazor.Pages.Auth.Register
 {
     [AllowAnonymous]
     [Route("/register/{invitationId}")]

@@ -3,7 +3,7 @@ using HITSBlazor.Services.Auth;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
 
-namespace HITSBlazor.Pages.Login
+namespace HITSBlazor.Pages.Auth.Login
 {
     [AllowAnonymous]
     [Route("/login")]

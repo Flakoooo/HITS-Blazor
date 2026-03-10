@@ -1,4 +1,4 @@
-﻿namespace HITSBlazor.Pages.RecoveryPassword
+﻿namespace HITSBlazor.Pages.Auth.RecoveryPassword
 {
     public class RecoveryModel
     {

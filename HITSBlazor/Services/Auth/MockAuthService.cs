@@ -1,9 +1,9 @@
 ﻿using HITSBlazor.Models.Users.Entities;
 using HITSBlazor.Models.Users.Enums;
-using HITSBlazor.Pages.Login;
-using HITSBlazor.Pages.NewPassword;
-using HITSBlazor.Pages.RecoveryPassword;
-using HITSBlazor.Pages.Register;
+using HITSBlazor.Pages.Auth.Login;
+using HITSBlazor.Pages.Auth.NewPassword;
+using HITSBlazor.Pages.Auth.RecoveryPassword;
+using HITSBlazor.Pages.Auth.Register;
 using HITSBlazor.Utils.Mocks.Users;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;

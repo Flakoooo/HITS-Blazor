@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace HITSBlazor.Pages.Register
+namespace HITSBlazor.Pages.Auth.Register
 {
     public class RegisterModel
     {

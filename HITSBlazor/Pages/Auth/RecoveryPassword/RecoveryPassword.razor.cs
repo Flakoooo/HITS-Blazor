@@ -1,9 +1,8 @@
-﻿using HITSBlazor.Services;
-using HITSBlazor.Services.Auth;
+﻿using HITSBlazor.Services.Auth;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
 
-namespace HITSBlazor.Pages.RecoveryPassword
+namespace HITSBlazor.Pages.Auth.RecoveryPassword
 {
     [AllowAnonymous]
     [Route("/recovery-password")]

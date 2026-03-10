@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
 
-namespace HITSBlazor.Pages.NewPassword
+namespace HITSBlazor.Pages.Auth.NewPassword
 {
     [AllowAnonymous]
     [Route("/new-password")]

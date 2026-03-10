@@ -1,6 +1,6 @@
-﻿using HITSBlazor.Pages.Login;
-using HITSBlazor.Pages.NewPassword;
-using HITSBlazor.Pages.Register;
+﻿using HITSBlazor.Pages.Auth.Login;
+using HITSBlazor.Pages.Auth.NewPassword;
+using HITSBlazor.Pages.Auth.Register;
 using HITSBlazor.Utils;
 using Newtonsoft.Json.Linq;
 using System.Net;
