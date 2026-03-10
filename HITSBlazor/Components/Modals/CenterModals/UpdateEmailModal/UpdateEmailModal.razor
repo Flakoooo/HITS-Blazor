@@ -7,7 +7,7 @@
 @using HITSBlazor.Utils.Models
 
 <div @onclick:stopPropagation="true"
-     class="p-3 rounded-3 shadow center-modal new-email-request-modal bg-white p-3 rounded">
+     class="p-3 rounded-3 shadow center-modal new-email-request-modal bg-white">
     <div class="d-flex align-items-center justify-content-between">
         <Typography FontSize="3" TextColor="ElementStyle.Primary" CustomClass="text-center">
             Доступные роли
@@ -16,35 +16,18 @@
                 ButtonClass="btn-close"
                 OnButtonClick="() => ModalService.Close(ModalType.Center)" />
     </div>
-    <!-- TODO: заменить на Input кмпонент -->
     @if (_isEmailRequestSended)
     {
-        <div class="w-100">
-            <div class="input-group">
-                <Typography FontSize="6" CustomClass="input-group-text">
-                    <i class="bi bi-fonts"></i>
-                </Typography>
-                <input type="text"
-                       @bind="@_verificationCode"
-                       @bind:event="oninput"
-                       class="form-control"
-                       placeholder="Введите код аутентификации"
-                       maxlength="6" />
-            </div>
-        </div>
-        <div class="w-100">
-            <div class="input-group">
-                <Typography FontSize="6" CustomClass="input-group-text">
-                    &#64;
-                </Typography>
-                <input type="email"
-                       @bind="_emailValue"
-                       @bind:event="oninput"
-                       disabled
-                       class="form-control"
-                       placeholder="Введите ваш новый email" />
-            </div>
-        </div>
+        <Input IconStyle="bi-fonts"
+               Placeholder="Введите код аутентификации"
+               NeedValidation="_submitted"
+               MaxLength="6"
+               @bind-Value="VerificationCode" />
+        <Input IconStyle="&#64;"
+               Placeholder="Введите ваш новый email"
+               NeedValidation="_submitted"
+               IsDisabled="true"
+               @bind-Value="EmailValue" />
         <Button BtnType="ButtonType.Button" 
                 IsLoading="_isLoading" 
                 Variant="ElementStyle.Primary"
@@ -54,18 +37,10 @@
     }
     else
     {
-        <div class="w-100">
-            <div class="input-group">
-                <Typography FontSize="6" CustomClass="input-group-text">
-                    &#64;
-                </Typography>
-                <input @bind="@_emailValue"
-                       @bind:event="oninput"
-                       type="email"
-                       placeholder="Введите ваш новый email"
-                       class="form-control rounded-end" />
-            </div>
-        </div>
+        <Input IconStyle="&#64;"
+               Placeholder="Введите ваш новый email"
+               NeedValidation="_submitted"
+               @bind-Value="EmailValue" />
         <Button BtnType="ButtonType.Button"
                 IsLoading="_isLoading"
                 Variant="ElementStyle.Primary"

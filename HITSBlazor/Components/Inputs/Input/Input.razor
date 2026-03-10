@@ -17,14 +17,22 @@
         @if (!string.IsNullOrWhiteSpace(IconStyle))
         {
             <Typography FontSize="6" CustomClass="input-group-text">
-                <i class="bi @IconStyle"></i>
+                @if (!IconStyle.Contains("bi"))
+                {
+                    @IconStyle
+                }
+                else
+                {
+                    <i class="bi @IconStyle"></i>
+                }
             </Typography>
         }
         <input type="text"
                value="@Value"
                placeholder="@Placeholder"
                @oninput="@OnInputChanged"
-               class="form-control rounded-end @(_showError ? "is-invalid" : string.Empty)" />
+               class="form-control rounded-end @(_showError ? "is-invalid" : string.Empty)"
+               @attributes="GetInputAttributes()" />
         @if (_showError)
         {
             <Typography CustomClass="invalid-feedback">@ErrorMessage</Typography>

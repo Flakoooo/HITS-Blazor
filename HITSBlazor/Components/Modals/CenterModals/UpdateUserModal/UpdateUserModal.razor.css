@@ -1,0 +1,30 @@
+﻿.edit-user-modal {
+    width: 400px;
+    background-color: #fff;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: stretch;
+    justify-content: flex-start;
+    gap: 12px;
+    align-self: center;
+    justify-self: center;
+    transition: all .15s ease-out;
+}
+
+.edit-user-modal-header {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.edit-user-modal-inputs {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 12px;
+}

@@ -17,6 +17,12 @@ namespace HITSBlazor.Components.Inputs.Input
         public string Placeholder { get; set; } = string.Empty;
 
         [Parameter]
+        public int? MaxLength { get; set; }
+
+        [Parameter]
+        public bool? IsDisabled { get; set; }
+
+        [Parameter]
         public string Value { get; set; } = string.Empty;
 
         [Parameter]
@@ -34,6 +40,23 @@ namespace HITSBlazor.Components.Inputs.Input
         {
             _showError = NeedValidation && string.IsNullOrWhiteSpace(Value);
             StateHasChanged();
+        }
+
+        private Dictionary<string, object> GetInputAttributes()
+        {
+            var attributes = new Dictionary<string, object>();
+
+            if (MaxLength.HasValue)
+            {
+                attributes["maxlength"] = MaxLength.Value.ToString();
+            }
+
+            if (IsDisabled.HasValue && IsDisabled.Value)
+            {
+                attributes["disabled"] = "disabled";
+            }
+
+            return attributes;
         }
 
         private async Task OnInputChanged(ChangeEventArgs e)
