@@ -1,7 +1,11 @@
 ﻿@namespace HITSBlazor.Components.ProgressBar
 @using HITSBlazor.Components.Placeholder
+@using HITSBlazor.Components.Typography
+@using HITSBlazor.Utils.Models
 
-<span class="fs-6 text-primary">@Text: @(Score.HasValue ? Score.Value : "вычисление")@($"{new string('.', _dotCount)}")</span>
+<Typography FontSize="6" TextColor="ElementStyle.Primary">
+    @Text: @(Score.HasValue ? Score.Value : "вычисление")@($"{new string('.', _dotCount)}")
+</Typography>
 @if (!Score.HasValue)
 {
     <Placeholder />

@@ -18,7 +18,10 @@ namespace HITSBlazor.Components.Button
         public string Text { get; set; } = string.Empty;
 
         [Parameter]
-        public string? LoadingText { get; set; }
+        public string LoadingText { get; set; } = string.Empty;
+
+        [Parameter]
+        public string IconStyle { get; set; } = string.Empty;
 
         [Parameter]
         public ElementStyle? Variant { get; set; }

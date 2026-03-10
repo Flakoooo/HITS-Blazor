@@ -1,4 +1,5 @@
-﻿using HITSBlazor.Models.Users.Entities;
+﻿using HITSBlazor.Models.Teams.Entities;
+using HITSBlazor.Models.Users.Entities;
 using HITSBlazor.Models.Users.Enums;
 
 namespace HITSBlazor.Utils.Mocks.Users
@@ -279,7 +280,25 @@ namespace HITSBlazor.Utils.Mocks.Users
                     RoleType.Admin,
                     RoleType.Member
                 ],
-                CreatedAt = new DateTime(2023, 10, 20, 11, 2, 17, DateTimeKind.Utc),
+                CreatedAt = new DateTime(2025, 10, 20, 11, 2, 17, DateTimeKind.Utc),
+                Telephone = "6699986789",
+                StudyGroup = "LLLL-22-1"
+            },
+            new User
+            {
+                Id = Guid.NewGuid(),
+                Email = "blazortext@gmail.ru",
+                FirstName = "<h1>Заголовок</h1>",
+                LastName = "'>\"><h1>кавычки</h1>",
+                Roles =
+                [
+                    RoleType.Initiator,
+                    RoleType.ProjectOffice,
+                    RoleType.Expert,
+                    RoleType.Admin,
+                    RoleType.Member
+                ],
+                CreatedAt = new DateTime(2026, 10, 20, 11, 2, 17, DateTimeKind.Utc),
                 Telephone = "6699986789",
                 StudyGroup = "LLLL-22-1"
             }
@@ -295,5 +314,7 @@ namespace HITSBlazor.Utils.Mocks.Users
 
         public static List<User> GetUsersByRole(RoleType role) 
             => [.. _users.Where(u => u.Roles.Contains(role))];
+
+        public static bool DeleteUser(User user) => _users.Remove(user);
     }
 }

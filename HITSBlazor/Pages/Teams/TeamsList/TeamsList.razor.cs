@@ -39,7 +39,7 @@ namespace HITSBlazor.Pages.Teams.TeamsList
         [Parameter]
         public Guid? TeamId { get; set; }
 
-        private static List<TableHeaderItem> TeamTableHeader { get; } =
+        private static readonly List<TableHeaderItem> _teamTableHeader =
         [
             new() { Text = "Приватность",   InCentered = true,  OrderBy = nameof(Team.Closed)           },
             new() { Text = "Название",  ColumnClass = "col-3",  OrderBy = nameof(Team.Name)             },
@@ -55,7 +55,7 @@ namespace HITSBlazor.Pages.Teams.TeamsList
         private HashSet<Guid> _userSkillIds = [];
         private HashSet<Guid> _selectedSkillIds = [];
 
-        private string? _searchTeamText = null;
+        private string? _searchText = null;
         private string? _orderTeamBy = null;
         private bool? _sortTeamState = null;
         private bool? _privacyState = null;
@@ -86,7 +86,7 @@ namespace HITSBlazor.Pages.Teams.TeamsList
         private async Task LoadTeamsAsync()
         {
             var filter = new TeamsFilter(
-                SearchText: _searchTeamText,
+                SearchText: _searchText,
                 Privacy: _privacyState,
                 Survey: _surveyState,
                 HasActiveProject: _hasActiveProjectState,
@@ -110,7 +110,7 @@ namespace HITSBlazor.Pages.Teams.TeamsList
 
         private async Task SearchTeam(string value)
         {
-            _searchTeamText = value;
+            _searchText = value;
             await LoadTeamsAsync();
         }
 
@@ -137,6 +137,7 @@ namespace HITSBlazor.Pages.Teams.TeamsList
 
         private void ShowTeam(Guid teamId) => ModalService.ShowTeamModal(teamId);
 
+        //TODO: сброс фильтров не влияет на иконки фильтров в хэдэре таблицы
         private async Task ResetFilters()
         {
             _sortTeamState = null;

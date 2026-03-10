@@ -12,6 +12,7 @@ using HITSBlazor.Services.Projects;
 using HITSBlazor.Services.Skills;
 using HITSBlazor.Services.Teams;
 using HITSBlazor.Services.Tests;
+using HITSBlazor.Services.Users;
 using HITSBlazor.Services.UserSkills;
 using HITSBlazor.Utils.Properties;
 using KristofferStrube.Blazor.Popper;
@@ -80,6 +81,9 @@ namespace HITSBlazor
             );
             builder.Services.AddCascadingAuthenticationState();
             builder.Services.AddAuthorizationCore();
+
+            //Users
+            builder.Services.AddScoped<IUserService, MockUserService>();
 
             //Skills
             builder.Services.AddScoped<ISkillService, MockSkillService>();

@@ -9,7 +9,7 @@
                     @item.Text
                     @if (!string.IsNullOrWhiteSpace(item.OrderBy))
                     {
-                        <i @onclick="@(() => SetOrderState(item))" class="teams-table-row-icon ms-1 bi @GetSortIcon(item) text-secondary"></i>
+                        <i @onclick="@(() => SetOrderState(item))" class="table-lables-row-icon ms-1 bi @GetSortIcon(item) text-secondary"></i>
                     }
                 </div>
             </th>

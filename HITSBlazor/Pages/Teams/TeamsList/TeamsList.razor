@@ -1,11 +1,14 @@
 ﻿@namespace HITSBlazor.Pages.Teams.TeamsList
 @using HITSBlazor.Components.ActionMenus.BaseActionMenu
+@using HITSBlazor.Components.Button
+@using HITSBlazor.Components.Filters.RadioFilter
 @using HITSBlazor.Components.Inputs.Input
-@using HITSBlazor.Components.Inputs.TeamRadioFilter
 @using HITSBlazor.Components.Placeholder
 @using HITSBlazor.Components.Tables.TableActionMenu
 @using HITSBlazor.Components.Tables.TableBodyRow
 @using HITSBlazor.Components.Tables.TableHeader
+@using HITSBlazor.Components.Typography
+@using HITSBlazor.Utils.Models
 
 <div class="bg-white teams-list page-content-with-header">
     @if (_isLoading)
@@ -49,9 +52,9 @@
     {
         <div class="w-100 bg-white p-3">
             <div class="list-page-header w-100">
-                <span class="fs-2 text-primary">
+                <Typography FontSize="2" TextColor="ElementStyle.Primary">
                     Список команд: @_teams.Count
-                </span>
+                </Typography>
                 <div class="d-flex gap-3">
                     <!-- TODO: кто то явно не может видеть сздание команд -->
                     <button type="button" 
@@ -70,7 +73,9 @@
             <div class="w-100 d-flex">
                 <div class="w-100">
                     <table class="table table-hover mb-0">
-                        <TableHeader TableActionMenuIsEnable="true" Items="TeamTableHeader" OrderChanged="@((value) => SortTeam(value.Item1, value.Item2))" />
+                        <TableHeader TableActionMenuIsEnable="true" 
+                                     Items="_teamTableHeader" 
+                                     OrderChanged="@((value) => SortTeam(value.Item1, value.Item2))" />
                         <tbody>
                             @foreach (var team in _teams)
                             {
@@ -110,35 +115,34 @@
                     </table>
                 </div>
                 <div class="list-page-filter w-25 bg-white p-2 ms-2 border-start">
-                    <TeamRadioFilter 
-                        Label="Приватность"
-                        Value1Text="Открытая команда"
-                        Value2Text="Закрытая команда"
-                        @bind-Value="_privacyState"
-                        OnFilterChanged="@LoadTeamsAsync" />
+                    <RadioFilter Label="Приватность"
+                                 Value1Text="Открытая команда"
+                                 Value2Text="Закрытая команда"
+                                 @bind-Value="_privacyState"
+                                 OnFilterChanged="@LoadTeamsAsync" />
 
-                    <TeamRadioFilter 
-                        Label="Опросы"
-                        Value1Text="Опрос не пройден"
-                        Value2Text="Опрос пройден"
-                        @bind-Value="_surveyState"
-                        OnFilterChanged="@LoadTeamsAsync" />
+                    <RadioFilter Label="Опросы"
+                                 Value1Text="Опрос не пройден"
+                                 Value2Text="Опрос пройден"
+                                 @bind-Value="_surveyState"
+                                 OnFilterChanged="@LoadTeamsAsync" />
 
-                    <TeamRadioFilter 
-                        Label="Статус"
-                        Value1Text="В поисках"
-                        Value2Text="В работе"
-                        @bind-Value="_hasActiveProjectState"
-                        OnFilterChanged="@LoadTeamsAsync" />
+                    <RadioFilter Label="Статус"
+                                 Value1Text="В поисках"
+                                 Value2Text="В работе"
+                                 @bind-Value="_hasActiveProjectState"
+                                 OnFilterChanged="@LoadTeamsAsync" />
 
-                    <TeamRadioFilter 
-                        Label="Компетенции"
-                        Value1Text="Искать везде"
-                        Value2Text="Искать по вакансиям"
-                        @bind-Value="_skillsState"
-                        OnFilterChanged="@LoadTeamsAsync" />
+                    <RadioFilter Label="Компетенции"
+                                 Value1Text="Искать везде"
+                                 Value2Text="Искать по вакансиям"
+                                 @bind-Value="_skillsState"
+                                 OnFilterChanged="@LoadTeamsAsync" />
                     <div class="w-100">
-                        <span class="fs-6 fw-semibold">Стек технологий</span>
+                        <Typography FontSize="6"CustomClass="fw-semibold">
+                            Стек технологий
+                        </Typography>
+                        <!-- TODO:Заменить на компонент Input -->
                         <div class="w-100">
                             <div class="input-group">
                                 <input @oninput="SearchSkill" type="text" placeholder="Найти" class="form-control my-1 rounded-end" />
@@ -166,10 +170,11 @@
                         </div>
                     </div>
                     <div class="w-100 d-flex justify-content-center">
-                        <button type="button" @onclick="@ResetFilters" class="btn d-flex btn-danger">
-                            <i class="icon bi bi-x-lg fs-5"></i>
-                            Сбросить фильтры
-                        </button>
+                        <Button BtnType="ButtonType.Button" 
+                                Variant="ElementStyle.Danger"
+                                Text="Сбросить фильтры" 
+                                IconStyle="bi-x-lg" 
+                                OnButtonClick="ResetFilters" />
                     </div>
                 </div>
             </div>

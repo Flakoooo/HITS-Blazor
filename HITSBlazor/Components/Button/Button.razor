@@ -5,7 +5,11 @@
         @onclick="@ButtonClick" 
         disabled="@IsLoading"
         class="@GetClass()">
-    @if (IsLoading.HasValue && IsLoading.Value && string.IsNullOrWhiteSpace(LoadingText))
+    @if (!string.IsNullOrWhiteSpace(IconStyle))
+    {
+        <i class="bi @IconStyle fs-5"></i>
+    }
+    @if (IsLoading.HasValue && IsLoading.Value && !string.IsNullOrWhiteSpace(LoadingText))
     {
         <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
         <Typography>@LoadingText...</Typography>
