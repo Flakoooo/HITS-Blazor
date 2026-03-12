@@ -111,13 +111,9 @@ namespace HITSBlazor.Services
         public async Task NavigateToDefaultAsync()
         {
             if (_authService.CurrentUser?.Role == null)
-            {
                 _modalService.ShowActiveRoleModal();
-            }
             else
-            {
                 await NavigateToAsync(DEFAULT_URL);
-            }
         }
 
         private async void OnActiveRoleChanged(RoleType? role)
@@ -179,7 +175,7 @@ namespace HITSBlazor.Services
                     BaseUrl = "ideas"
                 };
 
-                if (userRole == RoleType.Initiator || userRole == RoleType.Admin)
+                if (userRole is RoleType.Initiator or RoleType.Admin)
                 {
                     var subNav = new NavigationSubItem
                     {
@@ -236,7 +232,7 @@ namespace HITSBlazor.Services
                     BaseUrl = "teams"
                 };
 
-                if (userRole == RoleType.TeamOwner || userRole == RoleType.Admin)
+                if (userRole is RoleType.TeamOwner or RoleType.Admin)
                 {
                     var subNav = new NavigationSubItem
                     {
@@ -295,7 +291,7 @@ namespace HITSBlazor.Services
                 menuItems.Add(nav);
             }
 
-            if (userRole == RoleType.Teacher || userRole == RoleType.Admin)
+            if (userRole is RoleType.Teacher or RoleType.Admin)
             {
                 var nav = new NavigationItem
                 {
@@ -474,9 +470,7 @@ namespace HITSBlazor.Services
             {
                 if (!string.IsNullOrEmpty(item.BaseUrl) &&
                     url.StartsWith(item.BaseUrl, StringComparison.OrdinalIgnoreCase))
-                {
                     return item;
-                }
             }
 
             return null;
@@ -491,15 +485,11 @@ namespace HITSBlazor.Services
             {
                 if (!string.IsNullOrEmpty(item.Url) &&
                     url.EndsWith(item.Url, StringComparison.OrdinalIgnoreCase))
-                {
                     return item;
-                }
 
                 if (item.Url != null && item.Url.StartsWith('/') &&
                     url.Contains(item.Url, StringComparison.OrdinalIgnoreCase))
-                {
                     return item;
-                }
             }
 
             return null;

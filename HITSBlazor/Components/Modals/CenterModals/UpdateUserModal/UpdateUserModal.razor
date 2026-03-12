@@ -1,7 +1,11 @@
 ﻿@using HITSBlazor.Components.Button
+@using HITSBlazor.Components.Collapse
 @using HITSBlazor.Components.Inputs.Input
 @using HITSBlazor.Components.Typography
+@using HITSBlazor.Models.Users.Entities
+@using HITSBlazor.Models.Users.Enums
 @using HITSBlazor.Services.Modal
+@using HITSBlazor.Utils.EnumTranslators
 @using HITSBlazor.Utils.Models
 
 <div @onclick:stopPropagation="true" class="edit-user-modal p-3 rounded bg-white">
@@ -17,26 +21,54 @@
         <Input IconStyle="&#64;" 
                Placeholder="Введите email" 
                NeedValidation="true" 
-               @bind-Value="_value" />
+               @bind-Value="UserForUpdate.Email" />
         <Input IconStyle="bi-fonts"
                Placeholder="Введите имя"
                NeedValidation="true" 
-               @bind-Value="_value" />
+               @bind-Value="UserForUpdate.FirstName" />
         <Input IconStyle="bi-fonts"
                Placeholder="Введите фамилию"
                NeedValidation="true"
-               @bind-Value="_value" />
+               @bind-Value="UserForUpdate.LastName" />
         <Input IconStyle="bi-telephone-fill"
                Placeholder="Введите номер телефона"
                NeedValidation="true"
-               @bind-Value="_value" />
+               @bind-Value="UserForUpdate.Telephone" />
         <Input IconStyle="bi-person-lines-fill"
                Placeholder="Введите учебную группу"
                NeedValidation="true"
-               @bind-Value="_value" />
+               @bind-Value="UserForUpdate.StudyGroup" />
+        <Collapse StartCollapsed="true" ExpandedClass="w-100">
+            <MainContent Context="collapse">
+                <Button BtnType="ButtonType.Button"
+                        Text="Роли"
+                        IconStyle="bi-chevron-down"
+                        Variant="ElementStyle.Mute"
+                        ButtonClass="px-2 py-0"
+                        OnButtonClick="() => collapse.Toggle()" />
+            </MainContent>
+            <ExpandedContent>
+                <div class="list-group">
+                    @foreach (var role in Enum.GetValues<RoleType>())
+                    {
+                        <div class="d-flex">
+                            <div class="d-flex">
+                                <input type="checkbox"
+                                       checked="@UserForUpdate.Roles.Contains(role)"
+                                       @onchange="@(e => OnRoleTypeChanged(role, (bool)e.Value!))"
+                                       class="form-check-input drop-down-item" />
+                                <Typography CustomClass="form-check-label ms-2 drop-down-item">
+
+                                </Typography>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </ExpandedContent>
+        </Collapse>
     </div>
     <Button BtnType="ButtonType.Button" 
-            Text="Сохранить изменения" 
+            Text="Сохранить изменения"
             Variant="ElementStyle.Primary"
             OnButtonClick="() => Console.WriteLine()"/>
 </div>
@@ -45,5 +77,15 @@
     [Inject]
     private ModalService ModalService { get; set; } = null!;
 
+    private User UserForUpdate { get; set; } = new();
+
     private string _value = string.Empty;
+
+    private async Task OnRoleTypeChanged(RoleType role, bool isChecked)
+    {
+        if (isChecked)
+            UserForUpdate.Roles.Add(role);
+        else
+            UserForUpdate.Roles.Remove(role);
+    }
 }

@@ -8,6 +8,7 @@
 @using HITSBlazor.Components.Tables.TableBodyRow
 @using HITSBlazor.Components.Tables.TableHeader
 @using HITSBlazor.Components.Typography
+@using HITSBlazor.Models.Users.Enums
 @using HITSBlazor.Utils.Models
 
 <div class="bg-white teams-list page-content-with-header">
@@ -56,13 +57,14 @@
                     Список команд: @_teams.Count
                 </Typography>
                 <div class="d-flex gap-3">
-                    <!-- TODO: кто то явно не может видеть сздание команд -->
-                    <button type="button" 
-                            @onclick="@(() => NavigationService.NavigateToAsync("teams/create"))" 
-                            class="btn d-flex btn-primary">
-                        <i class="bi bi-plus-lg fs-5"></i>
-                        Создать команду
-                    </button>
+                    @if (AuthService.CurrentUser?.Role is RoleType.TeamOwner or RoleType.Admin)
+                    {
+                        <Button BtnType="ButtonType.Button" 
+                                Variant="ElementStyle.Primary"
+                                Text="Создать команду" 
+                                IconStyle="bi-plus-lg" 
+                                OnButtonClick="@(() => NavigationService.NavigateToAsync("teams/create"))" />
+                    }
                 </div>
             </div>
             <div class="py-2 d-flex justify-content-between">
@@ -118,36 +120,31 @@
                     <RadioFilter Label="Приватность"
                                  Value1Text="Открытая команда"
                                  Value2Text="Закрытая команда"
-                                 @bind-Value="_privacyState"
+                                 @bind-Value="PrivacyState"
                                  OnFilterChanged="@LoadTeamsAsync" />
 
                     <RadioFilter Label="Опросы"
                                  Value1Text="Опрос не пройден"
                                  Value2Text="Опрос пройден"
-                                 @bind-Value="_surveyState"
+                                 @bind-Value="SurveyState"
                                  OnFilterChanged="@LoadTeamsAsync" />
 
                     <RadioFilter Label="Статус"
                                  Value1Text="В поисках"
                                  Value2Text="В работе"
-                                 @bind-Value="_hasActiveProjectState"
+                                 @bind-Value="HasActiveProjectState"
                                  OnFilterChanged="@LoadTeamsAsync" />
 
                     <RadioFilter Label="Компетенции"
                                  Value1Text="Искать везде"
                                  Value2Text="Искать по вакансиям"
-                                 @bind-Value="_skillsState"
+                                 @bind-Value="SkillsState"
                                  OnFilterChanged="@LoadTeamsAsync" />
                     <div class="w-100">
                         <Typography FontSize="6"CustomClass="fw-semibold">
                             Стек технологий
                         </Typography>
-                        <!-- TODO:Заменить на компонент Input -->
-                        <div class="w-100">
-                            <div class="input-group">
-                                <input @oninput="SearchSkill" type="text" placeholder="Найти" class="form-control my-1 rounded-end" />
-                            </div>
-                        </div>
+                        <Input Placeholder="Найти" CustomClass="my-1" ValueChanged="@((value) => SearchSkill(value))" />
                         <div class="list-page-filter-choices">
                             @foreach (var skill in _skills)
                             {
@@ -159,7 +156,9 @@
                                                name="Стек технологий" 
                                                value="@skill.Name"
                                                class="form-check-input" />
-                                        <span class="form-check-label ms-2">@skill.Name</span>
+                                        <Typography CustomClass="form-check-label ms-2">
+                                            @skill.Name
+                                        </Typography>
                                     </div>
                                     @if (_userSkillIds.Contains(skill.Id))
                                     {

@@ -21,11 +21,11 @@
             <div class="d-flex gap-3">
                 @if (AuthService.CurrentUser?.Role is RoleType.Initiator or RoleType.Admin)
                 {
-                    <button type="button" @onclick="@(() => NavigationService.NavigateToAsync("ideas/create"))" 
-                            class="btn d-flex btn-primary">
-                        <i class="bi bi-plus-lg fs-5"></i>
-                        Создать идею
-                    </button>
+                    <Button BtnType="ButtonType.Button" 
+                            Variant="ElementStyle.Primary"
+                            Text="Создать идею" 
+                            IconStyle="bi-plus-lg" 
+                            OnButtonClick="@(() => NavigationService.NavigateToAsync("ideas/create"))" />
                 }
             </div>
         </div>

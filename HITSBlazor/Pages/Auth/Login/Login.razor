@@ -1,56 +1,37 @@
 ﻿@namespace HITSBlazor.Pages.Auth.Login
 @using HITSBlazor.Components
+@using HITSBlazor.Components.Button
+@using HITSBlazor.Components.Inputs.Input
+@using HITSBlazor.Components.Typography
 @using HITSBlazor.Services
-@using HITSBlazor.Utils
+@using HITSBlazor.Utils.Models
 
 <PageTitle>Авторизация</PageTitle>
 
-<div class="w-100 overflow-y-scroll" 
-     style="flex: 1; display: flex; flex-direction: column; overflow: hidden;">
-    <div class="p-3" 
-         style="height: 100vh; display: flex; flex-direction: row; flex-wrap: nowrap; align-items: center; justify-content: center;">
+<div class="w-100 overflow-y-scroll auth-card-layout">
+    <div class="p-3 auth-card">
         <form @onsubmit="HandleLogin" @onsubmit:preventDefault="true" 
-              class="p-3 rounded-3 shadow" 
-              style="width: 400px; background-color: #fff; flex-direction: column; align-items: stretch; gap: 12px; display: flex; flex-wrap: nowrap; justify-content: flex-start;
-                     margin-top: 0em; margin-block-end: 1em;">
-            <span class="fs-3 text-primary text-center">Авторизация</span>
-            <div class="w-100">
-                <div class="input-group">
-                    <span class="input-group-text fs-6">&#64;</span>
-                    <input type="text"
-                           @bind="loginModel.Email"
-                           @bind:event="oninput"
-                           class="form-control"
-                           placeholder="Введите логин" />
-                </div>
-            </div>
-            <div class="w-100">
-                <div class="input-group">
-                    <span class="input-group-text fs-6">
-                        <i class="bi bi-key"></i>
-                    </span>
-                    <input type="password"
-                           @bind="loginModel.Password"
-                           @bind:event="oninput"
-                           class="form-control"
-                           placeholder="Введите пароль" />
-                </div>
-            </div>
+              class="p-3 rounded-3 shadow auth-card-content"
+              style="margin-top: 0em; margin-block-end: 1em;">
+            <Typography FontSize="3" TextColor="ElementStyle.Primary" CustomClass="text-center">
+                Авторизация
+            </Typography>
+            <Input IconStyle="&#64;" 
+                   Placeholder="Введите логин" 
+                   @bind-Value="loginModel.Email" />
+            <Input InputType="InputType.Password" 
+                   IconStyle="bi-key" 
+                   Placeholder="Введите пароль" 
+                   @bind-Value="loginModel.Password" />
             <a href="/recovery-password" class="text-center">
                 Забыли пароль?
             </a>
-            <button type="submit" disabled="@isLoading" 
-                    class="btn d-flex btn-primary">
-                @if (isLoading)
-                {
-                    <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                    <span>Вход...</span>
-                }
-                else
-                {
-                    <span>Войти</span>
-                }
-            </button>
+            <!-- TODO: зачем мне form? -->
+            <Button BtnType="ButtonType.Submit" 
+                    Variant="ElementStyle.Primary" 
+                    IsLoading="isLoading" 
+                    Text="Войти" 
+                    LoadingText="Вход" />
         </form>
     </div>
 </div>

@@ -58,10 +58,10 @@ namespace HITSBlazor.Pages.Teams.TeamsList
         private string? _searchText = null;
         private string? _orderTeamBy = null;
         private bool? _sortTeamState = null;
-        private bool? _privacyState = null;
-        private bool? _surveyState = null;
-        private bool? _hasActiveProjectState = null;
-        private bool? _skillsState = null;
+        private bool? PrivacyState { get; set; } = null;
+        private bool? SurveyState { get; set; } = null;
+        private bool? HasActiveProjectState { get; set; } = null;
+        private bool? SkillsState { get; set; } = null;
         private string? _searchSkillText = null;
 
         protected override async Task OnInitializedAsync()
@@ -87,9 +87,9 @@ namespace HITSBlazor.Pages.Teams.TeamsList
         {
             var filter = new TeamsFilter(
                 SearchText: _searchText,
-                Privacy: _privacyState,
-                Survey: _surveyState,
-                HasActiveProject: _hasActiveProjectState,
+                Privacy: PrivacyState,
+                Survey: SurveyState,
+                HasActiveProject: HasActiveProjectState,
                 SearchSkillIds: _selectedSkillIds,
                 OrderBy: _orderTeamBy,
                 ByDescending: _sortTeamState
@@ -114,9 +114,9 @@ namespace HITSBlazor.Pages.Teams.TeamsList
             await LoadTeamsAsync();
         }
 
-        private async Task SearchSkill(ChangeEventArgs e)
+        private async Task SearchSkill(string value)
         {
-            _searchSkillText = e.Value?.ToString();
+            _searchSkillText = value;
             await LoadSkillsAsync();
         }
 
@@ -141,10 +141,10 @@ namespace HITSBlazor.Pages.Teams.TeamsList
         private async Task ResetFilters()
         {
             _sortTeamState = null;
-            _privacyState = null;
-            _surveyState = null;
-            _hasActiveProjectState = null;
-            _skillsState = null;
+            PrivacyState = null;
+            SurveyState = null;
+            HasActiveProjectState = null;
+            SkillsState = null;
             _searchSkillText = null;
             _selectedSkillIds = [];
 

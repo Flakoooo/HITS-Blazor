@@ -27,11 +27,11 @@
                 }
             </Typography>
         }
-        <input type="text"
+        <input type="@InputType.ToString().ToLower()"
                value="@Value"
                placeholder="@Placeholder"
                @oninput="@OnInputChanged"
-               class="form-control rounded-end @(_showError ? "is-invalid" : string.Empty)"
+               class="form-control rounded-end @CustomClass @(_showError ? "is-invalid" : string.Empty)"
                @attributes="GetInputAttributes()" />
         @if (_showError)
         {

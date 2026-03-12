@@ -14,6 +14,9 @@ namespace HITSBlazor.Components.Inputs.Input
         public string IconStyle { get; set; } = string.Empty;
 
         [Parameter]
+        public InputType InputType { get; set; } = InputType.Text; 
+
+        [Parameter]
         public string Placeholder { get; set; } = string.Empty;
 
         [Parameter]
@@ -21,6 +24,9 @@ namespace HITSBlazor.Components.Inputs.Input
 
         [Parameter]
         public bool? IsDisabled { get; set; }
+
+        [Parameter]
+        public string? CustomClass { get; set; }
 
         [Parameter]
         public string Value { get; set; } = string.Empty;

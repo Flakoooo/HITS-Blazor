@@ -7,6 +7,7 @@
         Primary,
         Success,
         White,
-        Secondary
+        Secondary,
+        Mute
     }
 }

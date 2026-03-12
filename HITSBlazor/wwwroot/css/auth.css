@@ -1,0 +1,26 @@
+﻿.auth-card-layout {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.auth-card {
+    height: 100vh;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: center;
+}
+
+.auth-card-content {
+    width: 400px;
+    background-color: #fff;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+}
