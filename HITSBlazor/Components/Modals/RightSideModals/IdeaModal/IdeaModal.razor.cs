@@ -34,6 +34,7 @@ namespace HITSBlazor.Components.Modals.RightSideModals.IdeaModal
         public Guid IdeaId { get; set; }
 
         private bool isLoading = true;
+        private bool _submitted = false;
         private bool isRatingSaving = false;
         private bool isRatingSaved = false;
         private bool isRatingConfirming = false;
@@ -115,6 +116,13 @@ namespace HITSBlazor.Components.Modals.RightSideModals.IdeaModal
             }
         }
 
+        private bool IsValidOptions => _expertRating is not null &&
+                _expertRating.MarketValue.HasValue &&
+                _expertRating.Originality.HasValue &&
+                _expertRating.TechnicalRealizability.HasValue &&
+                _expertRating.Suitability.HasValue &&
+                _expertRating.Budget.HasValue;
+
         private double? _expertRatingValue;
 
         protected override async Task OnInitializedAsync()
@@ -169,16 +177,10 @@ namespace HITSBlazor.Components.Modals.RightSideModals.IdeaModal
 
         private void UpdateRatingScore()
         {
-            if (_expertRating is null) return;
+            if (!IsValidOptions) return;
 
-            if (
-                !_expertRating.MarketValue.HasValue || 
-                !_expertRating.Originality.HasValue || 
-                !_expertRating.TechnicalRealizability.HasValue ||
-                !_expertRating.Suitability.HasValue ||
-                !_expertRating.Budget.HasValue
-            ) return;
-
+#pragma warning disable CS8629 // Nullable value type may be null.
+#pragma warning disable CS8602 // Dereference of a possibly null reference.
             _expertRatingValue = Formulas.CalculcateRating(
                 [
                     _expertRating.MarketValue.Value, 
@@ -188,6 +190,8 @@ namespace HITSBlazor.Components.Modals.RightSideModals.IdeaModal
                     _expertRating.Budget.Value
                 ]
             );
+#pragma warning restore CS8602 // Dereference of a possibly null reference.
+#pragma warning restore CS8629 // Nullable value type may be null.
 
             StateHasChanged();
         }
@@ -195,14 +199,21 @@ namespace HITSBlazor.Components.Modals.RightSideModals.IdeaModal
         private async Task ConfirmRating()
         {
             isRatingConfirming = true;
+            _submitted = false;
 
-            if (_expertRating is not null && await IdeasService.SendRatingAsync(_expertRating, true))
+#pragma warning disable CS8604 // Possible null reference argument.
+            if (!IsValidOptions)
+            {
+                _submitted = true;
+            }
+            else if (await IdeasService.SendRatingAsync(_expertRating, true))
             {
                 isRatingConfirmed = true;
                 IdeaRatings.FirstOrDefault(r => r.Id == _expertRating.Id)?.IsConfirmed = true;
                 if (IdeaRatings.Count == IdeaRatings.Count(r => r.IsConfirmed))
                     CurrentIdea?.Status = IdeaStatusType.Confirmed;
-            }    
+            }
+#pragma warning restore CS8604 // Possible null reference argument.
 
             isRatingConfirming = false;
         }

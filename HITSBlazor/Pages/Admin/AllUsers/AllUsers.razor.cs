@@ -1,12 +1,10 @@
 ﻿using HITSBlazor.Components.ActionMenus.BaseActionMenu;
+using HITSBlazor.Components.Modals.CenterModals.UpdateUserModal;
 using HITSBlazor.Components.Tables.TableHeader;
-using HITSBlazor.Models.Ideas.Enums;
-using HITSBlazor.Models.Teams.Entities;
 using HITSBlazor.Models.Users.Entities;
 using HITSBlazor.Models.Users.Enums;
-using HITSBlazor.Services;
+using HITSBlazor.Services.Auth;
 using HITSBlazor.Services.Modal;
-using HITSBlazor.Services.Teams;
 using HITSBlazor.Services.Users;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
@@ -15,13 +13,15 @@ namespace HITSBlazor.Pages.Admin.AllUsers
 {
     [Authorize]
     [Route("/admin/users")]
-    public partial class AllUsers
+    public partial class AllUsers : IDisposable
     {
         [Inject]
         private IUserService UserService { get; set; } = null!;
 
         [Inject]
         private ModalService ModalService { get; set; } = null!;
+
+        private bool _isLoading = true;
 
         private string SeacrhText { get; set; } = string.Empty;
         private string? _orderBy = null;
@@ -44,7 +44,12 @@ namespace HITSBlazor.Pages.Admin.AllUsers
 
         protected override async Task OnInitializedAsync()
         {
+            _isLoading = true;
+
+            UserService.OnUsersStateChanged += StateHasChanged;
             await LoadUsersAsync();
+
+            _isLoading = false;
         }
 
         private async Task LoadUsersAsync()
@@ -99,8 +104,11 @@ namespace HITSBlazor.Pages.Admin.AllUsers
             }
             else if (context.Action == MenuAction.Edit)
             {
-                if (context.Item is Guid guid)
-                    Console.WriteLine("редактор пользователя");
+                if (context.Item is User user)
+                    ModalService.Show<UpdateUserModal>(
+                        ModalType.Center, 
+                        parameters: new Dictionary<string, object> { [nameof(UpdateUserModal.UserForUpdate)] = user }
+                    );
             }
             else if (context.Action == MenuAction.Delete)
             {
@@ -109,6 +117,11 @@ namespace HITSBlazor.Pages.Admin.AllUsers
 
                 _users.Remove(user);
             }
+        }
+
+        public void Dispose()
+        {
+            UserService.OnUsersStateChanged -= StateHasChanged;
         }
     }
 }

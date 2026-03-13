@@ -3,6 +3,7 @@
 @using HITSBlazor.Components.Button
 @using HITSBlazor.Components.Filters.RadioFilter
 @using HITSBlazor.Components.Inputs.Input
+@using HITSBlazor.Components.Placeholders.TablePlaceholder
 @using HITSBlazor.Components.Tables.TableActionMenu
 @using HITSBlazor.Components.Tables.TableBodyRow
 @using HITSBlazor.Components.Tables.TableHeader
@@ -13,104 +14,111 @@
 @using HITSBlazor.Utils.Models
 
 <div class="users-content page-content-with-header bg-white">
-    <div class="w-100 bg-white p-3">
-        <div class="list-page-header w-100">
-            <Typography FontSize="2" TextColor="ElementStyle.Primary">
-                Список команд: @_users.Count
-            </Typography>
-        </div>
-        <div class="py-2 d-flex justify-content-between">
-            <div class="w-50">
-                <Input IconStyle="bi-search" Placeholder="Поиск" ValueChanged="@((value) => SearchUser(value))" />
+    @if (_isLoading)
+    {
+        <TablePlaceholder />
+    }
+    else
+    {
+        <div class="w-100 bg-white p-3">
+            <div class="list-page-header w-100">
+                <Typography FontSize="2" TextColor="ElementStyle.Primary">
+                    Список команд: @_users.Count
+                </Typography>
             </div>
-        </div>
-        <div class="w-100 d-flex">
-            <div class="w-100">
-                <table class="table table-hover mb-0">
-                    <TableHeader TableActionMenuIsEnable="true" 
-                                 Items="_userTableHeader" 
-                                 OrderChanged="@((value) => SortUser(value.Item1, value.Item2))" />
-                    <tbody>
-                        @foreach (var user in _users)
-                        {
-                            <tr>
-                                <TableBodyRow>
-                                    <div class="text-primary data-link" @onclick="@(() => ShowUserProfile(user.Id))">
-                                        @user.Email
-                                    </div>
-                                </TableBodyRow>
-                                <TableBodyRow>
-                                    @user.FirstName
-                                </TableBodyRow>
-                                <TableBodyRow>
-                                    @user.LastName
-                                </TableBodyRow>
-                                <TableBodyRow>
-                                    @user.Telephone
-                                </TableBodyRow>
-                                <TableBodyRow>
-                                    @user.StudyGroup
-                                </TableBodyRow>
-                                <TableBodyRow IsCentered="true">
-                                    @(user.CreatedAt.HasValue ? user.CreatedAt.Value.ToString("dd.MM.yyyy") : "Н/Д")
-                                </TableBodyRow>
-                                <TableBodyRow>
-                                    @foreach (var role in user.Roles)
-                                    {
-                                        <div class="px-2 py-1 rounded-4 text-center align-self-start @role.GetStyle()">
-                                            @role.GetTranslation()
-                                        </div>
-                                    }
-                                </TableBodyRow>
-                                <TableActionMenu ItemId="@user.Id"
-                                                 OnAction="OnUserAction"
-                                                 ActionIds="@(new Dictionary<MenuAction, object> { 
-                                                     [MenuAction.ViewProfile] = user.Id,
-                                                     [MenuAction.Edit] = user.Id,
-                                                     [MenuAction.Delete] = user
-                                                 })" />
-                            </tr>
-                        }
-                    </tbody>
-                </table>
+            <div class="py-2 d-flex justify-content-between">
+                <div class="w-50">
+                    <Input IconStyle="bi-search" Placeholder="Поиск" ValueChanged="@((value) => SearchUser(value))" />
+                </div>
             </div>
-            <div class="list-page-filter w-25 bg-white p-2 ms-2 border-start">
+            <div class="w-100 d-flex">
                 <div class="w-100">
-                    <Typography FontSize="6"CustomClass="fw-semibold">
-                        Роли
-                    </Typography>
-                    <div class="list-page-filter-choices">
-                        @foreach (var role in Enum.GetValues<RoleType>())
-                        {
-                            <div class="list-page-filter-choice px-2 py-1 rounded-1">
-                                <div class="d-flex">
-                                    <input type="checkbox"
-                                           checked="@SelectedUserRoles.Contains(role)"
-                                           @onchange="@(e => OnRoleTypeChanged(role, (bool)e.Value!))"
-                                           class="form-check-input" />
-                                    <Typography CustomClass="form-check-label ms-2">
-                                        @role.GetTranslation()
-                                    </Typography>
+                    <table class="table table-hover mb-0">
+                        <TableHeader TableActionMenuIsEnable="true" 
+                                     Items="_userTableHeader" 
+                                     OrderChanged="@((value) => SortUser(value.Item1, value.Item2))" />
+                        <tbody>
+                            @foreach (var user in _users)
+                            {
+                                <tr>
+                                    <TableBodyRow>
+                                        <div class="text-primary data-link" @onclick="@(() => ShowUserProfile(user.Id))">
+                                            @user.Email
+                                        </div>
+                                    </TableBodyRow>
+                                    <TableBodyRow>
+                                        @user.FirstName
+                                    </TableBodyRow>
+                                    <TableBodyRow>
+                                        @user.LastName
+                                    </TableBodyRow>
+                                    <TableBodyRow>
+                                        @user.Telephone
+                                    </TableBodyRow>
+                                    <TableBodyRow>
+                                        @user.StudyGroup
+                                    </TableBodyRow>
+                                    <TableBodyRow IsCentered="true">
+                                        @(user.CreatedAt.HasValue ? user.CreatedAt.Value.ToString("dd.MM.yyyy") : "Н/Д")
+                                    </TableBodyRow>
+                                    <TableBodyRow>
+                                        @foreach (var role in user.Roles)
+                                        {
+                                            <div class="px-2 py-1 rounded-4 text-center align-self-start @role.GetStyle()">
+                                                @role.GetTranslation()
+                                            </div>
+                                        }
+                                    </TableBodyRow>
+                                    <TableActionMenu ItemId="@user.Id"
+                                                     OnAction="OnUserAction"
+                                                     ActionIds="@(new Dictionary<MenuAction, object> { 
+                                                         [MenuAction.ViewProfile] = user.Id,
+                                                         [MenuAction.Edit] = user,
+                                                         [MenuAction.Delete] = user
+                                                     })" />
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+                <div class="list-page-filter w-25 bg-white p-2 ms-2 border-start">
+                    <div class="w-100">
+                        <Typography FontSize="6"CustomClass="fw-semibold">
+                            Роли
+                        </Typography>
+                        <div class="list-page-filter-choices">
+                            @foreach (var role in Enum.GetValues<RoleType>())
+                            {
+                                <div class="list-page-filter-choice px-2 py-1 rounded-1">
+                                    <div class="d-flex">
+                                        <input type="checkbox"
+                                               checked="@SelectedUserRoles.Contains(role)"
+                                               @onchange="@(e => OnRoleTypeChanged(role, (bool)e.Value!))"
+                                               class="form-check-input" />
+                                        <Typography CustomClass="form-check-label ms-2">
+                                            @role.GetTranslation()
+                                        </Typography>
+                                    </div>
                                 </div>
-                            </div>
-                        }
+                            }
+                        </div>
+                    </div>
+                    <!-- TODO: реализовать фильтр -->
+                    <RadioFilter Label="Студенты"
+                                 Value1Text="В команде"
+                                 Value2Text="Не в команде"
+                                 @bind-Value="InTeam"
+                                 OnFilterChanged="@LoadUsersAsync" />
+
+                    <div class="w-100 d-flex justify-content-center">
+                        <Button BtnType="ButtonType.Button" 
+                                Variant="ElementStyle.Danger"
+                                Text="Сбросить фильтры" 
+                                IconStyle="bi-x-lg" 
+                                OnButtonClick="ResetFilters" />
                     </div>
                 </div>
-                <!-- TODO: реализовать фильтр -->
-                <RadioFilter Label="Студенты"
-                             Value1Text="В команде"
-                             Value2Text="Не в команде"
-                             @bind-Value="InTeam"
-                             OnFilterChanged="@LoadUsersAsync" />
-
-                <div class="w-100 d-flex justify-content-center">
-                    <Button BtnType="ButtonType.Button" 
-                            Variant="ElementStyle.Danger"
-                            Text="Сбросить фильтры" 
-                            IconStyle="bi-x-lg" 
-                            OnButtonClick="ResetFilters" />
-                </div>
             </div>
         </div>
-    </div>
+    }
 </div>

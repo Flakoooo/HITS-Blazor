@@ -5,7 +5,7 @@
 @using HITSBlazor.Components.Collapse
 @using HITSBlazor.Components.Inputs.Select
 @using HITSBlazor.Components.Modals.Components.ModalHeader
-@using HITSBlazor.Components.Placeholder
+@using HITSBlazor.Components.Placeholders.Placeholder
 @using HITSBlazor.Components.ProgressBar
 @using HITSBlazor.Components.Typography
 @using HITSBlazor.Models.Common.Entities
@@ -39,11 +39,11 @@
                     <li class="list-group-item p-0 overflow-hidden">
                         <Collapse StartCollapsed="false">
                             <MainContent Context="collapse">
-                                <button @onclick="@(() => collapse.Toggle())"
-                                        type="button"
-                                        class="btn d-flex btn-light w-100 collapse-controller">
-                                    @data.Title
-                                </button>
+                                <Button BtnType="ButtonType.Button"
+                                        Text="@data.Title"
+                                        Variant="ElementStyle.Light"
+                                        ButtonClass="w-100 collapse-controller"
+                                        OnButtonClick="() => collapse.Toggle()" />
                             </MainContent>
                             <ExpandedContent>
                                 <div class="list-group">
@@ -90,18 +90,23 @@
                         {
                             <Select Label="Рыночная ценность" 
                                     @bind-Value="@MarketValue"
+                                    NeedValidation="_submitted"
                                     Options="IdeasRatingCategories.MarketValueOptions" />
                             <Select Label="Уникальность" 
                                     @bind-Value="@Originality"
+                                    NeedValidation="_submitted"
                                     Options="IdeasRatingCategories.OriginalityOptions" />
                             <Select Label="Реализуемость" 
                                     @bind-Value="@TechnicalRealizability"
+                                    NeedValidation="_submitted"
                                     Options="IdeasRatingCategories.TechnicalRealizabilityOptions" />
                             <Select Label="Пригодность" 
                                     @bind-Value="@Suitability"
+                                    NeedValidation="_submitted"
                                     Options="IdeasRatingCategories.SuitabilityOptions" />
                             <Select Label="Бюджет" 
                                     @bind-Value="@Budget"
+                                    NeedValidation="_submitted"
                                     Options="IdeasRatingCategories.BudgetOptions" />
                         }
                     </div>

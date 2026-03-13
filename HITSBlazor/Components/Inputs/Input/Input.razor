@@ -33,7 +33,7 @@
                @oninput="@OnInputChanged"
                class="form-control rounded-end @CustomClass @(_showError ? "is-invalid" : string.Empty)"
                @attributes="GetInputAttributes()" />
-        @if (_showError)
+        @if (_showError && !string.IsNullOrWhiteSpace(ErrorMessage))
         {
             <Typography CustomClass="invalid-feedback">@ErrorMessage</Typography>
         }

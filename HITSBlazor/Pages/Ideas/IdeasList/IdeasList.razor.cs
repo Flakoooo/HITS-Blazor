@@ -31,6 +31,8 @@ namespace HITSBlazor.Pages.Ideas.IdeasList
         [Parameter]
         public string IdeaId { get; set; } = string.Empty;
 
+        private bool _isLoading = true;
+
         private string? _searchText = null;
         private List<Idea> _ideas = [];
 
@@ -56,8 +58,10 @@ namespace HITSBlazor.Pages.Ideas.IdeasList
 
         protected override async Task OnInitializedAsync()
         {
+            _isLoading = true;
+
             AuthService.OnActiveRoleChanged += UserRoleHasChanged;
-            IdeasService.OnIdeasStateChanged += UpdateUIState;
+            IdeasService.OnIdeasStateChanged += StateHasChanged;
             ModalService.OnCloseSideModalContainer += IdeaModalHasClosed;
 
             var currentUser = AuthService.CurrentUser;
@@ -73,6 +77,8 @@ namespace HITSBlazor.Pages.Ideas.IdeasList
             }
 
             await LoadIdeasAsync();
+
+            _isLoading = false;
         }
 
         protected override async Task OnParametersSetAsync()
@@ -133,8 +139,6 @@ namespace HITSBlazor.Pages.Ideas.IdeasList
             }
         }
 
-        private void UpdateUIState() => StateHasChanged();
-
         private async void UserRoleHasChanged(RoleType? role)
         {
             if (role is RoleType.Expert)
@@ -165,7 +169,7 @@ namespace HITSBlazor.Pages.Ideas.IdeasList
         public void Dispose()
         {
             AuthService.OnActiveRoleChanged -= UserRoleHasChanged;
-            IdeasService.OnIdeasStateChanged -= UpdateUIState;
+            IdeasService.OnIdeasStateChanged -= StateHasChanged;
             ModalService.OnCloseSideModalContainer -= IdeaModalHasClosed;
         }
     }

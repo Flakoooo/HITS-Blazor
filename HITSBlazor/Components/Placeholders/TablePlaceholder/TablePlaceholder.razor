@@ -1,0 +1,51 @@
+﻿@namespace HITSBlazor.Components.Placeholders.TablePlaceholder
+@using HITSBlazor.Components.Placeholders.Placeholder
+
+<div class="w-100">
+    <table class="table mb-0">
+        @if (Header)
+        {
+            <thead>
+                <tr>
+                    @for (int i = 0; i < 6; ++i)
+                    {
+                        <th>
+                            <Placeholder />
+                        </th>
+                    }
+                </tr>
+            </thead>
+        }
+        @if (Body)
+        {
+            <tbody>
+                @for (int i = 0; i < 5; ++i)
+                {
+                    <tr>
+                        <td style="height: 67px">
+                            <div class="h-100 d-flex align-items-center">
+                                <Placeholder />
+                            </div>
+                        </td>
+                        @for (int j = 0; j < 5; ++j)
+                        {
+                            <td>
+                                <div class="h-100 d-flex align-items-center">
+                                    <Placeholder Height="PlaceholderHeight.Small" />
+                                </div>
+                            </td>
+                        }
+                    </tr>
+                }
+            </tbody>
+        }
+    </table>
+</div>
+
+@code {
+    [Parameter]
+    public bool Header { get; set;} = true;
+
+    [Parameter]
+    public bool Body { get; set; } = true;
+}

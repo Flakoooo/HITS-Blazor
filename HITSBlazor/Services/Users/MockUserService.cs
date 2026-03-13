@@ -1,5 +1,6 @@
 ﻿using HITSBlazor.Models.Users.Entities;
 using HITSBlazor.Models.Users.Enums;
+using HITSBlazor.Models.Users.Requests;
 using HITSBlazor.Utils.Mocks.Users;
 
 namespace HITSBlazor.Services.Users
@@ -11,6 +12,8 @@ namespace HITSBlazor.Services.Users
         private List<User> _cachedUsers = [];
         private DateTime _lastRefreshTime;
         private readonly TimeSpan _cacheLifetime = TimeSpan.FromMinutes(5);
+
+        public event Action? OnUsersStateChanged;
 
         private async Task RefreshCacheAsync()
         {
@@ -47,6 +50,28 @@ namespace HITSBlazor.Services.Users
             }
 
             return [.. query];
+        }
+
+        public async Task<bool> UpdateUser(UpdateUserRequest request)
+        {
+            if (!MockUsers.UpdateUser(request))
+            {
+                _globalNotificationService.ShowError("Не удалось обновить пользователя");
+                return false;
+            }
+
+            var userForUpdate = _cachedUsers.FirstOrDefault(u => u.Id == request.Id);
+            if (userForUpdate is not null)
+            {
+                userForUpdate.Email = request.Email;
+                userForUpdate.FirstName = request.FirstName;
+                userForUpdate.LastName = request.LastName;
+                userForUpdate.Telephone = request.Telephone;
+                userForUpdate.StudyGroup = request.StudyGroup;
+            }
+
+            OnUsersStateChanged?.Invoke();
+            return true;
         }
 
         public async Task<bool> DeleteUserAsync(User user)

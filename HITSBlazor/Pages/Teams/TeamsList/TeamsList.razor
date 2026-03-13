@@ -3,7 +3,8 @@
 @using HITSBlazor.Components.Button
 @using HITSBlazor.Components.Filters.RadioFilter
 @using HITSBlazor.Components.Inputs.Input
-@using HITSBlazor.Components.Placeholder
+@using HITSBlazor.Components.Placeholders.Placeholder
+@using HITSBlazor.Components.Placeholders.TablePlaceholder
 @using HITSBlazor.Components.Tables.TableActionMenu
 @using HITSBlazor.Components.Tables.TableBodyRow
 @using HITSBlazor.Components.Tables.TableHeader
@@ -14,40 +15,7 @@
 <div class="bg-white teams-list page-content-with-header">
     @if (_isLoading)
     {
-        <div class="w-100">
-            <table class="table mb-0">
-                <thead>
-                    <tr>
-                        @for (int i = 0; i < 6; ++i)
-                        {
-                            <th>
-                                <Placeholder />
-                            </th>
-                        }
-                    </tr>
-                </thead>
-                <tbody>
-                    @for (int i = 0; i < 5; ++i)
-                    {
-                        <tr>
-                            <td style="height: 67px">
-                                <div class="h-100 d-flex align-items-center">
-                                    <Placeholder />
-                                </div>
-                            </td>
-                            @for (int j = 0; j < 5; ++j)
-                            {
-                                <td>
-                                    <div class="h-100 d-flex align-items-center">
-                                        <Placeholder Height="PlaceholderHeight.Small" />
-                                    </div>
-                                </td>                        
-                            }
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        </div>
+        <TablePlaceholder />
     }
     else
     {

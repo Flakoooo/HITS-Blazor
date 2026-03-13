@@ -1,4 +1,4 @@
-﻿namespace HITSBlazor.Components.Placeholder
+﻿namespace HITSBlazor.Components.Placeholders.Placeholder
 {
     public enum PlaceholderHeight
     {

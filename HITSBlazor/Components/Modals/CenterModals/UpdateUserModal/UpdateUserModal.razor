@@ -4,9 +4,13 @@
 @using HITSBlazor.Components.Typography
 @using HITSBlazor.Models.Users.Entities
 @using HITSBlazor.Models.Users.Enums
+@using HITSBlazor.Models.Users.Requests
+@using HITSBlazor.Services
 @using HITSBlazor.Services.Modal
+@using HITSBlazor.Services.Users
 @using HITSBlazor.Utils.EnumTranslators
 @using HITSBlazor.Utils.Models
+@using HITSBlazor.Utils.Validation
 
 <div @onclick:stopPropagation="true" class="edit-user-modal p-3 rounded bg-white">
     <div class="edit-user-modal-header w-100">
@@ -20,32 +24,41 @@
     <div class="edit-user-modal-inputs w-100">
         <Input IconStyle="&#64;" 
                Placeholder="Введите email" 
-               NeedValidation="true" 
-               @bind-Value="UserForUpdate.Email" />
+               NeedValidation="_submitted"
+               CustomValidation="UserValidation.EmailValidation"
+               @bind-Value="UpdateUserRequest.Email" />
         <Input IconStyle="bi-fonts"
                Placeholder="Введите имя"
-               NeedValidation="true" 
-               @bind-Value="UserForUpdate.FirstName" />
+               NeedValidation="_submitted"
+               CustomValidation="UserValidation.FirstNameValidation"
+               @bind-Value="UpdateUserRequest.FirstName" />
         <Input IconStyle="bi-fonts"
                Placeholder="Введите фамилию"
-               NeedValidation="true"
-               @bind-Value="UserForUpdate.LastName" />
+               NeedValidation="_submitted"
+               CustomValidation="UserValidation.LastNameValidation"
+               @bind-Value="UpdateUserRequest.LastName" />
         <Input IconStyle="bi-telephone-fill"
                Placeholder="Введите номер телефона"
-               NeedValidation="true"
-               @bind-Value="UserForUpdate.Telephone" />
+               NeedValidation="_submitted"
+               CustomValidation="UserValidation.TelephoneValidation"
+               @bind-Value="UpdateUserRequest.Telephone" />
         <Input IconStyle="bi-person-lines-fill"
                Placeholder="Введите учебную группу"
-               NeedValidation="true"
-               @bind-Value="UserForUpdate.StudyGroup" />
-        <Collapse StartCollapsed="true" ExpandedClass="w-100">
+               NeedValidation="_submitted"
+               CustomValidation="UserValidation.StudyGroupValidation"
+               @bind-Value="UpdateUserRequest.StudyGroup" />
+        <Collapse StartCollapsed="!_showRoles" ExpandedClass="w-100">
             <MainContent Context="collapse">
                 <Button BtnType="ButtonType.Button"
                         Text="Роли"
-                        IconStyle="bi-chevron-down"
+                        IconStyle="@(String.Format("flip-icon {0} bi-chevron-up", _showRoles ? "active" : string.Empty))"
                         Variant="ElementStyle.Mute"
                         ButtonClass="px-2 py-0"
-                        OnButtonClick="() => collapse.Toggle()" />
+                        OnButtonClick="async () => 
+                        {
+                            _showRoles = !_showRoles;
+                            await collapse.Toggle();
+                        }" />
             </MainContent>
             <ExpandedContent>
                 <div class="list-group">
@@ -54,11 +67,11 @@
                         <div class="d-flex">
                             <div class="d-flex">
                                 <input type="checkbox"
-                                       checked="@UserForUpdate.Roles.Contains(role)"
+                                       checked="@UpdateUserRequest.Roles.Contains(role)"
                                        @onchange="@(e => OnRoleTypeChanged(role, (bool)e.Value!))"
                                        class="form-check-input drop-down-item" />
                                 <Typography CustomClass="form-check-label ms-2 drop-down-item">
-
+                                    @role.GetTranslation()
                                 </Typography>
                             </div>
                         </div>
@@ -69,17 +82,38 @@
     </div>
     <Button BtnType="ButtonType.Button" 
             Text="Сохранить изменения"
+            IsLoading="_submitting"
+            LoadingText="Сохранение изменений"
             Variant="ElementStyle.Primary"
-            OnButtonClick="() => Console.WriteLine()"/>
+            OnButtonClick="UpdateUser" />
 </div>
 
 @code {
     [Inject]
     private ModalService ModalService { get; set; } = null!;
 
-    private User UserForUpdate { get; set; } = new();
+    [Inject]
+    private IUserService UserService { get; set; } = null!;
 
-    private string _value = string.Empty;
+    [Parameter]
+    public User UserForUpdate { get; set; } = new();
+
+    private UpdateUserRequest UpdateUserRequest { get; set; } = new();
+
+    private bool _submitted = false;
+    private bool _submitting = false;
+    private bool _showRoles = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        UpdateUserRequest.Id = UserForUpdate.Id;
+        UpdateUserRequest.Email = UserForUpdate.Email;
+        UpdateUserRequest.FirstName = UserForUpdate.FirstName;
+        UpdateUserRequest.LastName = UserForUpdate.LastName;
+        UpdateUserRequest.Telephone = UserForUpdate.Telephone;
+        UpdateUserRequest.StudyGroup = UserForUpdate.StudyGroup;
+        UpdateUserRequest.Roles = [.. UserForUpdate.Roles];
+    }
 
     private async Task OnRoleTypeChanged(RoleType role, bool isChecked)
     {
@@ -87,5 +121,31 @@
             UserForUpdate.Roles.Add(role);
         else
             UserForUpdate.Roles.Remove(role);
+    }
+
+    //TODO: ПОДУМАТЬ НАД ВАЛИДАЦИЕЙ!!!!
+    private async Task UpdateUser()
+    {
+        _submitting = true;
+        _submitted = false;
+
+        bool isValid = true;
+
+        var emailValidResult = UserValidation.EmailValidation(UpdateUserRequest.Email);
+
+        if (!UserValidation.EmailValidation(UpdateUserRequest.Email).IsValid) isValid = false;
+        if (!UserValidation.FirstNameValidation(UpdateUserRequest.FirstName).IsValid) isValid = false;
+        if (!UserValidation.LastNameValidation(UpdateUserRequest.LastName).IsValid) isValid = false;
+        if (!UserValidation.TelephoneValidation(UpdateUserRequest.Telephone).IsValid) isValid = false;
+        if (!UserValidation.StudyGroupValidation(UpdateUserRequest.StudyGroup).IsValid) isValid = false;
+
+        if (isValid && await UserService.UpdateUser(UpdateUserRequest))
+        {
+            await ModalService.Close(ModalType.Center);
+            return;
+        }
+
+        _submitted = true;
+        _submitting = false;
     }
 }

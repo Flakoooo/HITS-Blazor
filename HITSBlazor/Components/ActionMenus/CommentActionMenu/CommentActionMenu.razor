@@ -8,7 +8,7 @@
             type="button"
             class="btn d-flex btn-primary p-1"
             aria-expanded="@IsOpen">
-        <i class="bi bi-list fs-5 comment-modal-icon @(IsOpen ? "active" : string.Empty)"></i>
+        <i class="bi bi-list fs-5 flip-icon @(IsOpen ? "active" : string.Empty)"></i>
     </button>
     <div @ref="_menuRef"
          @onclick:stopPropagation

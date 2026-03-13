@@ -1,6 +1,7 @@
 ﻿using HITSBlazor.Models.Teams.Entities;
 using HITSBlazor.Models.Users.Entities;
 using HITSBlazor.Models.Users.Enums;
+using HITSBlazor.Models.Users.Requests;
 
 namespace HITSBlazor.Utils.Mocks.Users
 {
@@ -314,6 +315,20 @@ namespace HITSBlazor.Utils.Mocks.Users
 
         public static List<User> GetUsersByRole(RoleType role) 
             => [.. _users.Where(u => u.Roles.Contains(role))];
+
+        public static bool UpdateUser(UpdateUserRequest updatedUser)
+        {
+            var user = _users.FirstOrDefault(u => u.Id == updatedUser.Id);
+            if (user is null) return false;
+
+            user.Email = updatedUser.Email;
+            user.FirstName = updatedUser.FirstName;
+            user.LastName = updatedUser.LastName;
+            user.Telephone = updatedUser.Telephone;
+            user.StudyGroup = updatedUser.StudyGroup;
+
+            return true;
+        }
 
         public static bool DeleteUser(User user) => _users.Remove(user);
     }
