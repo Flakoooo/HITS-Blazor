@@ -19,7 +19,7 @@
 
 <div class="new-idea page-content-with-header">
     <div class="p-3 bg-white w-100 h-100 idea-form">
-        <Typography FontSize="2" TextColor="ElementStyle.Primary">
+        <Typography FontSize="2" TextColor="TextColor.Primary">
             @(string.IsNullOrWhiteSpace(IdeaId) ? "Создание" : "Редактирование") идеи
         </Typography>
         <div class="w-75 d-flex flex-column gap-3">
@@ -50,7 +50,7 @@
                           Placeholder="Укажите список требуемых для выполнения проекта ресурсов"
                           @bind-Value="@IdeasCreateModel.Description" />
                 <div>
-                    <Typography FontSize="6" TextColor="ElementStyle.Primary">
+                    <Typography FontSize="6" TextColor="TextColor.Primary">
                         Желаемое количество участников в команде*
                     </Typography>
                     <Hint Text="@_hints["TeamSize"]" />
@@ -69,7 +69,7 @@
                 </div>
             </div>
             <div>
-                <Typography FontSize="6" TextColor="ElementStyle.Primary">
+                <Typography FontSize="6" TextColor="TextColor.Primary">
                     Стек технологий
                 </Typography>
                 <Hint Text="@_hints["Skills"]" />
@@ -131,18 +131,18 @@
                 @if (string.IsNullOrWhiteSpace(IdeaId))
                 {
                     <Button BtnType="ButtonType.Button" 
-                            Variant="ElementStyle.Primary"
+                            Variant="ButtonVariant.Primary"
                             Text="Сохранить черновик"
                             OnButtonClick="@(() => CreateIdea(IdeaStatusType.New))" />
                     <Button BtnType="ButtonType.Button"
-                            Variant="ElementStyle.Success"
+                            Variant="ButtonVariant.Success"
                             Text="Отправить на согласование"
                             OnButtonClick="@(() => CreateIdea(IdeaStatusType.OnApproval))" />
                 }
                 else
                 {
                     <Button BtnType="ButtonType.Button"
-                            Variant="ElementStyle.Primary"
+                            Variant="ButtonVariant.Primary"
                             Text="Сохранить изменения"
                             OnButtonClick="UpdateIdea" />
                 }

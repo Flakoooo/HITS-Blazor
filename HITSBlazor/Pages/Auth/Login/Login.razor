@@ -10,10 +10,9 @@
 
 <div class="w-100 overflow-y-scroll auth-card-layout">
     <div class="p-3 auth-card">
-        <form @onsubmit="HandleLogin" @onsubmit:preventDefault="true" 
-              class="p-3 rounded-3 shadow auth-card-content"
-              style="margin-top: 0em; margin-block-end: 1em;">
-            <Typography FontSize="3" TextColor="ElementStyle.Primary" CustomClass="text-center">
+        <div class="p-3 rounded-3 shadow auth-card-content"
+             style="margin-top: 0em; margin-block-end: 1em;">
+            <Typography FontSize="3" TextColor="TextColor.Primary" CustomClass="text-center">
                 Авторизация
             </Typography>
             <Input IconStyle="&#64;" 
@@ -26,12 +25,12 @@
             <a href="/recovery-password" class="text-center">
                 Забыли пароль?
             </a>
-            <!-- TODO: зачем мне form? -->
-            <Button BtnType="ButtonType.Submit" 
-                    Variant="ElementStyle.Primary" 
+            <Button BtnType="ButtonType.Button" 
+                    Variant="ButtonVariant.Primary" 
                     IsLoading="isLoading" 
                     Text="Войти" 
-                    LoadingText="Вход" />
-        </form>
+                    LoadingText="Вход"
+                    OnButtonClick="HandleLogin" />
+        </div>
     </div>
 </div>

@@ -23,14 +23,14 @@
     {
         <div class="w-100 bg-white p-3">
             <div class="w-100 list-page-header">
-                <Typography FontSize="2" TextColor="ElementStyle.Primary">
+                <Typography FontSize="2" TextColor="TextColor.Primary">
                     Список идей: @_ideas.Count
                 </Typography>
                 <div class="d-flex gap-3">
                     @if (AuthService.CurrentUser?.Role is RoleType.Initiator or RoleType.Admin)
                     {
                         <Button BtnType="ButtonType.Button" 
-                                Variant="ElementStyle.Primary"
+                                Variant="ButtonVariant.Primary"
                                 Text="Создать идею" 
                                 IconStyle="bi-plus-lg" 
                                 OnButtonClick="@(() => NavigationService.NavigateToAsync("ideas/create"))" />
@@ -139,7 +139,7 @@
                     }
                     <div class="w-100 d-flex justify-content-center">
                         <Button BtnType="ButtonType.Button" 
-                                Variant="ElementStyle.Danger"
+                                Variant="ButtonVariant.Danger"
                                 Text="Сбросить фильтры" 
                                 IconStyle="bi-x-lg" 
                                 OnButtonClick="ResetFilters" />

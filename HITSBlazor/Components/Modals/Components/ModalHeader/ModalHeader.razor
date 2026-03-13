@@ -1,17 +1,15 @@
 ﻿@namespace HITSBlazor.Components.Modals.Components.ModalHeader
+@using HITSBlazor.Components.Button
 @using HITSBlazor.Components.Typography
-@using HITSBlazor.Utils
 @using HITSBlazor.Utils.Models
 
 <div class="right-side-modal-header mb-3">
-    <!-- TODO: заменить на компонент Button -->
-    <button @onclick="@CloseModal"
-            type="button"
-            class="btn d-flex btn-primary">
-        <i class="bi bi-backspace-fill fs-5"></i>
-        Назад
-    </button>
-    <Typography FontSize="4" TextColor="ElementStyle.Primary" CustomClass="p-2 w-100 bg-white rounded-3 text-nowrap overflow-scroll-hidden">
+    <Button Text="Назад"
+            IconStyle="bi-backspace-fill"
+            BtnType="ButtonType.Button"
+            Variant="ButtonVariant.Primary"
+            OnButtonClick="CloseModal" />
+    <Typography FontSize="4" TextColor="TextColor.Primary" CustomClass="p-2 w-100 bg-white rounded-3 text-nowrap overflow-scroll-hidden">
         @Title
     </Typography>
 </div>

@@ -1,0 +1,87 @@
+﻿@namespace HITSBlazor.Pages.Admin.InviteUsers
+@using HITSBlazor.Components.Button
+@using HITSBlazor.Components.Collapse
+@using HITSBlazor.Components.Inputs.Input
+@using HITSBlazor.Components.Typography
+@using HITSBlazor.Models.Users.Enums
+@using HITSBlazor.Utils.EnumTranslators
+@using HITSBlazor.Utils.Models
+@using HITSBlazor.Utils.Validation
+
+<div class="add-users-page-content page-content-with-header p-3 bg-white">
+    <div class="add-users-form-layout p-3 rounded-3 shadow">
+        <Typography FontSize="3" TextColor="TextColor.Primary" CustomClass="text-center">
+            Добавление пользователей
+        </Typography>
+        <Collapse StartCollapsed="!_showRoles" ExpandedClass="w-100">
+            <MainContent Context="collapse">
+                <div class="add-users-form-content w-100">
+                    <div class="add-users-form-inputs w-100 p-1">
+                        @for (int i = 0; i < InviteUsersRequest.Emails.Count; ++i)
+                        {
+                            int index = i;
+                            <div class="add-users-form-inputs-field">
+                                <Input IconStyle="&#64;"
+                                       Placeholder="Введите email"
+                                       NeedValidation="_submitted || _fileLoaded"
+                                       CustomValidation="UserValidation.EmailValidation"
+                                       @bind-Value="InviteUsersRequest.Emails[index]" />
+                                @if (InviteUsersRequest.Emails.Count > 1)
+                                {
+                                    <Button ButtonClass="btn-close mt-2"
+                                            OnButtonClick="() => RemoveEmail(index)" />
+                                }
+                            </div>
+                        }
+                    </div>
+                    <div class="add-users-form-controllers">
+                        <Button Text="Добавить почту"
+                                IconStyle="bi-plus-lg"
+                                Variant="ButtonVariant.Primary"
+                                OnButtonClick="AddEmail" />
+                        <!-- TODO: вынести в отдельный компонент, как минимум для аницмации точек -->
+                        <label for="fileUpload" class="btn d-flex btn-primary" style="cursor: pointer;">
+                            <i class="bi bi-file-earmark"></i>
+                            @(_fileLoading ? "Загрузка..." : "Загрузить файл")
+                        </label>
+                        <InputFile id="fileUpload"
+                                   accept=".txt,.csv"
+                                   hidden
+                                   OnChange="HandleFileLoad" />
+                        <Button Text="Выбрать роли"
+                                IconStyle="bi-plus-lg"
+                                Variant="ButtonVariant.Primary"
+                                OnButtonClick="async () =>
+                                {
+                                    _showRoles = !_showRoles;
+                                    await collapse.Toggle();
+                                }" />
+                    </div>
+                </div>
+            </MainContent>
+            <ExpandedContent>
+                <div class="list-group">
+                    @foreach (var role in Enum.GetValues<RoleType>())
+                    {
+                        <div class="d-flex">
+                            <div class="d-flex">
+                                <input type="checkbox"
+                                       checked="@SelectedRoles.Contains(role)"
+                                       @onchange="@(e => OnRoleTypeChanged(role, (bool)e.Value!))"
+                                       class="form-check-input drop-down-item" />
+                                <Typography CustomClass="form-check-label ms-2 drop-down-item">
+                                    @role.GetTranslation()
+                                </Typography>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </ExpandedContent>
+        </Collapse>
+        <Button Text="Добавить"
+                IsLoading="_submitting"
+                LoadingText="Добавление"
+                Variant="ButtonVariant.Primary"
+                OnButtonClick="SendInvitations" />
+    </div>
+</div>

@@ -10,9 +10,7 @@
             <Found Context="routeData">
                 <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
                     <NotAuthorized>
-                        @{
-                            Navigation.NavigateTo($"/login");
-                        }
+                        
                     </NotAuthorized>
                     <Authorizing>
                         <div class="preloader">
@@ -68,6 +66,8 @@
                                currentPath.Equals("recovery-password") ||
                                currentPath.Equals("new-password");
 
+            Console.WriteLine(isPublicRoute);
+
             if (AuthService.IsAuthenticated)
             {
                 if (!isPublicRoute && !currentPath.Equals("redirect", StringComparison.OrdinalIgnoreCase))
@@ -77,7 +77,7 @@
             }
             else
             {
-                if (!currentPath.StartsWith("login", StringComparison.OrdinalIgnoreCase))
+                if (!isPublicRoute && !currentPath.StartsWith("login", StringComparison.OrdinalIgnoreCase))
                 {
                     Navigation.NavigateTo("login", replace: true);
                 }

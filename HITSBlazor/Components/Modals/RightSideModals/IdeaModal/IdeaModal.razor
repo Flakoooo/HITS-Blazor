@@ -13,7 +13,6 @@
 @using HITSBlazor.Models.Users.Enums
 @using HITSBlazor.Services.Ideas
 @using HITSBlazor.Services.Modal
-@using HITSBlazor.Utils
 @using HITSBlazor.Utils.EnumStyles
 @using HITSBlazor.Utils.EnumTranslators
 @using HITSBlazor.Utils.Models
@@ -41,7 +40,7 @@
                             <MainContent Context="collapse">
                                 <Button BtnType="ButtonType.Button"
                                         Text="@data.Title"
-                                        Variant="ElementStyle.Light"
+                                        Variant="ButtonVariant.Light"
                                         ButtonClass="w-100 collapse-controller"
                                         OnButtonClick="() => collapse.Toggle()" />
                             </MainContent>
@@ -122,13 +121,13 @@
                                  CategoryCounts="5" />
                     <div class="d-flex gap-3">
                         <Button BtnType="ButtonType.Button" 
-                                Variant="ElementStyle.Primary" 
+                                Variant="ButtonVariant.Primary" 
                                 IsLoading="isRatingConfirming"
                                 OnButtonClick="ConfirmRating"
                                 Text="Утвердить"
                                 LoadingText="Утверждение"/>
                         <Button BtnType="ButtonType.Button" 
-                                Variant="@(isRatingSaved ? ElementStyle.Success : ElementStyle.Primary)" 
+                                Variant="@(isRatingSaved ? ButtonVariant.Success : ButtonVariant.Primary)" 
                                 IsLoading="isRatingSaving"
                                 OnButtonClick="SaveRating"
                                 Text="Сохранить форму"
@@ -152,11 +151,11 @@
                     @if (CheckInitiatorAccess())
                     {
                         <Button BtnType="ButtonType.Button" 
-                                Variant="ElementStyle.Light" 
+                                Variant="ButtonVariant.Light" 
                                 OnButtonClick="NavigateToCreateIdea"
                                 Text="Редактировать" />
                         <Button BtnType="ButtonType.Button" 
-                                Variant="ElementStyle.Success" 
+                                Variant="ButtonVariant.Success" 
                                 OnButtonClick="@(() => UpdateIdeaStatus(IdeaStatusType.OnApproval))"
                                 Text="Отправить на согласование" />
                     }
@@ -164,11 +163,11 @@
                     @if (CheckProjectOfficeAccess())
                     {
                         <Button BtnType="ButtonType.Button" 
-                                Variant="ElementStyle.Danger" 
+                                Variant="ButtonVariant.Danger" 
                                 OnButtonClick="@(() => UpdateIdeaStatus(IdeaStatusType.OnEditing))"
                                 Text="Отправить на доработку" />
                         <Button BtnType="ButtonType.Button" 
-                                Variant="ElementStyle.Success" 
+                                Variant="ButtonVariant.Success" 
                                 OnButtonClick="@(() => UpdateIdeaStatus(IdeaStatusType.OnConfirmation))"
                                 Text="Отправить на утверждение" />
                     }
@@ -208,11 +207,11 @@
                         var isCurrentUserMessage = sender.Id == CurrentUser?.Id;
                         <div class="card rounded-3 shadow advertisement @(isCurrentUserMessage ? "current-user-advertisement" : string.Empty)">
                             <div class="card-header d-flex justify-content-between align-items-center advertisement-header">
-                                <Typography FontSize="6" TextColor="ElementStyle.Primary">
+                                <Typography FontSize="6" TextColor="TextColor.Primary">
                                     @sender.FullName
                                 </Typography>
                                 <div class="d-flex gap-2 align-items-center">
-                                    <Typography TextColor="ElementStyle.Primary">
+                                    <Typography TextColor="TextColor.Primary">
                                         @comment.CreatedAt.ToString("dd.MM.yyyy в HH:mm")
                                     </Typography>
                                     @if (isCurrentUserMessage)
@@ -244,7 +243,7 @@
                             </div>
                         </div>
                         <Button BtnType="ButtonType.Button" 
-                                Variant="ElementStyle.Primary"
+                                Variant="ButtonVariant.Primary"
                                 Text="Отправить" />
                     </div>
                 </div>
@@ -274,7 +273,7 @@
         }
         else
         {
-            <Typography FontSize="4" TextColor="ElementStyle.White" CustomClass="p-2 bg-primary rounded-top text-center">
+            <Typography FontSize="4" TextColor="TextColor.White" CustomClass="p-2 bg-primary rounded-top text-center">
                 @(
                     CurrentIdea.Status == IdeaStatusType.OnConfirmation 
                         ? $"Утвердили {IdeaRatings.Where(r => r.IsConfirmed).Count()}/{IdeaRatings.Count()}" 
@@ -283,18 +282,18 @@
             </Typography>
             <div class="w-100 pb-3 px-3 idea-info">
                 <div>
-                    <Typography FontSize="6" TextColor="ElementStyle.Secondary" CustomClass="border-bottom d-block">
+                    <Typography FontSize="6" TextColor="TextColor.Secondary" CustomClass="border-bottom d-block">
                         Заказчик
                     </Typography>
                     <div class="pt-2 idea-sub-info">
                         <i class="bi bi-person-circle text-secondary fs-3 opacity-25"></i>
-                        <Typography FontSize="6" TextColor="ElementStyle.Primary">
+                        <Typography FontSize="6" TextColor="TextColor.Primary">
                             @CurrentIdea.Customer
                         </Typography>
                     </div>
                 </div>
                 <div>
-                    <Typography FontSize="6" TextColor="ElementStyle.Secondary" CustomClass="border-bottom d-block">
+                    <Typography FontSize="6" TextColor="TextColor.Secondary" CustomClass="border-bottom d-block">
                         Инициатор
                     </Typography>
                     <div class="pt-2 idea-sub-info">
@@ -306,14 +305,14 @@
                     </div>
                 </div>
                 <div>
-                    <Typography FontSize="6" TextColor="ElementStyle.Secondary" CustomClass="border-bottom d-block">
+                    <Typography FontSize="6" TextColor="TextColor.Secondary" CustomClass="border-bottom d-block">
                         Эксперты
                     </Typography>
                     @foreach (var rating in IdeaRatings)
                     {
                         <div class="pt-2 idea-sub-info">
                             <i class="text-secondary fs-3 bi @(rating.IsConfirmed ? "bi-check-lg opacity-50 text-success" : "bi-clock-history opacity-25")"></i>
-                            <Typography FontSize="6" TextColor="ElementStyle.Primary">
+                            <Typography FontSize="6" TextColor="TextColor.Primary">
                                 @rating.ExpertFullName
                             </Typography>
                             <!-- TODO: заменить метод на работу с Enum-->
@@ -324,18 +323,18 @@
                     }
                 </div>
                 <div>
-                    <Typography FontSize="6" TextColor="ElementStyle.Secondary" CustomClass="border-bottom d-block">
+                    <Typography FontSize="6" TextColor="TextColor.Secondary" CustomClass="border-bottom d-block">
                         Режим
                     </Typography>
                     <div class="pt-2 idea-sub-info">
                         <i class="bi bi-circle-fill text-success fs-3 opacity-50"></i>
-                        <Typography FontSize="6" TextColor="ElementStyle.Primary">
+                        <Typography FontSize="6" TextColor="TextColor.Primary">
                             @CurrentUser?.Role.GetTranslation()
                         </Typography>
                     </div>
                 </div>
                 <Button BtnType="ButtonType.Button" 
-                        Variant="ElementStyle.Primary"
+                        Variant="ButtonVariant.Primary"
                         Text="Поделиться идеей" />
             </div>
         }

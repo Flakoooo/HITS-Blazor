@@ -24,7 +24,6 @@
 
   <ItemGroup>
     <Folder Include="Components\Inputs\Radio\" />
-    <Folder Include="Pages\Admin\InviteUsers\" />
   </ItemGroup>
 
 </Project>

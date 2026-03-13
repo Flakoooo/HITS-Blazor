@@ -43,7 +43,7 @@ namespace HITSBlazor.Components.Collapse
             else if (_isExpanded && !_isAnimating)
                 return "height: auto; overflow: visible;";
             else if (!_isExpanded && !_isAnimating)
-                return "height: 0; overflow: hidden;";
+                return "height: 0; overflow: hidden; display: none;";
 
             return string.Empty;
         }

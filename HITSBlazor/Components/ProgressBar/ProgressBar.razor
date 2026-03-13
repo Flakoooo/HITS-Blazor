@@ -3,7 +3,7 @@
 @using HITSBlazor.Components.Typography
 @using HITSBlazor.Utils.Models
 
-<Typography FontSize="6" TextColor="ElementStyle.Primary">
+<Typography FontSize="6" TextColor="TextColor.Primary">
     @Text: @(Score.HasValue ? Score.Value : "вычисление")@($"{new string('.', _dotCount)}")
 </Typography>
 @if (!Score.HasValue)

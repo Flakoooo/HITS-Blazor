@@ -1,7 +1,6 @@
 ﻿using HITSBlazor.Services;
 using HITSBlazor.Services.Auth;
 using HITSBlazor.Services.Invitation;
-using HITSBlazor.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
 
@@ -11,14 +10,16 @@ namespace HITSBlazor.Pages.Auth.Register
     [Route("/register/{invitationId}")]
     public partial class Register : ComponentBase
     {
-        private RegisterModel registerModel = new();
-        private bool isLoading;
+        private RegisterModel _registerModel = new();
 
-        private string phoneInput = "";
-        private string rawDigits = "";
+        private bool _submitted = false;
+        private bool _submitting = false;
+
+        private string _phoneInput = "";
+        private string _rawDigits = "";
 
         [Parameter]
-        public Guid InvitationId { get; set; }
+        public string InvitationId { get; set; } = string.Empty;
 
         private bool IsEmailDisabled { get; set; } = true;
 
@@ -29,37 +30,48 @@ namespace HITSBlazor.Pages.Auth.Register
         private IAuthService AuthService { get; set; } = null!;
 
         [Inject]
-        private InvitationApi InvitationApi { get; set; } = null!;
+        private IInvitationService InvitationService { get; set; } = null!;
 
         [Inject]
         private GlobalNotificationService NotificationService { get; set; } = null!;
 
+        //TODO: Сделать так, чтобы выбрасывало из регистрации, если не найдено id приглашения
+
         protected override async Task OnInitializedAsync()
         {
-            ServiceResponse<string> response = await InvitationApi.GetEmailByInvitationId(InvitationId);
-            if (response.IsSuccess && response.Response is not null)
+            if (!Guid.TryParse(InvitationId, out Guid guid))
             {
-                registerModel.Email = response.Response;
+                IsEmailDisabled = false;
+                return;
+            }
+
+            var invitedEmail = await InvitationService.GetEmailById(guid);
+            if (string.IsNullOrWhiteSpace(invitedEmail))
+            {
+                IsEmailDisabled = false;
+            }
+            else
+            {
+                _registerModel.Email = invitedEmail;
                 IsEmailDisabled = true;
             }
-            else IsEmailDisabled = false;
         }
 
         private async Task HandlePhoneInput(string value)
         {
-            if (value.Length < phoneInput.Length && phoneInput.Last() != '(')
+            if (value.Length < _phoneInput.Length && _phoneInput.Last() != '(')
             {
-                rawDigits = rawDigits[..^1];
-                var newValue = phoneInput[..^1];
+                _rawDigits = _rawDigits[..^1];
+                var newValue = _phoneInput[..^1];
 
                 if (newValue.Last() == '-')
-                    registerModel.Telephone = phoneInput = newValue[..^1];
+                    _registerModel.Telephone = _phoneInput = newValue[..^1];
                 else if (newValue.Last() == ' ')
-                    registerModel.Telephone = phoneInput = newValue[..^2];
+                    _registerModel.Telephone = _phoneInput = newValue[..^2];
                 else
-                    registerModel.Telephone = phoneInput = newValue;
+                    _registerModel.Telephone = _phoneInput = newValue;
             }
-            else if (value.Length > phoneInput.Length)
+            else if (value.Length > _phoneInput.Length)
             {
                 var digits = new string([.. value.Where(char.IsDigit)]);
 
@@ -75,24 +87,27 @@ namespace HITSBlazor.Pages.Auth.Register
                     };
                 }
 
-                rawDigits = digits;
-                registerModel.Telephone = phoneInput = result;
+                _rawDigits = digits;
+                _registerModel.Telephone = _phoneInput = result;
             }
         }
 
         private async Task HandleRegister()
         {
-            if (isLoading) return;
+            if (_submitting) return;
 
-            isLoading = true;
+            _submitting = true;
+            _submitted = false;
 
-            if (await AuthService.RegistrationAsync(registerModel, InvitationId))
+            if (Guid.TryParse(InvitationId, out Guid guid) && await AuthService.RegistrationAsync(_registerModel, guid))
             {
-                registerModel = new RegisterModel();
+                _registerModel = new RegisterModel();
                 Navigation.NavigateTo("/redirect");
+                return;
             }
 
-            isLoading = false;
+            _submitted = true;
+            _submitting = false;
         }
     }
 }

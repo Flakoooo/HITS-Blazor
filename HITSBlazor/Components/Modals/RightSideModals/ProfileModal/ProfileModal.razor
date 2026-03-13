@@ -93,18 +93,18 @@
                     </div>
                     <div class="w-100 bg-white border p-3 rounded-3">
                         <div class="user-info-header border-bottom pb-1">
-                            <Typography FontSize="5" TextColor="ElementStyle.Primary">
+                            <Typography FontSize="5" TextColor="TextColor.Primary">
                                 Информация
                             </Typography>
                             @if (_isCurrentUser && _editingField != null)
                             {
                                 <div class="d-flex justify-content-end gap-2">
                                     <Button BtnType="ButtonType.Button" 
-                                            Variant="ElementStyle.Success"
+                                            Variant="ButtonVariant.Success"
                                             OnButtonClick="SaveEdit"
                                             Text="Сохранить"/>
                                     <Button BtnType="ButtonType.Button"
-                                            Variant="ElementStyle.Danger"
+                                            Variant="ButtonVariant.Danger"
                                             OnButtonClick="CancelEdit"
                                             Text="Отменить" />
                                 </div>                                
@@ -152,10 +152,10 @@
                                 OnEdit="@(() => StartEdit(nameof(_userDataForm.Telephone)))" />
 
                             <div class="d-flex gap-1">
-                                <Typography FontSize="6" TextColor="ElementStyle.Primary">
+                                <Typography FontSize="6" TextColor="TextColor.Primary">
                                     Дата регистрации:
                                 </Typography>
-                                <Typography FontSize="6" TextColor="ElementStyle.Secondary">
+                                <Typography FontSize="6" TextColor="TextColor.Secondary">
                                     @(Profile?.CreatedAt is null ? "-" : Profile.CreatedAt.Value.ToString("dd.MM.yyyy"))
                                 </Typography>
                             </div>
@@ -165,7 +165,7 @@
                 <div class="user-info mb-3">
                     <div class="w-100 bg-white border p-3 rounded-3">
                         <div class="user-info-header border-bottom pb-1">
-                            <Typography FontSize="5" TextColor="ElementStyle.Primary">
+                            <Typography FontSize="5" TextColor="TextColor.Primary">
                                 Компетенции
                             </Typography>
                             @if (_isCurrentUser)
@@ -174,11 +174,11 @@
                                 {
                                     <div class="d-flex gap-2">
                                         <Button BtnType="ButtonType.Button" 
-                                                Variant="ElementStyle.Primary" 
+                                                Variant="ButtonVariant.Primary"
                                                 Text="Сохранить" 
                                                 OnButtonClick="UpdateUserSkills" />
                                         <Button BtnType="ButtonType.Button" 
-                                                Variant="ElementStyle.Danger" 
+                                                Variant="ButtonVariant.Danger"
                                                 Text="Отменить" 
                                                 OnButtonClick="() => _isChangeSkills = !_isChangeSkills" />
                                     </div>
@@ -186,7 +186,7 @@
                                 else
                                 {
                                     <Button BtnType="ButtonType.Button"
-                                            Variant="ElementStyle.Light"
+                                            Variant="ButtonVariant.Light"
                                             Text="Изменить стек"
                                             OnButtonClick="ChangeToUpdateSkills" />
                                 }
@@ -222,7 +222,7 @@
                             {
                                 @if (Profile?.Skills.Count == 0)
                                 {
-                                    <Typography FontSize="6" TextColor="ElementStyle.Secondary" CustomClass="d-flex w-100 justify-content-center mt-3">
+                                    <Typography FontSize="6" TextColor="TextColor.Secondary" CustomClass="d-flex w-100 justify-content-center mt-3">
                                         Компетенции не выбраны
                                     </Typography>
                                 }
@@ -255,7 +255,7 @@
                     </div>
                     <div class="w-100 bg-white border p-3 rounded-3">
                         <div class="user-ideas-header border-bottom">
-                            <Typography FontSize="5" TextColor="ElementStyle.Primary">
+                            <Typography FontSize="5" TextColor="TextColor.Primary">
                                 Идеи
                             </Typography>
                         </div>
@@ -274,7 +274,7 @@
                             {
                                 @if (Profile?.Ideas.Count == 0)
                                 {
-                                    <Typography FontSize="6" TextColor="ElementStyle.Secondary">
+                                    <Typography FontSize="6" TextColor="TextColor.Secondary">
                                         Идей пока нет
                                     </Typography>
                                 }
@@ -295,7 +295,7 @@
                                                             </div>
                                                         </div>
                                                         <div @onclick="@(() => collapse.Toggle())" class="d-flex align-items-center gap-1" style="cursor: pointer;">
-                                                            <Typography FontSize="6" TextColor="ElementStyle.Primary">
+                                                            <Typography FontSize="6" TextColor="TextColor.Primary">
                                                                 Описание
                                                             </Typography>
                                                             <i class="bi bi-caret-down text-primary"></i>
@@ -304,7 +304,7 @@
                                                 </MainContent>
                                                 <ExpandedContent>
                                                     <div class="list-group">
-                                                        <Typography FontSize="6" TextColor="ElementStyle.Secondary" CustomClass="w-100 mt-1 border-top">
+                                                        <Typography FontSize="6" TextColor="TextColor.Secondary" CustomClass="w-100 mt-1 border-top">
                                                             @idea.Description
                                                         </Typography>
                                                     </div>
@@ -318,7 +318,7 @@
                     </div>
                     <div class="w-100 bg-white border p-3 rounded-3">
                         <div class="user-ideas-header border-bottom mb-2">
-                            <Typography FontSize="5" TextColor="ElementStyle.Primary">
+                            <Typography FontSize="5" TextColor="TextColor.Primary">
                                 Портфолио
                             </Typography>
                         </div>
@@ -384,7 +384,7 @@
                     </div>
                     <div class="w-100 bg-white border p-3 rounded-3">
                         <div class="user-test-header border-bottom">
-                            <Typography FontSize="5" TextColor="ElementStyle.Primary">
+                            <Typography FontSize="5" TextColor="TextColor.Primary">
                                 Результаты тестирований
                             </Typography>
                         </div>
@@ -394,7 +394,7 @@
                             </Typography>
                             @if (BelbinTestResult is null)
                             {   
-                                <Typography FontSize="6" TextColor="ElementStyle.Secondary">
+                                <Typography FontSize="6" TextColor="TextColor.Secondary">
                                     Вы не прошли тест
                                 </Typography>
                             }
@@ -409,7 +409,7 @@
                             </Typography>
                             @if (TemperTestResult is null)
                             {
-                                <Typography FontSize="6" TextColor="ElementStyle.Secondary">
+                                <Typography FontSize="6" TextColor="TextColor.Secondary">
                                     Вы не прошли тест
                                 </Typography>
                             }
@@ -424,7 +424,7 @@
                             </Typography>
                             @if (MindTestResult is null)
                             {
-                                <Typography FontSize="6" TextColor="ElementStyle.Secondary">
+                                <Typography FontSize="6" TextColor="TextColor.Secondary">
                                     Вы не прошли тест
                                 </Typography>
                             }

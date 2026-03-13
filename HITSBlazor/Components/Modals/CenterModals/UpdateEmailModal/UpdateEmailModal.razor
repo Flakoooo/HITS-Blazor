@@ -3,13 +3,12 @@
 @using HITSBlazor.Components.Inputs.Input
 @using HITSBlazor.Components.Typography
 @using HITSBlazor.Services.Modal
-@using HITSBlazor.Utils
 @using HITSBlazor.Utils.Models
 
 <div @onclick:stopPropagation="true"
      class="p-3 rounded-3 shadow center-modal new-email-request-modal bg-white">
     <div class="d-flex align-items-center justify-content-between">
-        <Typography FontSize="3" TextColor="ElementStyle.Primary" CustomClass="text-center">
+        <Typography FontSize="3" TextColor="TextColor.Primary" CustomClass="text-center">
             Доступные роли
         </Typography>
         <Button BtnType="ButtonType.Button"
@@ -30,7 +29,7 @@
                @bind-Value="EmailValue" />
         <Button BtnType="ButtonType.Button" 
                 IsLoading="_isLoading" 
-                Variant="ElementStyle.Primary"
+                Variant="ButtonVariant.Primary"
                 Text="Изменить email"
                 LoadingText="Изменение"
                 OnButtonClick="VirificateEmailRequest" />
@@ -43,7 +42,7 @@
                @bind-Value="EmailValue" />
         <Button BtnType="ButtonType.Button"
                 IsLoading="_isLoading"
-                Variant="ElementStyle.Primary"
+                Variant="ButtonVariant.Primary"
                 Text="Отправить"
                 LoadingText="Отправка"
                 OnButtonClick="SendNewEmailRequest" />

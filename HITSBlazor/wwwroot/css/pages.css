@@ -2,6 +2,10 @@
     height: auto;
 }
 
+.page-content-no-header {
+    height: 100vh;
+}
+
 .list-page-header {
     display: flex;
     flex-direction: row;

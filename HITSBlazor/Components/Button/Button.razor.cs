@@ -24,7 +24,7 @@ namespace HITSBlazor.Components.Button
         public string IconStyle { get; set; } = string.Empty;
 
         [Parameter]
-        public ElementStyle? Variant { get; set; }
+        public ButtonVariant? Variant { get; set; }
 
         [Parameter]
         public string? ButtonClass { get; set; }

@@ -10,7 +10,6 @@
 @using HITSBlazor.Components.Typography
 @using HITSBlazor.Models.Common.Entities
 @using HITSBlazor.Models.Common.Enums
-@using HITSBlazor.Utils
 @using HITSBlazor.Utils.EnumStyles
 @using HITSBlazor.Utils.EnumTranslators
 @using HITSBlazor.Utils.Models
@@ -98,7 +97,7 @@
                         <MainContent Context="collapse">
                             <Button BtnType="ButtonType.Button" 
                                     Text="Описание команды" 
-                                    Variant="ElementStyle.Light" 
+                                    Variant="ButtonVariant.Light" 
                                     ButtonClass="collapse-controller w-100" 
                                     OnButtonClick="collapse.Toggle" />
                         </MainContent>
@@ -353,7 +352,7 @@
             {
                 <div class="team-modal-info w-100 pb-3 px-3">
                     <div class="w-100">
-                        <Typography FontSize="6" TextColor="ElementStyle.Secondary" CustomClass="border-bottom d-block">
+                        <Typography FontSize="6" TextColor="TextColor.Secondary" CustomClass="border-bottom d-block">
                             Владелец команды
                         </Typography>
                         <div class="team-modal-info-item pt-2">
@@ -366,7 +365,7 @@
                         </div>
                     </div>
                     <div class="w-100">
-                        <Typography FontSize="6" TextColor="ElementStyle.Secondary" CustomClass="border-bottom d-block">
+                        <Typography FontSize="6" TextColor="TextColor.Secondary" CustomClass="border-bottom d-block">
                             Тим-лидер команды
                         </Typography>
                         <div class="team-modal-info-item pt-2">
@@ -379,28 +378,28 @@
                         </div>
                     </div>
                     <div class="w-100">
-                        <Typography FontSize="6" TextColor="ElementStyle.Secondary" CustomClass="border-bottom d-block">
+                        <Typography FontSize="6" TextColor="TextColor.Secondary" CustomClass="border-bottom d-block">
                             Дата создания
                         </Typography>
                         <div class="team-modal-info-item pt-2">
                             <i class="bi bi-calendar-date text-secondary fs-3 opacity-25"></i>
-                            <Typography FontSize="6" TextColor="ElementStyle.Primary">
+                            <Typography FontSize="6" TextColor="TextColor.Primary">
                                 @_currentTeam.CreatedAt.ToString("dd.MM.yyyy")
                             </Typography>
                         </div>
                     </div>
                     <div class="w-100">
-                        <Typography FontSize="6" TextColor="ElementStyle.Secondary" CustomClass="border-bottom d-block">
+                        <Typography FontSize="6" TextColor="TextColor.Secondary" CustomClass="border-bottom d-block">
                             Количество участников:
-                            <Typography FontSize="6" TextColor="ElementStyle.Primary">
+                            <Typography FontSize="6" TextColor="TextColor.Primary">
                                 @_currentTeam.MembersCount
                             </Typography>
                         </Typography>
                     </div>
                     <!-- TODO: Реализовать передачу URL -->
-                    <button type="button" class="btn d-flex btn-primary">
-                        Поделиться командой
-                    </button>
+                    <Button BtnType="ButtonType.Button"
+                            Text="Поделиться командой"
+                            Variant="ButtonVariant.Primary" />
                 </div>
             }
             else if (_activeInfoCategory == TeamInfoCategory.Skills)

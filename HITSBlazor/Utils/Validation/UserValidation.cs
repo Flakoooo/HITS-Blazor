@@ -1,4 +1,6 @@
-﻿using System.Text.RegularExpressions;
+﻿using HITSBlazor.Pages.Auth.Register;
+using HITSBlazor.Services;
+using System.Text.RegularExpressions;
 
 namespace HITSBlazor.Utils.Validation
 {
@@ -97,6 +99,27 @@ namespace HITSBlazor.Utils.Validation
             var result = new ValidationEvaluation();
 
             //TODO: добавить валидацию бы
+
+            return result;
+        }
+
+        public static ValidationEvaluation PasswordValidation(string verifiablePassword)
+        {
+            var result = new ValidationEvaluation();
+
+            if (string.IsNullOrWhiteSpace(verifiablePassword))
+            {
+                result.IsValid = false;
+                result.Message = "Пароль не может быть пустым";
+                return result;
+            }
+
+            if (verifiablePassword.Length < 8)
+            {
+                result.IsValid = false;
+                result.Message = "Длина пароля не может быть меньше 8 символов";
+                return result;
+            }
 
             return result;
         }

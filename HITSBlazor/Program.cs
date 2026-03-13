@@ -4,6 +4,7 @@ using HITSBlazor.Services.ActionMenus;
 using HITSBlazor.Services.Auth;
 using HITSBlazor.Services.Companies;
 using HITSBlazor.Services.Ideas;
+using HITSBlazor.Services.Invitation;
 using HITSBlazor.Services.Markets;
 using HITSBlazor.Services.Modal;
 using HITSBlazor.Services.Notifications;
@@ -84,6 +85,9 @@ namespace HITSBlazor
 
             //Users
             builder.Services.AddScoped<IUserService, MockUserService>();
+
+            //Invitation
+            builder.Services.AddScoped<IInvitationService, MockInvitationService>();
 
             //Skills
             builder.Services.AddScoped<ISkillService, MockSkillService>();
