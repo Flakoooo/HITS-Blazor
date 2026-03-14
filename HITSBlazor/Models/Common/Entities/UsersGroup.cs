@@ -7,7 +7,7 @@ namespace HITSBlazor.Models.Common.Entities
     {
         public Guid Id { get; set; }
         public string Name { get; set; } = string.Empty;
-        public List<User> Users { get; set; } = [];
+        public List<User> Members { get; set; } = [];
         public List<RoleType> Roles { get; set; } = [];
 
         public UsersGroup() { }
@@ -17,14 +17,14 @@ namespace HITSBlazor.Models.Common.Entities
             Id = other.Id;
             Name = other.Name;
             Roles = other.Roles;
-            Users = other.Users;
+            Members = other.Members;
         }
 
-        public UsersGroup WithUsers(List<User> users)
+        public UsersGroup WithUsers(List<User> members)
         {
             var copy = new UsersGroup(this)
             {
-                Users = users
+                Members = members
             };
             return copy;
         }

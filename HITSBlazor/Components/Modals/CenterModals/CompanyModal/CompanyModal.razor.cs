@@ -2,7 +2,6 @@
 using HITSBlazor.Services;
 using HITSBlazor.Services.Companies;
 using HITSBlazor.Services.Modal;
-using HITSBlazor.Services.Notifications;
 using HITSBlazor.Services.Users;
 using Microsoft.AspNetCore.Components;
 
@@ -88,7 +87,7 @@ namespace HITSBlazor.Components.Modals.CenterModals.CompanyModal
 #pragma warning disable CS8604 // Possible null reference argument.
             if (CompanyId.HasValue)
             {
-                result = await CompanyService.UpdateCompany(
+                result = await CompanyService.UpdateCompanyAsync(
                     CompanyId.Value,
                     CompanyName,
                     SelectedOwner,
@@ -97,7 +96,7 @@ namespace HITSBlazor.Components.Modals.CenterModals.CompanyModal
             }
             else
             {
-                result = await CompanyService.CreateCompany(
+                result = await CompanyService.CreateCompanyAsync(
                     CompanyName,
                     SelectedOwner,
                     _companyUsers

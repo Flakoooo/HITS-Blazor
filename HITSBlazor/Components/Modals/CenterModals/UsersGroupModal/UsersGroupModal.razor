@@ -1,10 +1,13 @@
 ﻿@namespace HITSBlazor.Components.Modals.CenterModals.UsersGroupModal
 @using HITSBlazor.Components.Button
+@using HITSBlazor.Components.Inputs.CheckboxDropdown
 @using HITSBlazor.Components.Inputs.Input
 @using HITSBlazor.Components.Modals.Components.CenterModalHeader
 @using HITSBlazor.Components.Placeholders.Placeholder
+@using HITSBlazor.Components.UsersColumn
+@using HITSBlazor.Models.Users.Enums
 
-<div @onclick:stopPropagation="true" class="company-modal p-3 bg-white rounded-3">
+<div @onclick:stopPropagation="true" class="users-group-modal p-3 bg-white rounded-3">
     @if (_isLoading)
     {
         <div class="w-100 d-flex justify-content-center">
@@ -31,15 +34,22 @@
                Placeholder="Введите название группы"
                @bind-Value="UsersGroupName" />
         <div class="d-flex justify-content-between gap-3">
-
+            <UsersColumn HeaderText="Пользователи:"
+                         AllUsers="_users"
+                         SelectedUserChanged="SelectUser" />
+            <UsersColumn HeaderText="@($"Пользователи в группе: {_groupUsers.Count}")"
+                         AllUsers="_groupUsers"
+                         SelectedUserChanged="UnSelectUser" />
         </div>
-        <div class="w-100">
-
-        </div>
+        <CheckboxDropdown T="RoleTypeValues"
+                          AllValues="AllRoles"
+                          Label="Выберите тип группы:"
+                          Placeholder="Выбрано"
+                          @bind-SelectedValues="SelectedRoles" />
         <Button Variant="ButtonVariant.Primary"
                 IsLoading="_submitting"
                 Text="@(UsersGroupId.HasValue ? "Сохранить изменения" : "Добавить")"
                 LoadingText="@(UsersGroupId.HasValue ? "Сохранение" : "Добавление")"
-                OnButtonClick="() => Console.WriteLine()" />
+                OnButtonClick="SendUsersGroup" />
     }
 </div>

@@ -1,10 +1,11 @@
 ﻿using HITSBlazor.Components.ActionMenus.BaseActionMenu;
 using HITSBlazor.Components.Modals.CenterModals.UpdateUserModal;
+using HITSBlazor.Components.Modals.CenterModals.UsersGroupModal;
 using HITSBlazor.Components.Tables.TableHeader;
 using HITSBlazor.Models.Common.Entities;
 using HITSBlazor.Models.Users.Entities;
 using HITSBlazor.Models.Users.Enums;
-using HITSBlazor.Services.Groups;
+using HITSBlazor.Services.UsersGroups;
 using HITSBlazor.Services.Modal;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
@@ -12,8 +13,8 @@ using Microsoft.AspNetCore.Components;
 namespace HITSBlazor.Pages.Admin.AllUsersGroups
 {
     [Authorize]
-    [Route("/admin/users-groups")]
-    public partial class AllUsersGroups
+    [Route("admin/users-groups")]
+    public partial class AllUsersGroups : IDisposable
     {
         [Inject]
         private IUsersGroupsService UsersGroupsService { get; set; } = null!;
@@ -38,6 +39,7 @@ namespace HITSBlazor.Pages.Admin.AllUsersGroups
         {
             _isLoading = true;
 
+            UsersGroupsService.OnUsersGroupsStateChanged += StateHasChanged;
             await LoadUsersGroupsAsync();
 
             _isLoading = false;
@@ -53,7 +55,17 @@ namespace HITSBlazor.Pages.Admin.AllUsersGroups
 
         private void ShowUsersGroupModal(Guid? usersGroupid = null)
         {
-
+            if (usersGroupid.HasValue)
+            {
+                ModalService.Show<UsersGroupModal>(
+                    ModalType.Center,
+                    parameters: new Dictionary<string, object> { [nameof(UsersGroupModal.UsersGroupId)] = usersGroupid }
+                );
+            }
+            else
+            {
+                ModalService.Show<UsersGroupModal>(ModalType.Center);
+            }
         }
 
         private async Task SearchUsersGroup(string searchText)
@@ -95,6 +107,11 @@ namespace HITSBlazor.Pages.Admin.AllUsersGroups
 
                 _usersGroups.Remove(usersGroup);
             }
+        }
+
+        public void Dispose()
+        {
+            UsersGroupsService.OnUsersGroupsStateChanged -= StateHasChanged;
         }
     }
 }

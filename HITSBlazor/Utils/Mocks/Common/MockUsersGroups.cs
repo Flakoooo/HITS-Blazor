@@ -19,21 +19,21 @@ namespace HITSBlazor.Utils.Mocks.Common
             {
                 Id = DevelopersId,
                 Name = "Группа разработчиков",
-                Users = [.. MockUsers.GetUsersByRole(RoleType.Initiator)],
+                Members = [.. MockUsers.GetUsersByRole(RoleType.Initiator)],
                 Roles = [RoleType.Initiator]
             },
             new UsersGroup
             {
                 Id = ProjectOfficeId,
                 Name = "Группа проектного офиса",
-                Users = [.. MockUsers.GetUsersByRole(RoleType.ProjectOffice)],
+                Members = [.. MockUsers.GetUsersByRole(RoleType.ProjectOffice)],
                 Roles = [RoleType.ProjectOffice]
             },
             new UsersGroup
             {
                 Id = ExpertsId,
                 Name = "Группа экспертов",
-                Users = [.. MockUsers.GetUsersByRole(RoleType.Expert)],
+                Members = [.. MockUsers.GetUsersByRole(RoleType.Expert)],
                 Roles = [RoleType.Expert]
             }
         ];
@@ -45,13 +45,51 @@ namespace HITSBlazor.Utils.Mocks.Common
 
         public static List<User> GetRandomGroupUsersById(Guid id, int userCount)
         {
-            var users = _usersGroups.FirstOrDefault(g => g.Id == id)!.Users;
+            var users = _usersGroups.FirstOrDefault(g => g.Id == id)!.Members;
 
             var usedIndexes = new HashSet<int>();
             while (usedIndexes.Count < userCount)
                 usedIndexes.Add(_random.Next(users.Count));
 
             return [.. usedIndexes.Select(i => users[i])];
+        }
+
+        public static UsersGroup? CreateUsersGroup(string name, List<Guid> membersIds, List<RoleType> roles)
+        {
+            var members = new List<User>();
+            foreach (var memberId in membersIds)
+            {
+                var member = MockUsers.GetUserById(memberId);
+                if (member is not null) members.Add(member);
+            }
+
+            var usersGroup = new UsersGroup
+            {
+                Name = name,
+                Members = members,
+                Roles = roles
+            };
+
+            return usersGroup;
+        }
+
+        public static UsersGroup? UpdateUsersGroup(Guid usersGroupId, string name, List<Guid> membersIds, List<RoleType> roles)
+        {
+            var usersGroup = _usersGroups.FirstOrDefault(ug => ug.Id == usersGroupId);
+            if (usersGroup is null) return usersGroup;
+
+            var members = new List<User>();
+            foreach (var memberId in membersIds)
+            {
+                var member = MockUsers.GetUserById(memberId);
+                if (member is not null) members.Add(member);
+            }
+
+            usersGroup.Name = name;
+            usersGroup.Members = members;
+            usersGroup.Roles = [.. roles];
+
+            return usersGroup;
         }
 
         public static bool DeleteUsersGroup(UsersGroup usersGroup) => _usersGroups.Remove(usersGroup);

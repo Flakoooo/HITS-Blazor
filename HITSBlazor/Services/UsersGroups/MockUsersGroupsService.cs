@@ -1,8 +1,9 @@
 ﻿using HITSBlazor.Models.Common.Entities;
+using HITSBlazor.Models.Users.Entities;
 using HITSBlazor.Models.Users.Enums;
 using HITSBlazor.Utils.Mocks.Common;
 
-namespace HITSBlazor.Services.Groups
+namespace HITSBlazor.Services.UsersGroups
 {
     public class MockUsersGroupsService(GlobalNotificationService globalNotificationService) : IUsersGroupsService
     {
@@ -28,12 +29,58 @@ namespace HITSBlazor.Services.Groups
             var query = _cachedUsersGroups.AsEnumerable();
 
             if (selectedRoles?.Count > 0)
-                query = query.Where(g => g.Roles.Any(selectedRoles.Contains));
+                query = query.Where(ug => ug.Roles.Any(selectedRoles.Contains));
 
             if (!string.IsNullOrWhiteSpace(searchText))
-                query = query.Where(g => g.Name.Contains(searchText, StringComparison.CurrentCultureIgnoreCase));
+                query = query.Where(ug => ug.Name.Contains(searchText, StringComparison.CurrentCultureIgnoreCase));
 
             return [.. query];
+        }
+
+        public async Task<UsersGroup?> GetUsersGroupByIdAsync(Guid usersGroupId)
+        {
+            var usersGroup = MockUsersGroups.GetGroupById(usersGroupId);
+            if (usersGroup is null)
+                _globalNotificationService.ShowError("Группа не найдена");
+
+            return usersGroup;
+        }
+
+        public async Task<bool> CreateUsersGroup(string name, List<User> members, List<RoleType> roles)
+        {
+            var usersGroup = MockUsersGroups.CreateUsersGroup(name, [.. members.Select(u => u.Id)], roles);
+            if (usersGroup is null)
+            {
+                _globalNotificationService.ShowError("Не удалось создать группу");
+                return false;
+            }
+
+            _globalNotificationService.ShowSuccess("Группа успешно создана");
+            _cachedUsersGroups.Add(usersGroup);
+            OnUsersGroupsStateChanged?.Invoke();
+            return true;
+        }
+
+        public async Task<bool> UpdateUsersGroup(Guid usersGroupId, string name, List<User> members, List<RoleType> roles)
+        {
+            var usersGroup = MockUsersGroups.UpdateUsersGroup(usersGroupId, name, [.. members.Select(u => u.Id)], roles);
+            if (usersGroup is null)
+            {
+                _globalNotificationService.ShowError("Не удалось обновить группу");
+                return false;
+            }
+
+            var usersGroupForUpdate = _cachedUsersGroups.FirstOrDefault(ug => ug.Id == usersGroupId);
+            if (usersGroupForUpdate is not null)
+            {
+                usersGroupForUpdate.Name = name;
+                usersGroupForUpdate.Members = [.. members];
+                usersGroupForUpdate.Roles = [.. roles];
+            }
+
+            _globalNotificationService.ShowSuccess("Группа успешно обновлена");
+            OnUsersGroupsStateChanged?.Invoke();
+            return true;
         }
 
         public async Task<bool> DeleteUsersGroupsAsync(UsersGroup usersGroup)

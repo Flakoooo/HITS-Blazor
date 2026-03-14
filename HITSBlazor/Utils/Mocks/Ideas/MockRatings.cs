@@ -25,7 +25,7 @@ namespace HITSBlazor.Utils.Mocks.Ideas
         {
             double expertsRating = 0.0;
             bool ideaState = idea.Status == IdeaStatusType.Confirmed || idea.Status == IdeaStatusType.OnMarket;
-            foreach (var expert in idea.Experts!.Users)
+            foreach (var expert in idea.Experts!.Members)
             {
                 var rating = new Rating
                 {
@@ -65,7 +65,7 @@ namespace HITSBlazor.Utils.Mocks.Ideas
                 _ratings.Add(rating);
             }
 
-            return expertsRating == 0.0 ? null : expertsRating / idea.Experts!.Users.Count;
+            return expertsRating == 0.0 ? null : expertsRating / idea.Experts!.Members.Count;
         }
 
         public static bool UpdateOrConfirmRating(RatingRequest request, bool isConfirmed = false)

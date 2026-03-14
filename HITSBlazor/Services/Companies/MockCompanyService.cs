@@ -60,7 +60,7 @@ namespace HITSBlazor.Services.Companies
             return _cachedCompanies.FirstOrDefault(c => c.Name.Equals(name, StringComparison.CurrentCultureIgnoreCase));
         }
 
-        public async Task<bool> CreateCompany(string name, User owner, List<User> members)
+        public async Task<bool> CreateCompanyAsync(string name, User owner, List<User> members)
         {
             var company = MockCompanies.CreateCompany(name, owner.Id, [.. members.Select(u => u.Id)]);
             if (company is null)
@@ -75,7 +75,7 @@ namespace HITSBlazor.Services.Companies
             return true;
         }
 
-        public async Task<bool> UpdateCompany(Guid companyId, string name, User owner, List<User> members)
+        public async Task<bool> UpdateCompanyAsync(Guid companyId, string name, User owner, List<User> members)
         {
             var company = MockCompanies.UpdateCompany(companyId, name, owner.Id, [.. members.Select(u => u.Id)]);
             if (company is null)
@@ -87,9 +87,9 @@ namespace HITSBlazor.Services.Companies
             var companyForUpdate = _cachedCompanies.FirstOrDefault(u => u.Id == companyId);
             if (companyForUpdate is not null)
             {
-                company.Name = name;
-                company.Owner = owner;
-                company.Members = [.. members];
+                companyForUpdate.Name = name;
+                companyForUpdate.Owner = owner;
+                companyForUpdate.Members = [.. members];
             }
 
             _globalNotificationService.ShowSuccess("Компания успешно обновлена");
