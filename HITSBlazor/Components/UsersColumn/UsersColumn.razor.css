@@ -1,0 +1,27 @@
+﻿.users-column {
+    height: 220px;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: stretch;
+    justify-content: stretch;
+    gap: 8px;
+}
+
+.users-column-side {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: stretch;
+    justify-content: flex-start;
+    gap: 8px;
+}
+
+.users-column-user {
+    cursor: pointer;
+}
+
+    .users-column-user:hover {
+        background-color: rgba(13,110,253,.1);
+        transition: background-color .15s ease-out;
+    }

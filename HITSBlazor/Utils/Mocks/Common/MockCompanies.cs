@@ -1,4 +1,5 @@
 ﻿using HITSBlazor.Models.Common.Entities;
+using HITSBlazor.Models.Users.Entities;
 using HITSBlazor.Utils.Mocks.Users;
 
 namespace HITSBlazor.Utils.Mocks.Common
@@ -14,13 +15,13 @@ namespace HITSBlazor.Utils.Mocks.Common
         private static List<Company> CreateCompanies()
         {
             var ivan = MockUsers.GetUserById(MockUsers.IvanId)!;
-            var manager = MockUsers.GetUserById(MockUsers.IvanId)!;
+            var manager = MockUsers.GetUserById(MockUsers.ManagerId)!;
 
             return
             [
-                new Company { Id = HITSId,      Name = "ВШЦТ",      Owner = ivan,       Users = [manager]   },
-                new Company { Id = GazpromId,   Name = "Газпром",   Owner = ivan,       Users = [ivan]      },
-                new Company { Id = RosneftId,   Name = "Роснефть",  Owner = manager,    Users = [ivan]      }
+                new Company { Id = HITSId,      Name = "ВШЦТ",      Owner = ivan,       Members = [manager]   },
+                new Company { Id = GazpromId,   Name = "Газпром",   Owner = ivan,       Members = [ivan]      },
+                new Company { Id = RosneftId,   Name = "Роснефть",  Owner = manager,    Members = [ivan]      }
             ];
         }
 
@@ -28,5 +29,37 @@ namespace HITSBlazor.Utils.Mocks.Common
 
         public static Company? GetCompanyById(Guid id)
             => _companies.FirstOrDefault(c => c.Id == id);
+
+        public static Company? CreateCompany(string name, Guid ownerId, List<User> members)
+        {
+            var owner = MockUsers.GetUserById(ownerId);
+            if (owner is null) return null;
+
+            var company = new Company
+            {
+                Name = name,
+                Owner = owner,
+                Members = [.. members]
+            };
+
+            return company;
+        }
+
+        public static Company? UpdateCompany(Guid companyId, string name, Guid ownerId, List<User> members)
+        {
+            var company = GetCompanyById(companyId);
+            if (company is null) return null;
+
+            var owner = MockUsers.GetUserById(ownerId);
+            if (owner is null) return null;
+
+            company.Name = name;
+            company.Owner = owner;
+            company.Members = [.. members];
+
+            return company;
+        }
+
+        public static bool DeleteCompany(Company company) => _companies.Remove(company);
     }
 }

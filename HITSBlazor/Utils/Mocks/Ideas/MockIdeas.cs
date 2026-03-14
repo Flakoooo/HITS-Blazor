@@ -42,7 +42,7 @@ namespace HITSBlazor.Utils.Mocks.Ideas
             var admin = MockUsers.GetUserById(MockUsers.AdminId)!;
 
             var hits = MockCompanies.GetCompanyById(MockCompanies.HITSId)!;
-            string hitsContactPersonFullName = hits.Users.FirstOrDefault()?.FullName ?? "null null";
+            string hitsContactPersonFullName = hits.Members.FirstOrDefault()?.FullName ?? "null null";
 
             var projectOfficeGroup = MockUsersGroups.GetGroupById(MockUsersGroups.ProjectOfficeId)!;
             var expertGtoup = MockUsersGroups.GetGroupById(MockUsersGroups.ExpertsId)!;

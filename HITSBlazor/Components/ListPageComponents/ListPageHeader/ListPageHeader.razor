@@ -1,0 +1,33 @@
+﻿@namespace HITSBlazor.Components.ListPageComponents.ListPageHeader
+@using HITSBlazor.Components.Button
+@using HITSBlazor.Components.Typography
+
+<div class="w-100 list-page-header">
+    <Typography FontSize="2" TextColor="TextColor.Primary">
+        @HeaderText
+    </Typography>
+    <div class="d-flex gap-3">
+        @if (ShowCreateButton)
+        {
+            <Button BtnType="ButtonType.Button" 
+                    Variant="ButtonVariant.Primary"
+                    Text="@CreateButtonText"
+                    IconStyle="bi-plus-lg" 
+                    OnButtonClick="() => OnButtonClick.InvokeAsync()" />
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public string HeaderText { get; set; } = string.Empty;
+
+    [Parameter]
+    public bool ShowCreateButton { get; set; } = false;
+
+    [Parameter]
+    public string CreateButtonText { get; set; } = string.Empty;
+
+    [Parameter]
+    public EventCallback OnButtonClick { get; set; }
+}

@@ -1,0 +1,47 @@
+﻿@namespace HITSBlazor.Components.UsersColumn
+@using HITSBlazor.Components.Inputs.Input
+@using HITSBlazor.Components.Typography
+@using HITSBlazor.Models.Users.Entities
+
+<div class="users-column w-50">
+    <Input Label="@HeaderText" Placeholder="Найти" ValueChanged="@((value) => SearchUser(value))" />
+    <div class="users-column-side p-2 h-100 overflow-scroll border rounded-3">
+        @foreach (var user in _users)
+        {
+            <div class="px-1 rounded border users-column-user" @onclick="() => OnElementSelected(user)">
+                <Typography FontSize="6">
+                    @user.FullName
+                </Typography>
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public string HeaderText { get; set; } = string.Empty;
+
+    [Parameter]
+    public List<User> AllUsers { get; set; } = [];
+
+    [Parameter]
+    public EventCallback<User> SelectedUserChanged { get; set; }
+
+    private string _searchText = string.Empty;
+    private List<User> _users = [];
+
+    protected override void OnInitialized() => SearchUser(_searchText);
+
+    protected override void OnParametersSet() => SearchUser(_searchText);
+
+    private void SearchUser(string searchText)
+    {
+        _searchText = searchText;
+        if (string.IsNullOrWhiteSpace(_searchText))
+            _users = [.. AllUsers];
+        else 
+            _users = [.. AllUsers.Where(u => u.FullName.Contains(_searchText, StringComparison.CurrentCultureIgnoreCase))];
+    }
+
+    private async Task OnElementSelected(User user) => await SelectedUserChanged.InvokeAsync(user);
+}

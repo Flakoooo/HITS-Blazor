@@ -1,20 +1,14 @@
 ﻿@namespace HITSBlazor.Components.Modals.CenterModals.UpdateEmailModal
 @using HITSBlazor.Components.Button
 @using HITSBlazor.Components.Inputs.Input
+@using HITSBlazor.Components.Modals.Components.CenterModalHeader
 @using HITSBlazor.Components.Typography
 @using HITSBlazor.Services.Modal
 @using HITSBlazor.Utils.Models
 
 <div @onclick:stopPropagation="true"
      class="p-3 rounded-3 shadow center-modal new-email-request-modal bg-white">
-    <div class="d-flex align-items-center justify-content-between">
-        <Typography FontSize="3" TextColor="TextColor.Primary" CustomClass="text-center">
-            Доступные роли
-        </Typography>
-        <Button BtnType="ButtonType.Button"
-                ButtonClass="btn-close"
-                OnButtonClick="() => ModalService.Close(ModalType.Center)" />
-    </div>
+    <CenterModalHeader HeaderText="Доступные роли" />
     @if (_isEmailRequestSended)
     {
         <Input IconStyle="bi-fonts"

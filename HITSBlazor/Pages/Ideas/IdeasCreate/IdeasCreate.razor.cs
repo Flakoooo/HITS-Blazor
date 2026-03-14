@@ -146,7 +146,7 @@ namespace HITSBlazor.Pages.Ideas.IdeasCreate
             SelectedCompany = await CompanyService.GetCompanyByNameAsync(idea.Customer);
             if (SelectedCompany != null)
             {
-                SelectedContactPerson = SelectedCompany.Users.FirstOrDefault(
+                SelectedContactPerson = SelectedCompany.Members.FirstOrDefault(
                     u => u.FullName.Equals(idea.ContactPerson)
                 );
             }

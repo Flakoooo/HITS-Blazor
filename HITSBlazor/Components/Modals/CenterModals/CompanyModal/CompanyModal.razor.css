@@ -1,0 +1,12 @@
+﻿.company-modal {
+    width: 600px;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: stretch;
+    justify-content: flex-start;
+    gap: 16px;
+    align-self: center;
+    justify-self: center;
+    transition: all .15s ease-out;
+}

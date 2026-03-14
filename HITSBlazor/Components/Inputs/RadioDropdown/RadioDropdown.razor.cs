@@ -36,7 +36,7 @@ namespace HITSBlazor.Components.Inputs.RadioDropdown
         private bool _isOpen = false;
 
         private List<T> _values = [];
-        private string _radioGroupName = typeof(T).Name;
+        private readonly string _radioGroupName = typeof(T).Name;
         private string _searchText = string.Empty;
 
         protected override async Task OnAfterRenderAsync(bool firstRender)

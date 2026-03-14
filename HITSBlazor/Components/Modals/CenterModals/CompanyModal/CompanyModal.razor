@@ -1,0 +1,60 @@
+﻿@namespace HITSBlazor.Components.Modals.CenterModals.CompanyModal
+@using HITSBlazor.Components.Button
+@using HITSBlazor.Components.Inputs.Input
+@using HITSBlazor.Components.Inputs.RadioDropdown
+@using HITSBlazor.Components.Modals.Components.CenterModalHeader
+@using HITSBlazor.Components.Placeholders.Placeholder
+@using HITSBlazor.Components.Typography
+@using HITSBlazor.Components.UsersColumn
+@using HITSBlazor.Models.Common.Entities
+@using HITSBlazor.Models.Users.Entities
+@using HITSBlazor.Services.Companies
+@using HITSBlazor.Services.Users
+@using HITSBlazor.Utils.Validation
+
+<div @onclick:stopPropagation="true" class="company-modal p-3 bg-white rounded-3">
+    @if (_isLoading)
+    {
+        <div class="w-100 d-flex justify-content-center">
+            <Placeholder Width="w-50" />
+        </div>
+        <Placeholder Height="PlaceholderHeight.Small" />
+        <Placeholder Height="PlaceholderHeight.Small" />
+        <div class="d-flex gap-3">
+            <div class="w-50 d-flex flex-column gap-2">
+                <Placeholder />
+                <Placeholder Height="PlaceholderHeight.Medium" />
+            </div>
+            <div class="w-50 d-flex flex-column gap-2">
+                <Placeholder />
+                <Placeholder Height="PlaceholderHeight.Medium" />
+            </div>
+        </div>
+        <Placeholder Height="PlaceholderHeight.Small" />
+    }
+    else
+    {
+        <CenterModalHeader HeaderText="@(CompanyId.HasValue ? "Редактирование компании" : "Создание компании")" />
+        <Input Label="Название компании:"
+               Placeholder="Введите название компании"
+               @bind-Value="CompanyName" />
+        <RadioDropdown T=User
+                       AllValues="_users"
+                       Label="Выберите руководителя компании:"
+                       Placeholder="Руководитель компании"
+                       @bind-Value="SelectedOwner" />
+        <div class="d-flex justify-content-between gap-3">
+            <UsersColumn HeaderText="Пользователи:"
+                         AllUsers="_users"
+                         SelectedUserChanged="SelectUser" />
+            <UsersColumn HeaderText="Представители компании:"
+                         AllUsers="_companyUsers"
+                         SelectedUserChanged="UnSelectUser" />
+        </div>
+        <Button Variant="ButtonVariant.Primary"
+                IsLoading="_submitting"
+                Text="@(CompanyId.HasValue ? "Сохранить изменения" : "Добавить")"
+                LoadingText="@(CompanyId.HasValue ? "Сохранение" : "Добавление")"
+                OnButtonClick="SendCompany" />
+    }
+</div>

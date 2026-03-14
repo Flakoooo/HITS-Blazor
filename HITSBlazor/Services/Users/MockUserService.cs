@@ -7,7 +7,7 @@ namespace HITSBlazor.Services.Users
 {
     public class MockUserService(GlobalNotificationService globalNotificationService) : IUserService
     {
-        private GlobalNotificationService _globalNotificationService = globalNotificationService;
+        private readonly GlobalNotificationService _globalNotificationService = globalNotificationService;
 
         private List<User> _cachedUsers = [];
         private DateTime _lastRefreshTime;

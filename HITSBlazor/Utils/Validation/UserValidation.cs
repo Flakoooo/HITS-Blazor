@@ -1,6 +1,4 @@
-﻿using HITSBlazor.Pages.Auth.Register;
-using HITSBlazor.Services;
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 
 namespace HITSBlazor.Utils.Validation
 {

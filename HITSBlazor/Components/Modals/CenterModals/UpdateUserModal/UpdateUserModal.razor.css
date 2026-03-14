@@ -12,14 +12,6 @@
     transition: all .15s ease-out;
 }
 
-.edit-user-modal-header {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: nowrap;
-    align-items: center;
-    justify-content: space-between;
-}
-
 .edit-user-modal-inputs {
     display: flex;
     flex-direction: column;

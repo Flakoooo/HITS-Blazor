@@ -8,7 +8,7 @@ namespace HITSBlazor.Models.Common.Entities
         public Guid Id { get; set; }
         public string Name { get; set; } = string.Empty;
         public User Owner { get; set; } = new();
-        public List<User> Users { get; set; } = [];
+        public List<User> Members { get; set; } = [];
 
 
         public override string GetDisplayInfo() => Name;

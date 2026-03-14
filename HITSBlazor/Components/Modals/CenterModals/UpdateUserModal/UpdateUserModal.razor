@@ -1,6 +1,7 @@
 ﻿@using HITSBlazor.Components.Button
 @using HITSBlazor.Components.Collapse
 @using HITSBlazor.Components.Inputs.Input
+@using HITSBlazor.Components.Modals.Components.CenterModalHeader
 @using HITSBlazor.Components.Typography
 @using HITSBlazor.Models.Users.Entities
 @using HITSBlazor.Models.Users.Enums
@@ -13,14 +14,7 @@
 @using HITSBlazor.Utils.Validation
 
 <div @onclick:stopPropagation="true" class="edit-user-modal p-3 rounded bg-white">
-    <div class="edit-user-modal-header w-100">
-        <Typography FontSize="3" TextColor="TextColor.Primary">
-            Редактировать
-        </Typography>
-        <Button BtnType="ButtonType.Button" 
-                ButtonClass="btn-close" 
-                OnButtonClick="() => ModalService.Close(ModalType.Center)" />
-    </div>
+    <CenterModalHeader HeaderText="Редактировать" />
     <div class="edit-user-modal-inputs w-100">
         <Input IconStyle="&#64;" 
                Placeholder="Введите email" 

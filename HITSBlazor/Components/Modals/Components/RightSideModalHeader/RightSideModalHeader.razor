@@ -1,15 +1,25 @@
 ﻿@namespace HITSBlazor.Components.Modals.Components.ModalHeader
 @using HITSBlazor.Components.Button
 @using HITSBlazor.Components.Typography
+@using HITSBlazor.Services.Modal
 @using HITSBlazor.Utils.Models
 
 <div class="right-side-modal-header mb-3">
     <Button Text="Назад"
             IconStyle="bi-backspace-fill"
-            BtnType="ButtonType.Button"
             Variant="ButtonVariant.Primary"
             OnButtonClick="CloseModal" />
     <Typography FontSize="4" TextColor="TextColor.Primary" CustomClass="p-2 w-100 bg-white rounded-3 text-nowrap overflow-scroll-hidden">
-        @Title
+        @HeaderText
     </Typography>
 </div>
+
+@code {
+    [Inject]
+    private ModalService ModalService { get; set; } = null!;
+
+    [Parameter]
+    public string HeaderText { get; set; } = string.Empty;
+
+    private async Task CloseModal() => await ModalService.Close(ModalType.RightSide);
+}

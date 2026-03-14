@@ -1,0 +1,55 @@
+﻿@namespace HITSBlazor.Pages.Admin.AllCompanies
+@using HITSBlazor.Components.ActionMenus.BaseActionMenu
+@using HITSBlazor.Components.Button
+@using HITSBlazor.Components.ListPageComponents.ListPageHeader
+@using HITSBlazor.Components.ListPageComponents.ListPageSearch
+@using HITSBlazor.Components.Placeholders.TablePlaceholder
+@using HITSBlazor.Components.Tables.TableActionMenu
+@using HITSBlazor.Components.Tables.TableBodyRow
+@using HITSBlazor.Components.Tables.TableHeader
+@using HITSBlazor.Components.Typography
+
+<div class="page-content-with-header bg-white overflow-y-scroll">
+    @if (_isLoading)
+    {
+        <TablePlaceholder />
+    }
+    else
+    {
+        <div class="w-100 bg-white p-3">
+            <ListPageHeader HeaderText="@($"Список компаний: {_companies.Count}")"
+                            ShowCreateButton="true"
+                            CreateButtonText="Создать компанию" 
+                            OnButtonClick="@(() => ShowCompanyModal())" />
+            <ListPageSearch ValueChanged="@((value) => SeacrhCompany(value))" />
+            <div class="w-100 d-flex">
+                <div class="w-100">
+                    <table class="table table-hover mb-0">
+                        <TableHeader TableActionMenuIsEnable="true" Items="TableHeaderItems" />
+                        <tbody>
+                            @foreach (var company in _companies)
+                            {
+                                <tr>
+                                    <TableBodyRow>
+                                        <div class="text-primary data-link" @onclick="() => ShowCompanyModal(company.Id)">
+                                            @company.Name
+                                        </div>
+                                    </TableBodyRow>
+                                    <TableBodyRow>
+                                        @company.Owner.FullName
+                                    </TableBodyRow>
+                                    <TableActionMenu ItemId="company.Id"
+                                                     OnAction="OnCompanyAction"
+                                                     ActionIds="@(new Dictionary<MenuAction, object> { 
+                                                         [MenuAction.Edit] = company.Id,
+                                                         [MenuAction.Delete] = company
+                                                     })"/>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    }
+</div>
