@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Components.Routing;
 namespace HITSBlazor.Services
 {
     //TODO: думаю URL страниц как то унифицировать, рпвильное ли вообще слово?
+    //TODO: сделать сохранение текущей страницы, если роль позволяет на ней находиться
     public class NavigationService
     {
         private readonly NavigationManager _navigationManager;

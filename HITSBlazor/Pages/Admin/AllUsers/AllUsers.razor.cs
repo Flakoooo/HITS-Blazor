@@ -16,6 +16,9 @@ namespace HITSBlazor.Pages.Admin.AllUsers
     public partial class AllUsers : IDisposable
     {
         [Inject]
+        private IAuthService AuthService { get; set; } = null!;
+
+        [Inject]
         private IUserService UserService { get; set; } = null!;
 
         [Inject]
@@ -94,6 +97,28 @@ namespace HITSBlazor.Pages.Admin.AllUsers
         }
 
         private void ShowUserProfile(Guid userId) => ModalService.ShowProfileModal(userId);
+
+        private Dictionary<MenuAction, object> GetActions(User user)
+        {
+            if (AuthService.CurrentUser?.Role is RoleType.Admin)
+            {
+                return new Dictionary<MenuAction, object>
+                {
+                    [MenuAction.ViewProfile] = user.Id,
+                    [MenuAction.Edit] = user,
+                    [MenuAction.Delete] = user
+                };
+            }
+            else if (AuthService.CurrentUser?.Role is RoleType.Teacher)
+            {
+                return new Dictionary<MenuAction, object>
+                {
+                    [MenuAction.ViewProfile] = user.Id
+                };
+            }
+
+            return [];
+        }
 
         private async Task OnUserAction(TableActionContext context)
         {

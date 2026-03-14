@@ -65,11 +65,7 @@
                                     </TableBodyRow>
                                     <TableActionMenu ItemId="@user.Id"
                                                      OnAction="OnUserAction"
-                                                     ActionIds="@(new Dictionary<MenuAction, object> { 
-                                                         [MenuAction.ViewProfile] = user.Id,
-                                                         [MenuAction.Edit] = user,
-                                                         [MenuAction.Delete] = user
-                                                     })" />
+                                                     ActionIds="GetActions(user)" />
                                 </tr>
                             }
                         </tbody>
