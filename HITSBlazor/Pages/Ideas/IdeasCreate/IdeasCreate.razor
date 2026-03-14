@@ -1,6 +1,7 @@
 ﻿@using HITSBlazor.Components.Button
 @using HITSBlazor.Components.Hint
 @using HITSBlazor.Components.InputDropdowns.SkillDropdown
+@using HITSBlazor.Components.Inputs.CheckboxDropdown
 @using HITSBlazor.Components.Inputs.Input
 @using HITSBlazor.Components.Inputs.Number
 @using HITSBlazor.Components.Inputs.RadioDropdown
@@ -15,6 +16,8 @@
 @using HITSBlazor.Models.Users.Entities
 @using HITSBlazor.Services.Ideas
 @using HITSBlazor.Utils
+@using HITSBlazor.Utils.EnumStyles
+@using HITSBlazor.Utils.EnumTranslators
 @using HITSBlazor.Utils.Models
 
 <div class="new-idea page-content-with-header">
@@ -69,20 +72,38 @@
                 </div>
             </div>
             <div>
-                <Typography FontSize="6" TextColor="TextColor.Primary">
-                    Стек технологий
-                </Typography>
-                <Hint Text="@_hints["Skills"]" />
-                <div class="mt-2 w-100 stack-categories">
-                    <SkillDropdown SkillType="SkillType.Language"
-                                   @bind-SelectedSkills="@SelectedLanguageSkills" />
-                    <SkillDropdown SkillType="SkillType.Framework"
-                                   @bind-SelectedSkills="@SelectedFrameworkSkills" />
-                    <SkillDropdown SkillType="SkillType.Database"
-                                   @bind-SelectedSkills="@SelectedDatabaseSkills" />
-                    <SkillDropdown SkillType="SkillType.Devops"
-                                   @bind-SelectedSkills="@SelectedDevopsSkills" />
-                </div>
+                @if (_isLoading)
+                {
+                    @for (int p = 0; p < 4; ++p)
+                    {
+                        <Placeholder Height="PlaceholderHeight.Small" />
+                    }
+                }
+                else
+                {
+                    <Typography FontSize="6" TextColor="TextColor.Primary">
+                        Стек технологий
+                    </Typography>
+                    <Hint Text="@_hints["Skills"]" />
+                    <div class="mt-2 w-100 stack-categories">
+                        <SkillDropdown Placeholder="@SkillType.Language.GetTranslation()"
+                                       AllSkills="LanguageSkills"
+                                       @bind-SelectedSkills="@SelectedLanguageSkills"
+                                       ValueMustCreated="(value) => CreateNewSkill(value, SkillType.Language)" />
+                        <SkillDropdown Placeholder="@SkillType.Framework.GetTranslation()"
+                                       AllSkills="FrameworkSkills"
+                                       @bind-SelectedSkills="@SelectedFrameworkSkills"
+                                       ValueMustCreated="(value) => CreateNewSkill(value, SkillType.Framework)" />
+                        <SkillDropdown Placeholder="@SkillType.Database.GetTranslation()"
+                                       AllSkills="DatabaseSkills"
+                                       @bind-SelectedSkills="@SelectedDatabaseSkills"
+                                       ValueMustCreated="(value) => CreateNewSkill(value, SkillType.Database)" />
+                        <SkillDropdown Placeholder="@SkillType.Devops.GetTranslation()"
+                                       AllSkills="DevopsSkills"
+                                       @bind-SelectedSkills="@SelectedDevopsSkills"
+                                       ValueMustCreated="(value) => CreateNewSkill(value, SkillType.Devops)" />
+                    </div>
+                }
             </div>
             @if (_isLoading)
             {

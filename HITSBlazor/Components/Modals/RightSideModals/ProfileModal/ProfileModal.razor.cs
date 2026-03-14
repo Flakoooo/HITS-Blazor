@@ -28,6 +28,9 @@ namespace HITSBlazor.Components.Modals.RightSideModals.ProfileModal
         private IProfileService ProfileService { get; set; } = null!;
 
         [Inject]
+        private ISkillService SkillService { get; set; } = null!;
+
+        [Inject]
         private IUserSkillService UserSkillService { get; set; } = null!;
 
         [Inject]
@@ -52,6 +55,11 @@ namespace HITSBlazor.Components.Modals.RightSideModals.ProfileModal
 
         private Profile? Profile { get; set; }
         private UserDataForm? _userDataForm;
+
+        private List<Skill> LanguageSkills { get; set; } = [];
+        private List<Skill> FrameworkSkills { get; set; } = [];
+        private List<Skill> DatabaseSkills { get; set; } = [];
+        private List<Skill> DevopsSkills { get; set; } = [];
 
         private HashSet<Skill> SelectedLanguageSkills { get; set; } = [];
         private HashSet<Skill> SelectedFrameworkSkills { get; set; } = [];
@@ -79,6 +87,11 @@ namespace HITSBlazor.Components.Modals.RightSideModals.ProfileModal
 
             _userDataForm = ResetUserForm(Profile);
 
+            LanguageSkills = await SkillService.GetSkillsAsync(skillType: SkillType.Language);
+            FrameworkSkills = await SkillService.GetSkillsAsync(skillType: SkillType.Framework);
+            DatabaseSkills = await SkillService.GetSkillsAsync(skillType: SkillType.Database);
+            DevopsSkills = await SkillService.GetSkillsAsync(skillType: SkillType.Devops);
+
             BelbinTestResult = await TestService.GetTestResultAsync(UserId, TestService.BelbinTestName);
             TemperTestResult = await TestService.GetTestResultAsync(UserId, TestService.TemperTestName);
             MindTestResult = await TestService.GetTestResultAsync(UserId, TestService.MindTestName);
@@ -98,6 +111,33 @@ namespace HITSBlazor.Components.Modals.RightSideModals.ProfileModal
             Telephone = original.Telephone,
             StudyGroup = original.StudyGroup
         };
+
+        private async Task CreateNewSkill(string name, SkillType skillType)
+        {
+            var newSkill = await SkillService.CreateNewSkillAsync(name, skillType, false);
+            if (newSkill is null) return;
+
+            if (skillType is SkillType.Language)
+            {
+                LanguageSkills.Add(newSkill);
+                SelectedLanguageSkills.Add(newSkill);
+            }
+            else if (skillType is SkillType.Framework)
+            {
+                FrameworkSkills.Add(newSkill);
+                SelectedFrameworkSkills.Add(newSkill);
+            }
+            else if (skillType is SkillType.Database)
+            {
+                DatabaseSkills.Add(newSkill);
+                SelectedDatabaseSkills.Add(newSkill);
+            }
+            else if (skillType is SkillType.Devops)
+            {
+                DevopsSkills.Add(newSkill);
+                SelectedDevopsSkills.Add(newSkill);
+            }
+        }
 
         private void UpdateCurrentProfile()
         {

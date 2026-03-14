@@ -1,0 +1,45 @@
+﻿@namespace HITSBlazor.Components.Modals.CenterModals.UsersGroupModal
+@using HITSBlazor.Components.Button
+@using HITSBlazor.Components.Inputs.Input
+@using HITSBlazor.Components.Modals.Components.CenterModalHeader
+@using HITSBlazor.Components.Placeholders.Placeholder
+
+<div @onclick:stopPropagation="true" class="company-modal p-3 bg-white rounded-3">
+    @if (_isLoading)
+    {
+        <div class="w-100 d-flex justify-content-center">
+            <Placeholder Width="w-50" />
+        </div>
+        <Placeholder Height="PlaceholderHeight.Small" />
+        <div class="d-flex gap-3">
+            <div class="w-50 d-flex flex-column gap-2">
+                <Placeholder />
+                <Placeholder Height="PlaceholderHeight.Medium" />
+            </div>
+            <div class="w-50 d-flex flex-column gap-2">
+                <Placeholder />
+                <Placeholder Height="PlaceholderHeight.Medium" />
+            </div>
+        </div>
+        <Placeholder Height="PlaceholderHeight.Small" />
+        <Placeholder Height="PlaceholderHeight.Small" />
+    }
+    else
+    {
+        <CenterModalHeader HeaderText="@(UsersGroupId.HasValue ? "Редактирование группы" : "Создание группы")" />
+        <Input Label="Название группы:"
+               Placeholder="Введите название группы"
+               @bind-Value="UsersGroupName" />
+        <div class="d-flex justify-content-between gap-3">
+
+        </div>
+        <div class="w-100">
+
+        </div>
+        <Button Variant="ButtonVariant.Primary"
+                IsLoading="_submitting"
+                Text="@(UsersGroupId.HasValue ? "Сохранить изменения" : "Добавить")"
+                LoadingText="@(UsersGroupId.HasValue ? "Сохранение" : "Добавление")"
+                OnButtonClick="() => Console.WriteLine()" />
+    }
+</div>

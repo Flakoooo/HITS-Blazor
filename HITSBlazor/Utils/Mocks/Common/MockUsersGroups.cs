@@ -38,6 +38,8 @@ namespace HITSBlazor.Utils.Mocks.Common
             }
         ];
 
+        public static List<UsersGroup> GetAllGroups() => [.. _usersGroups];
+
         public static UsersGroup? GetGroupById(Guid id)
             => _usersGroups.FirstOrDefault(g => g.Id == id);
 
@@ -51,5 +53,7 @@ namespace HITSBlazor.Utils.Mocks.Common
 
             return [.. usedIndexes.Select(i => users[i])];
         }
+
+        public static bool DeleteUsersGroup(UsersGroup usersGroup) => _usersGroups.Remove(usersGroup);
     }
 }

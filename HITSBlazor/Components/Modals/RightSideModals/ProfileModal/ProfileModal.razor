@@ -207,14 +207,22 @@
                                 else
                                 {
                                     <div class="mt-2 w-100 stack-categories">
-                                        <SkillDropdown SkillType="SkillType.Language"
-                                                       @bind-SelectedSkills="@SelectedLanguageSkills" />
-                                        <SkillDropdown SkillType="SkillType.Framework"
-                                                       @bind-SelectedSkills="@SelectedFrameworkSkills" />
-                                        <SkillDropdown SkillType="SkillType.Database"
-                                                       @bind-SelectedSkills="@SelectedDatabaseSkills" />
-                                        <SkillDropdown SkillType="SkillType.Devops"
-                                                       @bind-SelectedSkills="@SelectedDevopsSkills" />
+                                        <SkillDropdown Placeholder="@SkillType.Language.GetTranslation()"
+                                                       AllSkills="LanguageSkills"
+                                                       @bind-SelectedSkills="@SelectedLanguageSkills"
+                                                       ValueMustCreated="(value) => CreateNewSkill(value, SkillType.Language)" />
+                                        <SkillDropdown Placeholder="@SkillType.Framework.GetTranslation()"
+                                                       AllSkills="FrameworkSkills"
+                                                       @bind-SelectedSkills="@SelectedFrameworkSkills"
+                                                       ValueMustCreated="(value) => CreateNewSkill(value, SkillType.Framework)" />
+                                        <SkillDropdown Placeholder="@SkillType.Database.GetTranslation()"
+                                                       AllSkills="DatabaseSkills"
+                                                       @bind-SelectedSkills="@SelectedDatabaseSkills"
+                                                       ValueMustCreated="(value) => CreateNewSkill(value, SkillType.Database)" />
+                                        <SkillDropdown Placeholder="@SkillType.Devops.GetTranslation()"
+                                                       AllSkills="DevopsSkills"
+                                                       @bind-SelectedSkills="@SelectedDevopsSkills"
+                                                       ValueMustCreated="(value) => CreateNewSkill(value, SkillType.Devops)" />
                                     </div>
                                 }
                             }

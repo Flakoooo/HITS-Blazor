@@ -30,22 +30,29 @@ namespace HITSBlazor.Utils.Mocks.Common
         public static Company? GetCompanyById(Guid id)
             => _companies.FirstOrDefault(c => c.Id == id);
 
-        public static Company? CreateCompany(string name, Guid ownerId, List<User> members)
+        public static Company? CreateCompany(string name, Guid ownerId, List<Guid> membersIds)
         {
             var owner = MockUsers.GetUserById(ownerId);
             if (owner is null) return null;
+
+            var members = new List<User>();
+            foreach (var memberId in membersIds)
+            {
+                var member = MockUsers.GetUserById(memberId);
+                if (member is not null) members.Add(member);
+            }
 
             var company = new Company
             {
                 Name = name,
                 Owner = owner,
-                Members = [.. members]
+                Members = members
             };
 
             return company;
         }
 
-        public static Company? UpdateCompany(Guid companyId, string name, Guid ownerId, List<User> members)
+        public static Company? UpdateCompany(Guid companyId, string name, Guid ownerId, List<Guid> membersIds)
         {
             var company = GetCompanyById(companyId);
             if (company is null) return null;
@@ -53,9 +60,16 @@ namespace HITSBlazor.Utils.Mocks.Common
             var owner = MockUsers.GetUserById(ownerId);
             if (owner is null) return null;
 
+            var members = new List<User>();
+            foreach (var memberId in membersIds)
+            {
+                var member = MockUsers.GetUserById(memberId);
+                if (member is not null) members.Add(member);
+            }
+
             company.Name = name;
             company.Owner = owner;
-            company.Members = [.. members];
+            company.Members = members;
 
             return company;
         }

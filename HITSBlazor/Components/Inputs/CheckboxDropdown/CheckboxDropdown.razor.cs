@@ -1,0 +1,130 @@
+﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Web;
+using Microsoft.JSInterop;
+
+namespace HITSBlazor.Components.Inputs.CheckboxDropdown
+{
+    public partial class CheckboxDropdown<T>
+    {
+        [Inject]
+        private IJSRuntime JSRuntime { get; set; } = null!;
+
+        [Parameter]
+        public string Label { get; set; } = string.Empty;
+
+        [Parameter]
+        public string Placeholder { get; set; } = string.Empty;
+
+        [Parameter]
+        public bool CreateValueAllowed { get; set; } = false;
+
+        [Parameter]
+        public EventCallback<string> ValueMustCreated { get; set; }
+
+        [Parameter]
+        public List<T> AllValues { get; set; } = [];
+
+        [Parameter]
+        public HashSet<T> SelectedValues { get; set; } = [];
+
+        [Parameter]
+        public EventCallback<HashSet<T>> SelectedValuesChanged { get; set; }
+
+        private ElementReference _inputRef;
+        private DotNetObjectReference<CheckboxDropdown<T>>? _dotNetHelper;
+
+        private bool _isOpen = false;
+
+        private List<T> _values = [];
+        private string _searchText = string.Empty;
+
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            if (firstRender)
+            {
+                _dotNetHelper = DotNetObjectReference.Create(this);
+                await JSRuntime.InvokeVoidAsync("listDropdown.registerClickOutside", _inputRef, _dotNetHelper);
+                _values = [.. AllValues];
+            }
+        }
+
+        private async Task OpenDropdown()
+        {
+            if (!_isOpen) _isOpen = true;
+        }
+
+        private void ToggleDropdown() => _isOpen = !_isOpen;
+
+        [JSInvokable]
+        public void CloseDropdown()
+        {
+            _isOpen = false;
+            InvokeAsync(StateHasChanged);
+        }
+
+        private bool CheckCreateValueAllowed() => ValueMustCreated.HasDelegate
+                && _isOpen
+                && CreateValueAllowed
+                && !string.IsNullOrWhiteSpace(_searchText)
+                && AllValues.FirstOrDefault(t => t.GetDisplayInfo().Equals(_searchText)) is null;
+
+        private async Task CreateNewValue()
+        {
+            await ValueMustCreated.InvokeAsync(_searchText);
+        }
+
+        private async Task OnSearch(ChangeEventArgs e)
+        {
+            _searchText = (e.Value?.ToString() ?? "").Trim();
+
+            if (string.IsNullOrWhiteSpace(_searchText))
+                _values = [.. AllValues];
+            else
+                _values = [.. AllValues.Where(v => v.MatchesSearch(_searchText))];
+
+            await InvokeAsync(StateHasChanged);
+
+        }
+
+        private void OnInputKeyDown(KeyboardEventArgs e)
+        {
+            if (e.Key == "Escape") _isOpen = false;
+        }
+
+        private async Task OnItemClick(T value)
+        {
+            if (!SelectedValues.Remove(value))
+                SelectedValues.Add(value);
+
+            await SelectedValuesChanged.InvokeAsync(SelectedValues);
+        }
+
+        private async Task OnCheckboxChange(T value, bool isChecked)
+        {
+            if (isChecked)
+                SelectedValues.Add(value);
+            else
+                SelectedValues.Remove(value);
+
+            await SelectedValuesChanged.InvokeAsync(SelectedValues);
+        }
+
+        private bool IsValueSelected(T value) => SelectedValues.Contains(value);
+
+        private async Task RemoveValue(T value)
+        {
+            SelectedValues.Remove(value);
+            await SelectedValuesChanged.InvokeAsync(SelectedValues);
+        }
+
+        public async ValueTask DisposeAsync()
+        {
+            if (_dotNetHelper != null)
+            {
+                await JSRuntime.InvokeVoidAsync("listDropdown.unregisterClickOutside", _inputRef);
+                _dotNetHelper.Dispose();
+            }
+        }
+
+    }
+}

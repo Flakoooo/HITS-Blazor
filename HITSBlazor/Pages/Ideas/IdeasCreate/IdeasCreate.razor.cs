@@ -3,6 +3,7 @@ using HITSBlazor.Models.Common.Enums;
 using HITSBlazor.Models.Ideas.Enums;
 using HITSBlazor.Models.Users.Entities;
 using HITSBlazor.Services;
+using HITSBlazor.Services.Auth;
 using HITSBlazor.Services.Companies;
 using HITSBlazor.Services.Ideas;
 using HITSBlazor.Services.Skills;
@@ -17,6 +18,9 @@ namespace HITSBlazor.Pages.Ideas.IdeasCreate
     [Route("/ideas/create/{IdeaId}")]
     public partial class IdeasCreate
     {
+        [Inject]
+        private IAuthService AuthService { get; set; } = null!;
+
         [Inject]
         private ISkillService SkillService { get; set; } = null!;
 
@@ -71,6 +75,11 @@ namespace HITSBlazor.Pages.Ideas.IdeasCreate
         private bool _isLoading = true;
         private bool _submitted = false;
 
+        private List<Skill> LanguageSkills { get; set; } = [];
+        private List<Skill> FrameworkSkills { get; set; } = [];
+        private List<Skill> DatabaseSkills { get; set; } = [];
+        private List<Skill> DevopsSkills { get; set; } = [];
+
         private HashSet<Skill> SelectedLanguageSkills { get; set; } = [];
         private HashSet<Skill> SelectedFrameworkSkills { get; set; } = [];
         private HashSet<Skill> SelectedDatabaseSkills { get; set; } = [];
@@ -117,7 +126,12 @@ namespace HITSBlazor.Pages.Ideas.IdeasCreate
         {
             _isLoading = true;
 
-            Companies = await CompanyService.GetCompaniesAsync();
+            LanguageSkills = await SkillService.GetSkillsAsync(skillType: SkillType.Language);
+            FrameworkSkills = await SkillService.GetSkillsAsync(skillType: SkillType.Framework);
+            DatabaseSkills = await SkillService.GetSkillsAsync(skillType: SkillType.Database);
+            DevopsSkills = await SkillService.GetSkillsAsync(skillType: SkillType.Devops);
+
+            Companies = await CompanyService.GetCompaniesAsync(role: AuthService.CurrentUser?.Role);
 
             _isLoading = false;
         }
@@ -159,6 +173,33 @@ namespace HITSBlazor.Pages.Ideas.IdeasCreate
             SelectedFrameworkSkills = [.. ideaSkills.Where(s => s.Type == SkillType.Framework)];
             SelectedDatabaseSkills = [.. ideaSkills.Where(s => s.Type == SkillType.Database)];
             SelectedDevopsSkills = [.. ideaSkills.Where(s => s.Type == SkillType.Devops)];
+        }
+
+        private async Task CreateNewSkill(string name, SkillType skillType)
+        {
+            var newSkill = await SkillService.CreateNewSkillAsync(name, skillType, false);
+            if (newSkill is null) return;
+
+            if (skillType is SkillType.Language)
+            {
+                LanguageSkills.Add(newSkill);
+                SelectedLanguageSkills.Add(newSkill);
+            }
+            else if (skillType is SkillType.Framework)
+            {
+                FrameworkSkills.Add(newSkill);
+                SelectedFrameworkSkills.Add(newSkill);
+            }
+            else if (skillType is SkillType.Database)
+            {
+                DatabaseSkills.Add(newSkill);
+                SelectedDatabaseSkills.Add(newSkill);
+            }
+            else if (skillType is SkillType.Devops)
+            {
+                DevopsSkills.Add(newSkill);
+                SelectedDevopsSkills.Add(newSkill);
+            }
         }
 
         private void UpdatePreAssessmentScore()

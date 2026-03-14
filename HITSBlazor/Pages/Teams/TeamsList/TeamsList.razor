@@ -5,6 +5,7 @@
 @using HITSBlazor.Components.Inputs.Input
 @using HITSBlazor.Components.ListPageComponents.ListPageHeader
 @using HITSBlazor.Components.ListPageComponents.ListPageSearch
+@using HITSBlazor.Components.ListPageComponents.ListPageTable
 @using HITSBlazor.Components.Placeholders.Placeholder
 @using HITSBlazor.Components.Placeholders.TablePlaceholder
 @using HITSBlazor.Components.Tables.TableActionMenu
@@ -27,51 +28,49 @@
                             CreateButtonText="Создать команду" 
                             OnButtonClick="@(() => NavigationService.NavigateToAsync("teams/create"))" />
             <ListPageSearch ValueChanged="@((value) => SearchTeam(value))" />
-            <div class="w-100 d-flex">
-                <div class="w-100">
-                    <table class="table table-hover mb-0">
-                        <TableHeader TableActionMenuIsEnable="true" 
-                                     Items="_teamTableHeader" 
-                                     OrderChanged="@((value) => SortTeam(value.Item1, value.Item2))" />
-                        <tbody>
-                            @foreach (var team in _teams)
-                            {
-                                <!-- TODO: реализовать компонент для вывода состояния статуса, так как у них стиль одинаков -->
-                                <tr>
-                                    <TableBodyRow IsCentered="true">
-                                        <div class="px-2 py-1 rounded-4 @(team.Closed ? "bg-danger-subtle text-danger" : "bg-success-subtle text-success")">
-                                            @(team.Closed ? "Закрыта" : "Открыта")
-                                        </div>
-                                    </TableBodyRow>
-                                    <TableBodyRow>
-                                        <div class="data-link" @onclick="@(() => ShowTeam(team.Id))">
-                                            @team.Name
-                                        </div>
-                                    </TableBodyRow>
-                                    <TableBodyRow IsCentered="true">
-                                        <div class="px-2 py-1 rounded-4 @(team.HasActiveProject ? "bg-warning-subtle text-warning" : "bg-primary-subtle text-primary")">
-                                            @(team.HasActiveProject ? "В работе" : "В поисках")
-                                        </div>
-                                    </TableBodyRow>
-                                    <TableBodyRow IsCentered="true">
-                                        @team.MembersCount
-                                    </TableBodyRow>
-                                    <TableBodyRow IsCentered="true">
-                                        @team.CreatedAt.ToString("dd.MM.yyyy")
-                                    </TableBodyRow>
-                                    <TableActionMenu ItemId="@team.Id"
-                                                     OnAction="OnTeamAction"
-                                                     ActionIds="@(new Dictionary<MenuAction, object> { 
-                                                        [MenuAction.View] = team.Id,
-                                                        [MenuAction.Edit] = team.Id,
-                                                        [MenuAction.Delete] = team
-                                                     })" />
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                </div>
-                <div class="list-page-filter w-25 bg-white p-2 ms-2 border-start">
+            <ListPageTable>
+                <TableContent>
+                    <TableHeader TableActionMenuIsEnable="true" 
+                                 Items="_teamTableHeader" 
+                                 OrderChanged="@((value) => SortTeam(value.Item1, value.Item2))" />
+                    <tbody>
+                        @foreach (var team in _teams)
+                        {
+                            <!-- TODO: реализовать компонент для вывода состояния статуса, так как у них стиль одинаков -->
+                            <tr>
+                                <TableBodyRow IsCentered="true">
+                                    <div class="px-2 py-1 rounded-4 @(team.Closed ? "bg-danger-subtle text-danger" : "bg-success-subtle text-success")">
+                                        @(team.Closed ? "Закрыта" : "Открыта")
+                                    </div>
+                                </TableBodyRow>
+                                <TableBodyRow>
+                                    <div class="data-link" @onclick="@(() => ShowTeam(team.Id))">
+                                        @team.Name
+                                    </div>
+                                </TableBodyRow>
+                                <TableBodyRow IsCentered="true">
+                                    <div class="px-2 py-1 rounded-4 @(team.HasActiveProject ? "bg-warning-subtle text-warning" : "bg-primary-subtle text-primary")">
+                                        @(team.HasActiveProject ? "В работе" : "В поисках")
+                                    </div>
+                                </TableBodyRow>
+                                <TableBodyRow IsCentered="true">
+                                    @team.MembersCount
+                                </TableBodyRow>
+                                <TableBodyRow IsCentered="true">
+                                    @team.CreatedAt.ToString("dd.MM.yyyy")
+                                </TableBodyRow>
+                                <TableActionMenu ItemId="@team.Id"
+                                                    OnAction="OnTeamAction"
+                                                    ActionIds="@(new Dictionary<MenuAction, object> { 
+                                                    [MenuAction.View] = team.Id,
+                                                    [MenuAction.Edit] = team.Id,
+                                                    [MenuAction.Delete] = team
+                                                    })" />
+                            </tr>
+                        }
+                    </tbody>
+                </TableContent>
+                <FilterContent>
                     <RadioFilter Label="Приватность"
                                  Value1Text="Открытая команда"
                                  Value2Text="Закрытая команда"
@@ -130,8 +129,8 @@
                                 IconStyle="bi-x-lg" 
                                 OnButtonClick="ResetFilters" />
                     </div>
-                </div>
-            </div>
+                </FilterContent>
+            </ListPageTable>
         </div>
     }
 </div>

@@ -1,8 +1,6 @@
-﻿@namespace HITSBlazor.Pages.Admin.AllUsers
+﻿@namespace HITSBlazor.Pages.Admin.AllUsersGroups
 @using HITSBlazor.Components.ActionMenus.BaseActionMenu
 @using HITSBlazor.Components.Button
-@using HITSBlazor.Components.Filters.RadioFilter
-@using HITSBlazor.Components.Inputs.Input
 @using HITSBlazor.Components.ListPageComponents.ListPageHeader
 @using HITSBlazor.Components.ListPageComponents.ListPageSearch
 @using HITSBlazor.Components.ListPageComponents.ListPageTable
@@ -14,9 +12,8 @@
 @using HITSBlazor.Models.Users.Enums
 @using HITSBlazor.Utils.EnumStyles
 @using HITSBlazor.Utils.EnumTranslators
-@using HITSBlazor.Utils.Models
 
-<div class="users-content page-content-with-header bg-white">
+<div class="page-content-with-header bg-white overflow-y-scroll">
     @if (_isLoading)
     {
         <TablePlaceholder />
@@ -24,48 +21,38 @@
     else
     {
         <div class="w-100 bg-white p-3">
-            <ListPageHeader HeaderText="@($"Список пользователей: {_users.Count}")" />
-            <ListPageSearch ValueChanged="@((value) => SearchUser(value))" />
+            <ListPageHeader HeaderText="@($"Группы пользователей: {_usersGroups.Count}")"
+                            ShowCreateButton="true"
+                            CreateButtonText="Создать группу" 
+                            OnButtonClick="@(() => ShowUsersGroupModal())"/>
+            <ListPageSearch ValueChanged="@((value) => SearchUsersGroup(value))" />
             <ListPageTable>
                 <TableContent>
                     <TableHeader TableActionMenuIsEnable="true"
-                                 Items="_userTableHeader"
-                                 OrderChanged="@((value) => SortUser(value.Item1, value.Item2))" />
+                                 Items="UsersGroupsTableHeader" />
                     <tbody>
-                        @foreach (var user in _users)
+                        @foreach (var usersGroup in _usersGroups)
                         {
                             <tr>
                                 <TableBodyRow>
-                                    <div class="text-primary data-link" @onclick="@(() => ShowUserProfile(user.Id))">
-                                        @user.Email
+                                    <div class="text-primary data-link" @onclick="() => ShowUsersGroupModal(usersGroup.Id)">
+                                        @usersGroup.Name
                                     </div>
                                 </TableBodyRow>
                                 <TableBodyRow>
-                                    @user.FirstName
-                                </TableBodyRow>
-                                <TableBodyRow>
-                                    @user.LastName
-                                </TableBodyRow>
-                                <TableBodyRow>
-                                    @user.Telephone
-                                </TableBodyRow>
-                                <TableBodyRow>
-                                    @user.StudyGroup
-                                </TableBodyRow>
-                                <TableBodyRow IsCentered="true">
-                                    @(user.CreatedAt.HasValue? user.CreatedAt.Value.ToString("dd.MM.yyyy") : "Н/Д")
-                                </TableBodyRow>
-                                <TableBodyRow>
-                                    @foreach (var role in user.Roles)
+                                    @foreach (var role in usersGroup.Roles)
                                     {
                                         <div class="px-2 py-1 rounded-4 text-center align-self-start @role.GetStyle()">
                                             @role.GetTranslation()
                                         </div>
                                     }
                                 </TableBodyRow>
-                                <TableActionMenu ItemId="@user.Id"
-                                                 OnAction="OnUserAction"
-                                                 ActionIds="GetActions(user)" />
+                                <TableActionMenu ItemId="usersGroup.Id"
+                                                 OnAction="OnUsersGroupAction"
+                                                 ActionIds="@(new Dictionary<MenuAction, object> { 
+                                                     [MenuAction.Edit] = usersGroup.Id,
+                                                     [MenuAction.Delete] = usersGroup
+                                                 })"/>
                             </tr>
                         }
                     </tbody>
@@ -81,7 +68,7 @@
                                 <div class="list-page-filter-choice px-2 py-1 rounded-1">
                                     <div class="d-flex">
                                         <input type="checkbox"
-                                               checked="@SelectedUserRoles.Contains(role)"
+                                               checked="@SelectedRoles.Contains(role)"
                                                @onchange="@(e => OnRoleTypeChanged(role, (bool)e.Value!))"
                                                class="form-check-input" />
                                         <Typography CustomClass="form-check-label ms-2">
@@ -92,16 +79,8 @@
                             }
                         </div>
                     </div>
-                    <!-- TODO: реализовать фильтр -->
-                    <RadioFilter Label="Студенты"
-                                 Value1Text="В команде"
-                                 Value2Text="Не в команде"
-                                 @bind-Value="InTeam"
-                                 OnFilterChanged="@LoadUsersAsync" />
-
                     <div class="w-100 d-flex justify-content-center">
-                        <Button BtnType="ButtonType.Button"
-                                Variant="ButtonVariant.Danger"
+                        <Button Variant="ButtonVariant.Danger"
                                 Text="Сбросить фильтры"
                                 IconStyle="bi-x-lg"
                                 OnButtonClick="ResetFilters" />

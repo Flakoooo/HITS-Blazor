@@ -3,6 +3,7 @@ using HITSBlazor.Services;
 using HITSBlazor.Services.ActionMenus;
 using HITSBlazor.Services.Auth;
 using HITSBlazor.Services.Companies;
+using HITSBlazor.Services.Groups;
 using HITSBlazor.Services.Ideas;
 using HITSBlazor.Services.Invitation;
 using HITSBlazor.Services.Markets;
@@ -97,6 +98,9 @@ namespace HITSBlazor
 
             //Companies
             builder.Services.AddScoped<ICompanyService, MockCompanyService>();
+
+            //UsersGroups
+            builder.Services.AddScoped<IUsersGroupsService, MockUsersGroupsService>();
 
             //Ideas
             builder.Services.AddScoped<IIdeasService, MockIdeasService>();

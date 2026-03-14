@@ -1,8 +1,9 @@
 ﻿using HITSBlazor.Models.Common.Enums;
+using HITSBlazor.Utils.Models;
 
 namespace HITSBlazor.Models.Common.Entities
 {
-    public class Skill : IEquatable<Skill>
+    public class Skill : ViewModelBase, IEquatable<Skill>
     {
         public Guid Id { get; set; }
         public string Name { get; set; } = string.Empty;
@@ -15,6 +16,8 @@ namespace HITSBlazor.Models.Common.Entities
         public bool Equals(Skill? other) => other is not null && Id.Equals(other.Id);
 
         public override bool Equals(object? obj) => Equals(obj as Skill);
+
+        public override string GetDisplayInfo() => Name;
 
         public override int GetHashCode() => Id.GetHashCode();
     }

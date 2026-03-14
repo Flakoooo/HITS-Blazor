@@ -66,8 +66,6 @@
                                currentPath.Equals("recovery-password") ||
                                currentPath.Equals("new-password");
 
-            Console.WriteLine(isPublicRoute);
-
             if (AuthService.IsAuthenticated)
             {
                 if (!isPublicRoute && !currentPath.Equals("redirect", StringComparison.OrdinalIgnoreCase))

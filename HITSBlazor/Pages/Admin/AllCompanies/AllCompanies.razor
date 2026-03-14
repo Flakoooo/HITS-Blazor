@@ -3,6 +3,7 @@
 @using HITSBlazor.Components.Button
 @using HITSBlazor.Components.ListPageComponents.ListPageHeader
 @using HITSBlazor.Components.ListPageComponents.ListPageSearch
+@using HITSBlazor.Components.ListPageComponents.ListPageTable
 @using HITSBlazor.Components.Placeholders.TablePlaceholder
 @using HITSBlazor.Components.Tables.TableActionMenu
 @using HITSBlazor.Components.Tables.TableBodyRow
@@ -22,34 +23,32 @@
                             CreateButtonText="Создать компанию" 
                             OnButtonClick="@(() => ShowCompanyModal())" />
             <ListPageSearch ValueChanged="@((value) => SeacrhCompany(value))" />
-            <div class="w-100 d-flex">
-                <div class="w-100">
-                    <table class="table table-hover mb-0">
-                        <TableHeader TableActionMenuIsEnable="true" Items="TableHeaderItems" />
-                        <tbody>
-                            @foreach (var company in _companies)
-                            {
-                                <tr>
-                                    <TableBodyRow>
-                                        <div class="text-primary data-link" @onclick="() => ShowCompanyModal(company.Id)">
-                                            @company.Name
-                                        </div>
-                                    </TableBodyRow>
-                                    <TableBodyRow>
-                                        @company.Owner.FullName
-                                    </TableBodyRow>
-                                    <TableActionMenu ItemId="company.Id"
-                                                     OnAction="OnCompanyAction"
-                                                     ActionIds="@(new Dictionary<MenuAction, object> { 
-                                                         [MenuAction.Edit] = company.Id,
-                                                         [MenuAction.Delete] = company
-                                                     })"/>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+            <ListPageTable>
+                <TableContent>
+                    <TableHeader TableActionMenuIsEnable="true" Items="TableHeaderItems" />
+                    <tbody>
+                        @foreach (var company in _companies)
+                        {
+                            <tr>
+                                <TableBodyRow>
+                                    <div class="text-primary data-link" @onclick="() => ShowCompanyModal(company.Id)">
+                                        @company.Name
+                                    </div>
+                                </TableBodyRow>
+                                <TableBodyRow>
+                                    @company.Owner.FullName
+                                </TableBodyRow>
+                                <TableActionMenu ItemId="company.Id"
+                                                 OnAction="OnCompanyAction"
+                                                 ActionIds="@(new Dictionary<MenuAction, object> { 
+                                                     [MenuAction.Edit] = company.Id,
+                                                     [MenuAction.Delete] = company
+                                                 })"/>
+                            </tr>
+                        }
+                    </tbody>
+                </TableContent>
+            </ListPageTable>
         </div>
     }
 </div>

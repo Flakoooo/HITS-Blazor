@@ -1,84 +1,34 @@
 ﻿@namespace HITSBlazor.Components.InputDropdowns.SkillDropdown
+@using HITSBlazor.Components.Inputs.CheckboxDropdown
 @using HITSBlazor.Components.Placeholders.Placeholder
+@using HITSBlazor.Components.Typography
 @using HITSBlazor.Models.Common.Entities
 @using HITSBlazor.Models.Common.Enums
 @using HITSBlazor.Utils.EnumStyles
 
-@if (_isLoading)
-{
-    <Placeholder Height="PlaceholderHeight.Small" />
-}
-else
-{
-    <div class="w-25" tabindex="-1">
-        <div class="w-100">
-            <div style="position: relative;">
-                <div class="w-100">
-                    <div class="input-group">
-                        <input type="text"
-                               @ref="inputRef"
-                               @oninput="@(async e => await OnSearch(e))"
-                               placeholder="@GetPlaceholder()"
-                               class="form-control"
-                               style="color: #000 !important;"
-                               @onclick="OpenDropdown"
-                               @onfocus="OpenDropdown"
-                               @onkeydown="OnInputKeyDown" />
-                    </div>
-                </div>
-
-                @if (!_isOpen)
+<div class="w-25">
+    <CheckboxDropdown T="Skill"
+                      AllValues="AllSkills"
+                      Placeholder="@Placeholder"
+                      @bind-SelectedValues="SelectedSkills"
+                      CreateValueAllowed="true"
+                      ValueMustCreated="(value) => CreateNewSkill(value)" />
+    @if (SelectedSkills.Any())
+    {
+        <div class="mt-2">
+            <div class="d-flex flex-wrap gap-1">
+                @foreach (var skill in SelectedSkills)
                 {
-                    <i class="input-dropdown-icon bi bi-chevron-down" @onclick="ToggleDropdown"></i>
-                }
-
-                @if (_isOpen && _skillCreateAllowed)
-                {
-                    <i class="input-dropdown-icon bi bi-plus-lg" @onclick="CreateNewUnconfirmedSkill"></i>
-                }
-
-                @if (_isOpen)
-                {
-                    <div class="list-group w-100 dropdown-list"
-                         style="top: 42px; right: auto; z-index: 10000; max-height: 173px; overflow-y: scroll; position: absolute; bottom: auto; left: auto;"
-                         @onclick:stopPropagation>
-
-                        @foreach (var skill in _skills)
-                        {
-                            <div @onclick="@(() => OnItemClick(skill))"
-                                 class="d-flex list-group-item list-group-item-action focusable-item"
-                                 style="padding: 8px 12px; cursor: pointer;"
-                                 tabindex="-1">
-                                <div class="d-flex align-items-center" @onclick:stopPropagation>
-                                    <input type="checkbox"
-                                           @onchange="@(e => OnCheckboxChange(skill, (bool)e.Value!))"
-                                           checked="@IsSkillSelected(skill)"
-                                           @onclick:stopPropagation
-                                           class="form-check-input" />
-                                    <span class="form-check-label ms-2" @onclick="@(() => OnItemClick(skill))">@skill.Name</span>
-                                </div>
-                            </div>
-                        }
+                    <div class="px-2 py-1 rounded d-flex gap-1 align-items-center @skill.Type.GetStyle()">
+                        <Typography FontSize="6">
+                            @skill.Name
+                        </Typography>
+                        <i @onclick="@(() => RemoveSkill(skill))"
+                            class="bi bi-x-lg"
+                            style="cursor: pointer;"></i>
                     </div>
                 }
             </div>
         </div>
-
-        @if (SelectedSkills.Any())
-        {
-            <div class="mt-2">
-                <div class="d-flex flex-wrap gap-1">
-                    @foreach (var skill in SelectedSkills)
-                    {
-                        <div class="px-2 py-1 rounded d-flex gap-1 @skill.Type.GetStyle() align-items-center">
-                            <span class="fs-6">@skill.Name</span>
-                            <i @onclick="@(() => RemoveSkill(skill))"
-                               class="bi bi-x-lg"
-                               style="cursor: pointer;"></i>
-                        </div>
-                    }
-                </div>
-            </div>
-        }
-    </div>
-}
+    }
+</div>
