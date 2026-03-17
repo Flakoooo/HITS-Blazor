@@ -49,6 +49,8 @@ namespace HITSBlazor.Utils.Mocks.Common
                 Members = members
             };
 
+            _companies.Add(company);
+
             return company;
         }
 

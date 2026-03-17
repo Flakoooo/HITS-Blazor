@@ -6,7 +6,8 @@ namespace HITSBlazor.Services.Companies
 {
     public interface ICompanyService
     {
-        event Action? OnCompaniesStateChanged;
+        event Func<Task>? OnCompaniesStateChanged;
+        event Action? OnCompaniesStateUpdated;
 
         Task<List<Company>> GetCompaniesAsync(string? searchText = null, RoleType? role = null);
         Task<Company?> GetCompanyByIdAsync(Guid companyId);

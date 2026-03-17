@@ -36,7 +36,8 @@ namespace HITSBlazor.Pages.Admin.AllCompanies
         {
             _isLoading = true;
 
-            CompanyService.OnCompaniesStateChanged += StateHasChanged;
+            CompanyService.OnCompaniesStateChanged += LoadCompaniesAsync;
+            CompanyService.OnCompaniesStateUpdated += StateHasChanged;
             await LoadCompaniesAsync();
 
             _isLoading = false;
@@ -47,6 +48,7 @@ namespace HITSBlazor.Pages.Admin.AllCompanies
             _companies = await CompanyService.GetCompaniesAsync(
                 _searchText
             );
+            StateHasChanged();
         }
 
         private async Task SeacrhCompany(string value)
@@ -88,7 +90,8 @@ namespace HITSBlazor.Pages.Admin.AllCompanies
 
         public void Dispose()
         {
-            CompanyService.OnCompaniesStateChanged -= StateHasChanged;
+            CompanyService.OnCompaniesStateChanged -= LoadCompaniesAsync;
+            CompanyService.OnCompaniesStateUpdated -= StateHasChanged;
         }
     }
 }

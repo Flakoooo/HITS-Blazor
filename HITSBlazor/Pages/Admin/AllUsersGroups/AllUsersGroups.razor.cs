@@ -39,7 +39,8 @@ namespace HITSBlazor.Pages.Admin.AllUsersGroups
         {
             _isLoading = true;
 
-            UsersGroupsService.OnUsersGroupsStateChanged += StateHasChanged;
+            UsersGroupsService.OnUsersGroupsStateChanged += LoadUsersGroupsAsync;
+            UsersGroupsService.OnUsersGroupsStateUpdated += StateHasChanged;
             await LoadUsersGroupsAsync();
 
             _isLoading = false;
@@ -51,6 +52,7 @@ namespace HITSBlazor.Pages.Admin.AllUsersGroups
                 searchText: _seacrhText,
                 selectedRoles: SelectedRoles
             );
+            StateHasChanged();
         }
 
         private void ShowUsersGroupModal(Guid? usersGroupid = null)
@@ -111,7 +113,8 @@ namespace HITSBlazor.Pages.Admin.AllUsersGroups
 
         public void Dispose()
         {
-            UsersGroupsService.OnUsersGroupsStateChanged -= StateHasChanged;
+            UsersGroupsService.OnUsersGroupsStateChanged -= LoadUsersGroupsAsync;
+            UsersGroupsService.OnUsersGroupsStateUpdated -= StateHasChanged;
         }
     }
 }

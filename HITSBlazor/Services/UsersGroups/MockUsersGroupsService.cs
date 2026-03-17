@@ -9,7 +9,8 @@ namespace HITSBlazor.Services.UsersGroups
     {
         private readonly GlobalNotificationService _globalNotificationService = globalNotificationService;
 
-        public event Action? OnUsersGroupsStateChanged;
+        public event Func<Task>? OnUsersGroupsStateChanged;
+        public event Action? OnUsersGroupsStateUpdated;
 
         private List<UsersGroup> _cachedUsersGroups = [];
         private DateTime _lastRefreshTime;
@@ -56,7 +57,7 @@ namespace HITSBlazor.Services.UsersGroups
             }
 
             _globalNotificationService.ShowSuccess("Группа успешно создана");
-            _cachedUsersGroups.Add(usersGroup);
+            _cachedUsersGroups.Clear();
             OnUsersGroupsStateChanged?.Invoke();
             return true;
         }

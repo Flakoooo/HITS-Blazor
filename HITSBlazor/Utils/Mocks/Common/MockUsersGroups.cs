@@ -70,6 +70,8 @@ namespace HITSBlazor.Utils.Mocks.Common
                 Roles = roles
             };
 
+            _usersGroups.Add(usersGroup);
+
             return usersGroup;
         }
 

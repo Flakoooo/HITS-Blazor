@@ -6,7 +6,8 @@ namespace HITSBlazor.Services.UsersGroups
 {
     public interface IUsersGroupsService
     {
-        event Action? OnUsersGroupsStateChanged;
+        event Func<Task>? OnUsersGroupsStateChanged;
+        event Action? OnUsersGroupsStateUpdated;
 
         Task<List<UsersGroup>> GetUsersGroupsAsync(string? searchText = null, HashSet<RoleType>? selectedRoles = null);
         Task<UsersGroup?> GetUsersGroupByIdAsync(Guid usersGroupId);

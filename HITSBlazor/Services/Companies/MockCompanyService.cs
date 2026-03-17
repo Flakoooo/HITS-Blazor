@@ -11,7 +11,8 @@ namespace HITSBlazor.Services.Companies
         private readonly IAuthService _authService = authService;
         private readonly GlobalNotificationService _globalNotificationService = globalNotificationService;
 
-        public event Action? OnCompaniesStateChanged;
+        public event Func<Task>? OnCompaniesStateChanged;
+        public event Action? OnCompaniesStateUpdated;
 
         private List<Company> _cachedCompanies = [];
         private DateTime _lastRefreshTime;
@@ -70,7 +71,7 @@ namespace HITSBlazor.Services.Companies
             }
 
             _globalNotificationService.ShowSuccess("Компания успешно создана");
-            _cachedCompanies.Add(company);
+            _cachedCompanies.Clear();
             OnCompaniesStateChanged?.Invoke();
             return true;
         }
@@ -93,7 +94,7 @@ namespace HITSBlazor.Services.Companies
             }
 
             _globalNotificationService.ShowSuccess("Компания успешно обновлена");
-            OnCompaniesStateChanged?.Invoke();
+            OnCompaniesStateUpdated?.Invoke();
             return true;
         }
 
