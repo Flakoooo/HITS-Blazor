@@ -5,7 +5,6 @@ using HITSBlazor.Models.Ideas.Enums;
 using HITSBlazor.Models.Users.Enums;
 using HITSBlazor.Pages.Ideas.IdeasCreate;
 using HITSBlazor.Services.Auth;
-using HITSBlazor.Utils.EnumTranslators;
 using HITSBlazor.Utils.Mocks.Common;
 using HITSBlazor.Utils.Mocks.Ideas;
 using HITSBlazor.Utils.Models;
@@ -142,7 +141,7 @@ namespace HITSBlazor.Services.Ideas
             var updatedIdea = MockIdeas.UpdateIdeaStatus(ideaId, ideaStatus);
             if (updatedIdea is null)
             {
-                _globalNotificationService.ShowError($"Не удалось сменить статус идеи на {ideaStatus.GetTranslation()}");
+                _globalNotificationService.ShowError($"Не удалось сменить статус идеи на {EnumViewModel<IdeaStatusType>.GetTranslation(ideaStatus)}");
                 return false;
             }
 

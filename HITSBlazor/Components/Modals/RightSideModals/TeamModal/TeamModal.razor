@@ -10,8 +10,8 @@
 @using HITSBlazor.Components.Typography
 @using HITSBlazor.Models.Common.Entities
 @using HITSBlazor.Models.Common.Enums
+@using HITSBlazor.Models.Teams.Enums
 @using HITSBlazor.Utils.EnumStyles
-@using HITSBlazor.Utils.EnumTranslators
 @using HITSBlazor.Utils.Models
 
 <div class="right-side-modal p-3 overflow-y-scroll" @onclick:stopPropagation="true">
@@ -205,7 +205,7 @@
                                                 <tr>
                                                     <TableBodyRow IsCentered="true">
                                                         <div class="px-2 py-1 rounded-4 @invitation.Status.GetStyle()">
-                                                            @invitation.Status.GetTranslation()
+                                                            @(EnumViewModel<TeamRequestStatus>.GetTranslation(invitation.Status))
                                                         </div>
                                                     </TableBodyRow>
                                                     <TableBodyRow IsCentered="true">
@@ -235,7 +235,7 @@
                                                 <tr>
                                                     <TableBodyRow IsCentered="true">
                                                         <div class="px-2 py-1 rounded-4 @request.Status.GetStyle()">
-                                                            @request.Status.GetTranslation()
+                                                            @(EnumViewModel<TeamRequestStatus>.GetTranslation(request.Status))
                                                         </div>
                                                     </TableBodyRow>
                                                     <TableBodyRow IsCentered="true">
@@ -272,7 +272,7 @@
                                                     </TableBodyRow>
                                                     <TableBodyRow IsCentered="true">
                                                         <div class="px-2 py-1 rounded-4 @request.Status.GetStyle()">
-                                                            @request.Status.GetTranslation()
+                                                            @(EnumViewModel<TeamRequestStatus>.GetTranslation(request.Status))
                                                         </div>
                                                     </TableBodyRow>
                                                     <TableActionMenu ItemId="request.Id"
@@ -292,7 +292,7 @@
                                                 <tr>
                                                     <TableBodyRow IsCentered="true">
                                                         <div class="px-2 py-1 rounded-4 @invitation.Status.GetStyle()">
-                                                            @invitation.Status.GetTranslation()
+                                                            @(EnumViewModel<TeamRequestStatus>.GetTranslation(invitation.Status))
                                                         </div>
                                                     </TableBodyRow>
                                                     <TableBodyRow>

@@ -1,7 +1,7 @@
 ﻿@namespace HITSBlazor.Components.Modals.CenterModals.SelectActiveRoleModal
 @using HITSBlazor.Components.Button
 @using HITSBlazor.Components.Typography
-@using HITSBlazor.Utils.EnumTranslators
+@using HITSBlazor.Models.Users.Enums
 @using HITSBlazor.Utils.Models
 
 <div @onclick:stopPropagation="true" class="center-modal p-3 rounded bg-white">
@@ -13,6 +13,6 @@
         <Button BtnType="ButtonType.Button" 
                 Variant="ButtonVariant.Primary" 
                 OnButtonClick="() => SetUserRole(role)" 
-                Text="@role.GetTranslation()" />
+                Text="@(EnumViewModel<RoleType>.GetTranslation(role))" />
     }
 </div>

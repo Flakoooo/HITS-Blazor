@@ -6,6 +6,7 @@ using HITSBlazor.Services;
 using HITSBlazor.Services.Auth;
 using HITSBlazor.Services.Ideas;
 using HITSBlazor.Services.Modal;
+using HITSBlazor.Utils.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
 
@@ -36,7 +37,8 @@ namespace HITSBlazor.Pages.Ideas.IdeasList
         private string? _searchText = null;
         private List<Idea> _ideas = [];
 
-        private HashSet<IdeaStatusType> SelectedStatuses { get; set; } = [];
+        private List<EnumViewModel<IdeaStatusType>> _ideasStatuses = [];
+        private HashSet<EnumViewModel<IdeaStatusType>> SelectedStatuses { get; set; } = [];
         private bool _unapprovedIdeasByCurrentUser = false;
 
         private async Task LoadIdeasAsync()
@@ -51,7 +53,7 @@ namespace HITSBlazor.Pages.Ideas.IdeasList
             _ideas = await IdeasService.GetIdeasAsync(
                     queryType: queryType,
                     searchText: _searchText,
-                    statusTypes: SelectedStatuses
+                    statusTypes: [.. SelectedStatuses.Select(s => s.Value)]
                 );
             StateHasChanged();
         }
@@ -67,16 +69,19 @@ namespace HITSBlazor.Pages.Ideas.IdeasList
             var currentUser = AuthService.CurrentUser;
             if (currentUser?.Role == RoleType.Member)
             {
-                SelectedStatuses.Add(IdeaStatusType.Confirmed);
-                SelectedStatuses.Add(IdeaStatusType.OnMarket);
+                SelectedStatuses.Add(new(IdeaStatusType.Confirmed));
+                SelectedStatuses.Add(new(IdeaStatusType.OnMarket));
             }
             else if (currentUser?.Role == RoleType.ProjectOffice)
             {
-                SelectedStatuses.Add(IdeaStatusType.OnApproval);
-                SelectedStatuses.Add(IdeaStatusType.Confirmed);
+                SelectedStatuses.Add(new(IdeaStatusType.OnApproval));
+                SelectedStatuses.Add(new(IdeaStatusType.Confirmed));
             }
 
             await LoadIdeasAsync();
+
+            foreach (var status in Enum.GetValues<IdeaStatusType>())
+                _ideasStatuses.Add(new(status));
 
             _isLoading = false;
         }
@@ -90,16 +95,6 @@ namespace HITSBlazor.Pages.Ideas.IdeasList
         private async Task SearchIdea(string value)
         {
             _searchText = value;
-            await LoadIdeasAsync();
-        }
-
-        private async Task OnStatusChanged(IdeaStatusType status, bool isChecked)
-        {
-            if (isChecked)
-                SelectedStatuses.Add(status);
-            else
-                SelectedStatuses.Remove(status);
-
             await LoadIdeasAsync();
         }
 
@@ -149,13 +144,13 @@ namespace HITSBlazor.Pages.Ideas.IdeasList
             var currentUser = AuthService.CurrentUser;
             if (currentUser?.Role == RoleType.Member)
             {
-                SelectedStatuses.Add(IdeaStatusType.Confirmed);
-                SelectedStatuses.Add(IdeaStatusType.OnMarket);
+                SelectedStatuses.Add(new(IdeaStatusType.Confirmed));
+                SelectedStatuses.Add(new(IdeaStatusType.OnMarket));
             }
             else if (currentUser?.Role == RoleType.ProjectOffice)
             {
-                SelectedStatuses.Add(IdeaStatusType.OnApproval);
-                SelectedStatuses.Add(IdeaStatusType.Confirmed);
+                SelectedStatuses.Add(new(IdeaStatusType.OnApproval));
+                SelectedStatuses.Add(new(IdeaStatusType.Confirmed));
             }
             else SelectedStatuses.Clear();
 

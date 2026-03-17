@@ -6,6 +6,7 @@
 @using HITSBlazor.Components.Placeholders.Placeholder
 @using HITSBlazor.Components.UsersColumn
 @using HITSBlazor.Models.Users.Enums
+@using HITSBlazor.Utils.Models
 
 <div @onclick:stopPropagation="true" class="users-group-modal p-3 bg-white rounded-3">
     @if (_isLoading)
@@ -41,7 +42,7 @@
                          AllUsers="_groupUsers"
                          SelectedUserChanged="UnSelectUser" />
         </div>
-        <CheckboxDropdown T="RoleTypeValues"
+        <CheckboxDropdown T="EnumViewModel<RoleType>"
                           AllValues="AllRoles"
                           Label="Выберите тип группы:"
                           Placeholder="Выбрано"

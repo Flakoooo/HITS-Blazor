@@ -1,6 +1,8 @@
 ﻿@namespace HITSBlazor.Pages.Ideas.IdeasList
 @using HITSBlazor.Components.ActionMenus.BaseActionMenu
 @using HITSBlazor.Components.Button
+@using HITSBlazor.Components.Filters.CheckboxFilter
+@using HITSBlazor.Components.Inputs.CheckboxDropdown
 @using HITSBlazor.Components.Inputs.Input
 @using HITSBlazor.Components.ListPageComponents.ListPageHeader
 @using HITSBlazor.Components.ListPageComponents.ListPageSearch
@@ -14,7 +16,6 @@
 @using HITSBlazor.Models.Users.Enums
 @using HITSBlazor.Utils
 @using HITSBlazor.Utils.EnumStyles
-@using HITSBlazor.Utils.EnumTranslators
 @using HITSBlazor.Utils.Models
 
 <div class="bg-white ideas-list page-content-with-header">
@@ -49,7 +50,7 @@
                                 </TableBodyRow>
                                 <TableBodyRow IsCentered="true">
                                     <div class="px-2 py-1 rounded-4 @idea.Status.GetStyle()">
-                                        <div>@idea.Status.GetTranslation()</div>
+                                        <div>@(EnumViewModel<IdeaStatusType>.GetTranslation(idea.Status))</div>
                                     </div>
                                 </TableBodyRow>
                                 <TableBodyRow IsCentered="true">
@@ -80,27 +81,11 @@
                     </tbody>
                 </TableContent>
                 <FilterContent>
-                    <div class="w-100">
-                        <Typography FontSize="6" CustomClass="fw-semibold">
-                            Статус
-                        </Typography>
-                        <div class="list-page-filter-choices">
-                            @foreach (var status in Enum.GetValues<IdeaStatusType>())
-                            {
-                                <div class="px-2 py-1 rounded-1 list-page-filter-choice">
-                                    <div class="d-flex">
-                                        <input type="checkbox"
-                                               checked="@SelectedStatuses.Contains(status)"
-                                               @onchange="@(e => OnStatusChanged(status, (bool)e.Value!))"
-                                               class="form-check-input" />
-                                        <Typography CustomClass="form-check-label ms-2">
-                                            @status.GetTranslation()
-                                        </Typography>
-                                    </div>
-                                </div>
-                            }
-                        </div>
-                    </div>
+                    <CheckboxFilter T="EnumViewModel<IdeaStatusType>" 
+                                    Label="Статус" 
+                                    AllValues="_ideasStatuses"
+                                    FilterChanged="LoadIdeasAsync"
+                                    @bind-SelectedValues="SelectedStatuses" />
                     @if (AuthService.CurrentUser?.Role is RoleType.Admin or RoleType.Expert)
                     {
                         <div class="w-100">

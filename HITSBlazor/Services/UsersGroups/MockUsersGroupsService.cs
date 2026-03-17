@@ -80,7 +80,7 @@ namespace HITSBlazor.Services.UsersGroups
             }
 
             _globalNotificationService.ShowSuccess("Группа успешно обновлена");
-            OnUsersGroupsStateChanged?.Invoke();
+            OnUsersGroupsStateUpdated?.Invoke();
             return true;
         }
 

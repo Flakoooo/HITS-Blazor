@@ -17,7 +17,6 @@
 @using HITSBlazor.Services.Ideas
 @using HITSBlazor.Utils
 @using HITSBlazor.Utils.EnumStyles
-@using HITSBlazor.Utils.EnumTranslators
 @using HITSBlazor.Utils.Models
 
 <div class="new-idea page-content-with-header">
@@ -86,19 +85,19 @@
                     </Typography>
                     <Hint Text="@_hints["Skills"]" />
                     <div class="mt-2 w-100 stack-categories">
-                        <SkillDropdown Placeholder="@SkillType.Language.GetTranslation()"
+                        <SkillDropdown Placeholder="@(EnumViewModel<SkillType>.GetTranslation(SkillType.Language))"
                                        AllSkills="LanguageSkills"
                                        @bind-SelectedSkills="@SelectedLanguageSkills"
                                        ValueMustCreated="(value) => CreateNewSkill(value, SkillType.Language)" />
-                        <SkillDropdown Placeholder="@SkillType.Framework.GetTranslation()"
+                        <SkillDropdown Placeholder="@(EnumViewModel<SkillType>.GetTranslation(SkillType.Framework))"
                                        AllSkills="FrameworkSkills"
                                        @bind-SelectedSkills="@SelectedFrameworkSkills"
                                        ValueMustCreated="(value) => CreateNewSkill(value, SkillType.Framework)" />
-                        <SkillDropdown Placeholder="@SkillType.Database.GetTranslation()"
+                        <SkillDropdown Placeholder="@(EnumViewModel<SkillType>.GetTranslation(SkillType.Database))"
                                        AllSkills="DatabaseSkills"
                                        @bind-SelectedSkills="@SelectedDatabaseSkills"
                                        ValueMustCreated="(value) => CreateNewSkill(value, SkillType.Database)" />
-                        <SkillDropdown Placeholder="@SkillType.Devops.GetTranslation()"
+                        <SkillDropdown Placeholder="@(EnumViewModel<SkillType>.GetTranslation(SkillType.Devops))"
                                        AllSkills="DevopsSkills"
                                        @bind-SelectedSkills="@SelectedDevopsSkills"
                                        ValueMustCreated="(value) => CreateNewSkill(value, SkillType.Devops)" />

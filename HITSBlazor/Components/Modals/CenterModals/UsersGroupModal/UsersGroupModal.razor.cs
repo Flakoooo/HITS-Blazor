@@ -1,9 +1,10 @@
 ﻿using HITSBlazor.Models.Users.Entities;
 using HITSBlazor.Models.Users.Enums;
 using HITSBlazor.Services;
-using HITSBlazor.Services.UsersGroups;
 using HITSBlazor.Services.Modal;
 using HITSBlazor.Services.Users;
+using HITSBlazor.Services.UsersGroups;
+using HITSBlazor.Utils.Models;
 using Microsoft.AspNetCore.Components;
 
 namespace HITSBlazor.Components.Modals.CenterModals.UsersGroupModal
@@ -33,9 +34,9 @@ namespace HITSBlazor.Components.Modals.CenterModals.UsersGroupModal
         private List<User> _users = [];
         private List<User> _groupUsers = [];
 
-        private List<RoleTypeValues> AllRoles { get; set; } = [];
+        private List<EnumViewModel<RoleType>> AllRoles { get; set; } = [];
 
-        private HashSet<RoleTypeValues> SelectedRoles { get; set; } = [];
+        private HashSet<EnumViewModel<RoleType>> SelectedRoles { get; set; } = [];
 
         protected override async Task OnInitializedAsync()
         {
@@ -49,7 +50,7 @@ namespace HITSBlazor.Components.Modals.CenterModals.UsersGroupModal
                 _users = [.. (await UserService.GetUsersAsync()).Where(u => !_groupUsers.Contains(u))];
                 if (usersGroup is not null)
                     foreach (var role in usersGroup.Roles)
-                        SelectedRoles.Add(new RoleTypeValues { Value = role });
+                        SelectedRoles.Add(new(role));
             }
             else
             {
@@ -57,7 +58,7 @@ namespace HITSBlazor.Components.Modals.CenterModals.UsersGroupModal
             }
 
             foreach (var role in Enum.GetValues<RoleType>())
-                AllRoles.Add(new RoleTypeValues { Value = role });
+                AllRoles.Add(new(role));
 
             _isLoading = false;
         }

@@ -14,7 +14,6 @@
 @using HITSBlazor.Services.Ideas
 @using HITSBlazor.Services.Modal
 @using HITSBlazor.Utils.EnumStyles
-@using HITSBlazor.Utils.EnumTranslators
 @using HITSBlazor.Utils.Models
 
 <div class="right-side-modal p-3 overflow-y-scroll" @onclick:stopPropagation="true">
@@ -275,9 +274,9 @@
         {
             <Typography FontSize="4" TextColor="TextColor.White" CustomClass="p-2 bg-primary rounded-top text-center">
                 @(
-                    CurrentIdea.Status == IdeaStatusType.OnConfirmation 
-                        ? $"Утвердили {IdeaRatings.Where(r => r.IsConfirmed).Count()}/{IdeaRatings.Count()}" 
-                        : CurrentIdea.Status.GetTranslation()
+                        CurrentIdea.Status == IdeaStatusType.OnConfirmation
+                            ? $"Утвердили {IdeaRatings.Where(r => r.IsConfirmed).Count()}/{IdeaRatings.Count()}"
+                            : EnumViewModel<IdeaStatusType>.GetTranslation(CurrentIdea.Status)
                 )
             </Typography>
             <div class="w-100 pb-3 px-3 idea-info">
@@ -329,7 +328,7 @@
                     <div class="pt-2 idea-sub-info">
                         <i class="bi bi-circle-fill text-success fs-3 opacity-50"></i>
                         <Typography FontSize="6" TextColor="TextColor.Primary">
-                            @CurrentUser?.Role.GetTranslation()
+                            @(EnumViewModel<RoleType>.GetTranslation(CurrentUser?.Role))
                         </Typography>
                     </div>
                 </div>

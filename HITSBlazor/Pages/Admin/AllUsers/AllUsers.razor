@@ -13,10 +13,9 @@
 @using HITSBlazor.Components.Typography
 @using HITSBlazor.Models.Users.Enums
 @using HITSBlazor.Utils.EnumStyles
-@using HITSBlazor.Utils.EnumTranslators
 @using HITSBlazor.Utils.Models
 
-<div class="users-content page-content-with-header bg-white">
+<div class="page-content-with-header bg-white overflow-y-scroll">
     @if (_isLoading)
     {
         <TablePlaceholder />
@@ -59,7 +58,7 @@
                                     @foreach (var role in user.Roles)
                                     {
                                         <div class="px-2 py-1 rounded-4 text-center align-self-start @role.GetStyle()">
-                                            @role.GetTranslation()
+                                            @(EnumViewModel<RoleType>.GetTranslation(role))
                                         </div>
                                     }
                                 </TableBodyRow>
@@ -85,7 +84,7 @@
                                                @onchange="@(e => OnRoleTypeChanged(role, (bool)e.Value!))"
                                                class="form-check-input" />
                                         <Typography CustomClass="form-check-label ms-2">
-                                            @role.GetTranslation()
+                                            @(EnumViewModel<RoleType>.GetTranslation(role))
                                         </Typography>
                                     </div>
                                 </div>
