@@ -1,0 +1,105 @@
+﻿@namespace HITSBlazor.Components.Modals.CenterModals.TagModal
+@using HITSBlazor.Components.Button
+@using HITSBlazor.Components.Inputs.Input
+@using HITSBlazor.Components.Modals.Components.CenterModalHeader
+@using HITSBlazor.Models.Common.Entities
+@using HITSBlazor.Services
+@using HITSBlazor.Services.Modal
+@using HITSBlazor.Services.Tags
+
+<div @onclick:stopPropagation="true" class="tag-modal p-3 rounded-3">
+    <CenterModalHeader HeaderText="@(Tag is not null ? "Редактировать тег" : "Создать тег")" />
+    <div class="tag-modal-inputs w-100">
+        <Input Label="Название тега" 
+               Placeholder="Введите название тега" 
+               @bind-Value="TagName" />
+        <div class="w-100">
+            <label class="form-label text-primary">
+                Цвет тега
+            </label>
+            <div class="input-group">
+                <input type="color" 
+                       @bind="TagColor"
+                       @bind:event="oninput"
+                       class="form-control form-control form-control-color" />
+            </div>
+        </div>
+        <Button Text="Сохранить" 
+                LoadingText="Сохранение" 
+                Variant="ButtonVariant.Primary"
+                OnButtonClick="SendTag" />
+    </div>
+</div>
+
+@code {
+    [Inject]
+    private ModalService ModalService { get; set; } = null!;
+
+    [Inject]
+    private ITagService TagService { get; set; } = null!;
+
+    [Inject]
+    private GlobalNotificationService NotificationService { get; set; } = null!;
+
+    [Parameter]
+    public Tag? Tag { get; set; }
+
+    private bool _isLoading = true;
+    private bool _submitting = false;
+
+    private string TagName { get; set; } = string.Empty;
+    private string TagColor { get; set; } = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _isLoading = true;
+
+        if (Tag is not null)
+        {
+            TagName = Tag.Name;
+            TagColor = Tag.Color;
+        }
+
+        _isLoading = false;
+    }
+
+    private async Task SendTag()
+    {
+        _submitting = true;
+
+        bool isValid = true;
+
+        if (string.IsNullOrWhiteSpace(TagName)) isValid = false;
+        if (string.IsNullOrWhiteSpace(TagColor)) isValid = false;
+
+        if (!isValid)
+        {
+            NotificationService.ShowError("Заполнены не все поля");
+            _submitting = false;
+            return;
+        }
+
+        bool result;
+        if (Tag is not null)
+        {
+            result = await TagService.UpdateTagAsync(
+                Tag.Id,
+                TagName,
+                TagColor
+            );
+        }
+        else
+        {
+            result = (await TagService.CreateNewTagAsync(
+                TagName,
+                TagColor,
+                true
+            )) is not null;
+        }
+
+        if (result)
+            await ModalService.Close(ModalType.Center);
+
+        _submitting = false;
+    }
+}

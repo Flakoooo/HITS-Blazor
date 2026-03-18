@@ -5,6 +5,7 @@ using HITSBlazor.Components.Modals.CenterModals.SkillModal;
 using HITSBlazor.Components.Tables.TableHeader;
 using HITSBlazor.Models.Common.Entities;
 using HITSBlazor.Models.Common.Enums;
+using HITSBlazor.Models.Teams.Entities;
 using HITSBlazor.Services.Modal;
 using HITSBlazor.Services.Skills;
 using HITSBlazor.Utils.Models;
@@ -59,6 +60,7 @@ namespace HITSBlazor.Pages.Admin.AllSkills
         {
             _skills = await SkillService.GetSkillsAsync(
                 searchText: _searchText,
+                confirmed: IsConfirmed,
                 skillTypes: [.. SelectedSkillTypes.Select(s => s.Value)]
             );
             StateHasChanged();
@@ -70,7 +72,7 @@ namespace HITSBlazor.Pages.Admin.AllSkills
             await LoadSkillsAsync();
         }
 
-        private Dictionary<MenuAction, object> GetTableActions(Skill skill)
+        private static Dictionary<MenuAction, object> GetTableActions(Skill skill)
         {
             var actions = new Dictionary<MenuAction, object>();
 
@@ -82,6 +84,13 @@ namespace HITSBlazor.Pages.Admin.AllSkills
             actions.Add(MenuAction.Delete, skill);
 
             return actions;
+        }
+
+        private async Task ResetFilters()
+        {
+            SelectedSkillTypes.Clear();
+            IsConfirmed = null;
+            await LoadSkillsAsync();
         }
 
         private void ShowSkillModal(Skill? skill = null)

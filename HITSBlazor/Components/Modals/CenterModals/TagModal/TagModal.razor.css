@@ -1,0 +1,22 @@
+﻿.tag-modal {
+    width: 400px;
+    background-color: #fff;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: flex-end;
+    justify-content: flex-start;
+    gap: 12px;
+    align-self: center;
+    justify-self: center;
+    transition: all .15s ease-out;
+}
+
+.tag-modal-inputs {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: stretch;
+    justify-content: flex-start;
+    gap: 12px;
+}

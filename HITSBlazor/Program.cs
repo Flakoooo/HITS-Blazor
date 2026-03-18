@@ -21,6 +21,7 @@ using KristofferStrube.Blazor.Popper;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+using HITSBlazor.Services.Tags;
 
 
 
@@ -92,6 +93,9 @@ namespace HITSBlazor
 
             //Skills
             builder.Services.AddScoped<ISkillService, MockSkillService>();
+
+            //Tag
+            builder.Services.AddScoped<ITagService, MockTagService>();
 
             //UserSkills
             builder.Services.AddScoped<IUserSkillService, MockUserSkillService>();

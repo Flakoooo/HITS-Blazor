@@ -30,6 +30,7 @@ namespace HITSBlazor.Services.Skills
 
         public async Task<List<Skill>> GetSkillsAsync(
             string? searchText,
+            bool? confirmed,
             HashSet<SkillType>? skillTypes
         )
         {
@@ -40,6 +41,9 @@ namespace HITSBlazor.Services.Skills
 
             if (skillTypes?.Count > 0)
                 query = query.Where(s => skillTypes.Contains(s.Type));
+
+            if (confirmed.HasValue)
+                query = query.Where(s => s.Confirmed == confirmed.Value);
 
             if (!string.IsNullOrWhiteSpace(searchText))
                 query = query.Where(s => s.Name.Contains(searchText, StringComparison.CurrentCultureIgnoreCase));

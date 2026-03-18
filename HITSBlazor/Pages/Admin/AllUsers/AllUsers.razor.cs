@@ -84,16 +84,6 @@ namespace HITSBlazor.Pages.Admin.AllUsers
             await LoadUsersAsync();
         }
 
-        private async Task OnRoleTypeChanged(RoleType role, bool isChecked)
-        {
-            if (isChecked)
-                SelectedUserRoles.Add(new(role));
-            else
-                SelectedUserRoles.Remove(new(role));
-
-            await LoadUsersAsync();
-        }
-
         private async Task ResetFilters()
         {
             SelectedUserRoles.Clear();

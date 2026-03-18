@@ -1,4 +1,5 @@
 ﻿using HITSBlazor.Models.Common.Entities;
+using HITSBlazor.Models.Common.Enums;
 
 namespace HITSBlazor.Utils.Mocks.Common
 {
@@ -34,7 +35,49 @@ namespace HITSBlazor.Utils.Mocks.Common
             new Tag { Id = DesignId,        Name = "Дизайн",        Color = "#8fce00",  Confirmed = true    }
         ];
 
+        public static List<Tag> GetTags() => [.. _tags];
+
         public static Tag? GetTagById(Guid id)
             => _tags.FirstOrDefault(t => t.Id == id);
+
+        public static Tag? CreateTag(string name, string color, bool IsConfirmed, Guid creatorId)
+        {
+            var newTag = new Tag 
+            {
+                Name = name,
+                Color = color,
+                Confirmed = IsConfirmed,
+                CreatorId = creatorId
+            };
+
+            _tags.Add(newTag);
+
+            return newTag;
+        }
+
+        public static bool ConfirmTag(Guid tagId, Guid updatorId)
+        {
+            var tagForUpdate = _tags.FirstOrDefault(t => t.Id == tagId);
+            if (tagForUpdate is null) return false;
+
+            tagForUpdate.Confirmed = true;
+            tagForUpdate.UpdaterId = updatorId;
+
+            return true;
+        }
+
+        public static Tag? UpdateTag(Guid tagId, string name, string color, Guid updatorId)
+        {
+            var tagForUpdate = _tags.FirstOrDefault(t => t.Id == tagId);
+            if (tagForUpdate is null) return null;
+
+            tagForUpdate.Name = name;
+            tagForUpdate.Color = color;
+            tagForUpdate.UpdaterId = updatorId;
+
+            return tagForUpdate;
+        }
+
+        public static bool DeleteTag(Tag tag) => _tags.Remove(tag);
     }
 }

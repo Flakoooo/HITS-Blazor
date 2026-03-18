@@ -10,6 +10,7 @@ namespace HITSBlazor.Services.Skills
 
         Task<List<Skill>> GetSkillsAsync(
             string? searchText = null,
+            bool? confirmed = null,
             HashSet<SkillType>? skillTypes = null
         );
 

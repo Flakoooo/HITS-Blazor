@@ -70,13 +70,13 @@
                                  Value1Text="Утверждена"
                                  Value2Text="На рассмотрении"
                                  @bind-Value="IsConfirmed"
-                                 OnFilterChanged="() => Console.WriteLine()" />
+                                 OnFilterChanged="LoadSkillsAsync" />
                     <div class="w-100 d-flex justify-content-center">
                         <Button BtnType="ButtonType.Button"
                                 Variant="ButtonVariant.Danger"
                                 Text="Сбросить фильтры"
                                 IconStyle="bi-x-lg"
-                                OnButtonClick="() => Console.WriteLine()" />
+                                OnButtonClick="ResetFilters" />
                     </div>
                 </FilterContent>
             </ListPageTable>
