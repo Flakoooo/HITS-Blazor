@@ -5,7 +5,6 @@ using HITSBlazor.Components.Modals.CenterModals.SkillModal;
 using HITSBlazor.Components.Tables.TableHeader;
 using HITSBlazor.Models.Common.Entities;
 using HITSBlazor.Models.Common.Enums;
-using HITSBlazor.Models.Teams.Entities;
 using HITSBlazor.Services.Modal;
 using HITSBlazor.Services.Skills;
 using HITSBlazor.Utils.Models;

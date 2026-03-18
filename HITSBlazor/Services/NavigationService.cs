@@ -489,7 +489,7 @@ namespace HITSBlazor.Services
                     return item;
 
                 if (item.Url != null && item.Url.StartsWith('/') &&
-                    url.Contains(item.Url, StringComparison.OrdinalIgnoreCase))
+                    url.Equals(item.Url, StringComparison.OrdinalIgnoreCase))
                     return item;
             }
 
