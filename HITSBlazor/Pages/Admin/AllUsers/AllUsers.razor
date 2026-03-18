@@ -1,6 +1,7 @@
 ﻿@namespace HITSBlazor.Pages.Admin.AllUsers
 @using HITSBlazor.Components.ActionMenus.BaseActionMenu
 @using HITSBlazor.Components.Button
+@using HITSBlazor.Components.Filters.CheckboxFilter
 @using HITSBlazor.Components.Filters.RadioFilter
 @using HITSBlazor.Components.Inputs.Input
 @using HITSBlazor.Components.ListPageComponents.ListPageHeader
@@ -70,27 +71,11 @@
                     </tbody>
                 </TableContent>
                 <FilterContent>
-                    <div class="w-100">
-                        <Typography FontSize="6" CustomClass="fw-semibold">
-                            Роли
-                        </Typography>
-                        <div class="list-page-filter-choices">
-                            @foreach (var role in Enum.GetValues<RoleType>())
-                            {
-                                <div class="list-page-filter-choice px-2 py-1 rounded-1">
-                                    <div class="d-flex">
-                                        <input type="checkbox"
-                                               checked="@SelectedUserRoles.Contains(role)"
-                                               @onchange="@(e => OnRoleTypeChanged(role, (bool)e.Value!))"
-                                               class="form-check-input" />
-                                        <Typography CustomClass="form-check-label ms-2">
-                                            @(EnumViewModel<RoleType>.GetTranslation(role))
-                                        </Typography>
-                                    </div>
-                                </div>
-                            }
-                        </div>
-                    </div>
+                    <CheckboxFilter T="EnumViewModel<RoleType>" 
+                                    AllValues="_filterRoleTypes"
+                                    Label="Роли"
+                                    @bind-SelectedValues="SelectedUserRoles"
+                                    FilterChanged="LoadUsersAsync"/>
                     <!-- TODO: реализовать фильтр -->
                     <RadioFilter Label="Студенты"
                                  Value1Text="В команде"

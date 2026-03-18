@@ -1,7 +1,10 @@
-﻿using HITSBlazor.Components.Modals.CenterModals.SelectActiveRoleModal;
+﻿using HITSBlazor.Components.Modals.CenterModals.DeleteModal;
+using HITSBlazor.Components.Modals.CenterModals.SelectActiveRoleModal;
 using HITSBlazor.Components.Modals.RightSideModals.IdeaModal;
 using HITSBlazor.Components.Modals.RightSideModals.ProfileModal;
 using HITSBlazor.Components.Modals.RightSideModals.TeamModal;
+using HITSBlazor.Models.Common.Entities;
+using HITSBlazor.Services.Skills;
 using Microsoft.AspNetCore.Components;
 using System;
 
@@ -142,19 +145,27 @@ namespace HITSBlazor.Services.Modal
             blockCloseModal: true
         );
 
+        public void ShowDeleteModal(string valueName, Func<Task> deleteMethod) => Show<DeleteModal>(
+            type: ModalType.Center,
+            parameters: new Dictionary<string, object> {
+                [nameof(DeleteModal.ValueName)] = valueName,
+                [nameof(DeleteModal.DeleteMethod)] = deleteMethod
+            }
+        );
+
         public void ShowProfileModal(Guid userId) => Show<ProfileModal>(
             ModalType.RightSide,
-            parameters: new Dictionary<string, object> { ["UserId"] = userId }
+            parameters: new Dictionary<string, object> { [nameof(ProfileModal.UserId)] = userId }
         );
 
         public void ShowIdeaModal(Guid ideaId) => Show<IdeaModal>(
             ModalType.RightSide,
-            parameters: new Dictionary<string, object> { ["IdeaId"] = ideaId }
+            parameters: new Dictionary<string, object> { [nameof(IdeaModal.IdeaId)] = ideaId }
         );
 
         public void ShowTeamModal(Guid teamId) => Show<TeamModal>(
             type: ModalType.RightSide,
-            parameters: new Dictionary<string, object> { ["TeamId"] = teamId }
+            parameters: new Dictionary<string, object> { [nameof(TeamModal.TeamId)] = teamId }
         );
     }
 }

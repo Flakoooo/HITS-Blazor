@@ -1,5 +1,6 @@
 ﻿@namespace HITSBlazor.Components.ActionsMenus.CommentActionMenu
 @using HITSBlazor.Components.ActionMenus.BaseActionMenu
+@using HITSBlazor.Utils.Models
 @inherits BaseActionMenuComponent
 
 <div @ref="_containerRef">
@@ -18,7 +19,7 @@
             {
                 <li @onclick="@(() => HandleActionClick(action.Key, action.Value))"
                     class="list-group-item list-group-item-action px-2 py-1 @GetActionStyle(action.Key)">
-                    @GetActionText(action.Key)
+                    @(EnumViewModel<MenuAction>.GetTranslation(action.Key))
                 </li>
             }
         </ul>

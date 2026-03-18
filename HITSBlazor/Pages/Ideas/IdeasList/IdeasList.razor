@@ -83,7 +83,7 @@
                 <FilterContent>
                     <CheckboxFilter T="EnumViewModel<IdeaStatusType>" 
                                     Label="Статус" 
-                                    AllValues="_ideasStatuses"
+                                    AllValues="_filterIdeaStatus"
                                     FilterChanged="LoadIdeasAsync"
                                     @bind-SelectedValues="SelectedStatuses" />
                     @if (AuthService.CurrentUser?.Role is RoleType.Admin or RoleType.Expert)

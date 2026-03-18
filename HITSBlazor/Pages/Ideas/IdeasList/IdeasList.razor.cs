@@ -1,4 +1,5 @@
 ﻿using HITSBlazor.Components.ActionMenus.BaseActionMenu;
+using HITSBlazor.Models.Common.Enums;
 using HITSBlazor.Models.Ideas.Entities;
 using HITSBlazor.Models.Ideas.Enums;
 using HITSBlazor.Models.Users.Enums;
@@ -37,7 +38,9 @@ namespace HITSBlazor.Pages.Ideas.IdeasList
         private string? _searchText = null;
         private List<Idea> _ideas = [];
 
-        private List<EnumViewModel<IdeaStatusType>> _ideasStatuses = [];
+        private readonly List<EnumViewModel<IdeaStatusType>> _filterIdeaStatus
+            = [.. Enum.GetValues<IdeaStatusType>().Select(s => new EnumViewModel<IdeaStatusType>(s))];
+
         private HashSet<EnumViewModel<IdeaStatusType>> SelectedStatuses { get; set; } = [];
         private bool _unapprovedIdeasByCurrentUser = false;
 
@@ -79,9 +82,6 @@ namespace HITSBlazor.Pages.Ideas.IdeasList
             }
 
             await LoadIdeasAsync();
-
-            foreach (var status in Enum.GetValues<IdeaStatusType>())
-                _ideasStatuses.Add(new(status));
 
             _isLoading = false;
         }

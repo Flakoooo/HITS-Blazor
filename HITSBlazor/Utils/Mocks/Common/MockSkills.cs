@@ -1,5 +1,6 @@
 ﻿using HITSBlazor.Models.Common.Entities;
 using HITSBlazor.Models.Common.Enums;
+using System.Xml.Linq;
 
 namespace HITSBlazor.Utils.Mocks.Common
 {
@@ -81,5 +82,30 @@ namespace HITSBlazor.Utils.Mocks.Common
 
             return newSkill;
         }
+
+        public static bool ConfirmSkill(Guid skillId, Guid updatorId)
+        {
+            var skillForUpdate = _skills.FirstOrDefault(s => s.Id == skillId);
+            if (skillForUpdate is null) return false;
+
+            skillForUpdate.Confirmed = true;
+            skillForUpdate.UpdaterId = updatorId;
+
+            return true;
+        }
+
+        public static Skill? UpdateSkill(Guid skillId, string name, SkillType type, Guid updatorId)
+        {
+            var skillForUpdate = _skills.FirstOrDefault(s => s.Id == skillId);
+            if (skillForUpdate is null) return null;
+
+            skillForUpdate.Name = name;
+            skillForUpdate.Type = type;
+            skillForUpdate.UpdaterId = updatorId;
+
+            return skillForUpdate;
+        }
+
+        public static bool DeleteSkill(Skill skill) => _skills.Remove(skill);
     }
 }

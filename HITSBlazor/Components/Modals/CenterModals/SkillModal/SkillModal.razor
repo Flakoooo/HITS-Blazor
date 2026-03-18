@@ -1,0 +1,120 @@
+﻿@namespace HITSBlazor.Components.Modals.CenterModals.SkillModal
+@using HITSBlazor.Components.Button
+@using HITSBlazor.Components.Inputs.Input
+@using HITSBlazor.Components.Inputs.RadioDropdown
+@using HITSBlazor.Components.Inputs.Select
+@using HITSBlazor.Components.Modals.Components.CenterModalHeader
+@using HITSBlazor.Models.Common.Entities
+@using HITSBlazor.Models.Common.Enums
+@using HITSBlazor.Services
+@using HITSBlazor.Services.Modal
+@using HITSBlazor.Services.Skills
+@using HITSBlazor.Utils.Models
+
+<div @onclick:stopPropagation="true" class="skill-modal p-3 rounded-3">
+    <CenterModalHeader HeaderText="@(Skill is not null ? "Редактировать компетенцию" : "Создать компетенцию")"
+                       FontSize="@(Skill is not null ? 4 : 3)" />
+    <div class="skill-modal-inputs w-100">
+        <Input Label="Название компетенции" 
+               Placeholder="Введите название компетенции" 
+               @bind-Value="SkillName" />
+        <Select Label="Тип компетенции"
+                @bind-Value="SelectedSkillType" 
+                Options="_skillTypeOptions" />
+        <Button Text="Сохранить" 
+                LoadingText="Сохранение" 
+                Variant="ButtonVariant.Primary"
+                OnButtonClick="SendSkill" />
+    </div>
+</div>
+
+@code {
+    [Inject]
+    private ModalService ModalService { get; set; } = null!;
+
+    [Inject]
+    private ISkillService SkillService { get; set; } = null!;
+
+    [Inject]
+    private GlobalNotificationService NotificationService { get; set; } = null!;
+
+    [Parameter]
+    public Skill? Skill { get; set; }
+
+    private bool _isLoading = true;
+    private bool _submitting = false;
+
+    private List<KeyValuePair<int, string>> _skillTypeOptions = 
+    [
+        new((int)SkillType.Language, EnumViewModel<SkillType>.GetTranslation(SkillType.Language)),
+        new((int)SkillType.Framework, EnumViewModel<SkillType>.GetTranslation(SkillType.Framework)),
+        new((int)SkillType.Database, EnumViewModel<SkillType>.GetTranslation(SkillType.Database)),
+        new((int)SkillType.Devops, EnumViewModel<SkillType>.GetTranslation(SkillType.Devops))
+    ];
+
+    private string SkillName { get; set; } = string.Empty;
+    private int? _skillType;
+    private string SelectedSkillType { 
+        get => _skillType.HasValue ? _skillType.Value.ToString() : string.Empty;
+        set
+        {
+            if (int.TryParse(value, out int intValue))
+                _skillType = intValue;
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        _isLoading = true;
+
+        if (Skill is not null)
+        {
+            SkillName = Skill.Name;
+            SelectedSkillType = ((int)Skill.Type).ToString();
+        }
+
+        _isLoading = false;
+    }
+
+    private async Task SendSkill()
+    {
+        _submitting = true;
+
+        bool isValid = true;
+
+        if (string.IsNullOrWhiteSpace(SkillName)) isValid = false;
+        if (!_skillType.HasValue) isValid = false;
+
+        if (!isValid)
+        {
+            NotificationService.ShowError("Заполнены не все поля");
+            _submitting = false;
+            return;
+        }
+
+        bool result;
+#pragma warning disable CS8629 // Nullable value type may be null.
+        if (Skill is not null)
+        {
+            result = await SkillService.UpdateSkillAsync(
+                Skill.Id,
+                SkillName,
+                (SkillType)_skillType.Value
+            );
+        }
+        else
+        {
+            result = (await SkillService.CreateNewSkillAsync(
+                SkillName,
+                (SkillType)_skillType.Value,
+                true
+            )) is not null;
+        }
+#pragma warning restore CS8629 // Nullable value type may be null.
+
+        if (result)
+            await ModalService.Close(ModalType.Center);
+
+        _submitting = false;
+    }
+}

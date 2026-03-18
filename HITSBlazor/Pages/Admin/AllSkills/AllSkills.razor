@@ -1,14 +1,18 @@
 ﻿@namespace HITSBlazor.Pages.Admin.AllSkills
+@using HITSBlazor.Components.ActionMenus.BaseActionMenu
 @using HITSBlazor.Components.Button
+@using HITSBlazor.Components.Filters.CheckboxFilter
 @using HITSBlazor.Components.Filters.RadioFilter
 @using HITSBlazor.Components.ListPageComponents.ListPageHeader
 @using HITSBlazor.Components.ListPageComponents.ListPageSearch
 @using HITSBlazor.Components.ListPageComponents.ListPageTable
+@using HITSBlazor.Components.Modals.CenterModals.DeleteModal
 @using HITSBlazor.Components.Placeholders.TablePlaceholder
 @using HITSBlazor.Components.Tables.TableActionMenu
 @using HITSBlazor.Components.Tables.TableBodyRow
 @using HITSBlazor.Components.Tables.TableHeader
 @using HITSBlazor.Components.Typography
+@using HITSBlazor.Models.Common.Entities
 @using HITSBlazor.Models.Common.Enums
 @using HITSBlazor.Utils.EnumStyles
 @using HITSBlazor.Utils.Models
@@ -24,8 +28,8 @@
             <ListPageHeader HeaderText="@($"Список компетенций: {_skills.Count}")"
                             CreateButtonText="Добавить компетенцию" 
                             ShowCreateButton="true" 
-                            OnButtonClick="() => Console.WriteLine()" />
-            <ListPageSearch ValueChanged="@((value) => Console.WriteLine(value))" />
+                            OnButtonClick="() => ShowSkillModal()" />
+            <ListPageSearch ValueChanged="@((value) => SeacrhSkill(value))" />
             <ListPageTable>
                 <TableContent>
                     <TableHeader TableActionMenuIsEnable="true"
@@ -35,7 +39,7 @@
                         {
                             <tr>
                                 <TableBodyRow>
-                                    <div class="data-link" @onclick="@(() => Console.WriteLine())">
+                                    <div class="data-link" @onclick="@(() => ShowSkillModal(skill))">
                                         @skill.Name
                                     </div>
                                 </TableBodyRow>
@@ -50,36 +54,22 @@
                                     </div>
                                 </TableBodyRow>
                                 <TableActionMenu ItemId="@skill.Id"
-                                                 OnAction="() => Console.WriteLine()"
-                                                 ActionIds="[]" />
+                                                 OnAction="OnSkillAction"
+                                                 ActionIds="@GetTableActions(skill)" />
                             </tr>
                         }
                     </tbody>
                 </TableContent>
                 <FilterContent>
-                    <div class="w-100">
-                        <Typography FontSize="6" CustomClass="fw-semibold">
-                            Категория
-                        </Typography>
-                        <div class="list-page-filter-choices">
-                            @foreach (var skill in Enum.GetValues<SkillType>())
-                            {
-                                <div class="list-page-filter-choice px-2 py-1 rounded-1">
-                                    <div class="d-flex">
-                                        <input type="checkbox"
-                                               class="form-check-input" />
-                                        <Typography CustomClass="form-check-label ms-2">
-                                            @(EnumViewModel<SkillType>.GetTranslation(skill))
-                                        </Typography>
-                                    </div>
-                                </div>
-                            }
-                        </div>
-                    </div>
+                    <CheckboxFilter T="EnumViewModel<SkillType>" 
+                                    Label="Категория" 
+                                    AllValues="_filterSkillTypes"
+                                    @bind-SelectedValues="SelectedSkillTypes" 
+                                    FilterChanged="LoadSkillsAsync" />
                     <RadioFilter Label="Статус"
                                  Value1Text="Утверждена"
                                  Value2Text="На рассмотрении"
-                                 @bind-Value="Temp"
+                                 @bind-Value="IsConfirmed"
                                  OnFilterChanged="() => Console.WriteLine()" />
                     <div class="w-100 d-flex justify-content-center">
                         <Button BtnType="ButtonType.Button"

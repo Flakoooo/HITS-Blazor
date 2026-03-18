@@ -87,10 +87,10 @@ namespace HITSBlazor.Components.Modals.RightSideModals.ProfileModal
 
             _userDataForm = ResetUserForm(Profile);
 
-            LanguageSkills = await SkillService.GetSkillsAsync(skillType: SkillType.Language);
-            FrameworkSkills = await SkillService.GetSkillsAsync(skillType: SkillType.Framework);
-            DatabaseSkills = await SkillService.GetSkillsAsync(skillType: SkillType.Database);
-            DevopsSkills = await SkillService.GetSkillsAsync(skillType: SkillType.Devops);
+            LanguageSkills = await SkillService.GetSkillsAsync(skillTypes: [SkillType.Language]);
+            FrameworkSkills = await SkillService.GetSkillsAsync(skillTypes: [SkillType.Framework]);
+            DatabaseSkills = await SkillService.GetSkillsAsync(skillTypes: [SkillType.Database]);
+            DevopsSkills = await SkillService.GetSkillsAsync(skillTypes: [SkillType.Devops]);
 
             BelbinTestResult = await TestService.GetTestResultAsync(UserId, TestService.BelbinTestName);
             TemperTestResult = await TestService.GetTestResultAsync(UserId, TestService.TemperTestName);

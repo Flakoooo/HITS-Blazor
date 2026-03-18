@@ -1,0 +1,33 @@
+﻿@namespace HITSBlazor.Components.Modals.CenterModals.DeleteModal
+@using HITSBlazor.Components.Button
+@using HITSBlazor.Components.Typography
+@using HITSBlazor.Services.Modal
+
+<div @onclick:stopPropagation="true" class="delete-modal p-3 rounded bg-white">
+    <Typography>
+        Вы действительно хотите удалить "@ValueName"?
+    </Typography>
+    <Button Variant="ButtonVariant.Danger" 
+            Text="Удалить" 
+            OnButtonClick="ExecuteDelete" />
+</div>
+
+@code {
+    [Inject]
+    private ModalService ModalService { get; set; } = null!;
+
+    [Parameter]
+    public string ValueName { get; set; } = string.Empty;
+
+    [Parameter]
+    public Func<Task>? DeleteMethod { get; set; }
+
+    private async Task ExecuteDelete()
+    {
+        if (DeleteMethod is null)
+            return;
+
+        await DeleteMethod();
+        await ModalService.Close(ModalType.Center);
+    }
+}

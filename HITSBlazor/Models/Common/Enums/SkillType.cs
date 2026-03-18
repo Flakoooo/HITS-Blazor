@@ -5,15 +5,15 @@ namespace HITSBlazor.Models.Common.Enums
     public enum SkillType
     {
         [Description("Язык разработки")]
-        Language,
+        Language = 0,
 
         [Description("Фреймворк")]
-        Framework,
+        Framework = 1,
 
         [Description("База данных")]
-        Database,
+        Database = 2,
 
         [Description("DevOps технология")]
-        Devops
+        Devops = 3
     }
 }

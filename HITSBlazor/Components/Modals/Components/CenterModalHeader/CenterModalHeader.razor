@@ -4,7 +4,7 @@
 @using HITSBlazor.Services.Modal
 
 <div class="center-modal-header w-100">
-    <Typography FontSize="3" TextColor="TextColor.Primary" CustomClass="text-center">
+    <Typography FontSize="FontSize" TextColor="TextColor.Primary" CustomClass="text-center">
         @HeaderText
     </Typography>
     <Button ButtonClass="btn-close"
@@ -17,6 +17,9 @@
 
     [Parameter]
     public string HeaderText { get; set; } = string.Empty;
+
+    [Parameter]
+    public int FontSize { get; set; } = 3;
 
     private async Task CloseModal() => await ModalService.Close(ModalType.Center);
 }

@@ -1,11 +1,13 @@
 ﻿using HITSBlazor.Components.ActionMenus.BaseActionMenu;
 using HITSBlazor.Components.Modals.CenterModals.UpdateUserModal;
 using HITSBlazor.Components.Tables.TableHeader;
+using HITSBlazor.Models.Common.Enums;
 using HITSBlazor.Models.Users.Entities;
 using HITSBlazor.Models.Users.Enums;
 using HITSBlazor.Services.Auth;
 using HITSBlazor.Services.Modal;
 using HITSBlazor.Services.Users;
+using HITSBlazor.Utils.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
 
@@ -29,7 +31,7 @@ namespace HITSBlazor.Pages.Admin.AllUsers
         private string SeacrhText { get; set; } = string.Empty;
         private string? _orderBy = null;
         private bool? _byDescending = null;
-        private HashSet<RoleType> SelectedUserRoles { get; set; } = [];
+        private HashSet<EnumViewModel<RoleType>> SelectedUserRoles { get; set; } = [];
         private bool? InTeam { get; set; }
 
         private static readonly List<TableHeaderItem> _userTableHeader =
@@ -42,6 +44,9 @@ namespace HITSBlazor.Pages.Admin.AllUsers
             new() { Text = "Дата регистрации", InCentered = true, OrderBy = nameof(User.CreatedAt)  },
             new() { Text = "Роли",             ColumnClass="col-5"                                  }
         ];
+
+        private readonly List<EnumViewModel<RoleType>> _filterRoleTypes
+            = [.. Enum.GetValues<RoleType>().Select(s => new EnumViewModel<RoleType>(s))];
 
         private List<User> _users = [];
 
@@ -61,7 +66,7 @@ namespace HITSBlazor.Pages.Admin.AllUsers
                 searchText: SeacrhText,
                 orderBy: _orderBy,
                 byDescending: _byDescending,
-                selectedRoles: SelectedUserRoles
+                selectedRoles: [.. SelectedUserRoles.Select(s => s.Value)]
             );
             await InvokeAsync(StateHasChanged);
         }
@@ -82,9 +87,9 @@ namespace HITSBlazor.Pages.Admin.AllUsers
         private async Task OnRoleTypeChanged(RoleType role, bool isChecked)
         {
             if (isChecked)
-                SelectedUserRoles.Add(role);
+                SelectedUserRoles.Add(new(role));
             else
-                SelectedUserRoles.Remove(role);
+                SelectedUserRoles.Remove(new(role));
 
             await LoadUsersAsync();
         }

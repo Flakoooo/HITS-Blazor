@@ -194,22 +194,6 @@ namespace HITSBlazor.Components.ActionMenus.BaseActionMenu
             await InvokeAsync(StateHasChanged);
         }
 
-        protected static string GetActionText(MenuAction action) => action switch
-        {
-            MenuAction.View => "Просмотреть",
-            MenuAction.ViewIdea or MenuAction.ViewIdeaMarket => "Открыть идею",
-            MenuAction.ViewProfile => "Перейти на профиль",
-            MenuAction.ViewLetter => "Просмотреть письмо",
-            MenuAction.Edit => "Редактировать",
-            MenuAction.TeamRequestAccept => "Принять",
-            MenuAction.SetLeader => "Назначить лидером",
-            MenuAction.Delete => "Удалить",
-            MenuAction.TeamRequestCancel => "Отклонить",
-            MenuAction.UnsetLeader => "Снять роль лидера",
-            MenuAction.RemoveTeamMember => "Исключить",
-            _ => action.ToString()
-        };
-
         protected static string GetActionStyle(MenuAction action) => action switch
         {
             MenuAction.TeamRequestAccept => "text-success",
