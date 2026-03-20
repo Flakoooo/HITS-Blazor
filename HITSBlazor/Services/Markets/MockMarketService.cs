@@ -1,6 +1,7 @@
 ﻿using HITSBlazor.Models.Markets.Entities;
 using HITSBlazor.Models.Markets.Enums;
 using HITSBlazor.Utils.Mocks.Markets;
+using System.Xml.Linq;
 
 namespace HITSBlazor.Services.Markets
 {
@@ -54,6 +55,18 @@ namespace HITSBlazor.Services.Markets
             }
 
             return [.. query];
+        }
+
+        public async Task<Market?> GetMarketByIdAsync(Guid marketId)
+        {
+            var market = MockMarkets.GetMarketById(marketId);
+            if (market is null)
+            {
+                _globalNotificationService.ShowError("Не удалось получить биржу");
+                return market;
+            }
+
+            return market;
         }
 
         public async Task<bool> CreateNewMarketAsync(string name, DateTime startDate, DateTime finishDate)

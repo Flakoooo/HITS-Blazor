@@ -1,6 +1,7 @@
 ﻿@namespace HITSBlazor.Pages.Admin.AllTags
 @using HITSBlazor.Components.Button
 @using HITSBlazor.Components.Filters.RadioFilter
+@using HITSBlazor.Components.Filters.ResetFilterButton
 @using HITSBlazor.Components.ListPageComponents.ListPageHeader
 @using HITSBlazor.Components.ListPageComponents.ListPageSearch
 @using HITSBlazor.Components.ListPageComponents.ListPageTable
@@ -58,12 +59,7 @@
                                  Value2Text="На рассмотрении"
                                  @bind-Value="IsConfirmed"
                                  OnFilterChanged="LoadTagsAsync" />
-                    <div class="w-100 d-flex justify-content-center">
-                        <Button Variant="ButtonVariant.Danger"
-                                Text="Сбросить фильтры"
-                                IconStyle="bi-x-lg"
-                                OnButtonClick="ResetFilters" />
-                    </div>
+                    <ResetFilterButton ResetMethod="ResetFilters" />
                 </FilterContent>
             </ListPageTable>
         </div>

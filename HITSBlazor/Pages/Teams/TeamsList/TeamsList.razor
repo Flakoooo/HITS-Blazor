@@ -2,6 +2,8 @@
 @using HITSBlazor.Components.ActionMenus.BaseActionMenu
 @using HITSBlazor.Components.Button
 @using HITSBlazor.Components.Filters.RadioFilter
+@using HITSBlazor.Components.Filters.ResetFilterButton
+@using HITSBlazor.Components.Filters.SkillFilter
 @using HITSBlazor.Components.Inputs.Input
 @using HITSBlazor.Components.ListPageComponents.ListPageHeader
 @using HITSBlazor.Components.ListPageComponents.ListPageSearch
@@ -94,41 +96,10 @@
                                  Value2Text="Искать по вакансиям"
                                  @bind-Value="SkillsState"
                                  OnFilterChanged="@LoadTeamsAsync" />
-                    <div class="w-100">
-                        <Typography FontSize="6"CustomClass="fw-semibold">
-                            Стек технологий
-                        </Typography>
-                        <Input Placeholder="Найти" CustomClass="my-1" ValueChanged="@((value) => SearchSkill(value))" />
-                        <div class="list-page-filter-choices">
-                            @foreach (var skill in _skills)
-                            {
-                                <div class="list-page-filter-choice px-2 py-1 rounded-1">
-                                    <div class="d-flex">
-                                        <input type="checkbox" 
-                                               checked="@_selectedSkillIds.Contains(skill.Id)"
-                                               @onchange="@(e => SelectedSkillsChanged(skill.Id, (bool)e.Value!))"
-                                               name="Стек технологий" 
-                                               value="@skill.Name"
-                                               class="form-check-input" />
-                                        <Typography CustomClass="form-check-label ms-2">
-                                            @skill.Name
-                                        </Typography>
-                                    </div>
-                                    @if (_userSkillIds.Contains(skill.Id))
-                                    {
-                                        <i class="icon bi bi-star-fill text-warning"></i>
-                                    }
-                                </div>
-                            }
-                        </div>
-                    </div>
-                    <div class="w-100 d-flex justify-content-center">
-                        <Button BtnType="ButtonType.Button" 
-                                Variant="ButtonVariant.Danger"
-                                Text="Сбросить фильтры" 
-                                IconStyle="bi-x-lg" 
-                                OnButtonClick="ResetFilters" />
-                    </div>
+                    <SkillFilter @bind-SeacrhSkillText="SeacrhSkillText" 
+                                 @bind-SelectedSkillIds="SelectedSkillIds" 
+                                 OnFilterChanged="LoadTeamsAsync" />
+                    <ResetFilterButton ResetMethod="ResetFilters" />
                 </FilterContent>
             </ListPageTable>
         </div>

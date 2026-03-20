@@ -70,7 +70,7 @@ namespace HITSBlazor.Utils.Mocks.Markets
                     Customer = helper.Customer,
                     Position = 7,
                     Stack = [..stackAI],
-                    Status = IdeaMarketStatusType.RECRUITMENT_IS_OPEN,
+                    Status = IdeaMarketStatusType.RecruitmentIsOpen,
                     Requests = 0,
                     AcceptedRequests = 0,
                     IsFavorite = false
@@ -96,7 +96,7 @@ namespace HITSBlazor.Utils.Mocks.Markets
                         git,
                         MockSkills.GetSkillById(MockSkills.CppId)!
                     ],
-                    Status = IdeaMarketStatusType.RECRUITMENT_IS_OPEN,
+                    Status = IdeaMarketStatusType.RecruitmentIsOpen,
                     Requests = 0,
                     AcceptedRequests = 0,
                     IsFavorite = false
@@ -117,7 +117,7 @@ namespace HITSBlazor.Utils.Mocks.Markets
                     Customer = eMetricsViewer.Customer,
                     Position = 9,
                     Stack = [..stackWeb],
-                    Status = IdeaMarketStatusType.RECRUITMENT_IS_OPEN,
+                    Status = IdeaMarketStatusType.RecruitmentIsOpen,
                     Requests = 0,
                     AcceptedRequests = 0,
                     IsFavorite = false
@@ -138,7 +138,7 @@ namespace HITSBlazor.Utils.Mocks.Markets
                     Customer = calculator.Customer,
                     Position = 10,
                     Stack = [.. stackWeb],
-                    Status = IdeaMarketStatusType.RECRUITMENT_IS_OPEN,
+                    Status = IdeaMarketStatusType.RecruitmentIsOpen,
                     Requests = 0,
                     AcceptedRequests = 0,
                     IsFavorite = false
@@ -159,7 +159,7 @@ namespace HITSBlazor.Utils.Mocks.Markets
                     Customer = chatbot.Customer,
                     Position = 11,
                     Stack = [.. stackAI],
-                    Status = IdeaMarketStatusType.RECRUITMENT_IS_CLOSED,
+                    Status = IdeaMarketStatusType.RecruitmentIsClosed,
                     Requests = 0,
                     AcceptedRequests = 0,
                     IsFavorite = false
@@ -180,13 +180,16 @@ namespace HITSBlazor.Utils.Mocks.Markets
                     Customer = armature.Customer,
                     Position = 11,
                     Stack = [.. stackAI],
-                    Status = IdeaMarketStatusType.RECRUITMENT_IS_CLOSED,
+                    Status = IdeaMarketStatusType.Project,
                     Requests = 0,
                     AcceptedRequests = 0,
                     IsFavorite = false
                 }
             ];
         }
+
+        public static List<IdeaMarket> GetIdeaMarketsByMarketId(Guid marketId) 
+            => [.. _ideaMarkets.Where(im => im.MarketId == marketId)];
 
         public static IdeaMarket? GetIdeaMarketById(Guid id) =>
             _ideaMarkets.FirstOrDefault(im => im.Id == id);

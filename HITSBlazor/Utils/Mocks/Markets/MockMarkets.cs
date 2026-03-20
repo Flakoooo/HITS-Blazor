@@ -51,8 +51,7 @@ namespace HITSBlazor.Utils.Mocks.Markets
 
         public static List<Market> GetAllMarkets() => [.. _markets];
 
-        public static List<Market> GetActiveMarkets()
-            => [.. _markets.Where(m => m.Status == MarketStatus.Active)];
+        public static Market? GetMarketById(Guid marketId) => _markets.FirstOrDefault(m => m.Id == marketId);
 
         public static Market? CreateMarket(string name, DateTime startDate, DateTime finishDate, MarketStatus status = MarketStatus.New)
         {

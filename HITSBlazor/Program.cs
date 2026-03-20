@@ -22,6 +22,7 @@ using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using HITSBlazor.Services.Tags;
+using HITSBlazor.Services.IdeaMarkets;
 
 
 
@@ -117,6 +118,9 @@ namespace HITSBlazor
 
             //Market
             builder.Services.AddScoped<IMarketService, MockMarketService>();
+
+            //IdeaMarket
+            builder.Services.AddScoped<IIdeaMarketService, MockIdeaMarketService>();
 
             //Tests
             builder.Services.AddScoped<ITestService, MockTestService>();

@@ -1,0 +1,154 @@
+﻿@namespace HITSBlazor.Pages.Markets.MarketIdeas
+@using HITSBlazor.Components.Button
+@using HITSBlazor.Components.Filters.RadioFilter
+@using HITSBlazor.Components.Filters.ResetFilterButton
+@using HITSBlazor.Components.Filters.SkillFilter
+@using HITSBlazor.Components.Inputs.Input
+@using HITSBlazor.Components.Placeholders.Placeholder
+@using HITSBlazor.Components.Typography
+@using HITSBlazor.Models.Common.Enums
+@using HITSBlazor.Models.Markets.Enums
+@using HITSBlazor.Utils.Models
+
+<div class="ideas-market-content page-content-with-header p-3 bg-white">
+    <div class="w-100 d-flex flex-column">
+        @if (_isLoading || _currentMarket is null)
+        {
+            <div class="w-25">
+                <Placeholder />
+                <div class="w-50 d-flex gap-3">
+                    <Placeholder />
+                    <Placeholder />
+                </div>
+            </div>
+        }
+        else
+        {
+            <Typography FontSize="2" TextColor="TextColor.Primary">
+                @_currentMarket.Name
+            </Typography>
+            <Typography FontSize="6" TextColor="TextColor.Secondary">
+                @_currentMarket.StartDate.ToString("dd.MM.yyyy") - @_currentMarket.FinishDate.ToString("dd.MM.yyyy")
+            </Typography>
+        }
+    </div>
+    <div class="nav nav-underline mb-3 w-100 d-flex justify-content-center">
+        <div class="nav-link cursor-pointer @GetActiveCategoryClass(MarketIdeasCategory.All)">
+            @(EnumViewModel<MarketIdeasCategory>.GetTranslation(MarketIdeasCategory.All))
+        </div>
+        <div class="nav-link cursor-pointer @GetActiveCategoryClass(MarketIdeasCategory.Favorite)">
+            @(EnumViewModel<MarketIdeasCategory>.GetTranslation(MarketIdeasCategory.Favorite))
+        </div>
+    </div>
+    <div class="d-flex justify-content-between align-items-center mb-3 w-100">
+        <div class="w-50">
+            <Input IconStyle="bi-search" Placeholder="Поиск" ValueChanged="@((value) => SearchMarketIdeas(value))" />
+        </div>
+        <Button Variant="ButtonVariant.Danger" Text="Закрыть биржу" OnButtonClick="CloseMarket" />
+    </div>
+    <div class="w-100 d-flex justify-content-stretch align-items-start">
+        <div class="w-100 d-grid">
+            <div class="row g-3 row-cols-1 row-cols-sm-1 row-cols-lg-2">
+                @if (_isLoading)
+                {
+                    @for (int i = 0; i < 3; ++i)
+                    {
+                        <div class="col">
+                            <div class="p-3 w-100 rounded border shadow-sm d-flex flex-column gap-2">
+                                <Placeholder Width="w-50" />
+                                <Placeholder />
+                                <Placeholder />
+                                <Placeholder Width="w-25" />
+                                <div class="skills d-flex flex-wrap gap-1">
+                                    @for (int j = 0; j < 4; ++j)
+                                    {
+                                        <div style="width: 100px;">
+                                            <Placeholder />
+                                        </div>
+                                    }
+                                </div>
+                                <div class="mt-1 pt-2 border-top d-flex gap-1">
+                                    <Placeholder Width="w-25" />
+                                    <Placeholder Width="w-25" />
+                                    <Placeholder Width="w-25" />
+                                </div>
+                            </div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    @foreach (var ideaMarket in _ideaMarkets)
+                    {
+                        <div class="col">
+                            <div class="p-3 w-100 h-100 rounded border shadow-sm d-flex flex-column gap-2">
+                                <div class="d-flex flex-column">
+                                    <div class="w-100 d-flex align-items-start justify-content-between gap-2">
+                                        <div class="idea-market-name bs-link mb-1 fw-semibold text-primary">
+                                            <Typography FontSize="5" TextColor="TextColor.Dark" CustomClass="me-1">
+                                                #@ideaMarket.Position
+                                            </Typography>
+                                            <Typography FontSize="5" CustomClass="fw-semibold cursor-pointer">
+                                                @ideaMarket.Name
+                                            </Typography>
+                                        </div>
+                                        <i class="bi bi-bookmark@(ideaMarket.IsFavorite ? "-fill" : string.Empty) fs-4 text-warning cursor-pointer"></i>
+                                    </div>
+                                    <div class="idea-market-solution">
+                                        <Typography FontSize="6" TextColor="TextColor.Secondary">
+                                            @ideaMarket.Solution
+                                        </Typography>
+                                    </div>
+                                    <div class="my-2 d-flex gap-1">
+                                        <i class="bi bi-person-circle fs-5"></i>
+                                        <Typography FontSize="6">
+                                            Инициатор: @ideaMarket.Initiator.FullName
+                                        </Typography>
+                                    </div>
+                                </div>
+                                <div class="d-flex flex-wrap gap-1">
+                                    @foreach (var skill in ideaMarket.Stack)
+                                    {
+                                        <div class="px-2 py-1 rounded d-flex gap-1 @(EnumViewModel<SkillType>.GetStyle(skill.Type))">
+                                            @skill.Name
+                                        </div>
+                                    }
+                                </div>
+                                <div class="mt-2 pt-2 border-top d-flex justify-content-between align-items-start gap-2">
+                                    <div class="d-flex flex-wrap row-gap-1 column-gap-3">
+                                        <div class="d-flex align-items-center gap-1 @(EnumViewModel<IdeaMarketStatusType>.GetStyle(ideaMarket.Status))">
+                                            <i class="bi bi-circle-fill opacity-75"></i>
+                                            <Typography FontSize="6">
+                                                @(EnumViewModel<IdeaMarketStatusType>.GetTranslation(ideaMarket.Status))
+                                            </Typography>
+                                        </div>
+                                        <div class="text-secondary d-flex align-items-center gap-1">
+                                            <i class="bi bi-people-fill opacity-75"></i>
+                                            <Typography FontSize="6">
+                                                Команда до @ideaMarket.MaxTeamSize человек
+                                            </Typography>
+                                        </div>
+                                        <div class="text-secondary d-flex align-items-center gap-1">
+                                            <i class="bi bi-envelope-fill opacity-75"></i>
+                                            <Typography FontSize="6">
+                                                Подано заявок @ideaMarket.Requests
+                                            </Typography>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                }
+            </div>
+        </div>
+        <div class="list-page-filter w-25 bg-white p-2 ms-2 border-start">
+            <!-- radio фильтр с 3 категориями (статус идеи на бирже) -->
+            <RadioFilter />
+            <SkillFilter @bind-SeacrhSkillText="SeacrhSkillText"
+                         @bind-SelectedSkillIds="SelectedSkillIds"
+                         OnFilterChanged="LoadMarketIdeasAsync" />
+            <ResetFilterButton ResetMethod="ResetFilters" />
+        </div>
+    </div>
+</div>

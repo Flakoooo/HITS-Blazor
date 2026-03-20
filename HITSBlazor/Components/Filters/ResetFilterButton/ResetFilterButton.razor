@@ -1,0 +1,22 @@
+﻿@namespace HITSBlazor.Components.Filters.ResetFilterButton
+@using HITSBlazor.Components.Button
+
+<div class="w-100 d-flex justify-content-center">
+    <Button BtnType="ButtonType.Button" 
+            Variant="ButtonVariant.Danger"
+            Text="Сбросить фильтры" 
+            IconStyle="bi-x-lg" 
+            OnButtonClick="ExecuteReset" />
+</div>
+
+@code {
+    [Parameter]
+    public Func<Task>? ResetMethod { get; set; }
+
+    private async Task ExecuteReset()
+    {
+        if (ResetMethod is null) return;
+
+        await ResetMethod();
+    }
+}

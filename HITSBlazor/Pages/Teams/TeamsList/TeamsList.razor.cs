@@ -1,13 +1,10 @@
 ﻿using HITSBlazor.Components.ActionMenus.BaseActionMenu;
 using HITSBlazor.Components.Tables.TableHeader;
-using HITSBlazor.Models.Common.Entities;
 using HITSBlazor.Models.Teams.Entities;
 using HITSBlazor.Services;
 using HITSBlazor.Services.Auth;
 using HITSBlazor.Services.Modal;
-using HITSBlazor.Services.Skills;
 using HITSBlazor.Services.Teams;
-using HITSBlazor.Services.UserSkills;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
 
@@ -22,13 +19,7 @@ namespace HITSBlazor.Pages.Teams.TeamsList
         private IAuthService AuthService { get; set; } = null!;
 
         [Inject]
-        private IUserSkillService UserSkillService { get; set; } = null!;
-
-        [Inject]
         private ITeamService TeamService { get; set; } = null!;
-
-        [Inject]
-        private ISkillService SkillService { get; set; } = null!;
 
         [Inject]
         private NavigationService NavigationService { get; set; } = null!;
@@ -51,9 +42,6 @@ namespace HITSBlazor.Pages.Teams.TeamsList
         private bool _isLoading = true;
 
         private List<Team> _teams = [];
-        private List<Skill> _skills = [];
-        private HashSet<Guid> _userSkillIds = [];
-        private HashSet<Guid> _selectedSkillIds = [];
 
         private string? _searchText = null;
         private string? _orderTeamBy = null;
@@ -62,17 +50,15 @@ namespace HITSBlazor.Pages.Teams.TeamsList
         private bool? SurveyState { get; set; } = null;
         private bool? HasActiveProjectState { get; set; } = null;
         private bool? SkillsState { get; set; } = null;
-        private string? _searchSkillText = null;
+
+        private string SeacrhSkillText { get; set; } = string.Empty;
+        private HashSet<Guid> SelectedSkillIds { get; set; } = [];
 
         protected override async Task OnInitializedAsync()
         {
             _isLoading = true;
 
             await LoadTeamsAsync();
-            if (AuthService.CurrentUser is not null)
-                _userSkillIds = [.. (await UserSkillService.GetUserSkillsAsync(AuthService.CurrentUser.Id)).Select(s => s.Id)];
-
-            await LoadSkillsAsync();
 
             _isLoading = false;
         }
@@ -90,7 +76,7 @@ namespace HITSBlazor.Pages.Teams.TeamsList
                 Privacy: PrivacyState,
                 Survey: SurveyState,
                 HasActiveProject: HasActiveProjectState,
-                SearchSkillIds: _selectedSkillIds,
+                SearchSkillIds: SelectedSkillIds,
                 OrderBy: _orderTeamBy,
                 ByDescending: _sortTeamState
             );
@@ -98,33 +84,9 @@ namespace HITSBlazor.Pages.Teams.TeamsList
             StateHasChanged();
         }
 
-        private async Task LoadSkillsAsync()
-        {
-            _skills = await SkillService.GetSkillsAsync(searchText: _searchSkillText);
-
-            _skills = [.. _skills
-                .OrderByDescending(s => _userSkillIds.Contains(s.Id))
-                .ThenBy(s => s.Name)];
-            StateHasChanged();
-        }
-
         private async Task SearchTeam(string value)
         {
             _searchText = value;
-            await LoadTeamsAsync();
-        }
-
-        private async Task SearchSkill(string value)
-        {
-            _searchSkillText = value;
-            await LoadSkillsAsync();
-        }
-
-        private async Task SelectedSkillsChanged(Guid skillId, bool isChecked)
-        {
-            if (isChecked) _selectedSkillIds.Add(skillId);
-            else           _selectedSkillIds.Remove(skillId);
-
             await LoadTeamsAsync();
         }
 
@@ -145,8 +107,8 @@ namespace HITSBlazor.Pages.Teams.TeamsList
             SurveyState = null;
             HasActiveProjectState = null;
             SkillsState = null;
-            _searchSkillText = null;
-            _selectedSkillIds = [];
+            SeacrhSkillText = string.Empty;
+            SelectedSkillIds = [];
 
             await LoadTeamsAsync();
         }
