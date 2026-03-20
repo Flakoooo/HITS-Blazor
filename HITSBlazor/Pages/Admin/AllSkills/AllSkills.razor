@@ -6,8 +6,8 @@
 @using HITSBlazor.Components.ListPageComponents.ListPageHeader
 @using HITSBlazor.Components.ListPageComponents.ListPageSearch
 @using HITSBlazor.Components.ListPageComponents.ListPageTable
-@using HITSBlazor.Components.Modals.CenterModals.DeleteModal
 @using HITSBlazor.Components.Placeholders.TablePlaceholder
+@using HITSBlazor.Components.Status
 @using HITSBlazor.Components.Tables.TableActionMenu
 @using HITSBlazor.Components.Tables.TableBodyRow
 @using HITSBlazor.Components.Tables.TableHeader
@@ -44,9 +44,7 @@
                                     </div>
                                 </TableBodyRow>
                                 <TableBodyRow>
-                                    <div class="px-2 py-1 rounded-4 @skill.Type.GetStyle()">
-                                        @(EnumViewModel<SkillType>.GetTranslation(skill.Type))
-                                    </div>
+                                    <Status Statustype="skill.Type" />
                                 </TableBodyRow>
                                 <TableBodyRow>
                                     <div class="@(skill.Confirmed ? string.Empty : "text-danger")">

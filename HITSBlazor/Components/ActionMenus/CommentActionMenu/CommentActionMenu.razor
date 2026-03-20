@@ -18,7 +18,7 @@
             @foreach (var action in ActionIds)
             {
                 <li @onclick="@(() => HandleActionClick(action.Key, action.Value))"
-                    class="list-group-item list-group-item-action px-2 py-1 @GetActionStyle(action.Key)">
+                    class="list-group-item list-group-item-action px-2 py-1 @(EnumViewModel<MenuAction>.GetStyle(action.Key))">
                     @(EnumViewModel<MenuAction>.GetTranslation(action.Key))
                 </li>
             }

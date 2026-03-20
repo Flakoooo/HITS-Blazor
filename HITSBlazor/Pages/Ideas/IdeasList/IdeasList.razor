@@ -8,6 +8,7 @@
 @using HITSBlazor.Components.ListPageComponents.ListPageSearch
 @using HITSBlazor.Components.ListPageComponents.ListPageTable
 @using HITSBlazor.Components.Placeholders.TablePlaceholder
+@using HITSBlazor.Components.Status
 @using HITSBlazor.Components.Tables.TableActionMenu
 @using HITSBlazor.Components.Tables.TableBodyRow
 @using HITSBlazor.Components.Tables.TableHeader
@@ -45,28 +46,26 @@
                                 </TableBodyRow>
                                 <TableBodyRow>
                                     <div @onclick="@(() => ShowIdea(idea.Id))" class="data-link">
-                                        <div>@idea.Name</div>
+                                        @idea.Name
                                     </div>
                                 </TableBodyRow>
                                 <TableBodyRow IsCentered="true">
-                                    <div class="px-2 py-1 rounded-4 @idea.Status.GetStyle()">
-                                        <div>@(EnumViewModel<IdeaStatusType>.GetTranslation(idea.Status))</div>
-                                    </div>
+                                    <Status Statustype="idea.Status" />
                                 </TableBodyRow>
                                 <TableBodyRow IsCentered="true">
-                                    <div>@idea.CreatedAt.ToString("dd.MM.yyyy")</div>
+                                    @idea.CreatedAt.ToString("dd.MM.yyyy")
                                 </TableBodyRow>
                                 <TableBodyRow IsCentered="true">
-                                    <div>@idea.ModifiedAt.ToString("dd.MM.yyyy")</div>
+                                    @idea.ModifiedAt.ToString("dd.MM.yyyy")
                                 </TableBodyRow>
                                 <TableBodyRow IsCentered="true">
                                     <div class="@idea.PreAssessment.GetStyle()">
-                                        <div>@idea.PreAssessment</div>
+                                        @idea.PreAssessment
                                     </div>
                                 </TableBodyRow>
                                 <TableBodyRow IsCentered="true">
                                     <div class="@idea.Rating.GetStyle()">
-                                        <div>@idea.Rating</div>
+                                        @idea.Rating
                                     </div>
                                 </TableBodyRow>
                                 <TableActionMenu ItemId="@idea.Id"

@@ -6,7 +6,10 @@ using HITSBlazor.Utils.Mocks.Common;
 
 namespace HITSBlazor.Services.Companies
 {
-    public class MockCompanyService(IAuthService authService, GlobalNotificationService globalNotificationService) : ICompanyService
+    public class MockCompanyService(
+        IAuthService authService, 
+        GlobalNotificationService globalNotificationService
+    ) : ICompanyService
     {
         private readonly IAuthService _authService = authService;
         private readonly GlobalNotificationService _globalNotificationService = globalNotificationService;

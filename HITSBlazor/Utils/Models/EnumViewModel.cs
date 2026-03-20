@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using HITSBlazor.Utils.Attributes;
+using System.ComponentModel;
 using System.Reflection;
 
 namespace HITSBlazor.Utils.Models
@@ -15,6 +16,16 @@ namespace HITSBlazor.Utils.Models
             var attribute = field?.GetCustomAttribute<DescriptionAttribute>();
 
             return attribute?.Description ?? value.ToString();
+        }
+
+        public static string GetStyle(Enum? value)
+        {
+            if (value is null) return nameof(value);
+
+            var field = value.GetType().GetField(value.ToString());
+            var attribute = field?.GetCustomAttribute<StyleAttribute>();
+
+            return attribute?.Style ?? value.ToString();
         }
 
         public override string GetDisplayInfo() => GetTranslation(Value);

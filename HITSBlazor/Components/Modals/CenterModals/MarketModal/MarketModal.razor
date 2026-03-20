@@ -1,0 +1,22 @@
+﻿@namespace HITSBlazor.Components.Modals.CenterModals.MarketModal
+@using HITSBlazor.Components.Button
+@using HITSBlazor.Components.Inputs.Input
+@using HITSBlazor.Components.Modals.Components.CenterModalHeader
+
+<div @onclick:stopPropagation="true" class="market-modal p-3 bg-white rounded">
+    <CenterModalHeader HeaderText="@(Market is not null ? "Редактирование биржи" : "Создание биржи")" />
+    <Input Label="Название"
+           Placeholder="Введите название биржи"
+           @bind-Value="MarketName" />
+    <Input Label="Дата старта"
+           InputType="InputType.Date"
+           @bind-Value="MarketStartDate" />
+    <Input Label="Дата окончания"
+           InputType="InputType.Date"
+           @bind-Value="MarketFinishDate" />
+    <Button Variant="ButtonVariant.Primary"
+            IsLoading="_submitting"
+            Text="@(Market is not null ? "Сохранить изменения" : "Добавить")"
+            LoadingText="@(Market is not null ? "Сохранение" : "Добавление")"
+            OnButtonClick="SendMarket" />
+</div>

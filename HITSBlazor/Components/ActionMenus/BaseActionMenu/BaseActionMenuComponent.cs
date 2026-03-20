@@ -194,17 +194,6 @@ namespace HITSBlazor.Components.ActionMenus.BaseActionMenu
             await InvokeAsync(StateHasChanged);
         }
 
-        protected static string GetActionStyle(MenuAction action) => action switch
-        {
-            MenuAction.TeamRequestAccept => "text-success",
-            MenuAction.SetLeader => "text-primary",
-            MenuAction.Delete
-            or MenuAction.TeamRequestCancel
-            or MenuAction.UnsetLeader
-            or MenuAction.RemoveTeamMember => "text-danger",
-            _ => string.Empty
-        };
-
         protected async Task HandleActionClick(MenuAction action, object item)
         {
             IsOpen = false;

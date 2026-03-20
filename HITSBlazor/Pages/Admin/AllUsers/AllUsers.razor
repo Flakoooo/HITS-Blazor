@@ -8,6 +8,7 @@
 @using HITSBlazor.Components.ListPageComponents.ListPageSearch
 @using HITSBlazor.Components.ListPageComponents.ListPageTable
 @using HITSBlazor.Components.Placeholders.TablePlaceholder
+@using HITSBlazor.Components.Status
 @using HITSBlazor.Components.Tables.TableActionMenu
 @using HITSBlazor.Components.Tables.TableBodyRow
 @using HITSBlazor.Components.Tables.TableHeader
@@ -58,9 +59,7 @@
                                 <TableBodyRow>
                                     @foreach (var role in user.Roles)
                                     {
-                                        <div class="px-2 py-1 rounded-4 text-center align-self-start @role.GetStyle()">
-                                            @(EnumViewModel<RoleType>.GetTranslation(role))
-                                        </div>
+                                        <Status Statustype="role" />
                                     }
                                 </TableBodyRow>
                                 <TableActionMenu ItemId="@user.Id"

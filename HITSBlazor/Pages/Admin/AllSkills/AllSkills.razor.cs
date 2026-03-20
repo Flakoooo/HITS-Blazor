@@ -1,12 +1,13 @@
 ﻿using ApexCharts;
 using HITSBlazor.Components.ActionMenus.BaseActionMenu;
-using HITSBlazor.Components.Modals.CenterModals.DeleteModal;
+using HITSBlazor.Components.Button;
 using HITSBlazor.Components.Modals.CenterModals.SkillModal;
 using HITSBlazor.Components.Tables.TableHeader;
 using HITSBlazor.Models.Common.Entities;
 using HITSBlazor.Models.Common.Enums;
 using HITSBlazor.Services.Modal;
 using HITSBlazor.Services.Skills;
+using HITSBlazor.Services.Tags;
 using HITSBlazor.Utils.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
@@ -41,7 +42,6 @@ namespace HITSBlazor.Pages.Admin.AllSkills
         private readonly List<EnumViewModel<SkillType>> _filterSkillTypes 
             = [.. Enum.GetValues<SkillType>().Select(s => new EnumViewModel<SkillType>(s))];
 
-        private List<EnumViewModel<SkillType>> AllSkillTypes { get; set; } = [];
         private HashSet<EnumViewModel<SkillType>> SelectedSkillTypes { get; set; } = [];
 
         protected override async Task OnInitializedAsync()
@@ -122,9 +122,11 @@ namespace HITSBlazor.Pages.Admin.AllSkills
             else if (context.Action == MenuAction.Delete)
             {
                 if (context.Item is Skill skill)
-                    ModalService.ShowDeleteModal(
-                        skill.Name,
-                        () => SkillService.DeleteSkillAsync(skill)
+                    ModalService.ShowConfirmModal(
+                        $"Вы действительно хотите удалить \"{skill.Name}\"?",
+                        () => SkillService.DeleteSkillAsync(skill),
+                        confirmButtonVariant: ButtonVariant.Danger,
+                        confirmButtonText: "Удалить"
                     );
             }
         }

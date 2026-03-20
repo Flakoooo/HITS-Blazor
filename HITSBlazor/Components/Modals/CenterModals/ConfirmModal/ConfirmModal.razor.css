@@ -1,0 +1,11 @@
+﻿.confirm-modal {
+    max-width: 450px;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: stretch;
+    justify-content: stretch;
+    gap: 16px;
+    align-self: center;
+    justify-self: center;
+}

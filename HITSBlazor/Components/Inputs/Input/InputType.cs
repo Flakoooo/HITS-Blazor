@@ -4,6 +4,10 @@
     {
         Text,
         Email,
-        Password
+        Password,
+        Date,
+        Color,
+        Radio,
+        Checkbox
     }
 }

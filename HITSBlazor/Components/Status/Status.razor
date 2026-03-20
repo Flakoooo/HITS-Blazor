@@ -1,0 +1,14 @@
+﻿@namespace HITSBlazor.Components.Status
+@using HITSBlazor.Utils.Models
+
+<div class="px-2 py-1 rounded-4 @CustomClass @(EnumViewModel<Enum>.GetStyle(Statustype))">
+    @(EnumViewModel<Enum>.GetTranslation(Statustype))
+</div>
+
+@code {
+    [Parameter]
+    public Enum? Statustype { get; set; }
+
+    [Parameter]
+    public string CustomClass { get; set; } = string.Empty;
+}

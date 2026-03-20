@@ -4,6 +4,7 @@
 @using HITSBlazor.Components.Collapse
 @using HITSBlazor.Components.Modals.Components.ModalHeader
 @using HITSBlazor.Components.Placeholders.Placeholder
+@using HITSBlazor.Components.Status
 @using HITSBlazor.Components.Tables.TableActionMenu
 @using HITSBlazor.Components.Tables.TableBodyRow
 @using HITSBlazor.Components.Tables.TableHeader
@@ -204,9 +205,7 @@
                                             {
                                                 <tr>
                                                     <TableBodyRow IsCentered="true">
-                                                        <div class="px-2 py-1 rounded-4 @invitation.Status.GetStyle()">
-                                                            @(EnumViewModel<TeamRequestStatus>.GetTranslation(invitation.Status))
-                                                        </div>
+                                                        <Status Statustype="invitation.Status" />
                                                     </TableBodyRow>
                                                     <TableBodyRow IsCentered="true">
                                                         <div class="data-link">
@@ -234,9 +233,7 @@
                                             {
                                                 <tr>
                                                     <TableBodyRow IsCentered="true">
-                                                        <div class="px-2 py-1 rounded-4 @request.Status.GetStyle()">
-                                                            @(EnumViewModel<TeamRequestStatus>.GetTranslation(request.Status))
-                                                        </div>
+                                                        <Status Statustype="request.Status" />
                                                     </TableBodyRow>
                                                     <TableBodyRow IsCentered="true">
                                                         <div class="data-link">
@@ -271,9 +268,7 @@
                                                         </div>
                                                     </TableBodyRow>
                                                     <TableBodyRow IsCentered="true">
-                                                        <div class="px-2 py-1 rounded-4 @request.Status.GetStyle()">
-                                                            @(EnumViewModel<TeamRequestStatus>.GetTranslation(request.Status))
-                                                        </div>
+                                                        <Status Statustype="request.Status" />
                                                     </TableBodyRow>
                                                     <TableActionMenu ItemId="request.Id"
                                                                      StrategyPosition="Strategy.Fixed"
@@ -291,9 +286,7 @@
                                             {
                                                 <tr>
                                                     <TableBodyRow IsCentered="true">
-                                                        <div class="px-2 py-1 rounded-4 @invitation.Status.GetStyle()">
-                                                            @(EnumViewModel<TeamRequestStatus>.GetTranslation(invitation.Status))
-                                                        </div>
+                                                        <Status Statustype="invitation.Status" />
                                                     </TableBodyRow>
                                                     <TableBodyRow>
                                                         <div class="data-link">
@@ -303,7 +296,7 @@
                                                     <TableBodyRow IsCentered="true">
                                                         @foreach (var skill in invitation.Skills)
                                                         {
-                                                            <div class="px-2 py-1 rounded d-flex gap-1 @skill.Type.GetStyle()">
+                                                            <div class="px-2 py-1 rounded d-flex gap-1 @(EnumViewModel<SkillType>.GetStyle(skill.Type))">
                                                                 @skill.Name
                                                             </div>
                                                         }

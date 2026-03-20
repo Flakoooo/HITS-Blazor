@@ -1,4 +1,5 @@
 ﻿using HITSBlazor.Components.LeftSideNavigation;
+using HITSBlazor.Models.Markets.Enums;
 using HITSBlazor.Models.Users.Enums;
 using HITSBlazor.Services.Auth;
 using HITSBlazor.Services.Markets;
@@ -273,7 +274,7 @@ namespace HITSBlazor.Services
                     nav.SubItems.Add(subItem1);
                 }
 
-                var activeMarket = await _marketService.GetActiveMarketsAsync();
+                var activeMarket = await _marketService.GetMarketssAsync(selectedStatuses: [MarketStatus.Active]);
                 int count = nav.SubItems.Count;
                 foreach (var market in activeMarket)
                 {

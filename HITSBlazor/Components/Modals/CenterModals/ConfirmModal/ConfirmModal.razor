@@ -1,0 +1,63 @@
+﻿@namespace HITSBlazor.Components.Modals.CenterModals.ConfirmModal
+@using HITSBlazor.Components.Button
+@using HITSBlazor.Components.Modals.Components.CenterModalHeader
+@using HITSBlazor.Components.Typography
+@using HITSBlazor.Services.Modal
+
+<div @onclick:stopPropagation="true" class="confirm-modal p-3 rounded bg-white">
+    <Typography FontSize="QuestionTextFontSize" TextColor="QuestionTextColor" CustomClass="@QuestionTextCustomClass">
+        @QuestionText
+    </Typography>
+    <div class="d-flex flex-row flex-nowrap align-items-center justify-content-center gap-3">
+        <Button ButtonClass="w-100"
+                Variant="CancelButtonVariant"
+                Text="@CancelButtonText"
+                OnButtonClick="CloseModal" />
+        <Button ButtonClass="w-100"
+                Variant="ConfirmButtonVariant"
+                Text="@ConfirmButtonText"
+                OnButtonClick="ExecuteDelete" />
+    </div>
+</div>
+
+@code {
+    [Inject]
+    private ModalService ModalService { get; set; } = null!;
+
+    [Parameter]
+    public int QuestionTextFontSize { get; set; } = 6;
+
+    [Parameter]
+    public TextColor QuestionTextColor { get; set; } = TextColor.Black;
+
+    [Parameter]
+    public string QuestionTextCustomClass { get; set; } = string.Empty;
+
+    [Parameter]
+    public string QuestionText { get; set; } = string.Empty;
+
+    [Parameter]
+    public ButtonVariant CancelButtonVariant { get; set; } = ButtonVariant.Light;
+
+    [Parameter]
+    public string CancelButtonText { get; set; } = "Отмена";
+
+    [Parameter]
+    public ButtonVariant ConfirmButtonVariant { get; set; } = ButtonVariant.Success;
+
+    [Parameter]
+    public string ConfirmButtonText { get; set; } = "Подтвердить";
+
+    [Parameter]
+    public Func<Task>? ConfirmMethod { get; set; }
+
+    private async Task CloseModal() => await ModalService.Close(ModalType.Center);
+
+    private async Task ExecuteDelete()
+    {
+        if (ConfirmMethod is null) return;
+
+        await ConfirmMethod();
+        await CloseModal();
+    }
+}

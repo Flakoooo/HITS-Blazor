@@ -1,4 +1,5 @@
 ﻿using HITSBlazor.Components.ActionMenus.BaseActionMenu;
+using HITSBlazor.Components.Button;
 using HITSBlazor.Components.Modals.CenterModals.TagModal;
 using HITSBlazor.Components.Tables.TableHeader;
 using HITSBlazor.Models.Common.Entities;
@@ -109,9 +110,11 @@ namespace HITSBlazor.Pages.Admin.AllTags
             else if (context.Action == MenuAction.Delete)
             {
                 if (context.Item is Tag tag)
-                    ModalService.ShowDeleteModal(
-                        tag.Name,
-                        () => TagService.DeleteTagAsync(tag)
+                    ModalService.ShowConfirmModal(
+                        $"Вы действительно хотите удалить \"{tag.Name}\"?",
+                        () => TagService.DeleteTagAsync(tag),
+                        confirmButtonVariant: ButtonVariant.Danger,
+                        confirmButtonText: "Удалить"
                     );
             }
         }

@@ -15,7 +15,6 @@
 @using HITSBlazor.Models.Ideas.Enums
 @using HITSBlazor.Models.Users.Enums
 @using HITSBlazor.Services.Modal
-@using HITSBlazor.Utils
 @using HITSBlazor.Utils.EnumStyles
 @using HITSBlazor.Utils.Models
 
@@ -299,7 +298,7 @@
                                                             <div @onclick="@(() => ShowIdea(idea.Id))" class="user-ideas-idea-link data-link fs-6 w-100">
                                                                 @idea.Name
                                                             </div>
-                                                            <div class="px-2 py-1 rounded-4 fs-6 text-center @idea.Status.GetStyle()">
+                                                            <div class="px-2 py-1 rounded-4 fs-6 text-center @(EnumViewModel<IdeaStatusType>.GetStyle(idea.Status))">
                                                                 @(EnumViewModel<IdeaStatusType>.GetTranslation(idea.Status))
                                                             </div>
                                                         </div>

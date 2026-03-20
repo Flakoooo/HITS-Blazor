@@ -1,12 +1,11 @@
-﻿using HITSBlazor.Components.Modals.CenterModals.DeleteModal;
+﻿using HITSBlazor.Components.Button;
+using HITSBlazor.Components.Modals.CenterModals.ConfirmModal;
 using HITSBlazor.Components.Modals.CenterModals.SelectActiveRoleModal;
 using HITSBlazor.Components.Modals.RightSideModals.IdeaModal;
 using HITSBlazor.Components.Modals.RightSideModals.ProfileModal;
 using HITSBlazor.Components.Modals.RightSideModals.TeamModal;
-using HITSBlazor.Models.Common.Entities;
-using HITSBlazor.Services.Skills;
+using HITSBlazor.Components.Typography;
 using Microsoft.AspNetCore.Components;
-using System;
 
 namespace HITSBlazor.Services.Modal
 {
@@ -145,13 +144,47 @@ namespace HITSBlazor.Services.Modal
             blockCloseModal: true
         );
 
-        public void ShowDeleteModal(string valueName, Func<Task> deleteMethod) => Show<DeleteModal>(
-            type: ModalType.Center,
-            parameters: new Dictionary<string, object> {
-                [nameof(DeleteModal.ValueName)] = valueName,
-                [nameof(DeleteModal.DeleteMethod)] = deleteMethod
-            }
-        );
+        public void ShowConfirmModal(
+            string questionText,
+            Func<Task> confirmMethod,
+            int? questionTextFontSize = null,
+            TextColor? questionTextColor = null,
+            string? questionTextCustomClass = null,
+            ButtonVariant? cancelButtonVariant = null,
+            string? cancelButtonText = null,
+            ButtonVariant? confirmButtonVariant = null,
+            string? confirmButtonText = null
+        )
+        {
+            var parameters = new Dictionary<string, object>();
+
+            if (questionTextFontSize.HasValue) 
+                parameters.Add(nameof(ConfirmModal.QuestionTextFontSize), questionTextFontSize.Value);
+
+            if (questionTextColor.HasValue)
+                parameters.Add(nameof(ConfirmModal.QuestionTextColor), questionTextColor.Value);
+
+            if (!string.IsNullOrWhiteSpace(questionTextCustomClass))
+                parameters.Add(nameof(ConfirmModal.QuestionTextCustomClass), questionTextCustomClass);
+
+            parameters.Add(nameof(ConfirmModal.QuestionText), questionText);
+
+            if (cancelButtonVariant.HasValue)
+                parameters.Add(nameof(ConfirmModal.CancelButtonVariant), cancelButtonVariant.Value);
+
+            if (!string.IsNullOrWhiteSpace(cancelButtonText))
+                parameters.Add(nameof(ConfirmModal.CancelButtonText), cancelButtonText);
+
+            if (confirmButtonVariant.HasValue)
+                parameters.Add(nameof(ConfirmModal.ConfirmButtonVariant), confirmButtonVariant.Value);
+
+            if (!string.IsNullOrWhiteSpace(confirmButtonText))
+                parameters.Add(nameof(ConfirmModal.ConfirmButtonText), confirmButtonText);
+
+            parameters.Add(nameof(ConfirmModal.ConfirmMethod), confirmMethod);
+
+            Show<ConfirmModal>(type: ModalType.Center, parameters: parameters);
+        }
 
         public void ShowProfileModal(Guid userId) => Show<ProfileModal>(
             ModalType.RightSide,

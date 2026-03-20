@@ -1,0 +1,77 @@
+﻿@namespace HITSBlazor.Pages.Markets.MarketsList
+@using HITSBlazor.Components.ActionMenus.BaseActionMenu
+@using HITSBlazor.Components.Button
+@using HITSBlazor.Components.Filters.CheckboxFilter
+@using HITSBlazor.Components.ListPageComponents.ListPageHeader
+@using HITSBlazor.Components.ListPageComponents.ListPageSearch
+@using HITSBlazor.Components.ListPageComponents.ListPageTable
+@using HITSBlazor.Components.Placeholders.TablePlaceholder
+@using HITSBlazor.Components.Status
+@using HITSBlazor.Components.Tables.TableActionMenu
+@using HITSBlazor.Components.Tables.TableBodyRow
+@using HITSBlazor.Components.Tables.TableHeader
+@using HITSBlazor.Models.Markets.Enums
+@using HITSBlazor.Models.Users.Enums
+@using HITSBlazor.Utils.Models
+
+<div class="page-content-with-header overflow-y-scroll bg-white">
+    @if (_isLoading)
+    {
+        <TablePlaceholder />
+    }
+    else
+    {
+        <div class="w-100 bg-white p-3">
+            <ListPageHeader HeaderText="@($"Список бирж: {_markets.Count}")" 
+                            ShowCreateButton="true"
+                            CreateButtonText="Создать биржу" 
+                            OnButtonClick="() => ShowMarketModal()" />
+            <ListPageSearch ValueChanged="@((value) => SearchMarket(value))" />
+            <ListPageTable>
+                <TableContent>
+                    <TableHeader TableActionMenuIsEnable="true"
+                                 Items="_marketTableHeader"
+                                 OrderChanged="@((value) => SortMarket(value.Item1, value.Item2))" />
+                    <tbody>
+                        @foreach(var market in _markets)
+                        {
+                            <tr>
+                                <TableBodyRow>
+                                    <div class="data-link">
+                                        @market.Name
+                                    </div>
+                                </TableBodyRow>
+                                <TableBodyRow IsCentered="true">
+                                    <Status Statustype="market.Status" />
+                                </TableBodyRow>
+                                <TableBodyRow IsCentered="true">
+                                    @market.StartDate.ToString("dd.MM.yyyy")
+                                </TableBodyRow>
+                                <TableBodyRow IsCentered="true">
+                                    @market.FinishDate.ToString("dd.MM.yyyy")
+                                </TableBodyRow>
+                                <TableActionMenu ItemId="@market.Id"
+                                                 OnAction="OnMarketAction"
+                                                 ActionIds="GetTableActions(market)" />
+                            </tr>
+                        }
+                    </tbody>
+                </TableContent>
+                <FilterContent>
+                    <CheckboxFilter T="EnumViewModel<MarketStatus>" 
+                                    Label="Статус" 
+                                    AllValues="_filterMarketStatus"
+                                    FilterChanged="LoadMarketsAsync"
+                                    @bind-SelectedValues="SelectedStatuses" />
+                    <div class="w-100 d-flex justify-content-center">
+                        <Button BtnType="ButtonType.Button" 
+                                Variant="ButtonVariant.Danger"
+                                Text="Сбросить фильтры" 
+                                IconStyle="bi-x-lg" 
+                                OnButtonClick="ResetFilters" />
+                    </div>
+                </FilterContent>
+            </ListPageTable>
+        </div>
+    }
+</div>
