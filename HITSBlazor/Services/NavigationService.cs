@@ -274,7 +274,7 @@ namespace HITSBlazor.Services
                     nav.SubItems.Add(subItem1);
                 }
 
-                var activeMarket = await _marketService.GetMarketssAsync(selectedStatuses: [MarketStatus.Active]);
+                var activeMarket = await _marketService.GetMarketsAsync(selectedStatuses: [MarketStatus.Active]);
                 int count = nav.SubItems.Count;
                 foreach (var market in activeMarket)
                 {

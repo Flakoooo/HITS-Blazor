@@ -1,19 +1,13 @@
-﻿using HITSBlazor.Models.Common.Entities;
-using HITSBlazor.Models.Markets.Entities;
+﻿using HITSBlazor.Models.Markets.Entities;
 using HITSBlazor.Models.Markets.Enums;
-using HITSBlazor.Models.Users.Entities;
-using HITSBlazor.Services.Auth;
-using HITSBlazor.Utils.Mocks.Common;
 using HITSBlazor.Utils.Mocks.Markets;
 
 namespace HITSBlazor.Services.Markets
 {
     public class MockMarketService(
-        IAuthService authService,
         GlobalNotificationService globalNotificationService
     ) : IMarketService
     {
-        private readonly IAuthService _authService = authService;
         private readonly GlobalNotificationService _globalNotificationService = globalNotificationService;
 
         public event Func<Task>? OnMarketsStateChanged;
@@ -25,11 +19,11 @@ namespace HITSBlazor.Services.Markets
 
         private async Task RefreshCacheAsync()
         {
-            _cachedMarkets = MockMarkets.GetActiveMarkets();
+            _cachedMarkets = MockMarkets.GetAllMarkets();
             _lastRefreshTime = DateTime.UtcNow;
         }
 
-        public async Task<List<Market>> GetMarketssAsync(
+        public async Task<List<Market>> GetMarketsAsync(
             string? searchText, 
             HashSet<MarketStatus>? selectedStatuses, 
             string? orderBy, 
@@ -105,7 +99,18 @@ namespace HITSBlazor.Services.Markets
 
         public async Task UpdateMarketStatusAsync(Guid marketId, MarketStatus status)
         {
+            var updatedmarket = MockMarkets.UpdateMarketStatus(marketId, status);
+            if (!updatedmarket)
+            {
+                _globalNotificationService.ShowError("Не удалось перевести биржу");
+                return;
+            }
 
+            _cachedMarkets.FirstOrDefault(m => m.Id == marketId)?.Status = status;
+
+            _globalNotificationService.ShowSuccess("Биржа успешно переведена");
+            OnMarketsStateUpdated?.Invoke();
+            return;
         }
 
         public async Task DeleteMarketAsync(Market market)

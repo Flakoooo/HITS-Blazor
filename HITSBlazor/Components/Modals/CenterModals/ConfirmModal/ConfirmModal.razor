@@ -5,7 +5,7 @@
 @using HITSBlazor.Services.Modal
 
 <div @onclick:stopPropagation="true" class="confirm-modal p-3 rounded bg-white">
-    <Typography FontSize="QuestionTextFontSize" TextColor="QuestionTextColor" CustomClass="@QuestionTextCustomClass">
+    <Typography FontSize="QuestionTextFontSize" TextColor="QuestionTextColor" CustomClass="@($"text-center {QuestionTextCustomClass}")">
         @QuestionText
     </Typography>
     <div class="d-flex flex-row flex-nowrap align-items-center justify-content-center gap-3">

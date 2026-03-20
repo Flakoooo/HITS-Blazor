@@ -3,13 +3,11 @@ using HITSBlazor.Components.Button;
 using HITSBlazor.Components.Modals.CenterModals.MarketModal;
 using HITSBlazor.Components.Tables.TableHeader;
 using HITSBlazor.Components.Typography;
-using HITSBlazor.Models.Common.Entities;
 using HITSBlazor.Models.Markets.Entities;
 using HITSBlazor.Models.Markets.Enums;
 using HITSBlazor.Services;
 using HITSBlazor.Services.Markets;
 using HITSBlazor.Services.Modal;
-using HITSBlazor.Services.Tags;
 using HITSBlazor.Utils.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
@@ -18,7 +16,7 @@ namespace HITSBlazor.Pages.Markets.MarketsList
 {
     [Authorize]
     [Route("market/list")]
-    public partial class MarketsList
+    public partial class MarketsList : IDisposable
     {
         [Inject]
         private IMarketService MarketService { get; set; } = null!;
@@ -55,13 +53,15 @@ namespace HITSBlazor.Pages.Markets.MarketsList
             _isLoading = true;
 
             await LoadMarketsAsync();
+            MarketService.OnMarketsStateUpdated += StateHasChanged;
+            MarketService.OnMarketsStateChanged += LoadMarketsAsync;
 
             _isLoading = false;
         }
 
         private async Task LoadMarketsAsync()
         {
-            _markets = await MarketService.GetMarketssAsync(
+            _markets = await MarketService.GetMarketsAsync(
                 searchText: _searchText, 
                 selectedStatuses: [.. SelectedStatuses.Select(s => s.Value)],
                 orderBy: _orderBy,
@@ -86,7 +86,7 @@ namespace HITSBlazor.Pages.Markets.MarketsList
             if (market.Status is MarketStatus.Active)
                 actions.Add(MenuAction.FinishMarket, market.Id);
 
-            if (market.Status is MarketStatus.New or MarketStatus.Active)
+            if (market.Status is MarketStatus.New or MarketStatus.Done)
                 actions.Add(MenuAction.Delete, market);
 
             return actions;
@@ -143,9 +143,8 @@ namespace HITSBlazor.Pages.Markets.MarketsList
                 if (context.Item is Guid marketId)
                     ModalService.ShowConfirmModal(
                         "Вы действительно хотите запустить биржу? Активную биржу можно будет ТОЛЬКО завершить.",
-                        () => MarketService.UpdateMarketStatusAsync(marketId, MarketStatus.New),
+                        () => MarketService.UpdateMarketStatusAsync(marketId, MarketStatus.Active),
                         questionTextColor: TextColor.Danger,
-                        questionTextCustomClass: "text-center",
                         confirmButtonVariant: ButtonVariant.Success,
                         confirmButtonText: "Запустить биржу"
                     );
@@ -162,7 +161,6 @@ namespace HITSBlazor.Pages.Markets.MarketsList
                         "Вы действительно хотите завершить биржу? Идеи, не нашедшие команды, попадут обратно в список идей.",
                         () => MarketService.UpdateMarketStatusAsync(marketId, MarketStatus.Done),
                         questionTextColor: TextColor.Danger,
-                        questionTextCustomClass: "text-center",
                         confirmButtonVariant: ButtonVariant.Success,
                         confirmButtonText: "Завершить биржу"
                     );
@@ -177,6 +175,12 @@ namespace HITSBlazor.Pages.Markets.MarketsList
                         confirmButtonText: "Удалить"
                     );
             }
+        }
+
+        public void Dispose()
+        {
+            MarketService.OnMarketsStateUpdated -= StateHasChanged;
+            MarketService.OnMarketsStateChanged -= LoadMarketsAsync;
         }
     }
 }

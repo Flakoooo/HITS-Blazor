@@ -5,7 +5,10 @@ namespace HITSBlazor.Services.Markets
 {
     public interface IMarketService
     {
-        Task<List<Market>> GetMarketssAsync(
+        event Func<Task>? OnMarketsStateChanged;
+        event Action? OnMarketsStateUpdated;
+
+        Task<List<Market>> GetMarketsAsync(
             string? searchText = null, 
             HashSet<MarketStatus>? selectedStatuses = null,
             string? orderBy = null,

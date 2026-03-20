@@ -2,17 +2,24 @@
 @using HITSBlazor.Components.Button
 @using HITSBlazor.Components.Inputs.Input
 @using HITSBlazor.Components.Modals.Components.CenterModalHeader
+@using HITSBlazor.Utils.Validation
 
 <div @onclick:stopPropagation="true" class="market-modal p-3 bg-white rounded">
     <CenterModalHeader HeaderText="@(Market is not null ? "Редактирование биржи" : "Создание биржи")" />
     <Input Label="Название"
            Placeholder="Введите название биржи"
+           NeedValidation="_submitted"
+           CustomValidation="MarketValidation.NameValidation"
            @bind-Value="MarketName" />
     <Input Label="Дата старта"
            InputType="InputType.Date"
+           NeedValidation="_submitted"
+           CustomValidation="MarketValidation.StartDateValidation"
            @bind-Value="MarketStartDate" />
     <Input Label="Дата окончания"
            InputType="InputType.Date"
+           NeedValidation="_submitted"
+           CustomValidation="ValidFinishDate"
            @bind-Value="MarketFinishDate" />
     <Button Variant="ButtonVariant.Primary"
             IsLoading="_submitting"
