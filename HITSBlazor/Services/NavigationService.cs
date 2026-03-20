@@ -327,7 +327,7 @@ namespace HITSBlazor.Services
                         new()
                         {
                             Id = 2,
-                            Icon = "bi-building",
+                            Icon = "bi-building-add",
                             Title = "Компании",
                             Url = "/companies"
                         },
@@ -454,7 +454,23 @@ namespace HITSBlazor.Services
                     Id = menuItems.Count,
                     Icon = "bi-clipboard",
                     Title = "Тесты",
-                    SubItems = [],
+                    SubItems =
+                    [
+                        new NavigationSubItem
+                        {
+                            Id = 0,
+                            Icon = "bi-list",
+                            Title = "Список тестов",
+                            Url = "/list"
+                        },
+                        new NavigationSubItem
+                        {
+                            Id = 1,
+                            Icon = "bi-journal-text",
+                            Title = "Результаты тестов",
+                            Url = "/results"
+                        }
+                    ],
                     BaseUrl = "tests"
                 };
 

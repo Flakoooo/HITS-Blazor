@@ -1,0 +1,34 @@
+﻿@namespace HITSBlazor.Pages.Tests.TestsList
+@using HITSBlazor.Components.ListPageComponents.ListPageHeader
+@using HITSBlazor.Components.ListPageComponents.ListPageSearch
+@using HITSBlazor.Components.ListPageComponents.ListPageTable
+@using HITSBlazor.Components.Tables.TableBodyRow
+@using HITSBlazor.Components.Tables.TableHeader
+
+<div class="page-content-with-header bg-white">
+    <div class="w-100 bg-white p-3">
+        <!-- TODO: проверить, кто может видеть эту кнопку -->
+        <ListPageHeader HeaderText="@($"Список тестов: {_tests.Count}")"
+                        ShowCreateButton="true"
+                        CreateButtonText="Результаты пользователей" 
+                        OnButtonClick="@(() => Console.WriteLine("Переход на страницу результатов всех пользователей по всем тестам"))" />
+        <ListPageSearch ValueChanged="@((value) => SearchTest(value))" />
+        <ListPageTable>
+            <TableContent>
+                <TableHeader />
+                <tbody>
+                    @foreach(var test in _tests)
+                    {
+                        <tr>
+                            <TableBodyRow>
+                                <div class="text-primary data-link" @onclick="@(() => Console.WriteLine("Модальное окно теста появляется"))">
+                                    @test.Name
+                                </div>
+                            </TableBodyRow>
+                        </tr>
+                    }
+                </tbody>
+            </TableContent>
+        </ListPageTable>
+    </div>
+</div>

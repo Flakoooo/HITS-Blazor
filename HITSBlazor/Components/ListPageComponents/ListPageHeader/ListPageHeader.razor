@@ -9,10 +9,9 @@
     <div class="d-flex gap-3">
         @if (ShowCreateButton)
         {
-            <Button BtnType="ButtonType.Button" 
-                    Variant="ButtonVariant.Primary"
+            <Button Variant="ButtonVariant.Primary"
                     Text="@CreateButtonText"
-                    IconStyle="bi-plus-lg" 
+                    IconStyle="@CreateButtonIconStyle"
                     OnButtonClick="() => OnButtonClick.InvokeAsync()" />
         }
     </div>
@@ -24,6 +23,9 @@
 
     [Parameter]
     public bool ShowCreateButton { get; set; } = false;
+
+    [Parameter]
+    public string CreateButtonIconStyle { get; set; } = "bi-plus-lg";
 
     [Parameter]
     public string CreateButtonText { get; set; } = string.Empty;

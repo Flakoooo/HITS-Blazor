@@ -8,6 +8,7 @@ namespace HITSBlazor.Services.Tests
         public string TemperTestName { get; }
         public string MindTestName { get; }
 
+        Task<List<Test>> GetTestsAsync(string? searchText = null);
         Task<TestResult?> GetTestResultAsync(Guid userId, string testName);
     }
 }
