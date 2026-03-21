@@ -2,29 +2,26 @@
 
 namespace HITSBlazor.Components.Filters.RadioFilter
 {
-    public partial class RadioFilter
+    public partial class RadioFilter<T>
     {
-        [Parameter]
-        public bool? Value { get; set; }
-
         [Parameter]
         public string Label { get; set; } = string.Empty;
 
         [Parameter]
-        public string Value1Text { get; set; } = string.Empty;
+        public List<T> AllValues { get; set; } = [];
 
         [Parameter]
-        public string Value2Text { get; set; } = string.Empty;
+        public T? Value { get; set; }
 
         [Parameter]
-        public EventCallback<bool?> ValueChanged { get; set; }
+        public EventCallback<T?> ValueChanged { get; set; }
 
         [Parameter]
         public EventCallback OnFilterChanged { get; set; }
 
-        private bool CheckState(bool state) => Value == state;
+        private bool CheckState(T state) => Value == state;
 
-        private async Task ToggleValue(bool value)
+        private async Task ToggleValue(T value)
         {
             Value = Value == value ? null : value;
 

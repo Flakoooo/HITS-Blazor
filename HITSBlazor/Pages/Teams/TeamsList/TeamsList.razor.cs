@@ -5,6 +5,7 @@ using HITSBlazor.Services;
 using HITSBlazor.Services.Auth;
 using HITSBlazor.Services.Modal;
 using HITSBlazor.Services.Teams;
+using HITSBlazor.Utils.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
 
@@ -46,10 +47,34 @@ namespace HITSBlazor.Pages.Teams.TeamsList
         private string? _searchText = null;
         private string? _orderTeamBy = null;
         private bool? _sortTeamState = null;
-        private bool? PrivacyState { get; set; } = null;
-        private bool? SurveyState { get; set; } = null;
-        private bool? HasActiveProjectState { get; set; } = null;
-        private bool? SkillsState { get; set; } = null;
+
+        private readonly List<ValueViewModel<bool?>> _isClosedFilterValues =
+        [
+            new(true, "Закрытая команда"),
+            new(false, "Открытая команда")
+        ];
+        private ValueViewModel<bool?>? IsClosed { get; set; }
+
+        private readonly List<ValueViewModel<bool?>> _isSurveyFilterValues =
+        [
+            new(true, "Опрос пройден"),
+            new(false, "Опрос не пройден")
+        ];
+        private ValueViewModel<bool?>? SurveyState { get; set; }
+
+        private readonly List<ValueViewModel<bool?>> _hasActiveProjectFilterValues =
+        [
+            new(true, "В работе"),
+            new(false, "В поисках")
+        ];
+        private ValueViewModel<bool?>? HasActiveProjectState { get; set; }
+
+        private readonly List<ValueViewModel<bool?>> _skillProjectFilterValues =
+        [
+            new(true, "Искать везде"),
+            new(false, "Искать по вакансиямх")
+        ];
+        private ValueViewModel<bool?>? SkillsState { get; set; }
 
         private string SeacrhSkillText { get; set; } = string.Empty;
         private HashSet<Guid> SelectedSkillIds { get; set; } = [];
@@ -73,9 +98,9 @@ namespace HITSBlazor.Pages.Teams.TeamsList
         {
             var filter = new TeamsFilter(
                 SearchText: _searchText,
-                Privacy: PrivacyState,
-                Survey: SurveyState,
-                HasActiveProject: HasActiveProjectState,
+                Privacy: IsClosed?.Value,
+                Survey: SurveyState?.Value,
+                HasActiveProject: HasActiveProjectState?.Value,
                 SearchSkillIds: SelectedSkillIds,
                 OrderBy: _orderTeamBy,
                 ByDescending: _sortTeamState
@@ -103,7 +128,7 @@ namespace HITSBlazor.Pages.Teams.TeamsList
         private async Task ResetFilters()
         {
             _sortTeamState = null;
-            PrivacyState = null;
+            IsClosed = null;
             SurveyState = null;
             HasActiveProjectState = null;
             SkillsState = null;

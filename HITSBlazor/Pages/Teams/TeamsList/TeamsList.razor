@@ -73,27 +73,27 @@
                     </tbody>
                 </TableContent>
                 <FilterContent>
-                    <RadioFilter Label="Приватность"
-                                 Value1Text="Открытая команда"
-                                 Value2Text="Закрытая команда"
-                                 @bind-Value="PrivacyState"
-                                 OnFilterChanged="@LoadTeamsAsync" />
+                    <RadioFilter T="ValueViewModel<bool?>"
+                                 Label="Приватность"
+                                 AllValues="_isClosedFilterValues"
+                                 @bind-Value="IsClosed"
+                                 OnFilterChanged="LoadTeamsAsync" />
 
-                    <RadioFilter Label="Опросы"
-                                 Value1Text="Опрос не пройден"
-                                 Value2Text="Опрос пройден"
+                    <RadioFilter T="ValueViewModel<bool?>"
+                                 Label="Опросы"
+                                 AllValues="_isSurveyFilterValues"
                                  @bind-Value="SurveyState"
-                                 OnFilterChanged="@LoadTeamsAsync" />
+                                 OnFilterChanged="LoadTeamsAsync" />
 
-                    <RadioFilter Label="Статус"
-                                 Value1Text="В поисках"
-                                 Value2Text="В работе"
+                    <RadioFilter T="ValueViewModel<bool?>"
+                                 Label="Статус"
+                                 AllValues="_hasActiveProjectFilterValues"
                                  @bind-Value="HasActiveProjectState"
                                  OnFilterChanged="@LoadTeamsAsync" />
 
-                    <RadioFilter Label="Компетенции"
-                                 Value1Text="Искать везде"
-                                 Value2Text="Искать по вакансиям"
+                    <RadioFilter T="ValueViewModel<bool?>"
+                                 Label="Компетенции"
+                                 AllValues="_skillProjectFilterValues"
                                  @bind-Value="SkillsState"
                                  OnFilterChanged="@LoadTeamsAsync" />
                     <SkillFilter @bind-SeacrhSkillText="SeacrhSkillText" 

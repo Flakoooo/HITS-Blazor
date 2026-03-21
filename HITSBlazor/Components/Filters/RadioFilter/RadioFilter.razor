@@ -1,26 +1,24 @@
 ﻿@namespace HITSBlazor.Components.Filters.RadioFilter
 @using HITSBlazor.Components.Typography
+@using HITSBlazor.Utils.Models
+@typeparam T where T : ViewModelBase
 
 <div class="w-100">
     <Typography FontSize="6" CustomClass="fw-semibold">@Label</Typography>
     <div class="list-page-filter-choices">
-        <div class="list-page-filter-choice px-2 py-1 rounded-1">
-            <div @onclick="() => ToggleValue(false)" class="d-flex">
-                <input type="radio" 
-                       name="@Label"
-                       checked="@CheckState(false)"
-                       class="form-check-input" />
-                <Typography CustomClass="form-check-label ms-2">@Value1Text</Typography>
+        @foreach (var value in AllValues)
+        {
+            <div class="list-page-filter-choice px-2 py-1 rounded-1">
+                <div class="d-flex" @onclick="() => ToggleValue(value)">
+                    <input type="radio"
+                           name="@Label"
+                           checked="@CheckState(value)"
+                           class="form-check-input" />
+                    <Typography CustomClass="form-check-label ms-2">
+                        @value.GetDisplayInfo()
+                    </Typography>
+                </div>
             </div>
-        </div>
-        <div class="list-page-filter-choice px-2 py-1 rounded-1">
-            <div class="d-flex" @onclick="() => ToggleValue(true)">
-                <input type="radio"
-                       name="@Label"
-                       checked="@CheckState(true)"
-                       class="form-check-input" />
-                <Typography CustomClass="form-check-label ms-2">@Value2Text</Typography>
-            </div>
-        </div>
+        }
     </div>
 </div>

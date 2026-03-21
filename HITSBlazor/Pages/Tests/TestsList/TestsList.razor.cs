@@ -1,4 +1,5 @@
-﻿using HITSBlazor.Models.Tests.Entities;
+﻿using HITSBlazor.Components.Tables.TableHeader;
+using HITSBlazor.Models.Tests.Entities;
 using HITSBlazor.Services.Tests;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
@@ -16,6 +17,8 @@ namespace HITSBlazor.Pages.Tests.TestsList
 
         private string? _searchText = null;
         private List<Test> _tests = [];
+
+        private readonly List<TableHeaderItem> _testTableHeader = [ new() { Text = "Название" } ];
 
         private async Task LoadTestsAsync()
         {

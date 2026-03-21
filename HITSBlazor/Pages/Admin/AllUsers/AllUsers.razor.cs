@@ -32,7 +32,14 @@ namespace HITSBlazor.Pages.Admin.AllUsers
         private string? _orderBy = null;
         private bool? _byDescending = null;
         private HashSet<EnumViewModel<RoleType>> SelectedUserRoles { get; set; } = [];
-        private bool? InTeam { get; set; }
+
+        private readonly List<ValueViewModel<bool?>> _inTeamFilterValues =
+        [
+            new(true, "В команде"),
+            new(false, "Не в команде")
+        ];
+
+        private ValueViewModel<bool?>? InTeam { get; set; }
 
         private static readonly List<TableHeaderItem> _userTableHeader =
         [

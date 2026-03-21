@@ -15,7 +15,7 @@
         <ListPageSearch ValueChanged="@((value) => SearchTest(value))" />
         <ListPageTable>
             <TableContent>
-                <TableHeader />
+                <TableHeader Items="_testTableHeader" />
                 <tbody>
                     @foreach(var test in _tests)
                     {

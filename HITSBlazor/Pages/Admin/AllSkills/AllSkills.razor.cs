@@ -28,7 +28,13 @@ namespace HITSBlazor.Pages.Admin.AllSkills
 
         private string _searchText = string.Empty;
 
-        private bool? IsConfirmed { get; set; }
+        private readonly List<ValueViewModel<bool?>> _confirmedFilterValues = 
+        [
+            new(true, "Утверждена"),
+            new(false, "На рассмотрении")
+        ];
+
+        private ValueViewModel<bool?>? IsConfirmed { get; set; }
 
         private List<Skill> _skills = [];
 
@@ -59,7 +65,7 @@ namespace HITSBlazor.Pages.Admin.AllSkills
         {
             _skills = await SkillService.GetSkillsAsync(
                 searchText: _searchText,
-                confirmed: IsConfirmed,
+                confirmed: IsConfirmed?.Value,
                 skillTypes: [.. SelectedSkillTypes.Select(s => s.Value)]
             );
             StateHasChanged();

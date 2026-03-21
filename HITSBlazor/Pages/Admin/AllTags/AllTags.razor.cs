@@ -5,6 +5,7 @@ using HITSBlazor.Components.Tables.TableHeader;
 using HITSBlazor.Models.Common.Entities;
 using HITSBlazor.Services.Modal;
 using HITSBlazor.Services.Tags;
+using HITSBlazor.Utils.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
 
@@ -24,7 +25,13 @@ namespace HITSBlazor.Pages.Admin.AllTags
 
         private string _searchText = string.Empty;
 
-        private bool? IsConfirmed { get; set; }
+        private readonly List<ValueViewModel<bool?>> _confirmedFilterValues =
+        [
+            new(true, "Утвержден"),
+            new(false, "На рассмотрении")
+        ];
+
+        private ValueViewModel<bool?>? IsConfirmed { get; set; }
 
         private List<Tag> _tags = [];
 
@@ -49,7 +56,7 @@ namespace HITSBlazor.Pages.Admin.AllTags
         {
             _tags = await TagService.GetTagsAsync(
                 searchText: _searchText,
-                confirmed: IsConfirmed
+                confirmed: IsConfirmed?.Value
             );
             StateHasChanged();
         }

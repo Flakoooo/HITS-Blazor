@@ -77,9 +77,9 @@
                                     @bind-SelectedValues="SelectedUserRoles"
                                     FilterChanged="LoadUsersAsync"/>
                     <!-- TODO: реализовать фильтр -->
-                    <RadioFilter Label="Студенты"
-                                 Value1Text="В команде"
-                                 Value2Text="Не в команде"
+                    <RadioFilter T="ValueViewModel<bool?>"
+                                 Label="Студенты"
+                                 AllValues="_inTeamFilterValues"
                                  @bind-Value="InTeam"
                                  OnFilterChanged="@LoadUsersAsync" />
                     <ResetFilterButton ResetMethod="ResetFilters" />

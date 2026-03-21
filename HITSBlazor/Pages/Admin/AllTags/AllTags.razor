@@ -9,6 +9,7 @@
 @using HITSBlazor.Components.Tables.TableActionMenu
 @using HITSBlazor.Components.Tables.TableBodyRow
 @using HITSBlazor.Components.Tables.TableHeader
+@using HITSBlazor.Utils.Models
 
 <div class="page-content-with-header bg-white overflow-y-scroll">
     @if (_isLoading)
@@ -54,9 +55,9 @@
                     </tbody>
                 </TableContent>
                 <FilterContent>
-                    <RadioFilter Label="Статус"
-                                 Value1Text="Утвержден"
-                                 Value2Text="На рассмотрении"
+                    <RadioFilter T="ValueViewModel<bool?>"
+                                 Label="Статус"
+                                 AllValues="_confirmedFilterValues"
                                  @bind-Value="IsConfirmed"
                                  OnFilterChanged="LoadTagsAsync" />
                     <ResetFilterButton ResetMethod="ResetFilters" />

@@ -65,9 +65,9 @@
                                     AllValues="_filterSkillTypes"
                                     @bind-SelectedValues="SelectedSkillTypes" 
                                     FilterChanged="LoadSkillsAsync" />
-                    <RadioFilter Label="Статус"
-                                 Value1Text="Утверждена"
-                                 Value2Text="На рассмотрении"
+                    <RadioFilter T="ValueViewModel<bool?>"
+                                 Label="Статус"
+                                 AllValues="_confirmedFilterValues"
                                  @bind-Value="IsConfirmed"
                                  OnFilterChanged="LoadSkillsAsync" />
                     <ResetFilterButton ResetMethod="ResetFilters" />

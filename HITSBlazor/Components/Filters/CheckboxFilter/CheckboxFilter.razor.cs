@@ -19,11 +19,9 @@ namespace HITSBlazor.Components.Filters.CheckboxFilter
         [Parameter]
         public EventCallback FilterChanged { get; set; }
 
-        private async Task OnCheckboxChange(T value, bool isChecked)
+        private async Task SelectValue(T value)
         {
-            if (isChecked)
-                SelectedValues.Add(value);
-            else
+            if (!SelectedValues.Add(value))
                 SelectedValues.Remove(value);
 
             await SelectedValuesChanged.InvokeAsync(SelectedValues);
