@@ -5,6 +5,9 @@ namespace HITSBlazor.Components.Filters.CheckboxFilter
     public partial class CheckboxFilter<T>
     {
         [Parameter]
+        public bool IsLoading { get; set; } = false;
+
+        [Parameter]
         public string Label { get; set; } = string.Empty;
 
         [Parameter]

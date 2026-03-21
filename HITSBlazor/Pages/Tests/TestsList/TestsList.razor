@@ -11,7 +11,7 @@
         <ListPageHeader HeaderText="@($"Список тестов: {_tests.Count}")"
                         ShowCreateButton="true"
                         CreateButtonText="Результаты пользователей" 
-                        OnButtonClick="@(() => Console.WriteLine("Переход на страницу результатов всех пользователей по всем тестам"))" />
+                        OnButtonClick="@(() => NavigationService.NavigateToAsync("tests/results"))" />
         <ListPageSearch ValueChanged="@((value) => SearchTest(value))" />
         <ListPageTable>
             <TableContent>

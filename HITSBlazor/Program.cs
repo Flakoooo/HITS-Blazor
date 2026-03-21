@@ -23,6 +23,7 @@ using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using HITSBlazor.Services.Tags;
 using HITSBlazor.Services.IdeaMarkets;
+using HITSBlazor.Services.TestResults;
 
 
 
@@ -124,6 +125,9 @@ namespace HITSBlazor
 
             //Tests
             builder.Services.AddScoped<ITestService, MockTestService>();
+
+            //TestResults
+            builder.Services.AddScoped<ITestResultService, MockTestResultService>();
 
             //Profile
             builder.Services.AddScoped<IProfileService, MockProfileService>();

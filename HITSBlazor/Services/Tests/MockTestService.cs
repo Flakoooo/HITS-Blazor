@@ -1,6 +1,4 @@
-﻿using HITSBlazor.Models.Common.Entities;
-using HITSBlazor.Models.Tests.Entities;
-using HITSBlazor.Utils.Mocks.Common;
+﻿using HITSBlazor.Models.Tests.Entities;
 using HITSBlazor.Utils.Mocks.Tests;
 
 namespace HITSBlazor.Services.Tests
@@ -36,8 +34,5 @@ namespace HITSBlazor.Services.Tests
 
             return [.. query];
         }
-
-        public async Task<TestResult?> GetTestResultAsync(Guid userId, string testName)
-            => MockTestResults.GetTestResult(userId, testName);
     }
 }

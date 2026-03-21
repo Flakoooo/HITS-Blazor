@@ -10,6 +10,7 @@ using HITSBlazor.Services.Auth;
 using HITSBlazor.Services.Modal;
 using HITSBlazor.Services.Profiles;
 using HITSBlazor.Services.Skills;
+using HITSBlazor.Services.TestResults;
 using HITSBlazor.Services.Tests;
 using HITSBlazor.Services.UserSkills;
 using Microsoft.AspNetCore.Components;
@@ -34,7 +35,7 @@ namespace HITSBlazor.Components.Modals.RightSideModals.ProfileModal
         private IUserSkillService UserSkillService { get; set; } = null!;
 
         [Inject]
-        private ITestService TestService { get; set; } = null!;
+        private ITestResultService TestResultService { get; set; } = null!;
 
         [Inject] 
         public IApexChartService ApexChartService { get; set; } = null!;
@@ -92,9 +93,9 @@ namespace HITSBlazor.Components.Modals.RightSideModals.ProfileModal
             DatabaseSkills = await SkillService.GetSkillsAsync(skillTypes: [SkillType.Database]);
             DevopsSkills = await SkillService.GetSkillsAsync(skillTypes: [SkillType.Devops]);
 
-            BelbinTestResult = await TestService.GetTestResultAsync(UserId, TestService.BelbinTestName);
-            TemperTestResult = await TestService.GetTestResultAsync(UserId, TestService.TemperTestName);
-            MindTestResult = await TestService.GetTestResultAsync(UserId, TestService.MindTestName);
+            BelbinTestResult = await TestResultService.GetTestResultAsync(UserId, TestResultService.BelbinTestName);
+            TemperTestResult = await TestResultService.GetTestResultAsync(UserId, TestResultService.TemperTestName);
+            MindTestResult = await TestResultService.GetTestResultAsync(UserId, TestResultService.MindTestName);
 
             if (UserId == AuthService.CurrentUser?.Id)
                 _isCurrentUser = true;

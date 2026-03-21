@@ -1,13 +1,24 @@
 ﻿@namespace HITSBlazor.Components.ListPageComponents.ListPageSearch
 @using HITSBlazor.Components.Inputs.Input
+@using HITSBlazor.Components.Placeholders.Placeholder
 
 <div class="py-2 d-flex justify-content-between">
     <div class="w-50">
-        <Input IconStyle="bi-search" Placeholder="Поиск" ValueChanged="@((value) => ValueChanged.InvokeAsync(value))" />
+        @if (IsLoading)
+        {
+            <Placeholder Height="PlaceholderHeight.Small" />
+        }
+        else
+        {
+            <Input IconStyle="bi-search" Placeholder="Поиск" ValueChanged="@((value) => ValueChanged.InvokeAsync(value))" />
+        }
     </div>
 </div>
 
 @code {
+    [Parameter]
+    public bool IsLoading { get; set; } = false;
+
     [Parameter]
     public EventCallback<string> ValueChanged { get; set; }
 }

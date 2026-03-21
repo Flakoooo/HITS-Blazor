@@ -1,24 +1,44 @@
 ﻿@namespace HITSBlazor.Components.Filters.RadioFilter
+@using HITSBlazor.Components.Placeholders.Placeholder
 @using HITSBlazor.Components.Typography
 @using HITSBlazor.Utils.Models
 @typeparam T where T : ViewModelBase
 
 <div class="w-100">
-    <Typography FontSize="6" CustomClass="fw-semibold">@Label</Typography>
-    <div class="list-page-filter-choices">
-        @foreach (var value in AllValues)
+    @if (IsLoading)
+    {
+        @if (!string.IsNullOrWhiteSpace(Label))
         {
-            <div class="list-page-filter-choice px-2 py-1 rounded-1">
-                <div class="d-flex" @onclick="() => ToggleValue(value)">
-                    <input type="radio"
-                           name="@Label"
-                           checked="@CheckState(value)"
-                           class="form-check-input" />
-                    <Typography CustomClass="form-check-label ms-2">
-                        @value.GetDisplayInfo()
-                    </Typography>
-                </div>
-            </div>
+            <Placeholder Width="w-25" />
         }
-    </div>
+        @for (int i = 0; i < 6; ++i)
+        {
+            <Placeholder />
+        }
+    }
+    else
+    {
+        @if (!string.IsNullOrWhiteSpace(Label))
+        {
+            <Typography FontSize="6" CustomClass="fw-semibold">
+                @Label
+            </Typography>
+        }
+        <div class="list-page-filter-choices">
+            @foreach (var value in AllValues)
+            {
+                <div class="list-page-filter-choice px-2 py-1 rounded-1">
+                    <div class="d-flex" @onclick="() => ToggleValue(value)">
+                        <input type="radio"
+                               name="@Label"
+                               checked="@CheckState(value)"
+                               class="form-check-input" />
+                        <Typography CustomClass="form-check-label ms-2">
+                            @value.GetDisplayInfo()
+                        </Typography>
+                    </div>
+                </div>
+            }
+        </div>
+    }
 </div>

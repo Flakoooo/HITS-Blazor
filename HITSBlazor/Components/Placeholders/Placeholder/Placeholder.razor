@@ -1,4 +1,5 @@
 ﻿@namespace HITSBlazor.Components.Placeholders.Placeholder
+@using HITSBlazor.Utils.Models
 
 <div class="placeholder-glow @Width">
     <span class="placeholder w-100 bg-secondary rounded @heightClass @AdditionalClass" style="@heightStyle"></span>
@@ -14,18 +15,12 @@
     [Parameter]
     public string AdditionalClass { get; set; } = string.Empty;
 
-    private string heightClass = "";
-    private string heightStyle = "";
+    private string heightClass = string.Empty;
+    private string heightStyle = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
-        (heightClass, heightStyle) = Height switch
-        {
-            PlaceholderHeight.None => ("", ""),
-            PlaceholderHeight.Small => ("small", "height: 50px;"),
-            PlaceholderHeight.Medium => ("medium", "height: 100px;"),
-            PlaceholderHeight.Second => ("second", "height: 200px;"),
-            _ => ("", "")
-        };
+        heightClass = EnumViewModel<PlaceholderHeight>.GetTranslation(Height);
+        heightStyle = EnumViewModel<PlaceholderHeight>.GetStyle(Height);
     }
 }

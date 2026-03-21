@@ -1,6 +1,7 @@
 ﻿using HITSBlazor.Models.Tests.Entities;
 using HITSBlazor.Models.Users.Entities;
 using HITSBlazor.Utils.Mocks.Users;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace HITSBlazor.Utils.Mocks.Tests
 {
@@ -340,6 +341,33 @@ namespace HITSBlazor.Utils.Mocks.Tests
                 GenerateMindTestResult(MockUsers.GetUserById(MockUsers.KirillId)!)!
             ];
         }
+
+        public static List<TestAllResponse> GetAllTestsResults() => [.. _testResults.GroupBy(tr => tr.User)
+            .Select(g =>
+            {
+                var belbinTestResult = g.FirstOrDefault(tr => tr.TestName == BelbinTestName);
+                var temperTestResult = g.FirstOrDefault(tr => tr.TestName == TemperTestName);
+                var mindTestResult = g.FirstOrDefault(tr => tr.TestName == MindTestName);
+
+                if (belbinTestResult == null && temperTestResult == null && mindTestResult == null)
+                    return null;
+
+                string? belbinResult = null;
+                if (belbinTestResult != null)
+                {
+                    int index = belbinTestResult.TestResultValue.IndexOf('\n');
+                    if (index != -1)
+                        belbinResult = belbinTestResult.TestResultValue[3..index ];
+                }
+
+                return new TestAllResponse
+                {
+                    User = g.Key,
+                    BelbinResult = belbinResult ?? "-",
+                    TemperResult = temperTestResult?.TestResultValue ?? "-",
+                    MindResult = mindTestResult?.TestResultValue ?? "-"
+                };
+            }).Where(response => response is not null).Select(response => response!)];
 
         public static TestResult? GetTestResult(Guid userId, string testname)
             => _testResults.FirstOrDefault(r => r.User.Id == userId && r.TestName == testname);

@@ -1,5 +1,6 @@
 ﻿using HITSBlazor.Components.Tables.TableHeader;
 using HITSBlazor.Models.Tests.Entities;
+using HITSBlazor.Services;
 using HITSBlazor.Services.Tests;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
@@ -13,6 +14,9 @@ namespace HITSBlazor.Pages.Tests.TestsList
         [Inject]
         private ITestService TestService { get; set; } = null!;
 
+        [Inject]
+        private NavigationService NavigationService { get; set; } = null!;
+
         private bool _isLoading = true;
 
         private string? _searchText = null;
@@ -20,10 +24,19 @@ namespace HITSBlazor.Pages.Tests.TestsList
 
         private readonly List<TableHeaderItem> _testTableHeader = [ new() { Text = "Название" } ];
 
+        protected override async Task OnInitializedAsync()
+        {
+            _isLoading = true;
+
+            await LoadTestsAsync();
+
+            _isLoading = false;
+        }
+
         private async Task LoadTestsAsync()
         {
             _tests = await TestService.GetTestsAsync(
-                    searchText: _searchText
+                searchText: _searchText
             );
             StateHasChanged();
         }
