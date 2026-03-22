@@ -1,0 +1,54 @@
+﻿@namespace HITSBlazor.Components.Modals.RightSideModals.TestModal
+@using HITSBlazor.Components.Button
+@using HITSBlazor.Components.Collapse
+@using HITSBlazor.Components.Modals.Components.ModalHeader
+@using HITSBlazor.Components.Placeholders.Placeholder
+@using HITSBlazor.Components.Typography
+
+<!-- TODO: Переделать в центральное модальное окно? -->
+
+<div class="right-side-modal p-3 overflow-y-scroll" @onclick:stopPropagation="true">
+    <div class="w-100 d-flex flex-column gap-3">
+        <RightSideModalHeader IsLoading="IsLoading" HeaderText="@CurrentTest?.Name" />
+        @if (IsLoading)
+        {
+            <Placeholder Height="PlaceholderHeight.Smaller" />
+        }
+        else
+        {
+            <ul class="list-group rounded-3">
+                <li class="list-group-item p-0 overflow-hidden">
+                    <Collapse StartCollapsed="false">
+                        <MainContent Context="collapse">
+                            <Button Text="Инструкция к тесту"
+                                    Variant="ButtonVariant.Light"
+                                    ButtonClass="collapse-controller w-100"
+                                    OnButtonClick="collapse.Toggle" />
+                        </MainContent>
+                        <ExpandedContent>
+                            <div class="list-group">
+                                <div class="p-2">
+                                    @CurrentTest?.Description
+                                </div>
+                            </div>
+                        </ExpandedContent>
+                    </Collapse>
+                </li>
+            </ul>
+        }
+        <div class="bg-white d-flex rounded-3 @(IsLoading ? "p-2 gap-2" : "p-3 gap-3 flex-wrap")">
+            @if (IsLoading)
+            {
+                @for (int i = 0; i < 3; ++i)
+                {
+                    <Placeholder Width="w-25" Height="PlaceholderHeight.Smaller" />
+                }
+            }
+            else
+            {
+                <Button Variant="ButtonVariant.Primary" Text="Пройти тест" />
+                <Button Variant="ButtonVariant.Primary" Text="Результаты по тесту" />
+            }
+        </div>
+    </div>
+</div>

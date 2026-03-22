@@ -1,0 +1,8 @@
+﻿.test-data {
+    flex-direction: column;
+    align-items: flex-start;
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    gap: 16px;
+}

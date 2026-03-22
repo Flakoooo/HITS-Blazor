@@ -1,22 +1,33 @@
 ﻿@namespace HITSBlazor.Components.Modals.Components.ModalHeader
 @using HITSBlazor.Components.Button
+@using HITSBlazor.Components.Placeholders.Placeholder
 @using HITSBlazor.Components.Typography
 @using HITSBlazor.Services.Modal
 @using HITSBlazor.Utils.Models
 
 <div class="right-side-modal-header mb-3">
-    <Button Text="Назад"
-            IconStyle="bi-backspace-fill"
-            Variant="ButtonVariant.Primary"
-            OnButtonClick="CloseModal" />
-    <Typography FontSize="4" TextColor="TextColor.Primary" CustomClass="p-2 w-100 bg-white rounded-3 text-nowrap overflow-scroll-hidden">
-        @HeaderText
-    </Typography>
+    @if (IsLoading)
+    {
+        <Placeholder Height="PlaceholderHeight.Small" />
+    }
+    else
+    {
+        <Button Text="Назад"
+                IconStyle="bi-backspace-fill"
+                Variant="ButtonVariant.Primary"
+                OnButtonClick="CloseModal" />
+        <Typography FontSize="4" TextColor="TextColor.Primary" CustomClass="p-2 w-100 bg-white rounded-3 text-nowrap overflow-scroll-hidden">
+            @HeaderText
+        </Typography>
+    }
 </div>
 
 @code {
     [Inject]
     private ModalService ModalService { get; set; } = null!;
+
+    [Parameter]
+    public bool IsLoading { get; set; } = false;
 
     [Parameter]
     public string HeaderText { get; set; } = string.Empty;

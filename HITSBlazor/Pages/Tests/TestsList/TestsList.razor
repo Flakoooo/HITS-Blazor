@@ -21,7 +21,7 @@
                     {
                         <tr>
                             <TableBodyRow>
-                                <div class="text-primary data-link" @onclick="@(() => Console.WriteLine("Модальное окно теста появляется"))">
+                                <div class="text-primary data-link" @onclick="@(() => ShowTestModal(test))">
                                     @test.Name
                                 </div>
                             </TableBodyRow>
