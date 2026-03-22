@@ -6,9 +6,12 @@
             @TableContent
         </table>
     </div>
-    <div class="list-page-filter w-25 bg-white p-2 ms-2 border-start">
-        @FilterContent
-    </div>
+    @if (FilterContent is not null)
+    {
+        <div class="list-page-filter w-25 bg-white p-2 ms-2 border-start">
+            @FilterContent
+        </div>
+    }
 </div>
 
 @code {

@@ -17,6 +17,7 @@ namespace HITSBlazor.Services.TestResults
             HashSet<string>? selectedNeurotismResults = null,
             HashSet<string>? selectedLieResults = null
         );
+        Task<List<TestResult>> GetTestResultsAsync(string testName);
         Task<TestResult?> GetTestResultAsync(Guid userId, string testName);
     }
 }

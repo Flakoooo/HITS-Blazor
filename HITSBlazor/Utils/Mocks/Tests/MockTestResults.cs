@@ -345,6 +345,42 @@ namespace HITSBlazor.Utils.Mocks.Tests
             ];
         }
 
+        private static string GetSimpleBelbinTestResult(string result)
+        {
+            int index = result.IndexOf('\n');
+            if (index != -1)
+                return result[3..index];
+
+            return result;
+        }
+
+        private static string GetSimpleMindTestResult(string result)
+        {
+            var pattern = @"([А-Яа-я]+ский стиль): \((\d+)\)";
+            var matches = Regex.Matches(result, pattern);
+
+            return string.Join("\n", matches.Select(m => $"{m.Groups[1].Value}: ({m.Groups[2].Value})"));
+        }
+
+        private static string GetSimpleTemperTestResult(string result)
+        {
+            var pattern = @"([^:]+): \((\d+)\) (.+?)(?=\n|$)";
+            var matches = Regex.Matches(result, pattern, RegexOptions.Multiline);
+
+            List<string> results = [];
+
+            foreach (Match match in matches)
+            {
+                string name = match.Groups[1].Value.Trim();
+                string score = match.Groups[2].Value;
+                string level = match.Groups[3].Value.Trim();
+
+                results.Add($"{name}: ({score}) {string.Join("", level.Take("Неискренность в ответах".Length))}");
+            }
+
+            return string.Join("\n", results);
+        }
+
         public static List<TestAllResponse> GetAllTestsResults() => [.. _testResults.GroupBy(tr => tr.User)
             .Select(g =>
             {
@@ -355,51 +391,36 @@ namespace HITSBlazor.Utils.Mocks.Tests
                 if (belbinTestResult == null && temperTestResult == null && mindTestResult == null)
                     return null;
 
-                string? belbinResult = null;
-                if (belbinTestResult is not null)
-                {
-                    int index = belbinTestResult.TestResultValue.IndexOf('\n');
-                    if (index != -1)
-                        belbinResult = belbinTestResult.TestResultValue[3..index ];
-                }
-
-                string? mindResult = null;
-                if (mindTestResult is not null)
-                {
-                    var pattern = @"([А-Яа-я]+ский стиль): \((\d+)\)";
-                    var matches = Regex.Matches(mindTestResult.TestResultValue, pattern);
-
-                    mindResult = string.Join("\n",
-                        matches.Select(m => $"{m.Groups[1].Value}: ({m.Groups[2].Value})"));
-                }
-
-                string? temperResult = null;
-                if (temperTestResult is not null)
-                {
-                    var pattern = @"([^:]+): \((\d+)\) (.+?)(?=\n|$)";
-                    var matches = Regex.Matches(temperTestResult.TestResultValue, pattern, RegexOptions.Multiline);
-
-                    List<string> results = [];
-
-                    foreach (Match match in matches)
-                    {
-                        string name = match.Groups[1].Value.Trim();
-                        string score = match.Groups[2].Value;
-                        string level = match.Groups[3].Value.Trim();
-
-                        results.Add($"{name}: ({score}) {string.Join("", level.Take("Неискренность в ответах".Length))}");
-                    }
-                    temperResult = string.Join("\n", results);
-                }
-
                 return new TestAllResponse
                 {
                     User = g.Key,
-                    BelbinResult = belbinResult ?? "-",
-                    TemperResult = temperResult ?? "-",
-                    MindResult = mindResult ?? "-"
+                    BelbinResult = belbinTestResult is not null
+                        ? GetSimpleBelbinTestResult(belbinTestResult.TestResultValue)
+                        : "-",
+                    TemperResult = temperTestResult is not null
+                        ? GetSimpleTemperTestResult(temperTestResult.TestResultValue)
+                        : "-",
+                    MindResult = mindTestResult is not null
+                        ? GetSimpleMindTestResult(mindTestResult.TestResultValue)
+                        : "-"
                 };
             }).Where(response => response is not null).Select(response => response!)];
+
+        public static List<TestResult> GetTestResults(string testName) => 
+        [.. _testResults
+            .Where(tr => tr.TestName.Equals(testName, StringComparison.CurrentCultureIgnoreCase))
+            .Select(tr =>
+            {
+                if (testName.Equals(BelbinTestName, StringComparison.CurrentCultureIgnoreCase))
+                    tr.TestResultValue = GetSimpleBelbinTestResult(tr.TestResultValue);
+                else if (testName.Equals(MindTestName, StringComparison.CurrentCultureIgnoreCase))
+                    tr.TestResultValue = GetSimpleMindTestResult(tr.TestResultValue);
+                else if (testName.Equals(TemperTestName, StringComparison.CurrentCultureIgnoreCase))
+                    tr.TestResultValue = GetSimpleTemperTestResult(tr.TestResultValue);
+
+                return tr;
+            })
+        ];
 
         public static TestResult? GetTestResult(Guid userId, string testname)
             => _testResults.FirstOrDefault(r => r.User.Id == userId && r.TestName == testname);

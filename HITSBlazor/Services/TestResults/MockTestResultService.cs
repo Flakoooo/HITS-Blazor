@@ -123,6 +123,8 @@ namespace HITSBlazor.Services.TestResults
             return [.. query];
         }
 
+        public async Task<List<TestResult>> GetTestResultsAsync(string testName) => MockTestResults.GetTestResults(testName);
+
         public async Task<TestResult?> GetTestResultAsync(Guid userId, string testName)
             => MockTestResults.GetTestResult(userId, testName);
     }

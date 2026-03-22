@@ -13,7 +13,7 @@
 
 <div class="h-auto bg-white">
     <div class="w-100 bg-white p-3">
-        <ListPageHeader IsLoading="_isLoading" HeaderText="@($"Список тестов: {_results.Count}")" />
+        <ListPageHeader IsLoading="_isLoading" HeaderText="@($"Все результаты: {_results.Count}")" />
         <ListPageSearch IsLoading="_isLoading" ValueChanged="@((value) => SearchResult(value))" />
         <ListPageTable>
             <TableContent>

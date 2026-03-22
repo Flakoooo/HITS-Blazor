@@ -1,8 +1,6 @@
-﻿using HITSBlazor.Components.Modals.RightSideModals.ProfileModal;
-using HITSBlazor.Components.Modals.RightSideModals.TestModal;
+﻿using HITSBlazor.Components.Modals.RightSideModals.TestModal;
 using HITSBlazor.Components.Tables.TableHeader;
 using HITSBlazor.Models.Tests.Entities;
-using HITSBlazor.Models.Users.Entities;
 using HITSBlazor.Services;
 using HITSBlazor.Services.Modal;
 using HITSBlazor.Services.Tests;
