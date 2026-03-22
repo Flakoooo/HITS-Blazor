@@ -5,8 +5,9 @@ using HITSBlazor.Components.Tables.TableHeader;
 using HITSBlazor.Models.Common.Entities;
 using HITSBlazor.Models.Users.Entities;
 using HITSBlazor.Models.Users.Enums;
-using HITSBlazor.Services.UsersGroups;
 using HITSBlazor.Services.Modal;
+using HITSBlazor.Services.UsersGroups;
+using HITSBlazor.Utils.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
 
@@ -33,7 +34,10 @@ namespace HITSBlazor.Pages.Admin.AllUsersGroups
         ];
 
         private List<UsersGroup> _usersGroups = [];
-        private HashSet<RoleType> SelectedRoles { get; set; } = [];
+
+        private readonly List<EnumViewModel<RoleType>> _filterRoleTypes
+            = [.. Enum.GetValues<RoleType>().Select(r => new EnumViewModel<RoleType>(r))];
+        private HashSet<EnumViewModel<RoleType>> SelectedRoles { get; set; } = [];
 
         protected override async Task OnInitializedAsync()
         {
@@ -50,7 +54,7 @@ namespace HITSBlazor.Pages.Admin.AllUsersGroups
         {
             _usersGroups = await UsersGroupsService.GetUsersGroupsAsync(
                 searchText: _seacrhText,
-                selectedRoles: SelectedRoles
+                selectedRoles: [.. SelectedRoles.Select(r => r.Value)]
             );
             StateHasChanged();
         }
@@ -73,16 +77,6 @@ namespace HITSBlazor.Pages.Admin.AllUsersGroups
         private async Task SearchUsersGroup(string searchText)
         {
             _seacrhText = searchText;
-            await LoadUsersGroupsAsync();
-        }
-
-        private async Task OnRoleTypeChanged(RoleType role, bool isChecked)
-        {
-            if (isChecked)
-                SelectedRoles.Add(role);
-            else
-                SelectedRoles.Remove(role);
-
             await LoadUsersGroupsAsync();
         }
 

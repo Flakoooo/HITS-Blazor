@@ -11,44 +11,37 @@
 @using HITSBlazor.Components.Typography
 
 <div class="page-content-with-header bg-white overflow-y-scroll">
-    @if (_isLoading)
-    {
-        <TablePlaceholder />
-    }
-    else
-    {
-        <div class="w-100 bg-white p-3">
-            <ListPageHeader HeaderText="@($"Список компаний: {_companies.Count}")"
-                            ShowCreateButton="true"
-                            CreateButtonText="Создать компанию" 
-                            OnButtonClick="@(() => ShowCompanyModal())" />
-            <ListPageSearch ValueChanged="@((value) => SeacrhCompany(value))" />
-            <ListPageTable>
-                <TableContent>
-                    <TableHeader TableActionMenuIsEnable="true" Items="TableHeaderItems" />
-                    <tbody>
-                        @foreach (var company in _companies)
-                        {
-                            <tr>
-                                <TableBodyRow>
-                                    <div class="text-primary data-link" @onclick="() => ShowCompanyModal(company.Id)">
-                                        @company.Name
-                                    </div>
-                                </TableBodyRow>
-                                <TableBodyRow>
-                                    @company.Owner.FullName
-                                </TableBodyRow>
-                                <TableActionMenu ItemId="company.Id"
-                                                 OnAction="OnCompanyAction"
-                                                 ActionIds="@(new Dictionary<MenuAction, object> { 
-                                                     [MenuAction.Edit] = company.Id,
-                                                     [MenuAction.Delete] = company
-                                                 })"/>
-                            </tr>
-                        }
-                    </tbody>
-                </TableContent>
-            </ListPageTable>
-        </div>
-    }
+    <div class="w-100 bg-white p-3">
+        <ListPageHeader IsLoading="_isLoading"
+                        HeaderText="@($"Список компаний: {_companies.Count}")"
+                        ShowCreateButton="true"
+                        CreateButtonText="Создать компанию" 
+                        OnButtonClick="@(() => ShowCompanyModal())" />
+        <ListPageSearch IsLoading="_isLoading" ValueChanged="@((value) => SeacrhCompany(value))" />
+        <ListPageTable IsLoading="_isLoading" TableActionMenuIsEnable="true" HeaderItems="TableHeaderItems">
+            <TableContent>
+                <tbody>
+                    @foreach (var company in _companies)
+                    {
+                        <tr>
+                            <TableBodyRow>
+                                <div class="text-primary data-link" @onclick="() => ShowCompanyModal(company.Id)">
+                                    @company.Name
+                                </div>
+                            </TableBodyRow>
+                            <TableBodyRow>
+                                @company.Owner.FullName
+                            </TableBodyRow>
+                            <TableActionMenu ItemId="company.Id"
+                                             OnAction="OnCompanyAction"
+                                             ActionIds="@(new Dictionary<MenuAction, object> { 
+                                                 [MenuAction.Edit] = company.Id,
+                                                 [MenuAction.Delete] = company
+                                             })"/>
+                        </tr>
+                    }
+                </tbody>
+            </TableContent>
+        </ListPageTable>
+    </div>
 </div>

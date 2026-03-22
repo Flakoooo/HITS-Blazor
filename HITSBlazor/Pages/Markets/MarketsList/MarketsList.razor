@@ -23,16 +23,14 @@
     else
     {
         <div class="w-100 bg-white p-3">
-            <ListPageHeader HeaderText="@($"Список бирж: {_markets.Count}")" 
+            <ListPageHeader IsLoading="_isLoading"
+                            HeaderText="@($"Список бирж: {_markets.Count}")" 
                             ShowCreateButton="true"
                             CreateButtonText="Создать биржу" 
                             OnButtonClick="() => ShowMarketModal()" />
-            <ListPageSearch ValueChanged="@((value) => SearchMarket(value))" />
-            <ListPageTable>
+            <ListPageSearch IsLoading="_isLoading" ValueChanged="@((value) => SearchMarket(value))" />
+            <ListPageTable IsLoading="_isLoading" HeaderItems="_marketTableHeader" TableActionMenuIsEnable="true" OrderMethod="SortMarket">
                 <TableContent>
-                    <TableHeader TableActionMenuIsEnable="true"
-                                 Items="_marketTableHeader"
-                                 OrderChanged="@((value) => SortMarket(value.Item1, value.Item2))" />
                     <tbody>
                         @foreach(var market in _markets)
                         {
@@ -59,12 +57,13 @@
                     </tbody>
                 </TableContent>
                 <FilterContent>
-                    <CheckboxFilter T="EnumViewModel<MarketStatus>" 
+                    <CheckboxFilter IsLoading="_isLoading"
+                                    T="EnumViewModel<MarketStatus>" 
                                     Label="Статус" 
                                     AllValues="_filterMarketStatus"
                                     FilterChanged="LoadMarketsAsync"
                                     @bind-SelectedValues="SelectedStatuses" />
-                    <ResetFilterButton ResetMethod="ResetFilters" />
+                    <ResetFilterButton IsLoading="_isLoading" ResetMethod="ResetFilters" />
                 </FilterContent>
             </ListPageTable>
         </div>

@@ -8,6 +8,7 @@
 @using HITSBlazor.Components.ListPageComponents.ListPageHeader
 @using HITSBlazor.Components.ListPageComponents.ListPageSearch
 @using HITSBlazor.Components.ListPageComponents.ListPageTable
+@using HITSBlazor.Components.Placeholders.Placeholder
 @using HITSBlazor.Components.Placeholders.TablePlaceholder
 @using HITSBlazor.Components.Status
 @using HITSBlazor.Components.Tables.TableActionMenu
@@ -20,75 +21,78 @@
 @using HITSBlazor.Utils.EnumStyles
 @using HITSBlazor.Utils.Models
 
-<div class="bg-white ideas-list page-content-with-header">
-    @if (_isLoading)
-    {
-        <TablePlaceholder Header="false" />
-    }
-    else
-    {
-        <div class="w-100 bg-white p-3">
-            <ListPageHeader HeaderText="@($"Список идей: {_ideas.Count}")" 
-                            ShowCreateButton="AuthService.CurrentUser?.Role is RoleType.Initiator or RoleType.Admin"
-                            CreateButtonText="Создать идею" 
-                            OnButtonClick="@(() => NavigationService.NavigateToAsync("ideas/create"))" />
-            <ListPageSearch ValueChanged="@((value) => SearchIdea(value))" />
-            <!-- TODO: если идей нет, то сообщить пользователю, что идеи не найдены, н это как ИДЕЯ -->
-            <ListPageTable>
-                <TableContent>
-                    <tbody>
-                        @foreach(var idea in _ideas)
-                        {
-                            <tr>
-                                <TableBodyRow>
-                                    <div class="bi bi-circle-fill fs-6 mt-1 @(idea.IsChecked ? "text-success" : "text-secondary")">
-                                        <div></div>
-                                    </div>
-                                </TableBodyRow>
-                                <TableBodyRow>
-                                    <div @onclick="@(() => ShowIdea(idea.Id))" class="data-link">
-                                        @idea.Name
-                                    </div>
-                                </TableBodyRow>
-                                <TableBodyRow IsCentered="true">
-                                    <Status Statustype="idea.Status" />
-                                </TableBodyRow>
-                                <TableBodyRow IsCentered="true">
-                                    @idea.CreatedAt.ToString("dd.MM.yyyy")
-                                </TableBodyRow>
-                                <TableBodyRow IsCentered="true">
-                                    @idea.ModifiedAt.ToString("dd.MM.yyyy")
-                                </TableBodyRow>
-                                <TableBodyRow IsCentered="true">
-                                    <div class="@idea.PreAssessment.GetStyle()">
-                                        @idea.PreAssessment
-                                    </div>
-                                </TableBodyRow>
-                                <TableBodyRow IsCentered="true">
-                                    <div class="@idea.Rating.GetStyle()">
-                                        @idea.Rating
-                                    </div>
-                                </TableBodyRow>
-                                <TableActionMenu ItemId="@idea.Id"
-                                                    OnAction="OnIdeaAction"
-                                                    ActionIds="@(new Dictionary<MenuAction, object> { 
-                                                    [MenuAction.View] = idea.Id,
-                                                    [MenuAction.Edit] = idea.Id,
-                                                    [MenuAction.Delete] = idea
-                                                    })" />
-                            </tr>
-                        }
-                    </tbody>
-                </TableContent>
-                <FilterContent>
-                    <CheckboxFilter T="EnumViewModel<IdeaStatusType>" 
-                                    Label="Статус" 
-                                    AllValues="_filterIdeaStatus"
-                                    FilterChanged="LoadIdeasAsync"
-                                    @bind-SelectedValues="SelectedStatuses" />
-                    @if (AuthService.CurrentUser?.Role is RoleType.Admin or RoleType.Expert)
+<div class="bg-white ideas-list h-auto">
+    <div class="w-100 bg-white p-3">
+        <ListPageHeader IsLoading="_isLoading"
+                        HeaderText="@($"Список идей: {_ideas.Count}")" 
+                        ShowCreateButton="AuthService.CurrentUser?.Role is RoleType.Initiator or RoleType.Admin"
+                        CreateButtonText="Создать идею" 
+                        OnButtonClick="@(() => NavigationService.NavigateToAsync("ideas/create"))" />
+        <ListPageSearch IsLoading="_isLoading" ValueChanged="@((value) => SearchIdea(value))" />
+        <!-- TODO: если идей нет, то сообщить пользователю, что идеи не найдены, н это как ИДЕЯ -->
+        <ListPageTable IsLoading="_isLoading">
+            <TableContent>
+                <tbody>
+                    @foreach(var idea in _ideas)
                     {
-                        <div class="w-100">
+                        <tr>
+                            <TableBodyRow>
+                                <div class="bi bi-circle-fill fs-6 mt-1 @(idea.IsChecked ? "text-success" : "text-secondary")">
+                                    <div></div>
+                                </div>
+                            </TableBodyRow>
+                            <TableBodyRow>
+                                <div @onclick="@(() => ShowIdea(idea.Id))" class="data-link">
+                                    @idea.Name
+                                </div>
+                            </TableBodyRow>
+                            <TableBodyRow IsCentered="true">
+                                <Status Statustype="idea.Status" />
+                            </TableBodyRow>
+                            <TableBodyRow IsCentered="true">
+                                @idea.CreatedAt.ToString("dd.MM.yyyy")
+                            </TableBodyRow>
+                            <TableBodyRow IsCentered="true">
+                                @idea.ModifiedAt.ToString("dd.MM.yyyy")
+                            </TableBodyRow>
+                            <TableBodyRow IsCentered="true">
+                                <div class="@idea.PreAssessment.GetStyle()">
+                                    @idea.PreAssessment
+                                </div>
+                            </TableBodyRow>
+                            <TableBodyRow IsCentered="true">
+                                <div class="@idea.Rating.GetStyle()">
+                                    @idea.Rating
+                                </div>
+                            </TableBodyRow>
+                            <TableActionMenu ItemId="@idea.Id"
+                                                OnAction="OnIdeaAction"
+                                                ActionIds="@(new Dictionary<MenuAction, object> { 
+                                                [MenuAction.View] = idea.Id,
+                                                [MenuAction.Edit] = idea.Id,
+                                                [MenuAction.Delete] = idea
+                                                })" />
+                        </tr>
+                    }
+                </tbody>
+            </TableContent>
+            <FilterContent>
+                <CheckboxFilter T="EnumViewModel<IdeaStatusType>" 
+                                IsLoading="_isLoading"
+                                Label="Статус" 
+                                AllValues="_filterIdeaStatus"
+                                FilterChanged="LoadIdeasAsync"
+                                @bind-SelectedValues="SelectedStatuses" />
+                @if (AuthService.CurrentUser?.Role is RoleType.Admin or RoleType.Expert)
+                {
+                    <div class="w-100">
+                        @if (_isLoading)
+                        {
+                            <Placeholder Width="w-25" />
+                            <Placeholder />
+                        }
+                        else
+                        {
                             <Typography FontSize="6" CustomClass="fw-semibold">
                                 Экспертиза
                             </Typography>
@@ -96,20 +100,20 @@
                                 <div class="px-2 py-1 rounded-1 list-page-filter-choice">
                                     <div class="d-flex">
                                         <input type="checkbox"
-                                               checked="@_unapprovedIdeasByCurrentUser"
-                                               @onchange="@(e => FindOnConfirmation((bool)e.Value!))"
-                                               class="form-check-input" />
+                                                checked="@_unapprovedIdeasByCurrentUser"
+                                                @onchange="@(e => FindOnConfirmation((bool)e.Value!))"
+                                                class="form-check-input" />
                                         <Typography CustomClass="form-check-label ms-2">
                                             Неутвержденные идеи
                                         </Typography>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    }
-                    <ResetFilterButton ResetMethod="ResetFilters" />
-                </FilterContent>
-            </ListPageTable>
-        </div>
-    }
+                        }
+                    </div>
+                }
+                <ResetFilterButton IsLoading="_isLoading" ResetMethod="ResetFilters" />
+            </FilterContent>
+        </ListPageTable>
+    </div>
 </div>

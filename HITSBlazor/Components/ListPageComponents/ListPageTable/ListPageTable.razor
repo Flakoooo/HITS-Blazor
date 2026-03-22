@@ -1,9 +1,60 @@
 ﻿@namespace HITSBlazor.Components.ListPageComponents.ListPageTable
+@using HITSBlazor.Components.Placeholders.Placeholder
+@using HITSBlazor.Components.Tables.TableHeader
 
 <div class="w-100 d-flex">
     <div class="w-100">
-        <table class="table table-hover mb-0">
-            @TableContent
+        <table class="table mb-0 @(!IsLoading ? "table-hover" : string.Empty)">
+            @if (IsLoading)
+            {
+                @if (HeaderItems.Count > 0)
+                {
+                    <thead>
+                        <tr>
+                            @foreach (var header in HeaderItems)
+                            {
+                                <th>
+                                    <Placeholder />
+                                </th>
+                            }
+                        </tr>
+                    </thead>
+                }
+                <tbody>
+                    @if (HeaderItems.Count > 0)
+                    {
+                        <tr>
+                            @foreach (var header in HeaderItems)
+                            {
+                                <td>
+                                    <Placeholder Height="PlaceholderHeight.Smaller" />
+                                </td>
+                            }
+                        </tr>
+                    }
+                    @for (int i = 0; i < 5; ++i)
+                    {
+                        <tr>
+                            @for (int j = 0; j < 6; ++j)
+                            {
+                                <td>
+                                    <Placeholder Height="PlaceholderHeight.Smaller" />
+                                </td>
+                            }
+                        </tr>
+                    }
+                </tbody>
+            }
+            else
+            {
+                @if (HeaderItems.Count > 0)
+                {
+                    <TableHeader Items="HeaderItems" 
+                                 TableActionMenuIsEnable="TableActionMenuIsEnable" 
+                                 OrderChanged="(value) => ExecuteOrder(value.Item1, value.Item2)" />
+                }
+                @TableContent
+            }
         </table>
     </div>
     @if (FilterContent is not null)
@@ -16,8 +67,27 @@
 
 @code {
     [Parameter]
+    public bool IsLoading { get; set; } = false;
+
+    [Parameter]
+    public List<TableHeaderItem> HeaderItems { get; set; } = [];
+
+    [Parameter]
+    public bool TableActionMenuIsEnable { get; set; } = false;
+
+    [Parameter]
+    public Func<string?, bool?, Task>? OrderMethod { get; set; }
+
+    [Parameter]
     public RenderFragment? TableContent { get; set; } 
 
     [Parameter]
     public RenderFragment? FilterContent { get; set; }
+
+    private async Task ExecuteOrder(string? value1, bool? value2)
+    {
+        if (OrderMethod is null) return;
+
+        await OrderMethod(value1, value2);
+    }
 }

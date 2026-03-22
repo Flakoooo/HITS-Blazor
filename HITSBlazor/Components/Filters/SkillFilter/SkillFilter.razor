@@ -1,5 +1,6 @@
 ﻿@namespace HITSBlazor.Components.Filters.SkillFilter
 @using HITSBlazor.Components.Inputs.Input
+@using HITSBlazor.Components.Placeholders.Placeholder
 @using HITSBlazor.Components.Typography
 @using HITSBlazor.Models.Common.Entities
 @using HITSBlazor.Services.Auth
@@ -7,32 +8,44 @@
 @using HITSBlazor.Services.UserSkills
 
 <div class="w-100">
-    <Typography FontSize="6"CustomClass="fw-semibold">
-        Стек технологий
-    </Typography>
-    <Input Placeholder="Найти" CustomClass="my-1" Value="@SeacrhSkillText" ValueChanged="@((value) => SearchSkill(value))" />
-    <div class="list-page-filter-choices">
-        @foreach (var skill in _skills)
+    @if (IsLoading)
+    {
+        <Placeholder Width="w-25" />
+        <Placeholder Height="PlaceholderHeight.Smaller" />
+        @for (int i = 0; i < 6; ++i)
         {
-            <div class="list-page-filter-choice px-2 py-1 rounded-1">
-                <div class="d-flex">
-                    <input type="checkbox" 
-                           checked="@SelectedSkillIds.Contains(skill.Id)"
-                           @onchange="@(e => SelectedSkillsChanged(skill.Id, (bool)e.Value!))"
-                           name="Стек технологий" 
-                           value="@skill.Name"
-                           class="form-check-input" />
-                    <Typography CustomClass="form-check-label ms-2">
-                        @skill.Name
-                    </Typography>
-                </div>
-                @if (_userSkillIds.Contains(skill.Id))
-                {
-                    <i class="icon bi bi-star-fill text-warning"></i>
-                }
-            </div>
+            <Placeholder />
         }
-    </div>
+    }
+    else
+    {
+        <Typography FontSize="6" CustomClass="fw-semibold">
+            Стек технологий
+        </Typography>
+        <Input Placeholder="Найти" CustomClass="my-1" Value="@SeacrhSkillText" ValueChanged="@((value) => SearchSkill(value))" />
+        <div class="list-page-filter-choices">
+            @foreach (var skill in _skills)
+            {
+                <div class="list-page-filter-choice px-2 py-1 rounded-1">
+                    <div class="d-flex">
+                        <input type="checkbox"
+                               checked="@SelectedSkillIds.Contains(skill.Id)"
+                               @onchange="@(e => SelectedSkillsChanged(skill.Id, (bool)e.Value!))"
+                               name="Стек технологий"
+                               value="@skill.Name"
+                               class="form-check-input" />
+                        <Typography CustomClass="form-check-label ms-2">
+                            @skill.Name
+                        </Typography>
+                    </div>
+                    @if (_userSkillIds.Contains(skill.Id))
+                    {
+                        <i class="icon bi bi-star-fill text-warning"></i>
+                    }
+                </div>
+            }
+        </div>
+    }
 </div>
 
 @code {
@@ -44,6 +57,9 @@
 
     [Inject]
     private IUserSkillService UserSkillService { get; set; } = null!;
+
+    [Parameter]
+    public bool IsLoading { get; set; } = false;
 
     [Parameter]
     public string SeacrhSkillText { get; set; } = string.Empty;

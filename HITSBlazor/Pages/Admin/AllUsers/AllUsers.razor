@@ -19,72 +19,64 @@
 @using HITSBlazor.Utils.Models
 
 <div class="page-content-with-header bg-white overflow-y-scroll">
-    @if (_isLoading)
-    {
-        <TablePlaceholder />
-    }
-    else
-    {
-        <div class="w-100 bg-white p-3">
-            <ListPageHeader HeaderText="@($"Список пользователей: {_users.Count}")" />
-            <ListPageSearch ValueChanged="@((value) => SearchUser(value))" />
-            <ListPageTable>
-                <TableContent>
-                    <TableHeader TableActionMenuIsEnable="true"
-                                 Items="_userTableHeader"
-                                 OrderChanged="@((value) => SortUser(value.Item1, value.Item2))" />
-                    <tbody>
-                        @foreach (var user in _users)
-                        {
-                            <tr>
-                                <TableBodyRow>
-                                    <div class="text-primary data-link" @onclick="@(() => ShowUserProfile(user.Id))">
-                                        @user.Email
-                                    </div>
-                                </TableBodyRow>
-                                <TableBodyRow>
-                                    @user.FirstName
-                                </TableBodyRow>
-                                <TableBodyRow>
-                                    @user.LastName
-                                </TableBodyRow>
-                                <TableBodyRow>
-                                    @user.Telephone
-                                </TableBodyRow>
-                                <TableBodyRow>
-                                    @user.StudyGroup
-                                </TableBodyRow>
-                                <TableBodyRow IsCentered="true">
-                                    @(user.CreatedAt.HasValue? user.CreatedAt.Value.ToString("dd.MM.yyyy") : "Н/Д")
-                                </TableBodyRow>
-                                <TableBodyRow>
-                                    @foreach (var role in user.Roles)
-                                    {
-                                        <Status Statustype="role" />
-                                    }
-                                </TableBodyRow>
-                                <TableActionMenu ItemId="@user.Id"
-                                                 OnAction="OnUserAction"
-                                                 ActionIds="GetActions(user)" />
-                            </tr>
-                        }
-                    </tbody>
-                </TableContent>
-                <FilterContent>
-                    <CheckboxFilter T="EnumViewModel<RoleType>" 
-                                    AllValues="_filterRoleTypes"
-                                    Label="Роли"
-                                    @bind-SelectedValues="SelectedUserRoles"
-                                    FilterChanged="LoadUsersAsync"/>
-                    <!-- TODO: реализовать фильтр -->
-                    <RadioFilter T="ValueViewModel<bool?>"
-                                 Label="Студенты"
-                                 AllValues="_inTeamFilterValues"
-                                 @bind-Value="InTeam"
-                                 OnFilterChanged="@LoadUsersAsync" />
-                    <ResetFilterButton ResetMethod="ResetFilters" />
-                </FilterContent>
-            </ListPageTable>
-        </div>
-    }
+    <div class="w-100 bg-white p-3">
+        <ListPageHeader IsLoading="_isLoading" HeaderText="@($"Список пользователей: {_users.Count}")" />
+        <ListPageSearch IsLoading="_isLoading" ValueChanged="@((value) => SearchUser(value))" />
+        <ListPageTable IsLoading="_isLoading" TableActionMenuIsEnable="true" HeaderItems="_userTableHeader" OrderMethod="SortUser">
+            <TableContent>
+                <tbody>
+                    @foreach (var user in _users)
+                    {
+                        <tr>
+                            <TableBodyRow>
+                                <div class="text-primary data-link" @onclick="@(() => ShowUserProfile(user.Id))">
+                                    @user.Email
+                                </div>
+                            </TableBodyRow>
+                            <TableBodyRow>
+                                @user.FirstName
+                            </TableBodyRow>
+                            <TableBodyRow>
+                                @user.LastName
+                            </TableBodyRow>
+                            <TableBodyRow>
+                                @user.Telephone
+                            </TableBodyRow>
+                            <TableBodyRow>
+                                @user.StudyGroup
+                            </TableBodyRow>
+                            <TableBodyRow IsCentered="true">
+                                @(user.CreatedAt.HasValue? user.CreatedAt.Value.ToString("dd.MM.yyyy") : "Н/Д")
+                            </TableBodyRow>
+                            <TableBodyRow>
+                                @foreach (var role in user.Roles)
+                                {
+                                    <Status Statustype="role" />
+                                }
+                            </TableBodyRow>
+                            <TableActionMenu ItemId="@user.Id"
+                                             OnAction="OnUserAction"
+                                             ActionIds="GetActions(user)" />
+                        </tr>
+                    }
+                </tbody>
+            </TableContent>
+            <FilterContent>
+                <CheckboxFilter T="EnumViewModel<RoleType>"
+                                IsLoading="_isLoading"
+                                AllValues="_filterRoleTypes"
+                                Label="Роли"
+                                @bind-SelectedValues="SelectedUserRoles"
+                                FilterChanged="LoadUsersAsync" />
+                <!-- TODO: реализовать фильтр -->
+                <RadioFilter T="ValueViewModel<bool?>"
+                             IsLoading="_isLoading"
+                             Label="Студенты"
+                             AllValues="_inTeamFilterValues"
+                             @bind-Value="InTeam"
+                             OnFilterChanged="@LoadUsersAsync" />
+                <ResetFilterButton IsLoading="_isLoading" ResetMethod="ResetFilters" />
+            </FilterContent>
+        </ListPageTable>
+    </div>
 </div>

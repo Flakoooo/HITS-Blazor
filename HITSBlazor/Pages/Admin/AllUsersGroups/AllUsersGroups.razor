@@ -1,6 +1,7 @@
 ﻿@namespace HITSBlazor.Pages.Admin.AllUsersGroups
 @using HITSBlazor.Components.ActionMenus.BaseActionMenu
 @using HITSBlazor.Components.Button
+@using HITSBlazor.Components.Filters.CheckboxFilter
 @using HITSBlazor.Components.Filters.ResetFilterButton
 @using HITSBlazor.Components.ListPageComponents.ListPageHeader
 @using HITSBlazor.Components.ListPageComponents.ListPageSearch
@@ -23,15 +24,14 @@
     else
     {
         <div class="w-100 bg-white p-3">
-            <ListPageHeader HeaderText="@($"Группы пользователей: {_usersGroups.Count}")"
+            <ListPageHeader IsLoading="_isLoading"
+                            HeaderText="@($"Группы пользователей: {_usersGroups.Count}")"
                             ShowCreateButton="true"
                             CreateButtonText="Создать группу" 
                             OnButtonClick="@(() => ShowUsersGroupModal())"/>
-            <ListPageSearch ValueChanged="@((value) => SearchUsersGroup(value))" />
-            <ListPageTable>
+            <ListPageSearch IsLoading="_isLoading" ValueChanged="@((value) => SearchUsersGroup(value))" />
+            <ListPageTable IsLoading="_isLoading" TableActionMenuIsEnable="true" HeaderItems="UsersGroupsTableHeader">
                 <TableContent>
-                    <TableHeader TableActionMenuIsEnable="true"
-                                 Items="UsersGroupsTableHeader" />
                     <tbody>
                         @foreach (var usersGroup in _usersGroups)
                         {
@@ -58,28 +58,13 @@
                     </tbody>
                 </TableContent>
                 <FilterContent>
-                    <div class="w-100">
-                        <Typography FontSize="6" CustomClass="fw-semibold">
-                            Роли
-                        </Typography>
-                        <div class="list-page-filter-choices">
-                            @foreach (var role in Enum.GetValues<RoleType>())
-                            {
-                                <div class="list-page-filter-choice px-2 py-1 rounded-1">
-                                    <div class="d-flex">
-                                        <input type="checkbox"
-                                               checked="@SelectedRoles.Contains(role)"
-                                               @onchange="@(e => OnRoleTypeChanged(role, (bool)e.Value!))"
-                                               class="form-check-input" />
-                                        <Typography CustomClass="form-check-label ms-2">
-                                            @(EnumViewModel<RoleType>.GetTranslation(role))
-                                        </Typography>
-                                    </div>
-                                </div>
-                            }
-                        </div>
-                    </div>
-                    <ResetFilterButton ResetMethod="ResetFilters" />
+                    <CheckboxFilter T="EnumViewModel<RoleType>" 
+                                    IsLoading="_isLoading"
+                                    Label="Роли" 
+                                    AllValues="_filterRoleTypes"
+                                    FilterChanged="LoadUsersGroupsAsync"
+                                    @bind-SelectedValues="SelectedRoles" />
+                    <ResetFilterButton IsLoading="_isLoading" ResetMethod="ResetFilters" />
                 </FilterContent>
             </ListPageTable>
         </div>
