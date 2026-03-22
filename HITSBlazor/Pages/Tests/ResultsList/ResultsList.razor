@@ -29,7 +29,7 @@
                         {
                             <tr>
                                 <TableBodyRow>
-                                    <div class="text-primary data-link">
+                                    <div class="text-primary data-link" @onclick="() => ModalService.ShowProfileModal(result.User.Id)">
                                         @result.User.Email
                                     </div>
                                 </TableBodyRow>
@@ -43,13 +43,13 @@
                                     @result.User.StudyGroup
                                 </TableBodyRow>
                                 <TableBodyRow>
-                                    @result.BelbinResult
+                                    @((MarkupString)result.BelbinResult.Replace("\n", "<br>"))
                                 </TableBodyRow>
                                 <TableBodyRow>
-                                    @result.MindResult
+                                    @((MarkupString)result.MindResult.Replace("\n", "<br>"))
                                 </TableBodyRow>
                                 <TableBodyRow>
-                                    @result.TemperResult
+                                    @((MarkupString)result.TemperResult.Replace("\n", "<br>"))
                                 </TableBodyRow>
                             </tr>
                         }
@@ -57,13 +57,44 @@
                 }
             </TableContent>
             <FilterContent>
-                <CheckboxFilter T="ValueViewModel<string>" IsLoading="_isLoading" Label="Учебная группа" AllValues="_studyFilterValues" @bind-SelectedValues="SelectedStudyGroups" />
-                <CheckboxFilter T="ValueViewModel<string>" IsLoading="_isLoading" Label="Тест Белбина" AllValues="_belbinResultFilterValues" @bind-SelectedValues="SelectedBelbinResult" />
-                <RadioFilter T="ValueViewModel<string>" IsLoading="_isLoading" Label="Стиль мышления" AllValues="_mindResultFilterValues" @bind-Value="SelectedMindResult" />
-                <CheckboxFilter T="ValueViewModel<string>" IsLoading="_isLoading" Label="Экстраверсия" AllValues="_temperExtraversionFilterValues" @bind-SelectedValues="SelectedTemperExtraversion" />
-                <CheckboxFilter T="ValueViewModel<string>" IsLoading="_isLoading" Label="Нейротизм" AllValues="_temperNeurotismFilterValues" @bind-SelectedValues="SelectedTemperNeurotism" />
-                <CheckboxFilter T="ValueViewModel<string>" IsLoading="_isLoading" Label="Ложь" AllValues="_temperLieFilterValues" @bind-SelectedValues="SelectedTemperLie" />
-                <ResetFilterButton ResetMethod="ResetFilters" />
+                <CheckboxFilter T="ValueViewModel<string>" 
+                                IsLoading="_isLoading" 
+                                Label="Учебная группа" 
+                                AllValues="_studyFilterValues" 
+                                @bind-SelectedValues="SelectedStudyGroups" 
+                                FilterChanged="LoadTestsResultsAsync" />
+                <CheckboxFilter T="ValueViewModel<string>" 
+                                IsLoading="_isLoading"
+                                Label="Тест Белбина" 
+                                AllValues="_belbinResultFilterValues" 
+                                @bind-SelectedValues="SelectedBelbinResult" 
+                                FilterChanged="LoadTestsResultsAsync" />
+                <RadioFilter T="ValueViewModel<string>" 
+                             IsLoading="_isLoading" 
+                             Label="Стиль мышления" 
+                             AllValues="_mindResultFilterValues" 
+                             @bind-Value="SelectedMindResult" 
+                             OnFilterChanged="LoadTestsResultsAsync" />
+                <CheckboxFilter T="ValueViewModel<string>" 
+                                IsLoading="_isLoading" 
+                                Label="Экстраверсия" 
+                                AllValues="_temperExtraversionFilterValues" 
+                                @bind-SelectedValues="SelectedTemperExtraversion" 
+                                FilterChanged="LoadTestsResultsAsync" />
+                <CheckboxFilter T="ValueViewModel<string>" 
+                                IsLoading="_isLoading" 
+                                Label="Нейротизм" 
+                                AllValues="_temperNeurotismFilterValues" 
+                                @bind-SelectedValues="SelectedTemperNeurotism" 
+                                FilterChanged="LoadTestsResultsAsync" />
+                <CheckboxFilter T="ValueViewModel<string>" 
+                                IsLoading="_isLoading" 
+                                Label="Ложь" 
+                                AllValues="_temperLieFilterValues" 
+                                @bind-SelectedValues="SelectedTemperLie" 
+                                FilterChanged="LoadTestsResultsAsync" />
+                <ResetFilterButton IsLoading="_isLoading" 
+                                   ResetMethod="ResetFilters" />
             </FilterContent>
         </ListPageTable>
     </div>

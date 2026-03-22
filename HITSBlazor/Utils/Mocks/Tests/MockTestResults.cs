@@ -1,6 +1,9 @@
-﻿using HITSBlazor.Models.Tests.Entities;
+﻿using HITSBlazor.Components.Inputs.Input;
+using HITSBlazor.Models.Tests.Entities;
 using HITSBlazor.Models.Users.Entities;
 using HITSBlazor.Utils.Mocks.Users;
+using System.Linq;
+using System.Text.RegularExpressions;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace HITSBlazor.Utils.Mocks.Tests
@@ -353,19 +356,48 @@ namespace HITSBlazor.Utils.Mocks.Tests
                     return null;
 
                 string? belbinResult = null;
-                if (belbinTestResult != null)
+                if (belbinTestResult is not null)
                 {
                     int index = belbinTestResult.TestResultValue.IndexOf('\n');
                     if (index != -1)
                         belbinResult = belbinTestResult.TestResultValue[3..index ];
                 }
 
+                string? mindResult = null;
+                if (mindTestResult is not null)
+                {
+                    var pattern = @"([А-Яа-я]+ский стиль): \((\d+)\)";
+                    var matches = Regex.Matches(mindTestResult.TestResultValue, pattern);
+
+                    mindResult = string.Join("\n",
+                        matches.Select(m => $"{m.Groups[1].Value}: ({m.Groups[2].Value})"));
+                }
+
+                string? temperResult = null;
+                if (temperTestResult is not null)
+                {
+                    var pattern = @"([^:]+): \((\d+)\) (.+?)(?=\n|$)";
+                    var matches = Regex.Matches(temperTestResult.TestResultValue, pattern, RegexOptions.Multiline);
+
+                    List<string> results = [];
+
+                    foreach (Match match in matches)
+                    {
+                        string name = match.Groups[1].Value.Trim();
+                        string score = match.Groups[2].Value;
+                        string level = match.Groups[3].Value.Trim();
+
+                        results.Add($"{name}: ({score}) {string.Join("", level.Take("Неискренность в ответах".Length))}");
+                    }
+                    temperResult = string.Join("\n", results);
+                }
+
                 return new TestAllResponse
                 {
                     User = g.Key,
                     BelbinResult = belbinResult ?? "-",
-                    TemperResult = temperTestResult?.TestResultValue ?? "-",
-                    MindResult = mindTestResult?.TestResultValue ?? "-"
+                    TemperResult = temperResult ?? "-",
+                    MindResult = mindResult ?? "-"
                 };
             }).Where(response => response is not null).Select(response => response!)];
 

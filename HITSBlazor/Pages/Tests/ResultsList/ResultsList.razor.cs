@@ -1,5 +1,6 @@
 ﻿using HITSBlazor.Components.Tables.TableHeader;
 using HITSBlazor.Models.Tests.Entities;
+using HITSBlazor.Services.Modal;
 using HITSBlazor.Services.TestResults;
 using HITSBlazor.Utils.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -13,6 +14,9 @@ namespace HITSBlazor.Pages.Tests.ResultsList
     {
         [Inject]
         private ITestResultService TestResultService { get; set; } = null!;
+
+        [Inject]
+        private ModalService ModalService { get; set; } = null!;
 
         private bool _isLoading = true;
 
@@ -31,8 +35,8 @@ namespace HITSBlazor.Pages.Tests.ResultsList
 
         private List<TestAllResponse> _results = [];
 
-        private List<ValueViewModel<string?>> _studyFilterValues = [];
-        private HashSet<ValueViewModel<string?>> SelectedStudyGroups { get; set; } = [];
+        private List<ValueViewModel<string>> _studyFilterValues = [];
+        private HashSet<ValueViewModel<string>> SelectedStudyGroups { get; set; } = [];
 
         private readonly List<ValueViewModel<string?>> _belbinResultFilterValues = 
         [
@@ -46,9 +50,9 @@ namespace HITSBlazor.Pages.Tests.ResultsList
             new("КОНТРОЛЕР",        "КОНТРОЛЕР"         ),
             new("СПЕЦИАЛИСТ",       "СПЕЦИАЛИСТ"        )
         ];
-        private HashSet<ValueViewModel<string?>> SelectedBelbinResult { get; set; } = [];
+        private HashSet<ValueViewModel<string>> SelectedBelbinResult { get; set; } = [];
 
-        private readonly List<ValueViewModel<string?>> _mindResultFilterValues =
+        private readonly List<ValueViewModel<string>> _mindResultFilterValues =
         [
             new("Все",              "Все"               ),
             new("Синтетический",    "Синтетический"     ),
@@ -57,9 +61,9 @@ namespace HITSBlazor.Pages.Tests.ResultsList
             new("Аналитический",    "Аналитический"     ),
             new("Реалистический",   "Реалистический"    )
         ];
-        private ValueViewModel<string?>? SelectedMindResult { get; set; }
+        private ValueViewModel<string>? SelectedMindResult { get; set; }
 
-        private readonly List<ValueViewModel<string?>> _temperExtraversionFilterValues =
+        private readonly List<ValueViewModel<string>> _temperExtraversionFilterValues =
         [
             new("Яркий экстраверт",     "Яркий экстраверт"  ),
             new("Экстраверт",           "Экстраверт"        ),
@@ -67,7 +71,7 @@ namespace HITSBlazor.Pages.Tests.ResultsList
             new("Интроверт",            "Интроверт"         ),
             new("Глубокий интроверт",   "Глубокий интроверт")
         ];
-        private HashSet<ValueViewModel<string?>> SelectedTemperExtraversion { get; set; } = [];
+        private HashSet<ValueViewModel<string>> SelectedTemperExtraversion { get; set; } = [];
 
         private readonly List<ValueViewModel<string?>> _temperNeurotismFilterValues =
         [
@@ -76,28 +80,21 @@ namespace HITSBlazor.Pages.Tests.ResultsList
             new("Среднее значение",                 "Среднее значение"                  ),
             new("Низкий уровень нейротизма",        "Низкий уровень нейротизма"         )
         ];
-        private HashSet<ValueViewModel<string?>> SelectedTemperNeurotism { get; set; } = [];
+        private HashSet<ValueViewModel<string>> SelectedTemperNeurotism { get; set; } = [];
 
         private readonly List<ValueViewModel<string?>> _temperLieFilterValues =
         [
             new("Неискренность в ответах",  "Неискренность в ответах"   ),
             new("Норма",                    "Норма"                     )
         ];
-        private HashSet<ValueViewModel<string?>> SelectedTemperLie { get; set; } = [];
+        private HashSet<ValueViewModel<string>> SelectedTemperLie { get; set; } = [];
 
         protected override async Task OnInitializedAsync()
         {
             _isLoading = true;
 
             await LoadTestsResultsAsync();
-            _studyFilterValues = [.. _results.Select(r => r.User.StudyGroup).Distinct().Select(sg => new ValueViewModel<string?>(sg, sg))];
-
-            //foreach( var result in _results)
-            //{
-            //    Console.WriteLine(result.BelbinResult);
-            //    Console.WriteLine(result.TemperResult);
-            //    Console.WriteLine(result.MindResult);
-            //}
+            _studyFilterValues = [.. _results.Select(r => r.User.StudyGroup).Distinct().Select(sg => new ValueViewModel<string>(sg, sg))];
 
             _isLoading = false;
         }
@@ -105,8 +102,15 @@ namespace HITSBlazor.Pages.Tests.ResultsList
         private async Task LoadTestsResultsAsync()
         {
             _results = await TestResultService.GetTestsResultsAsync(
-                searchText: _searchText
+                searchText: _searchText,
+                selectedStudyGroups: [.. SelectedStudyGroups.Select(v => v.Value.ToLower())],
+                selectedBelbinResults: [.. SelectedBelbinResult.Select(v => v.Value.ToLower())],
+                selectedMindResult: SelectedMindResult?.Value,
+                selectedExtraversionResults: [.. SelectedTemperExtraversion.Select(v => v.Value.ToLower())],
+                selectedNeurotismResults: [.. SelectedTemperNeurotism.Select(v => v.Value.ToLower())],
+                selectedLieResults: [.. SelectedTemperLie.Select(v => v.Value.ToLower())]
             );
+            StateHasChanged();
         }
 
         private async Task SearchResult(string value)
@@ -117,6 +121,12 @@ namespace HITSBlazor.Pages.Tests.ResultsList
 
         private async Task ResetFilters()
         {
+            SelectedStudyGroups.Clear();
+            SelectedBelbinResult.Clear();
+            SelectedMindResult = null;
+            SelectedTemperExtraversion.Clear();
+            SelectedTemperNeurotism.Clear();
+            SelectedTemperLie.Clear();
             await LoadTestsResultsAsync();
         }
     }

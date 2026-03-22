@@ -1,15 +1,25 @@
 ﻿@namespace HITSBlazor.Components.Filters.ResetFilterButton
 @using HITSBlazor.Components.Button
+@using HITSBlazor.Components.Placeholders.Placeholder
 
 <div class="w-100 d-flex justify-content-center">
-    <Button BtnType="ButtonType.Button" 
-            Variant="ButtonVariant.Danger"
-            Text="Сбросить фильтры" 
-            IconStyle="bi-x-lg" 
-            OnButtonClick="ExecuteReset" />
+    @if (IsLoading)
+    {
+        <Placeholder Width="w-50" Height="PlaceholderHeight.Smaller" />
+    }
+    else
+    {
+        <Button Variant="ButtonVariant.Danger"
+                Text="Сбросить фильтры"
+                IconStyle="bi-x-lg"
+                OnButtonClick="ExecuteReset" />
+    }
 </div>
 
 @code {
+    [Parameter]
+    public bool IsLoading { get; set; } = false;
+
     [Parameter]
     public Func<Task>? ResetMethod { get; set; }
 
