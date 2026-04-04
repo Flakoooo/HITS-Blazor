@@ -1,5 +1,4 @@
-﻿using HITSBlazor.Models.Teams.Entities;
-using HITSBlazor.Models.Users.Entities;
+﻿using HITSBlazor.Models.Users.Entities;
 using HITSBlazor.Models.Users.Enums;
 using HITSBlazor.Models.Users.Requests;
 

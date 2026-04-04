@@ -1,7 +1,7 @@
-﻿using ApexCharts;
-using HITSBlazor.Components.ActionMenus.BaseActionMenu;
+﻿using HITSBlazor.Components.ActionMenus.BaseActionMenu;
+using HITSBlazor.Components.Modals.Components;
+using HITSBlazor.Components.Modals.Components.RightSideModalInfo;
 using HITSBlazor.Components.Tables.TableHeader;
-using HITSBlazor.Models.Common.Entities;
 using HITSBlazor.Models.Teams.Entities;
 using HITSBlazor.Services.Modal;
 using HITSBlazor.Services.Teams;
@@ -29,7 +29,6 @@ namespace HITSBlazor.Components.Modals.RightSideModals.TeamModal
         private List<InvitationTeamToIdea> _invitationsTeamToIdeas = [];
 
         private TeamTableCategory _activeTableCategory = TeamTableCategory.Members;
-        private TeamInfoCategory _activeInfoCategory = TeamInfoCategory.Info;
 
         private static List<TableHeaderItem> MembersTableHeader { get; } =
         [
@@ -58,6 +57,33 @@ namespace HITSBlazor.Components.Modals.RightSideModals.TeamModal
             new() { Text = "Компетенции", InCentered = true, ColumnClass = "col-4" }
         ];
 
+        private readonly List<RightSideModalInfoItem> _infoItems =
+        [
+            new RightSideModalInfoItem
+            {
+                Label = "Владелец команды",
+                Icon = "bi-person-circle",
+                IsLinkable = true
+            },
+            new RightSideModalInfoItem
+            {
+                Label = "Тим-лидер команды",
+                Icon = "bi-person-circle"
+            },
+            new RightSideModalInfoItem
+            {
+                Label = "Дата создания",
+                Icon = "bi-calendar-date",
+                TextColor = Typography.TextColor.Primary
+            },
+            new RightSideModalInfoItem
+            {
+                IsInline = true,
+                Label = "Количество участников:",
+                TextColor = Typography.TextColor.Primary
+            }
+        ];
+
         protected override async Task OnInitializedAsync()
         {
             _isLoading = true;
@@ -71,14 +97,27 @@ namespace HITSBlazor.Components.Modals.RightSideModals.TeamModal
             _requestsTeamToIdeas = [.. _requestsTeamToIdeas, .. _requestsTeamToIdeas, .. _requestsTeamToIdeas];
             _invitationsTeamToIdeas = await TeamService.GetInvitationsTeamToIdeasAsync(TeamId);
 
+            var ownerInfoItem = _infoItems[0];
+            ownerInfoItem.Text = _currentTeam.Owner.FullName;
+            ownerInfoItem.LinkMethod = (() => ModalService.ShowProfileModal(_currentTeam.Owner.UserId));
+
+            var leaderInfoItem = _infoItems[1];
+            leaderInfoItem.Text = _currentTeam.Leader?.FullName ?? "-";
+            if (_currentTeam.Leader is not null)
+            {
+                leaderInfoItem.IsLinkable = true;
+                leaderInfoItem.LinkMethod = (() => ModalService.ShowProfileModal(_currentTeam.Leader.UserId));
+            }
+
+            _infoItems[2].Text = _currentTeam.CreatedAt.ToString("dd.MM.yyyy");
+
+            _infoItems[3].Text = _currentTeam.MembersCount.ToString();
+
             _isLoading = false;
         }
 
         private string GetTableCategoryClass(TeamTableCategory category)
             => _activeTableCategory == category ? "active text-primary" : "text-secondary";
-
-        private string GetInfoCategoryClass(TeamInfoCategory category)
-            => _activeInfoCategory == category ? "btn-primary" : "btn-secondary";
 
         private void HandleTableMenuClick(TableActionContext context)
         {
@@ -113,47 +152,6 @@ namespace HITSBlazor.Components.Modals.RightSideModals.TeamModal
                 }
             }
         }
-
-        private static ApexChartOptions<Skill> GetRadarChartOptions() => new()
-        {
-            Chart = new Chart
-            {
-                Type = ChartType.Radar,
-                Toolbar = new Toolbar { Show = false }
-            },
-            Yaxis =
-            [
-                new YAxis
-                {
-                    Min = 0,
-                    Max = 1,
-                    Labels = new YAxisLabels { Show = false },
-                    Show = false
-                }
-            ],
-            Xaxis = new XAxis
-            {
-                Labels = new XAxisLabels
-                {
-                    Style = new AxisLabelStyle
-                    {
-                        Colors = new List<string> { "#a8a8a8" },
-                        FontSize = "11px"
-                    }
-                }
-            },
-            Stroke = new Stroke { Width = 2 },
-            Fill = new Fill { 
-                Opacity = 0.5,
-                Type = new List<FillType> { FillType.Solid }
-            },
-            Markers = new Markers { Size = 4 },
-            Legend = new Legend
-            {
-                Show = true,
-                Position = LegendPosition.Bottom
-            }
-        };
 
         internal class ShowTeamModal
         {

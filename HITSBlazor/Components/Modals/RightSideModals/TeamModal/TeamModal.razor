@@ -2,7 +2,9 @@
 @using HITSBlazor.Components.ActionMenus.BaseActionMenu
 @using HITSBlazor.Components.Button
 @using HITSBlazor.Components.Collapse
+@using HITSBlazor.Components.Modals.Components
 @using HITSBlazor.Components.Modals.Components.ModalHeader
+@using HITSBlazor.Components.Modals.Components.RightSideModalInfo
 @using HITSBlazor.Components.Placeholders.Placeholder
 @using HITSBlazor.Components.Status
 @using HITSBlazor.Components.Tables.TableActionMenu
@@ -330,119 +332,6 @@
                 </button>
             </div>
         </div>
-        <div class="team-modal-side rounded-3 w-25 bg-white">
-            <div class="p-2 rounded-top d-flex gap-2">
-                <Button BtnType="ButtonType.Button" 
-                        ButtonClass="@($"w-50 {GetInfoCategoryClass(TeamInfoCategory.Info)}")" 
-                        Text="Информация" 
-                        OnButtonClick="() => _activeInfoCategory = TeamInfoCategory.Info" />
-                <Button BtnType="ButtonType.Button" 
-                        ButtonClass="@($"w-50 {GetInfoCategoryClass(TeamInfoCategory.Skills)}")" 
-                        Text="Компетенции" 
-                        OnButtonClick="() => _activeInfoCategory = TeamInfoCategory.Skills" />
-            </div>
-            @if (_activeInfoCategory == TeamInfoCategory.Info)
-            {
-                <div class="team-modal-info w-100 pb-3 px-3">
-                    <div class="w-100">
-                        <Typography FontSize="6" TextColor="TextColor.Secondary" CustomClass="border-bottom d-block">
-                            Владелец команды
-                        </Typography>
-                        <div class="team-modal-info-item pt-2">
-                            <i class="bi bi-person-circle text-secondary fs-3 opacity-25"></i>
-                            <div class="data-link">
-                                <Typography FontSize="6">
-                                    @_currentTeam.Owner?.FullName
-                                </Typography>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="w-100">
-                        <Typography FontSize="6" TextColor="TextColor.Secondary" CustomClass="border-bottom d-block">
-                            Тим-лидер команды
-                        </Typography>
-                        <div class="team-modal-info-item pt-2">
-                            <i class="bi bi-person-circle text-secondary fs-3 opacity-25"></i>
-                            <div class="data-link">
-                                <Typography FontSize="6">
-                                    @_currentTeam.Leader?.FullName
-                                </Typography>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="w-100">
-                        <Typography FontSize="6" TextColor="TextColor.Secondary" CustomClass="border-bottom d-block">
-                            Дата создания
-                        </Typography>
-                        <div class="team-modal-info-item pt-2">
-                            <i class="bi bi-calendar-date text-secondary fs-3 opacity-25"></i>
-                            <Typography FontSize="6" TextColor="TextColor.Primary">
-                                @_currentTeam.CreatedAt.ToString("dd.MM.yyyy")
-                            </Typography>
-                        </div>
-                    </div>
-                    <div class="w-100">
-                        <Typography FontSize="6" TextColor="TextColor.Secondary" CustomClass="border-bottom d-block">
-                            Количество участников:
-                            <Typography FontSize="6" TextColor="TextColor.Primary">
-                                @_currentTeam.MembersCount
-                            </Typography>
-                        </Typography>
-                    </div>
-                    <!-- TODO: Реализовать передачу URL -->
-                    <Button BtnType="ButtonType.Button"
-                            Text="Поделиться командой"
-                            Variant="ButtonVariant.Primary" />
-                </div>
-            }
-            else if (_activeInfoCategory == TeamInfoCategory.Skills)
-            {
-                <div class="team-modal-info px-2 pb-2">
-                    <div class="radar-charts">
-                        @foreach (var type in Enum.GetValues<SkillType>())
-                        {
-                            var teamSkills = _currentTeam.Skills.Where(s => s.Type == type).ToList();
-                            var teamWantedSkills = _currentTeam.WantedSkills.Where(s => s.Type == type).ToList();
-                            var intersectSkills = teamWantedSkills.IntersectBy(teamSkills.Select(s => s.Id), ws => ws.Id).ToList();
-
-                            var allSkills = teamSkills
-                                .UnionBy(teamWantedSkills, s => s.Id)
-                                .OrderBy(s => s.Name)
-                                .ToList();
-
-                            if (allSkills?.Count > 0)
-                            {
-                                <ApexChart TItem="Skill"
-                                           Options="@GetRadarChartOptions()"
-                                           Width="250"
-                                           Height="275">
-                                    <ApexPointSeries TItem="Skill"
-                                                     Items="allSkills"
-                                                     Name="Желаемые компетенции"
-                                                     SeriesType="SeriesType.Radar"
-                                                     XValue="@(s => s.Name)"
-                                                     YValue="@(s => teamWantedSkills.Contains(s) ? 1 : 0)"
-                                                     Color="@type.GetWantedColor()" />
-                                    <ApexPointSeries TItem="Skill"
-                                                     Items="allSkills"
-                                                     Name="Фактические компетенции"
-                                                     SeriesType="SeriesType.Radar"
-                                                     XValue="@(s => s.Name)"
-                                                     YValue="@(s => teamSkills.Contains(s) ? 1 : 0)"
-                                                     Color="@type.GetColor()" />
-                                    <ApexPointSeries TItem="Skill"
-                                                     Items="allSkills"
-                                                     Name="Пересечение"
-                                                     SeriesType="SeriesType.Radar"
-                                                     XValue="@(s => s.Name)"
-                                                     YValue="@(s => intersectSkills.Contains(s) ? 1 : 0)"
-                                                     Color="#bfbfbf" />
-                                </ApexChart>
-                            }
-                        }
-                    </div>
-                </div>
-            }
-        </div>
+        <RightSideModalInfo Skills1="_currentTeam.Skills" Skills2="_currentTeam.WantedSkills" Items="_infoItems" SearhButtonTest="Поделиться командой" />
     }
 </div>

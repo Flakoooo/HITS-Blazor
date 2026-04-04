@@ -1,0 +1,69 @@
+﻿.idea-market-modal {
+    position: relative;
+    width: 80%;
+    border-top-left-radius: 8px;
+    border-bottom-left-radius: 8px;
+    background-color: #e9e9e9;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: column;
+    justify-content: flex-start;
+    gap: 16px;
+    align-self: stretch;
+    justify-self: flex-end;
+    transition: all .3s ease-out;
+}
+
+.idea-market-modal-left-side {
+    height: -moz-fit-content;
+    height: fit-content;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: stretch;
+    justify-content: flex-start;
+    gap: 16px;
+}
+
+.right-side {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: flex-start;
+    justify-content: flex-start;
+    gap: 16px;
+}
+
+.right-side-header {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: flex-start;
+    gap: 8px;
+}
+
+.exchange-header {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: center;
+}
+
+.exchange-info {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: stretch;
+    justify-content: flex-start;
+    gap: 16px;
+}
+
+.exchange-info-user {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 8px;
+}

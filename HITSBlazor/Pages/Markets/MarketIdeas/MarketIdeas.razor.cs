@@ -5,9 +5,9 @@ using HITSBlazor.Models.Markets.Enums;
 using HITSBlazor.Services.IdeaMarkets;
 using HITSBlazor.Services.Markets;
 using HITSBlazor.Services.Modal;
+using HITSBlazor.Utils.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
-using System;
 
 namespace HITSBlazor.Pages.Markets.MarketIdeas
 {
@@ -36,8 +36,9 @@ namespace HITSBlazor.Pages.Markets.MarketIdeas
 
         private List<IdeaMarket> _ideaMarkets = [];
 
-
-        private IdeaMarketStatusType? _selectedStatusType;
+        private readonly List<EnumViewModel<IdeaMarketStatusType>> _filterIdeaMarketStatus
+            = [.. Enum.GetValues<IdeaMarketStatusType>().Select(s => new EnumViewModel<IdeaMarketStatusType>(s))];
+        private EnumViewModel<IdeaMarketStatusType>? SelectedStatusType { get; set; }
         private string SeacrhSkillText { get; set; } = string.Empty;
         private HashSet<Guid> SelectedSkillIds { get; set; } = [];
 
@@ -53,24 +54,33 @@ namespace HITSBlazor.Pages.Markets.MarketIdeas
 
                 _isLoading = false;
             }
+
+            IdeaMarketService.OnIdeasMarketStateUpdated += StateHasChanged;
+            IdeaMarketService.OnIdeasMarketStateChanged += LoadMarketIdeasAsync;
         }
 
         private async Task LoadMarketIdeasAsync()
         {
             if (_currentMarket is null) return;
 
+            Console.WriteLine(_category == MarketIdeasCategory.Favorite);
+
             _ideaMarkets = await IdeaMarketService.GetIdeasMarketAsync(
                 _currentMarket.Id,
+                favorite: _category == MarketIdeasCategory.Favorite,
                 searchText: _searchText,
-                selectedStatus: _selectedStatusType
+                selectedStatus: SelectedStatusType?.Value
             );
         }
 
         private string GetActiveCategoryClass(MarketIdeasCategory category)
             => category == _category? "active text-primary" : "text-dark";
 
-        private void SelectActiveCategory(MarketIdeasCategory category)
-            => _category = category;
+        private async Task SelectActiveCategory(MarketIdeasCategory category)
+        {
+            _category = category;
+            await LoadMarketIdeasAsync();
+        }
 
         private async Task SearchMarketIdeas(string value)
         {
@@ -80,8 +90,7 @@ namespace HITSBlazor.Pages.Markets.MarketIdeas
 
         private async Task CloseMarket()
         {
-            if (_currentMarket is null)
-                return;
+            if (_currentMarket is null) return;
 
             ModalService.ShowConfirmModal(
                 "Вы действительно хотите завершить биржу? Идеи, не нашедшие команды, попадут обратно в список идей.",

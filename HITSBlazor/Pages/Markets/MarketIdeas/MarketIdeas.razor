@@ -15,7 +15,7 @@
         @if (_isLoading || _currentMarket is null)
         {
             <div class="w-25">
-                <Placeholder />
+                <Placeholder Height="PlaceholderHeight.Small" />
                 <div class="w-50 d-flex gap-3">
                     <Placeholder />
                     <Placeholder />
@@ -33,10 +33,12 @@
         }
     </div>
     <div class="nav nav-underline mb-3 w-100 d-flex justify-content-center">
-        <div class="nav-link cursor-pointer @GetActiveCategoryClass(MarketIdeasCategory.All)">
+        <div class="nav-link @GetActiveCategoryClass(MarketIdeasCategory.All)" style="cursor: pointer;"
+             @onclick="() => SelectActiveCategory(MarketIdeasCategory.All)">
             @(EnumViewModel<MarketIdeasCategory>.GetTranslation(MarketIdeasCategory.All))
         </div>
-        <div class="nav-link cursor-pointer @GetActiveCategoryClass(MarketIdeasCategory.Favorite)">
+        <div class="nav-link cursor-pointer @GetActiveCategoryClass(MarketIdeasCategory.Favorite)" style="cursor: pointer;"
+             @onclick="() => SelectActiveCategory(MarketIdeasCategory.Favorite)">
             @(EnumViewModel<MarketIdeasCategory>.GetTranslation(MarketIdeasCategory.Favorite))
         </div>
     </div>
@@ -143,12 +145,17 @@
             </div>
         </div>
         <div class="list-page-filter w-25 bg-white p-2 ms-2 border-start">
-            <!-- radio фильтр с 3 категориями (статус идеи на бирже) -->
-            <!-- <RadioFilter /> -->
+            <RadioFilter T="EnumViewModel<IdeaMarketStatusType>"
+                         IsLoading="_isLoading"
+                         Label="Статус идеи"
+                         AllValues="_filterIdeaMarketStatus"
+                         @bind-Value="SelectedStatusType"
+                         OnFilterChanged="LoadMarketIdeasAsync" />
             <SkillFilter @bind-SeacrhSkillText="SeacrhSkillText"
                          @bind-SelectedSkillIds="SelectedSkillIds"
+                         IsLoading="_isLoading"
                          OnFilterChanged="LoadMarketIdeasAsync" />
-            <ResetFilterButton ResetMethod="ResetFilters" />
+            <ResetFilterButton IsLoading="_isLoading" ResetMethod="ResetFilters" />
         </div>
     </div>
 </div>
