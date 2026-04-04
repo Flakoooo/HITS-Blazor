@@ -8,7 +8,7 @@ namespace HITSBlazor.Components.Modals.RightSideModals.IdeaMarketModal
         private bool _isLoading = true;
         private RightSideModalCategory _activeInfoCategory = RightSideModalCategory.Info;
 
-        private IdeaMarket? CurrentIdeaMarket { get; set; } = null;
+        private IdeaMarket? _currentIdeaMarket;
 
         protected override async Task OnInitializedAsync()
         {

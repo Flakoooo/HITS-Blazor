@@ -1,12 +1,13 @@
-﻿@using HITSBlazor.Components.Button
+﻿@namespace HITSBlazor.Components.Modals.Components.RightSideModalInfo
+@using HITSBlazor.Components.Button
 @using HITSBlazor.Components.Typography
 @using HITSBlazor.Models.Common.Entities
 @using HITSBlazor.Models.Common.Enums
 @using HITSBlazor.Utils.EnumStyles
 @using HITSBlazor.Utils.Models
 
-<div class="team-modal-side rounded-3 w-25 bg-white">
-    <div class="p-2 rounded-top d-flex gap-2">
+<div class="right-side-modal-info w-25 @GetSideClass(!IsSplitted)">
+    <div class="p-2 rounded-top d-flex gap-2 rounded-3 bg-white">
         <Button ButtonClass="@($"w-50 {GetInfoCategoryClass(RightSideModalCategory.Info)}")" 
                 Text="@(EnumViewModel<RightSideModalCategory>.GetTranslation(RightSideModalCategory.Info))"
                 OnButtonClick="() => _activeInfoCategory = RightSideModalCategory.Info" />
@@ -14,185 +15,102 @@
                 Text="@(EnumViewModel<RightSideModalCategory>.GetTranslation(RightSideModalCategory.Skills))" 
                 OnButtonClick="() => _activeInfoCategory = RightSideModalCategory.Skills" />
     </div>
-    <div class="team-modal-info w-100 pb-3 px-3">
-        @if (_activeInfoCategory == RightSideModalCategory.Info)
+    <div class="@GetSideClass(IsSplitted)">
+        @if (IsSplitted)
         {
-            @foreach (var item in Items)
+            <div class="right-side-modal-info-header w-100 bg-primary rounded-top fs-5 text-white p-2">
+                @(EnumViewModel<RightSideModalCategory>.GetTranslation(_activeInfoCategory))
+            </div>            
+        }
+        <div class="right-side-modal-info-items w-100 pb-3 px-3 @(IsSplitted ? "pt-3" : string.Empty)">
+            @if (_activeInfoCategory == RightSideModalCategory.Info)
             {
-                <div class="w-100">
-                    <Typography FontSize="6" TextColor="TextColor.Secondary" CustomClass="border-bottom d-block">
-                        @item.Label
-                        @if (item.IsInline)
-                        {
-                            <Typography FontSize="6" TextColor="item.TextColor">
-                                @item.Text
-                            </Typography>
-                        }
-                    </Typography>
-                    @if (!item.IsInline)
-                    {
-                        <div class="team-modal-info-item pt-2">
-                            @if (!string.IsNullOrWhiteSpace(item.Icon))
-                            {
-                                <i class="bi @item.Icon text-secondary fs-3 opacity-25"></i>
-                            }
-                            @if (item.IsLinkable)
-                            {
-                                <div class="data-link" @onclick="() => item.LinkMethod?.Invoke()">
-                                    <Typography FontSize="6" TextColor="item.TextColor">
-                                        @item.Text
-                                    </Typography>
-                                </div>
-                            }
-                            else
+                @foreach (var item in Items)
+                {
+                    <div class="w-100">
+                        <Typography FontSize="6" TextColor="TextColor.Secondary" CustomClass="border-bottom d-block">
+                            @item.Label
+                            @if (item.IsInline)
                             {
                                 <Typography FontSize="6" TextColor="item.TextColor">
                                     @item.Text
                                 </Typography>
                             }
-                        </div>
+                        </Typography>
+                        @if (!item.IsInline)
+                        {
+                            <div class="right-side-modal-info-item pt-2">
+                                @if (!string.IsNullOrWhiteSpace(item.Icon))
+                                {
+                                    <i class="bi @item.Icon text-secondary fs-3 opacity-25"></i>
+                                }
+                                @if (item.IsLinkable)
+                                {
+                                    <div class="data-link" @onclick="() => item.LinkMethod?.Invoke()">
+                                        <Typography FontSize="6" TextColor="item.TextColor">
+                                            @item.Text
+                                        </Typography>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <Typography FontSize="6" TextColor="item.TextColor">
+                                        @item.Text
+                                    </Typography>
+                                }
+                            </div>
+                        }
+                    </div>
+                }
+                <Button Text="@SearhButtonTest"
+                        Variant="ButtonVariant.Primary" />
+            }
+            else if (_activeInfoCategory == RightSideModalCategory.Skills)
+            {
+                <div class="radar-charts">
+                    @foreach (var type in Enum.GetValues<SkillType>())
+                    {
+                        var teamSkills = Skills1.Where(s => s.Type == type).ToList();
+                        var teamWantedSkills = Skills2.Where(s => s.Type == type).ToList();
+                        var intersectSkills = teamWantedSkills.IntersectBy(teamSkills.Select(s => s.Id), ws => ws.Id).ToList();
+
+                        var allSkills = teamSkills
+                        .UnionBy(teamWantedSkills, s => s.Id)
+                        .OrderBy(s => s.Name)
+                        .ToList();
+
+                        if (allSkills?.Count > 0)
+                        {
+                            <ApexChart TItem="Skill"
+                                       Options="@GetRadarChartOptions()"
+                                       Width="250"
+                                       Height="275">
+                                <ApexPointSeries TItem="Skill"
+                                                 Items="allSkills"
+                                                 Name="Желаемые компетенции"
+                                                 SeriesType="SeriesType.Radar"
+                                                 XValue="@(s => s.Name)"
+                                                 YValue="@(s => teamWantedSkills.Contains(s) ? 1 : 0)"
+                                                 Color="@type.GetWantedColor()" />
+                                <ApexPointSeries TItem="Skill"
+                                                 Items="allSkills"
+                                                 Name="Фактические компетенции"
+                                                 SeriesType="SeriesType.Radar"
+                                                 XValue="@(s => s.Name)"
+                                                 YValue="@(s => teamSkills.Contains(s) ? 1 : 0)"
+                                                 Color="@type.GetColor()" />
+                                <ApexPointSeries TItem="Skill"
+                                                 Items="allSkills"
+                                                 Name="Пересечение"
+                                                 SeriesType="SeriesType.Radar"
+                                                 XValue="@(s => s.Name)"
+                                                 YValue="@(s => intersectSkills.Contains(s) ? 1 : 0)"
+                                                 Color="#bfbfbf" />
+                            </ApexChart>
+                        }
                     }
                 </div>
             }
-            <Button Text="@SearhButtonTest"
-                    Variant="ButtonVariant.Primary" />
-        }
-        else if (_activeInfoCategory == RightSideModalCategory.Skills)
-        {
-            <div class="radar-charts">
-                @foreach (var type in Enum.GetValues<SkillType>())
-                {
-                    var teamSkills = Skills1.Where(s => s.Type == type).ToList();
-                    var teamWantedSkills = Skills2.Where(s => s.Type == type).ToList();
-                    var intersectSkills = teamWantedSkills.IntersectBy(teamSkills.Select(s => s.Id), ws => ws.Id).ToList();
-
-                    var allSkills = teamSkills
-                    .UnionBy(teamWantedSkills, s => s.Id)
-                    .OrderBy(s => s.Name)
-                    .ToList();
-
-                    if (allSkills?.Count > 0)
-                    {
-                        <ApexChart TItem="Skill"
-                                   Options="@GetRadarChartOptions()"
-                                   Width="250"
-                                   Height="275">
-                            <ApexPointSeries TItem="Skill"
-                                             Items="allSkills"
-                                             Name="Желаемые компетенции"
-                                             SeriesType="SeriesType.Radar"
-                                             XValue="@(s => s.Name)"
-                                             YValue="@(s => teamWantedSkills.Contains(s) ? 1 : 0)"
-                                             Color="@type.GetWantedColor()" />
-                            <ApexPointSeries TItem="Skill"
-                                             Items="allSkills"
-                                             Name="Фактические компетенции"
-                                             SeriesType="SeriesType.Radar"
-                                             XValue="@(s => s.Name)"
-                                             YValue="@(s => teamSkills.Contains(s) ? 1 : 0)"
-                                             Color="@type.GetColor()" />
-                            <ApexPointSeries TItem="Skill"
-                                             Items="allSkills"
-                                             Name="Пересечение"
-                                             SeriesType="SeriesType.Radar"
-                                             XValue="@(s => s.Name)"
-                                             YValue="@(s => intersectSkills.Contains(s) ? 1 : 0)"
-                                             Color="#bfbfbf" />
-                        </ApexChart>
-                    }
-                }
-            </div>
-        }
+        </div>
     </div>
 </div>
-
-<style>
-    .team-modal-side {
-        height: fit-content;
-        display: flex;
-        flex-direction: column;
-        flex-wrap: nowrap;
-        align-items: stretch;
-        justify-content: flex-start;
-        gap: 16px;
-    }
-
-    .team-modal-info {
-        display: flex;
-        flex-direction: column;
-        flex-wrap: nowrap;
-        align-items: stretch;
-        justify-content: flex-start;
-        gap: 16px;
-    }
-
-    .team-modal-info-item {
-        display: flex;
-        flex-direction: row;
-        flex-wrap: nowrap;
-        align-items: center;
-        justify-content: flex-start;
-        gap: 8px;
-    }
-</style>
-
-@code {
-    [Parameter]
-    public List<RightSideModalInfoItem> Items { get; set; } = [];
-
-    [Parameter]
-    public List<Skill> Skills1 { get; set; } = [];
-
-    [Parameter]
-    public List<Skill> Skills2 { get; set; } = [];
-
-    [Parameter]
-    public string SearhButtonTest { get; set; } = string.Empty;
-
-    private RightSideModalCategory _activeInfoCategory = RightSideModalCategory.Info;
-
-    private string GetInfoCategoryClass(RightSideModalCategory category)
-            => _activeInfoCategory == category ? "btn-primary" : "btn-secondary";
-
-    private static ApexChartOptions<Skill> GetRadarChartOptions() => new()
-    {
-        Chart = new Chart
-        {
-            Type = ChartType.Radar,
-            Toolbar = new Toolbar { Show = false }
-        },
-        Yaxis =
-            [
-                new YAxis
-                {
-                    Min = 0,
-                    Max = 1,
-                    Labels = new YAxisLabels { Show = false },
-                    Show = false
-                }
-            ],
-        Xaxis = new XAxis
-        {
-            Labels = new XAxisLabels
-            {
-                Style = new AxisLabelStyle
-                {
-                    Colors = new List<string> { "#a8a8a8" },
-                    FontSize = "11px"
-                }
-            }
-        },
-        Stroke = new Stroke { Width = 2 },
-        Fill = new Fill
-        {
-            Opacity = 0.5,
-            Type = new List<FillType> { FillType.Solid }
-        },
-        Markers = new Markers { Size = 4 },
-        Legend = new Legend
-        {
-            Show = true,
-            Position = LegendPosition.Bottom
-        }
-    };
-}
