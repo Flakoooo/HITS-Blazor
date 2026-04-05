@@ -117,26 +117,13 @@
             <div class="bg-white rounded-3">
                 <div class="border-bottom px-3">
                     <ul class="nav nav-underline">
-                        <div @onclick="@(() => _activeTableCategory = TeamTableCategory.Members)"
-                             class="nav-link fw-normal pb-1 @GetTableCategoryClass(TeamTableCategory.Members)">
-                            Участники
-                        </div>
-                        <div @onclick="@(() => _activeTableCategory = TeamTableCategory.Invitations)"
-                             class="nav-link fw-normal pb-1 @GetTableCategoryClass(TeamTableCategory.Invitations)">
-                            Приглашения в команду
-                        </div>
-                        <div @onclick="@(() => _activeTableCategory = TeamTableCategory.RequestsToTeam)"
-                             class="nav-link fw-normal pb-1 @GetTableCategoryClass(TeamTableCategory.RequestsToTeam)">
-                            Заявки в команду
-                        </div>
-                        <div @onclick="@(() => _activeTableCategory = TeamTableCategory.RequestsTeamToIdeas)"
-                             class="nav-link fw-normal pb-1 @GetTableCategoryClass(TeamTableCategory.RequestsTeamToIdeas)">
-                            Заявки в идеи
-                        </div>
-                        <div @onclick="@(() => _activeTableCategory = TeamTableCategory.InvitationsTeamToIdeas)"
-                             class="nav-link fw-normal pb-1 @GetTableCategoryClass(TeamTableCategory.InvitationsTeamToIdeas)">
-                            Приглашения в идеи
-                        </div>
+                        @foreach (var category in Enum.GetValues<TeamTableCategory>())
+                        {
+                            <div @onclick="@(() => _activeTableCategory = category)" 
+                                 class="nav-link fw-normal pb-1 @GetTableCategoryClass(category)">
+                                @(EnumViewModel<TeamTableCategory>.GetTranslation(category))
+                            </div>
+                        }
                     </ul>
                 </div>
                 <div class="team-modal-tables">
@@ -332,6 +319,11 @@
                 </button>
             </div>
         </div>
-        <RightSideModalInfo Skills1="_currentTeam.Skills" Skills2="_currentTeam.WantedSkills" Items="_infoItems" SearhButtonTest="Поделиться командой" />
+        <RightSideModalInfo Skills1="_currentTeam.Skills" 
+                            Skills1Label="Желаемые компетенции"     
+                            Skills2="_currentTeam.WantedSkills" 
+                            Skills2Label="Фактические компетенции" 
+                            Items="_infoItems" 
+                            SearhButtonTest="Поделиться командой" />
     }
 </div>

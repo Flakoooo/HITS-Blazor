@@ -20,430 +20,373 @@
 
 <!-- TODO: Когда нужно будет добавлять что то в профиль, те же достижения, думаю сделать справа навигацию как выбор таблиц в модалке команд -->
 
-<div class="right-side-modal p-3 overflow-y-scroll" @onclick:stopPropagation="true">
-    <div class="w-100 @(_isLoading || Profile is null ? "user-placeholder" : string.Empty)">
-        @if (_isLoading || Profile is null)
-        {
-            <Placeholder Width="w-75" />
-            <div class="user-placeholder-content">
-                <div class="user-placeholder-left-side bg-white rounded p-3">
-                    <div class="w-100 d-flex justify-content-center">
-                        <div class="user-placeholder-avatar rounded-circle overflow-hidden">
-                            <Placeholder Height="PlaceholderHeight.Second" />
-                        </div>
-                    </div>
-                    <div class="w-100 d-flex gap-2">
-                        @for (int i = 0; i < 4; ++i)
-                        {
-                            <Placeholder Width="w-25" AdditionalClass="p-3" />
-                        }
-                    </div>
+<div class="right-side-modal flex-column p-3 overflow-y-scroll" @onclick:stopPropagation="true">
+    <RightSideModalHeader IsLoading="_isLoading" HeaderText="@($"{Profile?.FirstName} {Profile?.LastName}")" />
+    <div class="right-side-modal-content">
+        <div class="d-flex flex-column gap-3 w-75">
+            <div class="w-100 bg-white border p-3 rounded-3 d-flex flex-column gap-3" style="height: fit-content;">
+                <div class="d-flex justify-content-center w-100">
+                    <button class="position-relative p-0 rounded-circle">
+                        <img class="text-secondary" width="150" height="150" src="/images//defProfile.png" />
+                    </button>
                 </div>
-                <div class="user-placeholder-right-side">
-                    <div class="bg-white rounded p-3">
-                        <div class="user-placeholder-right-side-header border-bottom">
-                            <Placeholder Width="w-25 mb-1"/>
+                <div class="w-100 d-flex flex-wrap justify-content-center gap-1">
+                    @foreach (var role in Profile?.Roles ?? [])
+                    {
+                        <div class="w-auto">
+                            <div class="text-center rounded-pill px-2 py-1 @(_isCurrentUser && role == AuthService.CurrentUser?.Role ? "bg-primary text-light" : "bg-light border p-2")">
+                                @(EnumViewModel<RoleType>.GetTranslation(role))
+                            </div>
                         </div>
-                        <div class="user-placeholder-right-side-content">
-                            @for (int i = 0; i < 4; ++i)
-                            {
-                                <div class="w-75">
-                                    <Placeholder Width="w-50" />
-                                    <Placeholder Width="w-75" />
-                                </div>
-                            }
+                    }
+                </div>
+            </div>
+            <div class="w-100 bg-white border p-3 rounded-3">
+                <div class="user-info-header border-bottom pb-1">
+                    <Typography FontSize="5" TextColor="TextColor.Primary">
+                        Информация
+                    </Typography>
+                    @if (_isCurrentUser && _editingField != null)
+                    {
+                        <div class="d-flex justify-content-end gap-2">
+                            <Button BtnType="ButtonType.Button"
+                                    Variant="ButtonVariant.Success"
+                                    OnButtonClick="SaveEdit"
+                                    Text="Сохранить" />
+                            <Button BtnType="ButtonType.Button"
+                                    Variant="ButtonVariant.Danger"
+                                    OnButtonClick="CancelEdit"
+                                    Text="Отменить" />
                         </div>
-                    </div>
-                    <div class="bg-white rounded p-3">
-                        <div class="user-placeholder-right-side-header border-bottom">
-                            <Placeholder Width="w-25 m-2" />
-                            <Placeholder Width="w-25 m-2" />
-                        </div>
-                        <div class="user-placeholder-right-side-content p-2">
-                            @for (int i = 0; i < 3; ++i)
-                            {
-                                <Placeholder Width="w-50" Height="PlaceholderHeight.Medium" />
-                            }
-                        </div>
+                    }
+                </div>
+                <div class="user-info-content p-2">
+                    <UserInfoField Title="Почта"
+                                   Value="@Profile?.Email"
+                                   ValueChanged="@((value) => value = string.Empty)"
+                                   IsEditing="false"
+                                   IsCurrentUser="@_isCurrentUser"
+                                   OnEdit="@(() => ShowUpdateEmail())" />
+
+                    <UserInfoField Title="Имя"
+                                   Value="@_userDataForm?.FirstName"
+                                   ValueChanged="@((value) => _userDataForm?.FirstName = value)"
+                                   IsEditing="@(_editingField == nameof(_userDataForm.FirstName))"
+                                   IsCurrentUser="@_isCurrentUser"
+                                   OnEdit="@(() => StartEdit(nameof(_userDataForm.FirstName)))" />
+
+                    <UserInfoField Title="Фамилия"
+                                   Value="@_userDataForm?.LastName"
+                                   ValueChanged="@((value) => _userDataForm?.LastName = value)"
+                                   IsEditing="@(_editingField == nameof(_userDataForm.LastName))"
+                                   IsCurrentUser="@_isCurrentUser"
+                                   OnEdit="@(() => StartEdit(nameof(_userDataForm.LastName)))" />
+
+                    <UserInfoField Title="Группа"
+                                   Value="@_userDataForm?.StudyGroup"
+                                   ValueChanged="@((value) => _userDataForm?.StudyGroup = value)"
+                                   IsEditing="@(_editingField == nameof(_userDataForm.StudyGroup))"
+                                   IsCurrentUser="@_isCurrentUser"
+                                   OnEdit="@(() => StartEdit(nameof(_userDataForm.StudyGroup)))" />
+
+                    <UserInfoField Title="Телефон"
+                                   Value="@_userDataForm?.Telephone"
+                                   ValueChanged="@((value) => _userDataForm?.Telephone = value)"
+                                   IsEditing="@(_editingField == nameof(_userDataForm.Telephone))"
+                                   IsCurrentUser="@_isCurrentUser"
+                                   OnEdit="@(() => StartEdit(nameof(_userDataForm.Telephone)))" />
+
+                    <div class="d-flex gap-1">
+                        <Typography FontSize="6" TextColor="TextColor.Primary">
+                            Дата регистрации:
+                        </Typography>
+                        <Typography FontSize="6" TextColor="TextColor.Secondary">
+                            @(Profile?.CreatedAt is null ? "-" : Profile.CreatedAt.Value.ToString("dd.MM.yyyy"))
+                        </Typography>
                     </div>
                 </div>
             </div>
-        }
-        else
-        {
-            <RightSideModalHeader HeaderText="@($"{Profile.FirstName} {Profile.LastName}")" />
-            <div class="right-side-modal-content">
-                <div class="d-flex flex-column gap-3 w-75">
-                    <div class="w-100 bg-white border p-3 rounded-3 d-flex flex-column gap-3" style="height: fit-content;">
-                        <div class="d-flex justify-content-center w-100">
-                            <button class="position-relative p-0 rounded-circle">
-                                <img class="text-secondary" width="150" height="150" src="/images//defProfile.png" />
-                            </button>
-                        </div>
-                        <div class="w-100 d-flex flex-wrap justify-content-center gap-1">
-                            @foreach (var role in Profile.Roles)
-                            {
-                                <div class="w-auto">
-                                    <div class="text-center rounded-pill px-2 py-1 @(_isCurrentUser && role == AuthService.CurrentUser?.Role ? "bg-primary text-light" : "bg-light border p-2")">
-                                        @(EnumViewModel<RoleType>.GetTranslation(role))
-                                    </div>
-                                </div>
-                            }
-                        </div>
-                    </div>
-                    <div class="w-100 bg-white border p-3 rounded-3">
-                        <div class="user-info-header border-bottom pb-1">
-                            <Typography FontSize="5" TextColor="TextColor.Primary">
-                                Информация
-                            </Typography>
-                            @if (_isCurrentUser && _editingField != null)
-                            {
-                                <div class="d-flex justify-content-end gap-2">
-                                    <Button BtnType="ButtonType.Button" 
-                                            Variant="ButtonVariant.Success"
-                                            OnButtonClick="SaveEdit"
-                                            Text="Сохранить"/>
-                                    <Button BtnType="ButtonType.Button"
-                                            Variant="ButtonVariant.Danger"
-                                            OnButtonClick="CancelEdit"
-                                            Text="Отменить" />
-                                </div>                                
-                            }
-                        </div>
-                        <div class="user-info-content p-2">
-                            <UserInfoField 
-                                Title="Почта" 
-                                Value="@Profile?.Email"
-                                ValueChanged="@((value) => value = string.Empty)"
-                                IsEditing="false"
-                                IsCurrentUser="@_isCurrentUser"
-                                OnEdit="@(() => ShowUpdateEmail())" />
-
-                            <UserInfoField 
-                                Title="Имя" 
-                                Value="@_userDataForm?.FirstName"
-                                ValueChanged="@((value) => _userDataForm?.FirstName = value)"
-                                IsEditing="@(_editingField == nameof(_userDataForm.FirstName))"
-                                IsCurrentUser="@_isCurrentUser"
-                                OnEdit="@(() => StartEdit(nameof(_userDataForm.FirstName)))" />
-
-                            <UserInfoField 
-                                Title="Фамилия" 
-                                Value="@_userDataForm?.LastName"
-                                ValueChanged="@((value) => _userDataForm?.LastName = value)"
-                                IsEditing="@(_editingField == nameof(_userDataForm.LastName))"
-                                IsCurrentUser="@_isCurrentUser"
-                                OnEdit="@(() => StartEdit(nameof(_userDataForm.LastName)))" />
-
-                            <UserInfoField 
-                                Title="Группа" 
-                                Value="@_userDataForm?.StudyGroup"
-                                ValueChanged="@((value) => _userDataForm?.StudyGroup = value)"
-                                IsEditing="@(_editingField == nameof(_userDataForm.StudyGroup))"
-                                IsCurrentUser="@_isCurrentUser"
-                                OnEdit="@(() => StartEdit(nameof(_userDataForm.StudyGroup)))" />
-
-                            <UserInfoField 
-                                Title="Телефон" 
-                                Value="@_userDataForm?.Telephone"
-                                ValueChanged="@((value) => _userDataForm?.Telephone = value)"
-                                IsEditing="@(_editingField == nameof(_userDataForm.Telephone))"
-                                IsCurrentUser="@_isCurrentUser"
-                                OnEdit="@(() => StartEdit(nameof(_userDataForm.Telephone)))" />
-
-                            <div class="d-flex gap-1">
-                                <Typography FontSize="6" TextColor="TextColor.Primary">
-                                    Дата регистрации:
-                                </Typography>
-                                <Typography FontSize="6" TextColor="TextColor.Secondary">
-                                    @(Profile?.CreatedAt is null ? "-" : Profile.CreatedAt.Value.ToString("dd.MM.yyyy"))
-                                </Typography>
+        </div>
+        <div class="user-info mb-3">
+            <div class="w-100 bg-white border p-3 rounded-3">
+                <div class="user-info-header border-bottom pb-1">
+                    <Typography FontSize="5" TextColor="TextColor.Primary">
+                        Компетенции
+                    </Typography>
+                    @if (_isCurrentUser)
+                    {
+                        @if (_isChangeSkills)
+                        {
+                            <div class="d-flex gap-2">
+                                <Button BtnType="ButtonType.Button"
+                                        Variant="ButtonVariant.Primary"
+                                        Text="Сохранить"
+                                        OnButtonClick="UpdateUserSkills" />
+                                <Button BtnType="ButtonType.Button"
+                                        Variant="ButtonVariant.Danger"
+                                        Text="Отменить"
+                                        OnButtonClick="() => _isChangeSkills = !_isChangeSkills" />
                             </div>
-                        </div>
-                    </div>
+                        }
+                        else
+                        {
+                            <Button BtnType="ButtonType.Button"
+                                    Variant="ButtonVariant.Light"
+                                    Text="Изменить стек"
+                                    OnButtonClick="ChangeToUpdateSkills" />
+                        }
+                    }
                 </div>
-                <div class="user-info mb-3">
-                    <div class="w-100 bg-white border p-3 rounded-3">
-                        <div class="user-info-header border-bottom pb-1">
-                            <Typography FontSize="5" TextColor="TextColor.Primary">
-                                Компетенции
+                <div>
+                    @if (_isCurrentUser && _isChangeSkills)
+                    {
+                        @if (_isSkillsLoading)
+                        {
+                            <div class="mt-2 w-100 d-flex gap-3">
+                                @for (int p = 0; p < 4; ++p)
+                                {
+                                    <Placeholder Height="PlaceholderHeight.Small" />
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="mt-2 w-100 stack-categories">
+                                <SkillDropdown Placeholder="@(EnumViewModel<SkillType>.GetTranslation(SkillType.Language))"
+                                               AllSkills="LanguageSkills"
+                                               @bind-SelectedSkills="@SelectedLanguageSkills"
+                                               ValueMustCreated="(value) => CreateNewSkill(value, SkillType.Language)" />
+                                <SkillDropdown Placeholder="@(EnumViewModel<SkillType>.GetTranslation(SkillType.Framework))"
+                                               AllSkills="FrameworkSkills"
+                                               @bind-SelectedSkills="@SelectedFrameworkSkills"
+                                               ValueMustCreated="(value) => CreateNewSkill(value, SkillType.Framework)" />
+                                <SkillDropdown Placeholder="@(EnumViewModel<SkillType>.GetTranslation(SkillType.Database))"
+                                               AllSkills="DatabaseSkills"
+                                               @bind-SelectedSkills="@SelectedDatabaseSkills"
+                                               ValueMustCreated="(value) => CreateNewSkill(value, SkillType.Database)" />
+                                <SkillDropdown Placeholder="@(EnumViewModel<SkillType>.GetTranslation(SkillType.Devops))"
+                                               AllSkills="DevopsSkills"
+                                               @bind-SelectedSkills="@SelectedDevopsSkills"
+                                               ValueMustCreated="(value) => CreateNewSkill(value, SkillType.Devops)" />
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        @if (Profile?.Skills.Count == 0)
+                        {
+                            <Typography FontSize="6" TextColor="TextColor.Secondary" CustomClass="d-flex w-100 justify-content-center mt-3">
+                                Компетенции не выбраны
                             </Typography>
-                            @if (_isCurrentUser)
-                            {
-                                @if (_isChangeSkills)
+                        }
+                        else
+                        {
+                            <div class="radar-charts">
+                                @foreach (var type in Enum.GetValues<SkillType>())
                                 {
-                                    <div class="d-flex gap-2">
-                                        <Button BtnType="ButtonType.Button" 
-                                                Variant="ButtonVariant.Primary"
-                                                Text="Сохранить" 
-                                                OnButtonClick="UpdateUserSkills" />
-                                        <Button BtnType="ButtonType.Button" 
-                                                Variant="ButtonVariant.Danger"
-                                                Text="Отменить" 
-                                                OnButtonClick="() => _isChangeSkills = !_isChangeSkills" />
-                                    </div>
-                                }
-                                else
-                                {
-                                    <Button BtnType="ButtonType.Button"
-                                            Variant="ButtonVariant.Light"
-                                            Text="Изменить стек"
-                                            OnButtonClick="ChangeToUpdateSkills" />
-                                }
-                            }
-                        </div>
-                        <div>
-                            @if (_isCurrentUser && _isChangeSkills)
-                            {
-                                @if (_isSkillsLoading)
-                                {
-                                    <div class="mt-2 w-100 d-flex gap-3">
-                                        @for (int p = 0; p < 4; ++p)
-                                        {
-                                            <Placeholder Height="PlaceholderHeight.Small" />
-                                        }
-                                    </div>
-                                }
-                                else
-                                {
-                                    <div class="mt-2 w-100 stack-categories">
-                                        <SkillDropdown Placeholder="@(EnumViewModel<SkillType>.GetTranslation(SkillType.Language))"
-                                                       AllSkills="LanguageSkills"
-                                                       @bind-SelectedSkills="@SelectedLanguageSkills"
-                                                       ValueMustCreated="(value) => CreateNewSkill(value, SkillType.Language)" />
-                                        <SkillDropdown Placeholder="@(EnumViewModel<SkillType>.GetTranslation(SkillType.Framework))"
-                                                       AllSkills="FrameworkSkills"
-                                                       @bind-SelectedSkills="@SelectedFrameworkSkills"
-                                                       ValueMustCreated="(value) => CreateNewSkill(value, SkillType.Framework)" />
-                                        <SkillDropdown Placeholder="@(EnumViewModel<SkillType>.GetTranslation(SkillType.Database))"
-                                                       AllSkills="DatabaseSkills"
-                                                       @bind-SelectedSkills="@SelectedDatabaseSkills"
-                                                       ValueMustCreated="(value) => CreateNewSkill(value, SkillType.Database)" />
-                                        <SkillDropdown Placeholder="@(EnumViewModel<SkillType>.GetTranslation(SkillType.Devops))"
-                                                       AllSkills="DevopsSkills"
-                                                       @bind-SelectedSkills="@SelectedDevopsSkills"
-                                                       ValueMustCreated="(value) => CreateNewSkill(value, SkillType.Devops)" />
-                                    </div>
-                                }
-                            }
-                            else
-                            {
-                                @if (Profile?.Skills.Count == 0)
-                                {
-                                    <Typography FontSize="6" TextColor="TextColor.Secondary" CustomClass="d-flex w-100 justify-content-center mt-3">
-                                        Компетенции не выбраны
-                                    </Typography>
-                                }
-                                else
-                                {
-                                    <div class="radar-charts">
-                                        @foreach (var type in Enum.GetValues<SkillType>())
-                                        {
-                                            var userSkills = Profile?.Skills.Where(s => s.Type == type).ToList();
-                                            if (userSkills?.Count > 0)
-                                            {
-                                                <ApexChart TItem="Skill"
-                                                           Options="@GetRadarChartOptions()"
-                                                           Width="300"
-                                                           Height="200">
-                                                    <ApexPointSeries TItem="Skill"
-                                                                     Items="userSkills"
-                                                                     Name="Фактические компетенции"
-                                                                     SeriesType="SeriesType.Radar"
-                                                                     XValue="@(s => s.Name)"
-                                                                     YValue="@(s => 1)"
-                                                                     Color="@type.GetColor()" />
-                                                </ApexChart>
-                                            }
-                                        }
-                                    </div>
-                                }
-                            }
-                        </div>
-                    </div>
-                    <div class="w-100 bg-white border p-3 rounded-3">
-                        <div class="user-ideas-header border-bottom">
-                            <Typography FontSize="5" TextColor="TextColor.Primary">
-                                Идеи
-                            </Typography>
-                        </div>
-                        <div class="user-ideas-content @(ideasIsLoading ? "p-3" : "mt-3")">
-                            @if (ideasIsLoading)
-                            {
-                                @for (int i = 0; i < 3; ++i)
-                                {
-                                    <div class="w-100 p-2 d-flex flex-column border rounded">
-                                        <Placeholder Width="w-75" />
-                                        <Placeholder Width="w-50" />
-                                    </div>                                    
-                                }
-                            }
-                            else
-                            {
-                                @if (Profile?.Ideas.Count == 0)
-                                {
-                                    <Typography FontSize="6" TextColor="TextColor.Secondary">
-                                        Идей пока нет
-                                    </Typography>
-                                }
-                                else
-                                {
-                                    @foreach (var idea in Profile?.Ideas ?? [])
+                                    var userSkills = Profile?.Skills.Where(s => s.Type == type).ToList();
+                                    if (userSkills?.Count > 0)
                                     {
-                                        <div class="user-ideas-idea w-100 p-2 bg-white border rounded">
-                                            <Collapse ExpandedClass="w-100" StartCollapsed="true">
-                                                <MainContent Context="collapse">
-                                                    <div class="w-100 d-flex justify-content-between align-items-center gap-3">
-                                                        <div class="w-100 d-flex gap-2 align-items-center justify-content-between">
-                                                            <div @onclick="@(() => ShowIdea(idea.Id))" class="user-ideas-idea-link data-link fs-6 w-100">
-                                                                @idea.Name
-                                                            </div>
-                                                            <div class="px-2 py-1 rounded-4 fs-6 text-center @(EnumViewModel<IdeaStatusType>.GetStyle(idea.Status))">
-                                                                @(EnumViewModel<IdeaStatusType>.GetTranslation(idea.Status))
-                                                            </div>
-                                                        </div>
-                                                        <div @onclick="@(() => collapse.Toggle())" class="d-flex align-items-center gap-1" style="cursor: pointer;">
-                                                            <Typography FontSize="6" TextColor="TextColor.Primary">
-                                                                Описание
-                                                            </Typography>
-                                                            <i class="bi bi-caret-down text-primary"></i>
-                                                        </div>
-                                                    </div>
-                                                </MainContent>
-                                                <ExpandedContent>
-                                                    <div class="list-group">
-                                                        <Typography FontSize="6" TextColor="TextColor.Secondary" CustomClass="w-100 mt-1 border-top">
-                                                            @idea.Description
-                                                        </Typography>
-                                                    </div>
-                                                </ExpandedContent>
-                                            </Collapse>
-                                        </div>
+                                        <ApexChart TItem="Skill"
+                                                   Options="@GetRadarChartOptions()"
+                                                   Width="300"
+                                                   Height="200">
+                                            <ApexPointSeries TItem="Skill"
+                                                             Items="userSkills"
+                                                             Name="Фактические компетенции"
+                                                             SeriesType="SeriesType.Radar"
+                                                             XValue="@(s => s.Name)"
+                                                             YValue="@(s => 1)"
+                                                             Color="@type.GetColor()" />
+                                        </ApexChart>
                                     }
                                 }
-                            }
-                        </div>
-                    </div>
-                    <div class="w-100 bg-white border p-3 rounded-3">
-                        <div class="user-ideas-header border-bottom mb-2">
-                            <Typography FontSize="5" TextColor="TextColor.Primary">
-                                Портфолио
+                            </div>
+                        }
+                    }
+                </div>
+            </div>
+            <div class="w-100 bg-white border p-3 rounded-3">
+                <div class="user-ideas-header border-bottom">
+                    <Typography FontSize="5" TextColor="TextColor.Primary">
+                        Идеи
+                    </Typography>
+                </div>
+                <div class="user-ideas-content @(ideasIsLoading ? "p-3" : "mt-3")">
+                    @if (ideasIsLoading)
+                    {
+                        @for (int i = 0; i < 3; ++i)
+                        {
+                            <div class="w-100 p-2 d-flex flex-column border rounded">
+                                <Placeholder Width="w-75" />
+                                <Placeholder Width="w-50" />
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        @if (Profile?.Ideas.Count == 0)
+                        {
+                            <Typography FontSize="6" TextColor="TextColor.Secondary">
+                                Идей пока нет
                             </Typography>
-                        </div>
-                        <div class="w-100 bg-white">
-                            <div class="py-2 d-flex justify-content-between">
-                                <div class="w-50">
-                                    <div class="w-100">
-                                        <div class="input-group">
-                                            <Typography FontSize="6" CustomClass="input-group-text">
-                                                <i class="bi bi-search"></i>
-                                            </Typography>
-                                            <input type="text" placeholder="Поиск" class="form-control rounded-end" />
-                                        </div>
-                                    </div>
+                        }
+                        else
+                        {
+                            @foreach (var idea in Profile?.Ideas ?? [])
+                            {
+                                <div class="user-ideas-idea w-100 p-2 bg-white border rounded">
+                                    <Collapse ExpandedClass="w-100" StartCollapsed="true">
+                                        <MainContent Context="collapse">
+                                            <div class="w-100 d-flex justify-content-between align-items-center gap-3">
+                                                <div class="w-100 d-flex gap-2 align-items-center justify-content-between">
+                                                    <div @onclick="@(() => ShowIdea(idea.Id))" class="user-ideas-idea-link data-link fs-6 w-100">
+                                                        @idea.Name
+                                                    </div>
+                                                    <div class="px-2 py-1 rounded-4 fs-6 text-center @(EnumViewModel<IdeaStatusType>.GetStyle(idea.Status))">
+                                                        @(EnumViewModel<IdeaStatusType>.GetTranslation(idea.Status))
+                                                    </div>
+                                                </div>
+                                                <div @onclick="@(() => collapse.Toggle())" class="d-flex align-items-center gap-1" style="cursor: pointer;">
+                                                    <Typography FontSize="6" TextColor="TextColor.Primary">
+                                                        Описание
+                                                    </Typography>
+                                                    <i class="bi bi-caret-down text-primary"></i>
+                                                </div>
+                                            </div>
+                                        </MainContent>
+                                        <ExpandedContent>
+                                            <div class="list-group">
+                                                <Typography FontSize="6" TextColor="TextColor.Secondary" CustomClass="w-100 mt-1 border-top">
+                                                    @idea.Description
+                                                </Typography>
+                                            </div>
+                                        </ExpandedContent>
+                                    </Collapse>
+                                </div>
+                            }
+                        }
+                    }
+                </div>
+            </div>
+            <div class="w-100 bg-white border p-3 rounded-3">
+                <div class="user-ideas-header border-bottom mb-2">
+                    <Typography FontSize="5" TextColor="TextColor.Primary">
+                        Портфолио
+                    </Typography>
+                </div>
+                <div class="w-100 bg-white">
+                    <div class="py-2 d-flex justify-content-between">
+                        <div class="w-50">
+                            <div class="w-100">
+                                <div class="input-group">
+                                    <Typography FontSize="6" CustomClass="input-group-text">
+                                        <i class="bi bi-search"></i>
+                                    </Typography>
+                                    <input type="text" placeholder="Поиск" class="form-control rounded-end" />
                                 </div>
                             </div>
-                            <div class="w-100 d-flex">
-                                <div class="w-100">
-                                    <table class="table table-hover mb-0">
-                                        <TableHeader TableActionMenuIsEnable="true" Items="HeaderItems" />
-                                        <tbody>
-                                            @foreach (var teamExp in Profile?.Teams ?? [])
-                                            {
-                                                <tr>
-                                                    <TableBodyRow>
-                                                        <div @onclick="@(() => ShowTeam(teamExp.TeamId))" class="data-link">
-                                                            <div>@teamExp.TeamName</div>
-                                                        </div>
-                                                    </TableBodyRow>
-                                                    <TableBodyRow IsCentered="true">
-                                                        <div>@teamExp.StartDate.ToString("dd.MM.yyyy")</div>
-                                                    </TableBodyRow>
-                                                    <TableBodyRow IsCentered="true">
-                                                        <div class="@(teamExp.FinishDate is null ? "text-primary" : string.Empty)">
-                                                            <div>@(teamExp.FinishDate is null ? "В команде" : teamExp.FinishDate.Value.ToString("dd.MM.yyyy"))</div>
-                                                        </div>
-                                                    </TableBodyRow>
-                                                    <TableBodyRow IsCentered="true">
-                                                        @if (teamExp.HasActiveProject)
-                                                        {
-                                                            <div class="px-2 py-1 rounded-4 bg-warning-subtle text-warning">
-                                                                <div>В работе</div>
-                                                            </div>
-                                                        }
-                                                        else
-                                                        {
-                                                            <div class="px-2 py-1 rounded-4 bg-primary-subtle text-primary">
-                                                                <div>В поисках</div>
-                                                            </div>
-                                                        }
-                                                    </TableBodyRow>
-                                                    <TableActionMenu ItemId="@teamExp.TeamId"
-                                                                     StrategyPosition="Strategy.Fixed"
-                                                                     OnAction="OnTeamAction"
-                                                                     ActionIds="@(new Dictionary<MenuAction, object> { [MenuAction.View] = teamExp.TeamId })" />
-                                                </tr>
-                                            }
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
                         </div>
                     </div>
-                    <div class="w-100 bg-white border p-3 rounded-3">
-                        <div class="user-test-header border-bottom">
-                            <Typography FontSize="5" TextColor="TextColor.Primary">
-                                Результаты тестирований
-                            </Typography>
-                        </div>
-                        <div class="user-tests-content mt-3">
-                            <Typography FontSize="6" CustomClass="text-decoration-underline">
-                                Тест Белбина:
-                            </Typography>
-                            @if (BelbinTestResult is null)
-                            {   
-                                <Typography FontSize="6" TextColor="TextColor.Secondary">
-                                    Вы не прошли тест
-                                </Typography>
-                            }
-                            else
-                            {
-                                <p>@((MarkupString)BelbinTestResult.TestResultValue.Replace("\n", "<br>"))</p>
-                            }
-                        </div>
-                        <div class="user-tests-content mt-3">
-                            <Typography FontSize="6" CustomClass="text-decoration-underline">
-                                Айзенка личностный опросник:
-                            </Typography>
-                            @if (TemperTestResult is null)
-                            {
-                                <Typography FontSize="6" TextColor="TextColor.Secondary">
-                                    Вы не прошли тест
-                                </Typography>
-                            }
-                            else
-                            {
-                                <p>@((MarkupString)TemperTestResult.TestResultValue.Replace("\n", "<br>"))</p>
-                            }
-                        </div>
-                        <div class="user-tests-content mt-3">
-                            <Typography FontSize="6" CustomClass="text-decoration-underline">
-                                Опросник «Стиль мышления»:
-                            </Typography>
-                            @if (MindTestResult is null)
-                            {
-                                <Typography FontSize="6" TextColor="TextColor.Secondary">
-                                    Вы не прошли тест
-                                </Typography>
-                            }
-                            else
-                            {
-                                <p>@((MarkupString)MindTestResult.TestResultValue.Replace("\n", "<br>"))</p>
-                            }
+                    <div class="w-100 d-flex">
+                        <div class="w-100">
+                            <table class="table table-hover mb-0">
+                                <TableHeader TableActionMenuIsEnable="true" Items="HeaderItems" />
+                                <tbody>
+                                    @foreach (var teamExp in Profile?.Teams ?? [])
+                                    {
+                                        <tr>
+                                            <TableBodyRow>
+                                                <div @onclick="@(() => ShowTeam(teamExp.TeamId))" class="data-link">
+                                                    <div>@teamExp.TeamName</div>
+                                                </div>
+                                            </TableBodyRow>
+                                            <TableBodyRow IsCentered="true">
+                                                <div>@teamExp.StartDate.ToString("dd.MM.yyyy")</div>
+                                            </TableBodyRow>
+                                            <TableBodyRow IsCentered="true">
+                                                <div class="@(teamExp.FinishDate is null ? "text-primary" : string.Empty)">
+                                                    <div>@(teamExp.FinishDate is null ? "В команде" : teamExp.FinishDate.Value.ToString("dd.MM.yyyy"))</div>
+                                                </div>
+                                            </TableBodyRow>
+                                            <TableBodyRow IsCentered="true">
+                                                @if (teamExp.HasActiveProject)
+                                                {
+                                                    <div class="px-2 py-1 rounded-4 bg-warning-subtle text-warning">
+                                                        <div>В работе</div>
+                                                    </div>
+                                                }
+                                                else
+                                                {
+                                                    <div class="px-2 py-1 rounded-4 bg-primary-subtle text-primary">
+                                                        <div>В поисках</div>
+                                                    </div>
+                                                }
+                                            </TableBodyRow>
+                                            <TableActionMenu ItemId="@teamExp.TeamId"
+                                                             StrategyPosition="Strategy.Fixed"
+                                                             OnAction="OnTeamAction"
+                                                             ActionIds="@(new Dictionary<MenuAction, object> { [MenuAction.View] = teamExp.TeamId })" />
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
             </div>
-        }
+            <div class="w-100 bg-white border p-3 rounded-3">
+                <div class="user-test-header border-bottom">
+                    <Typography FontSize="5" TextColor="TextColor.Primary">
+                        Результаты тестирований
+                    </Typography>
+                </div>
+                <div class="user-tests-content mt-3">
+                    <Typography FontSize="6" CustomClass="text-decoration-underline">
+                        Тест Белбина:
+                    </Typography>
+                    @if (BelbinTestResult is null)
+                    {
+                        <Typography FontSize="6" TextColor="TextColor.Secondary">
+                            Вы не прошли тест
+                        </Typography>
+                    }
+                    else
+                    {
+                        <p>@((MarkupString)BelbinTestResult.TestResultValue.Replace("\n", "<br>"))</p>
+                    }
+                </div>
+                <div class="user-tests-content mt-3">
+                    <Typography FontSize="6" CustomClass="text-decoration-underline">
+                        Айзенка личностный опросник:
+                    </Typography>
+                    @if (TemperTestResult is null)
+                    {
+                        <Typography FontSize="6" TextColor="TextColor.Secondary">
+                            Вы не прошли тест
+                        </Typography>
+                    }
+                    else
+                    {
+                        <p>@((MarkupString)TemperTestResult.TestResultValue.Replace("\n", "<br>"))</p>
+                    }
+                </div>
+                <div class="user-tests-content mt-3">
+                    <Typography FontSize="6" CustomClass="text-decoration-underline">
+                        Опросник «Стиль мышления»:
+                    </Typography>
+                    @if (MindTestResult is null)
+                    {
+                        <Typography FontSize="6" TextColor="TextColor.Secondary">
+                            Вы не прошли тест
+                        </Typography>
+                    }
+                    else
+                    {
+                        <p>@((MarkupString)MindTestResult.TestResultValue.Replace("\n", "<br>"))</p>
+                    }
+                </div>
+            </div>
+        </div>
     </div>
 </div>

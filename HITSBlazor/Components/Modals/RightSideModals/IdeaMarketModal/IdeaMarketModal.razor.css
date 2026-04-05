@@ -26,44 +26,7 @@
     gap: 16px;
 }
 
-.right-side {
-    display: flex;
-    flex-direction: column;
-    flex-wrap: nowrap;
-    align-items: flex-start;
-    justify-content: flex-start;
-    gap: 16px;
-}
-
-.right-side-header {
-    display: flex;
-    flex-wrap: nowrap;
-    align-items: flex-start;
-    gap: 8px;
-}
-
-.exchange-header {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: nowrap;
-    align-items: center;
-    justify-content: center;
-}
-
-.exchange-info {
-    display: flex;
-    flex-direction: column;
-    flex-wrap: nowrap;
-    align-items: stretch;
-    justify-content: flex-start;
-    gap: 16px;
-}
-
-.exchange-info-user {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: nowrap;
-    align-items: center;
-    justify-content: flex-start;
-    gap: 8px;
+.idea-market-tables {
+    max-height: 430px;
+    overflow-y: scroll;
 }

@@ -8,24 +8,6 @@
     gap: 16px;
 }
 
-.team-modal-info {
-    display: flex;
-    flex-direction: column;
-    flex-wrap: nowrap;
-    align-items: stretch;
-    justify-content: flex-start;
-    gap: 16px;
-}
-
-.team-modal-info-item {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: nowrap;
-    align-items: center;
-    justify-content: flex-start;
-    gap: 8px;
-}
-
 .team-modal-tables {
     max-height: 430px;
     overflow-y: auto;

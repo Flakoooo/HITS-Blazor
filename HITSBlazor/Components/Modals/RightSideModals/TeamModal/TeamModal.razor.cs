@@ -94,19 +94,18 @@ namespace HITSBlazor.Components.Modals.RightSideModals.TeamModal
             _teamInvitations = await TeamService.GetTeamInvitationsAsync(TeamId);
             _requestsToTeam = await TeamService.GetTeamRequestsToTeamAsync(TeamId);
             _requestsTeamToIdeas = await TeamService.GetRequestsTeamToIdeasAsync(TeamId);
-            _requestsTeamToIdeas = [.. _requestsTeamToIdeas, .. _requestsTeamToIdeas, .. _requestsTeamToIdeas];
             _invitationsTeamToIdeas = await TeamService.GetInvitationsTeamToIdeasAsync(TeamId);
 
             var ownerInfoItem = _infoItems[0];
             ownerInfoItem.Text = _currentTeam.Owner.FullName;
-            ownerInfoItem.LinkMethod = (() => ModalService.ShowProfileModal(_currentTeam.Owner.UserId));
+            ownerInfoItem.LinkMethod = () => ModalService.ShowProfileModal(_currentTeam.Owner.UserId);
 
             var leaderInfoItem = _infoItems[1];
             leaderInfoItem.Text = _currentTeam.Leader?.FullName ?? "-";
             if (_currentTeam.Leader is not null)
             {
                 leaderInfoItem.IsLinkable = true;
-                leaderInfoItem.LinkMethod = (() => ModalService.ShowProfileModal(_currentTeam.Leader.UserId));
+                leaderInfoItem.LinkMethod = () => ModalService.ShowProfileModal(_currentTeam.Leader.UserId);
             }
 
             _infoItems[2].Text = _currentTeam.CreatedAt.ToString("dd.MM.yyyy");
@@ -151,10 +150,6 @@ namespace HITSBlazor.Components.Modals.RightSideModals.TeamModal
 
                 }
             }
-        }
-
-        internal class ShowTeamModal
-        {
         }
     }
 }

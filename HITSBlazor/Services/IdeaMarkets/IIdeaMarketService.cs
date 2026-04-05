@@ -14,5 +14,7 @@ namespace HITSBlazor.Services.IdeaMarkets
             string? searchText = null,
             IdeaMarketStatusType? selectedStatus = null
         );
+
+        Task<IdeaMarket?> GetIdeaMarketAsync(Guid guid);
     }
 }

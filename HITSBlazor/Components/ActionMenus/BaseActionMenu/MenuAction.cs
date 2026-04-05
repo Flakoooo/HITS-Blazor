@@ -33,6 +33,10 @@ namespace HITSBlazor.Components.ActionMenus.BaseActionMenu
         [Style("")]
         Confirm,
 
+        [Description("Профиль команды")]
+        [Style("")]
+        ViewTeamProfile,
+
         //=== text-success стили ===
         [Description("Принять")]
         [Style("text-success")]

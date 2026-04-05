@@ -33,14 +33,13 @@
         }
     </div>
     <div class="nav nav-underline mb-3 w-100 d-flex justify-content-center">
-        <div class="nav-link @GetActiveCategoryClass(MarketIdeasCategory.All)" style="cursor: pointer;"
-             @onclick="() => SelectActiveCategory(MarketIdeasCategory.All)">
-            @(EnumViewModel<MarketIdeasCategory>.GetTranslation(MarketIdeasCategory.All))
-        </div>
-        <div class="nav-link cursor-pointer @GetActiveCategoryClass(MarketIdeasCategory.Favorite)" style="cursor: pointer;"
-             @onclick="() => SelectActiveCategory(MarketIdeasCategory.Favorite)">
-            @(EnumViewModel<MarketIdeasCategory>.GetTranslation(MarketIdeasCategory.Favorite))
-        </div>
+        @foreach (var category in Enum.GetValues<MarketIdeasCategory>())
+        {
+            <div @onclick="@(() => SelectActiveCategory(category))" style="cursor: pointer;"
+                 class="nav-link @GetActiveCategoryClass(category)">
+                @(EnumViewModel<MarketIdeasCategory>.GetTranslation(category))
+            </div>
+        }
     </div>
     <div class="d-flex justify-content-between align-items-center mb-3 w-100">
         <div class="w-50">
@@ -90,7 +89,7 @@
                                             <Typography FontSize="5" TextColor="TextColor.Dark" CustomClass="me-1">
                                                 #@ideaMarket.Position
                                             </Typography>
-                                            <Typography FontSize="5" CustomClass="fw-semibold cursor-pointer">
+                                            <Typography FontSize="5" TextColor="TextColor.Primary" CustomClass="fw-semibold" OnClick="() => ShowIdeaMarketModal(ideaMarket.Id)">
                                                 @ideaMarket.Name
                                             </Typography>
                                         </div>

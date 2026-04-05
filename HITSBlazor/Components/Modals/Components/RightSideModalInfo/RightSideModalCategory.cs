@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
 
-namespace HITSBlazor.Components.Modals.Components
+namespace HITSBlazor.Components.Modals.Components.RightSideModalInfo
 {
     public enum RightSideModalCategory
     {

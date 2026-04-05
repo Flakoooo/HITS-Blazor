@@ -2,7 +2,7 @@
 @using HITSBlazor.Utils
 @using HITSBlazor.Utils.Models
 
-<span class="@GetClass()">@ChildContent</span>
+<span class="@GetClass()" @onclick="OnClickHandler">@ChildContent</span>
 
 @code {
     [Parameter]
@@ -17,6 +17,11 @@
     [Parameter]
     public string CustomClass { get; set; } = string.Empty;
 
+    [Parameter]
+    public EventCallback<MouseEventArgs> OnClick { get; set; }
+
+    private async Task OnClickHandler(MouseEventArgs args) => await OnClick.InvokeAsync(args);
+
     private string GetClass()
     {
         var classes = new List<string>();
@@ -29,6 +34,9 @@
 
         if (!string.IsNullOrWhiteSpace(CustomClass))
             classes.Add(CustomClass);
+
+        if (OnClick.HasDelegate)
+            classes.Add("data-link");
 
         return string.Join(" ", classes);
     }

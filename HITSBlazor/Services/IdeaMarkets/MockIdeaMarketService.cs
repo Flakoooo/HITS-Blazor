@@ -45,5 +45,8 @@ namespace HITSBlazor.Services.IdeaMarkets
 
             return [.. query];
         }
+
+        public async Task<IdeaMarket?> GetIdeaMarketAsync(Guid guid) 
+            => MockIdeaMarkets.GetIdeaMarketById(guid);
     }
 }

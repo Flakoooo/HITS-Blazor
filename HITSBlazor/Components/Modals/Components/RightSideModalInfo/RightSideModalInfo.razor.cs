@@ -16,7 +16,13 @@ namespace HITSBlazor.Components.Modals.Components.RightSideModalInfo
         public List<Skill> Skills1 { get; set; } = [];
 
         [Parameter]
+        public string Skills1Label { get; set; } = string.Empty;
+
+        [Parameter]
         public List<Skill> Skills2 { get; set; } = [];
+
+        [Parameter]
+        public string Skills2Label { get; set; } = string.Empty;
 
         [Parameter]
         public string SearhButtonTest { get; set; } = string.Empty;

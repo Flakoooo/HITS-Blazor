@@ -1,4 +1,5 @@
 ﻿using HITSBlazor.Components.Button;
+using HITSBlazor.Components.Modals.RightSideModals.IdeaMarketModal;
 using HITSBlazor.Components.Typography;
 using HITSBlazor.Models.Markets.Entities;
 using HITSBlazor.Models.Markets.Enums;
@@ -100,6 +101,14 @@ namespace HITSBlazor.Pages.Markets.MarketIdeas
                 confirmButtonText: "Завершить биржу"
             );
         }
+
+        private void ShowIdeaMarketModal(Guid ideaMarketId) => ModalService.Show<IdeaMarketModal>(
+            ModalType.RightSide,
+            parameters: new Dictionary<string, object>
+            {
+                [nameof(IdeaMarketModal.IdeaMarketId)] = ideaMarketId
+            }
+        );
 
         private async Task ResetFilters()
         {

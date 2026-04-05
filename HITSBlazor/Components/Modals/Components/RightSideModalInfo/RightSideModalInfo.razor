@@ -46,11 +46,9 @@
                                 }
                                 @if (item.IsLinkable)
                                 {
-                                    <div class="data-link" @onclick="() => item.LinkMethod?.Invoke()">
-                                        <Typography FontSize="6" TextColor="item.TextColor">
-                                            @item.Text
-                                        </Typography>
-                                    </div>
+                                    <Typography FontSize="6" TextColor="item.TextColor" OnClick="() => item.LinkMethod?.Invoke()">
+                                        @item.Text
+                                    </Typography>
                                 }
                                 else
                                 {
@@ -87,14 +85,14 @@
                                        Height="275">
                                 <ApexPointSeries TItem="Skill"
                                                  Items="allSkills"
-                                                 Name="Желаемые компетенции"
+                                                 Name="@Skills1Label"
                                                  SeriesType="SeriesType.Radar"
                                                  XValue="@(s => s.Name)"
                                                  YValue="@(s => teamWantedSkills.Contains(s) ? 1 : 0)"
                                                  Color="@type.GetWantedColor()" />
                                 <ApexPointSeries TItem="Skill"
                                                  Items="allSkills"
-                                                 Name="Фактические компетенции"
+                                                 Name="@Skills2Label"
                                                  SeriesType="SeriesType.Radar"
                                                  XValue="@(s => s.Name)"
                                                  YValue="@(s => teamSkills.Contains(s) ? 1 : 0)"
