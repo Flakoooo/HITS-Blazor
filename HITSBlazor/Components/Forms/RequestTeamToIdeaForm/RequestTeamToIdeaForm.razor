@@ -28,8 +28,8 @@ else
             @foreach (var team in _teams)
             {
                 <div class="team-request-collapse w-100">
-                    <div class="border rounded-3 py-1 px-2 overflow-hidden w-100">
-                        <Collapse StartCollapsed="false">
+                    <div class="border rounded-3 py-1 px-2 w-100">
+                        <Collapse>
                             <MainContent Context="collapse">
                                 <div class="team-request-collapse-button">
                                     <Button Variant="ButtonVariant.Link" 
@@ -49,7 +49,6 @@ else
                                     }
                                     else
                                     {
-                                        <!-- TODO: если команда уже подала заявку в эту идею, вызывать подтверждающее модальное окно -->
                                         <Button Variant="ButtonVariant.Danger" 
                                                 Text="Отозвать заявку" />
                                     }

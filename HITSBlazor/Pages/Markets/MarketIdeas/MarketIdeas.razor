@@ -137,7 +137,9 @@
                                             </Typography>
                                         </div>
                                     </div>
-                                    @if (AuthService.CurrentUser?.Role is RoleType.TeamOwner or RoleType.TeamLeader or RoleType.Admin)
+                                    @if (ideaMarket.Status is IdeaMarketStatusType.RecruitmentIsOpen 
+                                        && AuthService.CurrentUser?.Role is RoleType.TeamOwner or RoleType.TeamLeader or RoleType.Admin
+                                    )
                                     {
                                         <Button Variant="ButtonVariant.Primary"
                                                 ButtonClass="btn-sm w-25"

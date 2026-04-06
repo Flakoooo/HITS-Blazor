@@ -191,6 +191,9 @@ namespace HITSBlazor.Utils.Mocks.Markets
         public static List<IdeaMarket> GetIdeaMarketsByMarketId(Guid marketId) 
             => [.. _ideaMarkets.Where(im => im.MarketId == marketId)];
 
+        public static List<IdeaMarket> GetIdeaMarketsByMarketIdAndInitiatorId(Guid marketId, Guid initiatorId)
+            => [.. _ideaMarkets.Where(im => im.MarketId == marketId && im.Initiator.Id == initiatorId)];
+
         public static IdeaMarket? GetIdeaMarketById(Guid id) =>
             _ideaMarkets.FirstOrDefault(im => im.Id == id);
     }

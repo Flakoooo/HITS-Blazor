@@ -1,6 +1,7 @@
 ﻿using HITSBlazor.Models.Markets.Entities;
 using HITSBlazor.Models.Markets.Enums;
 using HITSBlazor.Models.Teams.Entities;
+using HITSBlazor.Models.Users.Enums;
 using HITSBlazor.Services.Auth;
 using HITSBlazor.Utils.Mocks.Markets;
 using HITSBlazor.Utils.Mocks.Teams;
@@ -16,7 +17,8 @@ namespace HITSBlazor.Services.IdeaMarkets
         public event Func<Task>? OnIdeasMarketStateChanged;
         public event Action? OnIdeasMarketStateUpdated;
 
-        private Dictionary<Guid, CacheEntry<List<IdeaMarket>>> _cache = [];
+        //private Dictionary<Guid, CacheEntry<List<IdeaMarket>>> _cache = [];
+        private Dictionary<Guid, Dictionary<bool, CacheEntry<List<IdeaMarket>>>> _cache = [];
         private readonly TimeSpan _cacheLifetime = TimeSpan.FromMinutes(5);
 
         public async Task<List<IdeaMarket>> GetIdeasMarketAsync(
@@ -26,19 +28,35 @@ namespace HITSBlazor.Services.IdeaMarkets
             IdeaMarketStatusType? selectedStatus
         )
         {
-            List<IdeaMarket> ideaMarkets;
+            List<IdeaMarket> ideaMarkets = [];
 
-            if (_cache.TryGetValue(marketId, out var cache) && !cache.IsExpired(_cacheLifetime))
+            if (_authService.CurrentUser is not null)
             {
-                ideaMarkets = cache.Data;
-            }
-            else
-            {
-                ideaMarkets = MockIdeaMarkets.GetIdeaMarketsByMarketId(marketId);
-                _cache[marketId] = new CacheEntry<List<IdeaMarket>>(ideaMarkets);
+                if (_cache.TryGetValue(marketId, out var marketCache)
+                    && marketCache.TryGetValue(_authService.CurrentUser.Role is RoleType.Initiator, out var cache)
+                    && !cache.IsExpired(_cacheLifetime)
+                )
+                {
+                    ideaMarkets = cache.Data;
+                }
+                else
+                {
+                    var isInitiator = _authService.CurrentUser.Role is RoleType.Initiator;
+                    if (isInitiator)
+                        ideaMarkets = MockIdeaMarkets.GetIdeaMarketsByMarketIdAndInitiatorId(marketId, _authService.CurrentUser.Id);
+                    else
+                        ideaMarkets = MockIdeaMarkets.GetIdeaMarketsByMarketId(marketId);
+
+                    _cache[marketId] = new Dictionary<bool, CacheEntry<List<IdeaMarket>>>
+                    {
+                        [isInitiator] = new CacheEntry<List<IdeaMarket>>(ideaMarkets)
+                    };
+                }
             }
 
             var query = ideaMarkets.AsEnumerable();
+
+            if (!query.Any()) return [];
 
             if (favorite.HasValue)
                 query = query.Where(im => im.IsFavorite == favorite.Value);

@@ -193,7 +193,7 @@
                 }
             </div>
         }
-        @if (AuthService.CurrentUser?.Role is RoleType.TeamOwner or RoleType.TeamLeader)
+        @if (_currentIdeaMarket is not null && AuthService.CurrentUser?.Role is RoleType.TeamOwner or RoleType.TeamLeader)
         {
             <RequestTeamToIdeaForm IdeaMarketId="_currentIdeaMarket.Id" />          
         }

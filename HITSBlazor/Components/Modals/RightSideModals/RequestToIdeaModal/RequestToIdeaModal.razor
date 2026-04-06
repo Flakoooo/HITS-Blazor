@@ -3,11 +3,12 @@
 @using HITSBlazor.Components.Modals.Components.ModalHeader
 @using HITSBlazor.Models.Markets.Entities
 
-<div class="p-3 h-100 overflow-y-scroll right-side-modal w-50" @onclick:stopPropagation="true">
-    <div class="d-flex flex-column w-100">
-        <RightSideModalHeader HeaderText="@CurrentIdeaMarket?.Name" />
+<div class="p-3 h-100 overflow-y-scroll flex-column right-side-modal w-50" @onclick:stopPropagation="true">
+    <RightSideModalHeader HeaderText="@CurrentIdeaMarket?.Name" />
+    @if (CurrentIdeaMarket is not null)
+    {
         <RequestTeamToIdeaForm IdeaMarketId="CurrentIdeaMarket.Id" />
-    </div>
+    }
 </div>
 
 @code {
