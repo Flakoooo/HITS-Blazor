@@ -1,7 +1,11 @@
 ﻿using HITSBlazor.Components.ActionMenus.BaseActionMenu;
 using HITSBlazor.Components.Modals.Components;
+using HITSBlazor.Components.Modals.Components.RightSideModaCollapselInfo;
 using HITSBlazor.Components.Modals.Components.RightSideModalInfo;
+using HITSBlazor.Components.Modals.RightSideModals.IdeaModal;
 using HITSBlazor.Components.Tables.TableHeader;
+using HITSBlazor.Models.Common.Entities;
+using HITSBlazor.Models.Ideas.Entities;
 using HITSBlazor.Models.Teams.Entities;
 using HITSBlazor.Services.Modal;
 using HITSBlazor.Services.Teams;
@@ -23,6 +27,9 @@ namespace HITSBlazor.Components.Modals.RightSideModals.TeamModal
         private bool _isLoading = true;
 
         private Team? _currentTeam;
+
+        private List<CollapseItem> _teamData = [];
+
         private List<TeamInvitation> _teamInvitations = [];
         private List<RequestToTeam> _requestsToTeam = [];
         private List<RequestTeamToIdea> _requestsTeamToIdeas = [];
@@ -91,6 +98,8 @@ namespace HITSBlazor.Components.Modals.RightSideModals.TeamModal
             _currentTeam = await TeamService.GetTeamByIdAsync(TeamId);
             if (_currentTeam is null) return;
 
+            _teamData = GetTeamData();
+
             _teamInvitations = await TeamService.GetTeamInvitationsAsync(TeamId);
             _requestsToTeam = await TeamService.GetTeamRequestsToTeamAsync(TeamId);
             _requestsTeamToIdeas = await TeamService.GetRequestsTeamToIdeasAsync(TeamId);
@@ -114,6 +123,10 @@ namespace HITSBlazor.Components.Modals.RightSideModals.TeamModal
 
             _isLoading = false;
         }
+
+        private List<CollapseItem> GetTeamData() => [
+            new() { Title = "Описание команды", Data = _currentTeam?.Description },
+        ];
 
         private string GetTableCategoryClass(TeamTableCategory category)
             => _activeTableCategory == category ? "active text-primary" : "text-secondary";

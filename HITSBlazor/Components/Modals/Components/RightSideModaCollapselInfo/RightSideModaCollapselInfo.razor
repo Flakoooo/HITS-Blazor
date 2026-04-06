@@ -1,0 +1,53 @@
+﻿@using HITSBlazor.Components.Button
+@using HITSBlazor.Components.Collapse
+@using HITSBlazor.Components.Modals.RightSideModals.IdeaModal
+@namespace HITSBlazor.Components.Modals.Components.RightSideModaCollapselInfo
+@using HITSBlazor.Components.Typography
+@using HITSBlazor.Models.Common.Entities
+@using HITSBlazor.Models.Common.Enums
+@using HITSBlazor.Models.Ideas.Entities
+@using HITSBlazor.Utils.Models
+
+<ul class="list-group rounded-3">
+    @foreach (var data in Data)
+    {
+        <li class="list-group-item p-0 overflow-hidden">
+            <Collapse StartCollapsed="false">
+                <MainContent Context="collapse">
+                    <Button Text="@data.Title"
+                            Variant="ButtonVariant.Light"
+                            ButtonClass="w-100 collapse-controller"
+                            OnButtonClick="() => collapse.Toggle()" />
+                </MainContent>
+                <ExpandedContent>
+                    <div class="list-group">
+                        <div class="p-2">
+                            @if (data.Data is List<Skill>)
+                            {
+                                <div class="d-flex flex-wrap gap-1">
+                                    @foreach (var skill in (List<Skill>)data.Data)
+                                    {
+                                        <div class="px-2 py-1 rounded d-flex gap-1 @(EnumViewModel<SkillType>.GetStyle(skill.Type))">
+                                            <Typography FontSize="6">
+                                                @skill.Name
+                                            </Typography>
+                                        </div>
+                                    }
+                                </div>
+                            }
+                            else
+                            {
+                                @data.Data
+                            }
+                        </div>
+                    </div>
+                </ExpandedContent>
+            </Collapse>
+        </li>
+    }
+</ul>
+
+@code {
+    [Parameter]
+    public List<CollapseItem> Data { get; set; } = [];
+}

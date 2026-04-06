@@ -3,6 +3,7 @@
 @using HITSBlazor.Components.Button
 @using HITSBlazor.Components.Modals.Components
 @using HITSBlazor.Components.Modals.Components.ModalHeader
+@using HITSBlazor.Components.Modals.Components.RightSideModaCollapselInfo
 @using HITSBlazor.Components.Modals.Components.RightSideModalInfo
 @using HITSBlazor.Components.Status
 @using HITSBlazor.Components.Tables.TableActionMenu
@@ -10,90 +11,59 @@
 @using HITSBlazor.Components.Tables.TableHeader
 @using HITSBlazor.Components.Typography
 @using HITSBlazor.Models.Common.Enums
+@using HITSBlazor.Models.Users.Enums
 @using HITSBlazor.Utils.Models
 
 <div class="p-3 h-100 overflow-y-scroll right-side-modal" @onclick:stopPropagation="true">
     <div class="idea-market-modal-left-side w-75">
         <RightSideModalHeader HeaderText="@_currentIdeaMarket?.Name" />
-        <div class="bg-white rounded-3">
-            <ul class="nav nav-underline border-bottom px-3">
-                @foreach (var category in Enum.GetValues<IdeaMarketTableCategory>())
-                {
-                    <div @onclick="@(() => _activeTableCategory = category)" style="cursor: pointer;"
-                         class="nav-link fw-normal pb-1 @GetTableCategoryClass(category)">
-                        @(EnumViewModel<IdeaMarketTableCategory>.GetTranslation(category))
-                    </div>
-                }
-            </ul>
-            <div class="idea-market-tables">
-                <div class="w-100 bg-white px-3 pb-3 pt-1">
-                    <div class="py-2 d-flex justify-content-between">
-                        <div class="w-50">
-                            <!-- TODO: Реализовать поиск -->
-                            <div class="input-group">
-                                <Typography FontSize="6" CustomClass="input-group-text">
-                                    <i class="bi bi-search"></i>
-                                </Typography>
-                                <input type="text" placeholder="Поиск" class="form-control rounded-end" />
+        <!-- TODO: уточнить, как выводить блоки информации -->
+        @if (AuthService.CurrentUser?.Id != _currentIdeaMarket?.Initiator.Id || AuthService.CurrentUser?.Role is RoleType.Admin)
+        {
+            <RightSideModaCollapselInfo Data="_ideaData" />
+        }
+        @if (AuthService.CurrentUser?.Id == _currentIdeaMarket?.Initiator.Id || AuthService.CurrentUser?.Role is RoleType.Admin)
+        {
+            <div class="bg-white rounded-3">
+                <ul class="nav nav-underline border-bottom px-3">
+                    @foreach (var category in Enum.GetValues<IdeaMarketTableCategory>())
+                    {
+                        <div @onclick="@(() => _activeTableCategory = category)" style="cursor: pointer;"
+                             class="nav-link fw-normal pb-1 @GetTableCategoryClass(category)">
+                            @(EnumViewModel<IdeaMarketTableCategory>.GetTranslation(category))
+                        </div>
+                    }
+                </ul>
+                <div class="idea-market-tables">
+                    <div class="w-100 bg-white px-3 pb-3 pt-1">
+                        <div class="py-2 d-flex justify-content-between">
+                            <div class="w-50">
+                                <!-- TODO: Реализовать поиск -->
+                                <div class="input-group">
+                                    <Typography FontSize="6" CustomClass="input-group-text">
+                                        <i class="bi bi-search"></i>
+                                    </Typography>
+                                    <input type="text" placeholder="Поиск" class="form-control rounded-end" />
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="w-100 d-flex">
-                        <div class="w-100">
-                            <table class="table table-hover mb-0">
-                                @switch (_activeTableCategory)
-                                {
-                                    case IdeaMarketTableCategory.AcceptedTeam:
-                                        <TableHeader TableActionMenuIsEnable="true" Items="AcceptedTeamTableHeader" />
-                                        break;
-                                    case IdeaMarketTableCategory.Requests:
-                                        <TableHeader TableActionMenuIsEnable="true" Items="RequestsTableHeader" />
-                                        break;
-                                    case IdeaMarketTableCategory.InvitedTeams:
-                                        <TableHeader TableActionMenuIsEnable="true" Items="InvitedTeamsTableHeader" />
-                                        break;
-                                }
-                                <tbody>
-                                    @if (_activeTableCategory is IdeaMarketTableCategory.AcceptedTeam && _currentIdeaMarket?.Team is not null)
+                        <div class="w-100 d-flex">
+                            <div class="w-100">
+                                <table class="table table-hover mb-0">
+                                    @switch (_activeTableCategory)
                                     {
-                                        <tr>
-                                            <td class="py-3 col">
-                                                <div class="d-flex">
-                                                    <input type="checkbox" class="form-check-input mb-1" />
-                                                </div>
-                                            </td>
-                                            <TableBodyRow>
-                                                <div class="data-link">
-                                                    @_currentIdeaMarket.Team.Name
-                                                </div>
-                                            </TableBodyRow>
-                                            <TableBodyRow>
-                                                <div class="data-link text-warning">
-                                                    @_currentIdeaMarket.Team.Leader?.FullName
-                                                </div>
-                                            </TableBodyRow>
-                                            <TableBodyRow IsCentered="true">
-                                                @_currentIdeaMarket.Team.MembersCount
-                                            </TableBodyRow>
-                                            <TableBodyRow IsCentered="true">
-                                                @foreach (var skill in _currentIdeaMarket.Team.Skills)
-                                                {
-                                                    <div class="px-2 py-1 rounded d-flex gap-1 @(EnumViewModel<SkillType>.GetStyle(skill.Type))">
-                                                        @skill.Name
-                                                    </div>
-                                                }
-                                            </TableBodyRow>
-                                            <TableActionMenu ItemId="_currentIdeaMarket.Id"
-                                                             StrategyPosition="Strategy.Fixed"
-                                                             OnAction="@HandleTableMenuClick"
-                                                             ActionIds="@(new Dictionary<MenuAction, object> { 
-                                                                 [MenuAction.ViewTeamProfile] = _currentIdeaMarket.Team.Id 
-                                                             })" />
-                                        </tr>
+                                        case IdeaMarketTableCategory.AcceptedTeam:
+                                            <TableHeader TableActionMenuIsEnable="true" Items="AcceptedTeamTableHeader" />
+                                            break;
+                                        case IdeaMarketTableCategory.Requests:
+                                            <TableHeader TableActionMenuIsEnable="true" Items="RequestsTableHeader" />
+                                            break;
+                                        case IdeaMarketTableCategory.InvitedTeams:
+                                            <TableHeader TableActionMenuIsEnable="true" Items="InvitedTeamsTableHeader" />
+                                            break;
                                     }
-                                    else if (_activeTableCategory is IdeaMarketTableCategory.Requests)
-                                    {
-                                        @foreach (var request in _requestsTeamToIdeas)
+                                    <tbody>
+                                        @if (_activeTableCategory is IdeaMarketTableCategory.AcceptedTeam && _currentIdeaMarket?.Team is not null)
                                         {
                                             <tr>
                                                 <td class="py-3 col">
@@ -103,47 +73,136 @@
                                                 </td>
                                                 <TableBodyRow>
                                                     <div class="data-link">
-                                                        @request.Name
+                                                        @_currentIdeaMarket.Team.Name
                                                     </div>
                                                 </TableBodyRow>
                                                 <TableBodyRow>
-                                                    <Status Statustype="request.Status" />
+                                                    <div class="data-link text-warning">
+                                                        @_currentIdeaMarket.Team.Leader?.FullName
+                                                    </div>
                                                 </TableBodyRow>
                                                 <TableBodyRow IsCentered="true">
-                                                    @request.MembersCount
+                                                    @_currentIdeaMarket.Team.MembersCount
                                                 </TableBodyRow>
                                                 <TableBodyRow IsCentered="true">
-                                                    @foreach (var skill in request.Skills)
+                                                    @foreach (var skill in _currentIdeaMarket.Team.Skills)
                                                     {
                                                         <div class="px-2 py-1 rounded d-flex gap-1 @(EnumViewModel<SkillType>.GetStyle(skill.Type))">
                                                             @skill.Name
                                                         </div>
                                                     }
                                                 </TableBodyRow>
-                                                <TableActionMenu ItemId="request.TeamId"
+                                                <TableActionMenu ItemId="_currentIdeaMarket.Id"
                                                                  StrategyPosition="Strategy.Fixed"
                                                                  OnAction="@HandleTableMenuClick"
                                                                  ActionIds="@(new Dictionary<MenuAction, object> { 
-                                                                     [MenuAction.ViewTeamProfile] = request.TeamId,
-                                                                     [MenuAction.ViewLetter] = request.Letter
+                                                                     [MenuAction.ViewTeamProfile] = _currentIdeaMarket.Team.Id 
                                                                  })" />
-                                            </tr>                                            
+                                            </tr>
                                         }
-                                    }
-                                </tbody>
-                            </table>
+                                        else if (_activeTableCategory is IdeaMarketTableCategory.Requests)
+                                        {
+                                            @foreach (var request in _requestsTeamToIdeas)
+                                            {
+                                                <tr>
+                                                    <td class="py-3 col">
+                                                        <div class="d-flex">
+                                                            <input type="checkbox" class="form-check-input mb-1" />
+                                                        </div>
+                                                    </td>
+                                                    <TableBodyRow>
+                                                        <div class="data-link">
+                                                            @request.Name
+                                                        </div>
+                                                    </TableBodyRow>
+                                                    <TableBodyRow>
+                                                        <Status Statustype="request.Status" />
+                                                    </TableBodyRow>
+                                                    <TableBodyRow IsCentered="true">
+                                                        @request.MembersCount
+                                                    </TableBodyRow>
+                                                    <TableBodyRow IsCentered="true">
+                                                        @foreach (var skill in request.Skills)
+                                                        {
+                                                            <div class="px-2 py-1 rounded d-flex gap-1 @(EnumViewModel<SkillType>.GetStyle(skill.Type))">
+                                                                @skill.Name
+                                                            </div>
+                                                        }
+                                                    </TableBodyRow>
+                                                    <TableActionMenu ItemId="request.TeamId"
+                                                                     StrategyPosition="Strategy.Fixed"
+                                                                     OnAction="@HandleTableMenuClick"
+                                                                     ActionIds="@(new Dictionary<MenuAction, object> { 
+                                                                         [MenuAction.ViewTeamProfile] = request.TeamId,
+                                                                         [MenuAction.ViewLetter] = request.Letter
+                                                                     })" />
+                                                </tr>                                            
+                                            }
+                                        }
+                                        else if (_activeTableCategory is IdeaMarketTableCategory.InvitedTeams)
+                                        {
+                                            @foreach (var request in _invitationsTeamToIdeas)
+                                            {
+                                                <tr>
+                                                    <td class="py-3 col">
+                                                        <div class="d-flex">
+                                                            <input type="checkbox" class="form-check-input mb-1" />
+                                                        </div>
+                                                    </td>
+                                                    <TableBodyRow>
+                                                        <div class="data-link">
+                                                            @request.TeamName
+                                                        </div>
+                                                    </TableBodyRow>
+                                                    <TableBodyRow>
+                                                        <Status Statustype="request.Status" />
+                                                    </TableBodyRow>
+                                                    <TableBodyRow IsCentered="true">
+                                                        @request.TeamMembersCount
+                                                    </TableBodyRow>
+                                                    <TableBodyRow IsCentered="true">
+                                                        @foreach (var skill in request.Skills)
+                                                        {
+                                                            <div class="px-2 py-1 rounded d-flex gap-1 @(EnumViewModel<SkillType>.GetStyle(skill.Type))">
+                                                                @skill.Name
+                                                            </div>
+                                                        }
+                                                    </TableBodyRow>
+                                                    <TableActionMenu ItemId="request.TeamId"
+                                                                     StrategyPosition="Strategy.Fixed"
+                                                                     OnAction="@HandleTableMenuClick"
+                                                                     ActionIds="@(new Dictionary<MenuAction, object> { 
+                                                                         [MenuAction.ViewTeamProfile] = request.TeamId
+                                                                     })" />
+                                                </tr>                                            
+                                            }
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>
+                @if (_activeTableCategory is IdeaMarketTableCategory.InvitedTeams)
+                {
+                    <!-- TODO: Добавить клик кнопке -->
+                    <Button Variant="ButtonVariant.Primary" 
+                            ButtonClass="ms-auto m-3" 
+                            Text="Отправить приглашения" />
+                }
             </div>
-            @if (_activeTableCategory is IdeaMarketTableCategory.InvitedTeams)
-            {
-                <!-- TODO: Добавить клик кнопке -->
+        }
+        @if (AuthService.CurrentUser?.Role is RoleType.TeamOwner or RoleType.TeamLeader)
+        {
+            <div class="d-flex bg-white rounded p-2 w-100 px-3 align-items-center justify-content-between">
+                <Typography FontSize="6" TextColor="TextColor.Danger">
+                     У вас нет команд
+                </Typography>
                 <Button Variant="ButtonVariant.Primary" 
-                        ButtonClass="ms-auto m-3" 
-                        Text="Отправить приглашения" />
-            }
-        </div>
+                        Text="Создать команду?" 
+                        OnButtonClick="@(() => NavigationService.NavigateToAsync("teams/create"))" />
+            </div>            
+        }
         <div class="bg-white rounded-3">
             <div class="py-2 w-100 border-bottom">
                 <Typography FontSize="6" CustomClass="px-3">

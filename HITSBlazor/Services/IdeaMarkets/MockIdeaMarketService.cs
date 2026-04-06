@@ -5,6 +5,7 @@ using HITSBlazor.Utils.Models;
 
 namespace HITSBlazor.Services.IdeaMarkets
 {
+    //TODO: Сделать так чтобы при роли инициатор выдало только идеи инициатора
     public class MockIdeaMarketService : IIdeaMarketService
     {
         public event Func<Task>? OnIdeasMarketStateChanged;

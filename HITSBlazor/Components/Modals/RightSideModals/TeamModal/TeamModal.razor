@@ -4,6 +4,7 @@
 @using HITSBlazor.Components.Collapse
 @using HITSBlazor.Components.Modals.Components
 @using HITSBlazor.Components.Modals.Components.ModalHeader
+@using HITSBlazor.Components.Modals.Components.RightSideModaCollapselInfo
 @using HITSBlazor.Components.Modals.Components.RightSideModalInfo
 @using HITSBlazor.Components.Placeholders.Placeholder
 @using HITSBlazor.Components.Status
@@ -94,26 +95,7 @@
     {
         <div class="team-modal-side w-75">
             <RightSideModalHeader HeaderText="@_currentTeam.Name" />
-            <ul class="list-group rounded-3">
-                <li class="list-group-item p-0 overflow-hidden">
-                    <Collapse StartCollapsed="false">
-                        <MainContent Context="collapse">
-                            <Button BtnType="ButtonType.Button" 
-                                    Text="Описание команды" 
-                                    Variant="ButtonVariant.Light" 
-                                    ButtonClass="collapse-controller w-100" 
-                                    OnButtonClick="collapse.Toggle" />
-                        </MainContent>
-                        <ExpandedContent>
-                            <div class="list-group">
-                                <div class="p-2">
-                                    @_currentTeam.Description
-                                </div>
-                            </div>
-                        </ExpandedContent>
-                    </Collapse>
-                </li>
-            </ul>
+            <RightSideModaCollapselInfo Data="_teamData" />
             <div class="bg-white rounded-3">
                 <div class="border-bottom px-3">
                     <ul class="nav nav-underline">

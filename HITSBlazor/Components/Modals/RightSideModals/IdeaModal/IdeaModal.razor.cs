@@ -1,4 +1,5 @@
 ﻿using HITSBlazor.Components.ActionMenus.BaseActionMenu;
+using HITSBlazor.Components.Modals.Components.RightSideModaCollapselInfo;
 using HITSBlazor.Models.Common.Entities;
 using HITSBlazor.Models.Ideas.Entities;
 using HITSBlazor.Models.Ideas.Enums;
@@ -46,7 +47,7 @@ namespace HITSBlazor.Components.Modals.RightSideModals.IdeaModal
         private List<Rating> IdeaRatings { get; set; } = [];
         private List<Comment> IdeaComments { get; set; } = [];
 
-        private List<IdeaModalItem> ideaData = [];
+        private List<CollapseItem> ideaData = [];
 
         private RatingRequest? _expertRating = null;
 
@@ -133,7 +134,7 @@ namespace HITSBlazor.Components.Modals.RightSideModals.IdeaModal
 
             CurrentIdea = await IdeasService.GetIdeaByIdAsync(IdeaId);
             IdeaSkills = await IdeasService.GetAllIdeaSkillsAsync(IdeaId);
-            ideaData = GetIdeaData(CurrentIdea, IdeaSkills);
+            ideaData = GetIdeaData();
             IdeaRatings = await IdeasService.GetIdeaRatingsAsync(IdeaId);
             IdeaComments = await IdeasService.GetIdeasCommentsAsync(IdeaId);
 
@@ -167,12 +168,12 @@ namespace HITSBlazor.Components.Modals.RightSideModals.IdeaModal
             isLoading = false;
         }
 
-        private static List<IdeaModalItem> GetIdeaData(Idea? idea, List<Skill> skills) => [
-            new IdeaModalItem { Title = "Проблема",                                     Data = idea?.Problem        },
-            new IdeaModalItem { Title = "Предлагаемое решение",                         Data = idea?.Solution       },
-            new IdeaModalItem { Title = "Ожидаемый результат",                          Data = idea?.Result         },
-            new IdeaModalItem { Title = "Описание необходимых ресурсов для реализации", Data = idea?.Description    },
-            new IdeaModalItem { Title = "Стек технологий",                              Data = skills               }
+        private List<CollapseItem> GetIdeaData() => [
+            new() { Title = "Проблема",                                     Data = CurrentIdea?.Problem        },
+            new() { Title = "Предлагаемое решение",                         Data = CurrentIdea?.Solution       },
+            new() { Title = "Ожидаемый результат",                          Data = CurrentIdea?.Result         },
+            new() { Title = "Описание необходимых ресурсов для реализации", Data = CurrentIdea?.Description    },
+            new() { Title = "Стек технологий",                              Data = IdeaSkills               }
         ];
 
         private void UpdateRatingScore()

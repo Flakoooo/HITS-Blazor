@@ -5,6 +5,7 @@
 @using HITSBlazor.Components.Collapse
 @using HITSBlazor.Components.Inputs.Select
 @using HITSBlazor.Components.Modals.Components.ModalHeader
+@using HITSBlazor.Components.Modals.Components.RightSideModaCollapselInfo
 @using HITSBlazor.Components.Placeholders.Placeholder
 @using HITSBlazor.Components.ProgressBar
 @using HITSBlazor.Components.Typography
@@ -32,45 +33,7 @@
         else
         {
             <RightSideModalHeader HeaderText="@CurrentIdea.Name" />
-            <ul class="list-group rounded-3">
-                @foreach (var data in ideaData)
-                {
-                    <li class="list-group-item p-0 overflow-hidden">
-                        <Collapse StartCollapsed="false">
-                            <MainContent Context="collapse">
-                                <Button BtnType="ButtonType.Button"
-                                        Text="@data.Title"
-                                        Variant="ButtonVariant.Light"
-                                        ButtonClass="w-100 collapse-controller"
-                                        OnButtonClick="() => collapse.Toggle()" />
-                            </MainContent>
-                            <ExpandedContent>
-                                <div class="list-group">
-                                    <div class="p-2">
-                                        @if (data.Data is List<Skill>)
-                                        {
-                                            <div class="d-flex flex-wrap gap-1">
-                                                @foreach (var skill in IdeaSkills)
-                                                {
-                                                    <div class="px-2 py-1 rounded d-flex gap-1 @(EnumViewModel<SkillType>.GetStyle(skill.Type))">
-                                                        <Typography FontSize="6">
-                                                            @skill.Name
-                                                        </Typography>
-                                                    </div>
-                                                }
-                                            </div>
-                                        }
-                                        else
-                                        {
-                                            @data.Data
-                                        }
-                                    </div>
-                                </div>
-                            </ExpandedContent>
-                        </Collapse>
-                    </li>
-                }
-            </ul>
+            <RightSideModaCollapselInfo Data="ideaData" />
         }
         <!-- TODO: сделать валидацию полей рейтинга -->
         @if (CheckIdeaRatingAccess() && !isRatingConfirmed)

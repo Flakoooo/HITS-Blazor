@@ -1,11 +1,12 @@
 ﻿using HITSBlazor.Components.ActionMenus.BaseActionMenu;
+using HITSBlazor.Components.Modals.Components.RightSideModaCollapselInfo;
 using HITSBlazor.Components.Modals.Components.RightSideModalInfo;
-using HITSBlazor.Components.Modals.RightSideModals.TeamModal;
 using HITSBlazor.Components.Tables.TableHeader;
-using HITSBlazor.Models.Common.Entities;
 using HITSBlazor.Models.Markets.Entities;
 using HITSBlazor.Models.Markets.Enums;
 using HITSBlazor.Models.Teams.Entities;
+using HITSBlazor.Services;
+using HITSBlazor.Services.Auth;
 using HITSBlazor.Services.IdeaMarkets;
 using HITSBlazor.Services.Markets;
 using HITSBlazor.Services.Modal;
@@ -18,6 +19,12 @@ namespace HITSBlazor.Components.Modals.RightSideModals.IdeaMarketModal
 {
     public partial class IdeaMarketModal
     {
+        [Inject]
+        private IAuthService AuthService { get; set; } = null!;
+
+        [Inject]
+        private NavigationService NavigationService { get; set; } = null!;
+
         [Inject]
         private IIdeaMarketService IdeaMarketService { get; set; } = null!;
 
@@ -39,8 +46,11 @@ namespace HITSBlazor.Components.Modals.RightSideModals.IdeaMarketModal
         private IdeaMarket? _currentIdeaMarket;
 
         private List<RequestTeamToIdea> _requestsTeamToIdeas = [];
+        private List<InvitationTeamToIdea> _invitationsTeamToIdeas = [];
 
         private IdeaMarketTableCategory _activeTableCategory = IdeaMarketTableCategory.AcceptedTeam;
+
+        private List<CollapseItem> _ideaData = [];
 
         private static List<TableHeaderItem> AcceptedTeamTableHeader { get; } =
         [
@@ -110,6 +120,8 @@ namespace HITSBlazor.Components.Modals.RightSideModals.IdeaMarketModal
             _currentIdeaMarket = await IdeaMarketService.GetIdeaMarketAsync(IdeaMarketId);
             if (_currentIdeaMarket is null) return;
 
+            _ideaData = GetIdeaData();
+
             if (_currentIdeaMarket.Team is not null)
                 _requestsTeamToIdeas = await TeamService.GetRequestsTeamToIdeasAsync(_currentIdeaMarket.Team.Id);
 
@@ -129,6 +141,13 @@ namespace HITSBlazor.Components.Modals.RightSideModals.IdeaMarketModal
 
             _isLoading = false;
         }
+
+        private List<CollapseItem> GetIdeaData() => [
+            new() { Title = "Проблема",                                     Data = _currentIdeaMarket?.Problem        },
+            new() { Title = "Предлагаемое решение",                         Data = _currentIdeaMarket?.Solution       },
+            new() { Title = "Ожидаемый результат",                          Data = _currentIdeaMarket?.Result         },
+            new() { Title = "Описание необходимых ресурсов для реализации", Data = _currentIdeaMarket?.Description    }
+        ];
 
         private string GetTableCategoryClass(IdeaMarketTableCategory category)
             => _activeTableCategory == category ? "active text-primary" : "text-secondary";
