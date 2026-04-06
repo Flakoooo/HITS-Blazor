@@ -1,5 +1,4 @@
-﻿using HITSBlazor.Models.Common.Entities;
-using HITSBlazor.Models.Teams.Entities;
+﻿using HITSBlazor.Models.Teams.Entities;
 using HITSBlazor.Utils.Mocks.Teams;
 
 namespace HITSBlazor.Services.Teams
@@ -60,6 +59,9 @@ namespace HITSBlazor.Services.Teams
 
             return [.. query];
         }
+
+        public async Task<List<Team>> GetTeamsByOwnerOrLeaderId(Guid userId)
+            => MockTeams.GetTeamsByOwnerIdOrLeaderId(userId);
 
         public async Task<Team?> GetTeamByIdAsync(Guid teamId) 
             => MockTeams.GetTeamById(teamId);

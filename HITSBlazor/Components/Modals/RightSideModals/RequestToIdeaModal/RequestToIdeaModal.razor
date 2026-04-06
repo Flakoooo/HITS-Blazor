@@ -1,0 +1,16 @@
+﻿@namespace HITSBlazor.Components.Modals.RightSideModals.RequestToIdeaModal
+@using HITSBlazor.Components.Forms.RequestTeamToIdeaForm
+@using HITSBlazor.Components.Modals.Components.ModalHeader
+@using HITSBlazor.Models.Markets.Entities
+
+<div class="p-3 h-100 overflow-y-scroll right-side-modal w-50" @onclick:stopPropagation="true">
+    <div class="d-flex flex-column w-100">
+        <RightSideModalHeader HeaderText="@CurrentIdeaMarket?.Name" />
+        <RequestTeamToIdeaForm IdeaMarketId="CurrentIdeaMarket.Id" />
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public IdeaMarket? CurrentIdeaMarket { get; set; }
+}

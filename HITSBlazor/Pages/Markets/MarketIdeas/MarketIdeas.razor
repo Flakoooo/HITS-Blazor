@@ -8,6 +8,7 @@
 @using HITSBlazor.Components.Typography
 @using HITSBlazor.Models.Common.Enums
 @using HITSBlazor.Models.Markets.Enums
+@using HITSBlazor.Models.Users.Enums
 @using HITSBlazor.Utils.Models
 
 <div class="ideas-market-content page-content-with-header p-3 bg-white">
@@ -136,11 +137,14 @@
                                             </Typography>
                                         </div>
                                     </div>
-                                    <!-- TODO: реализовать кнопку -->
-                                    <Button Variant="ButtonVariant.Primary" 
-                                            ButtonClass="btn-sm w-25" 
-                                            Text="Подать заявку" 
-                                            IconStyle="bi-send-fill" />
+                                    @if (AuthService.CurrentUser?.Role is RoleType.TeamOwner or RoleType.TeamLeader or RoleType.Admin)
+                                    {
+                                        <Button Variant="ButtonVariant.Primary"
+                                                ButtonClass="btn-sm w-25"
+                                                Text="Подать заявку"
+                                                IconStyle="bi-send-fill"
+                                                OnButtonClick="() => ShowCreateTeamRequestModal(ideaMarket)" />
+                                    }
                                 </div>
                             </div>
                         </div>

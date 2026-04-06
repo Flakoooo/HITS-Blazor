@@ -132,6 +132,9 @@ namespace HITSBlazor.Utils.Mocks.Teams
 
         public static List<Team> GetAllTeams() => _teams;
 
+        public static List<Team> GetTeamsByOwnerIdOrLeaderId(Guid userId) 
+            => [.. _teams.Where(t => t.Owner.Id == userId || t.Leader?.Id == userId)];
+
         public static bool DeleteTeam(Team team) => _teams.Remove(team);
     }
 }

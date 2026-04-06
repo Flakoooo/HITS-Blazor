@@ -1,0 +1,107 @@
+﻿@namespace HITSBlazor.Components.Forms.RequestTeamToIdeaForm
+@using HITSBlazor.Components.Button
+@using HITSBlazor.Components.Collapse
+@using HITSBlazor.Components.Inputs.TextArea
+@using HITSBlazor.Components.Typography
+@using HITSBlazor.Models.Common.Enums
+@using HITSBlazor.Models.Teams.Enums
+@using HITSBlazor.Utils.Models
+
+@if (_teams.Count == 0)
+{
+    <div class="d-flex bg-white rounded p-2 w-100 px-3 align-items-center justify-content-between">
+        <Typography FontSize="6" TextColor="TextColor.Danger">
+            У вас нет команд
+        </Typography>
+        <Button Variant="ButtonVariant.Primary"
+                Text="Создать команду?"
+                OnButtonClick="@(() => NavigationService.NavigateToAsync("teams/create"))" />
+    </div>
+}
+else
+{
+    <div class="w-100 d-flex flex-column bg-white rounded-3">
+        <Typography FontSize="6" CustomClass="py-2 px-3 border-bottom">
+            Ваши команды
+        </Typography>
+        <div class="d-flex flex-column gap-2 p-3">
+            @foreach (var team in _teams)
+            {
+                <div class="team-request-collapse w-100">
+                    <div class="border rounded-3 py-1 px-2 overflow-hidden w-100">
+                        <Collapse StartCollapsed="false">
+                            <MainContent Context="collapse">
+                                <div class="team-request-collapse-button">
+                                    <Button Variant="ButtonVariant.Link" 
+                                            Text="@team.Name" 
+                                            OnButtonClick="() => ModalService.ShowTeamModal(team.Id)" />
+                                    @if (team.HasActiveProject || team.IsAcceptedToIdea)
+                                    {
+                                        <Button Variant="ButtonVariant.Secondary" 
+                                                Text="Ваша команда уже участвует в идее или проекте" 
+                                                IsLoading="true" />
+                                    }
+                                    else if (_cachedRequests.TryGetValue(team.Id, out var request) && request.Status is not TeamRequestStatus.New)
+                                    {
+                                        <Button Text="@(EnumViewModel<TeamRequestStatus>.GetTranslation(request.Status))"
+                                                Variant="GetStatusButtonVariant(request.Status)"
+                                                OnButtonClick="() => collapse.Toggle()" />
+                                    }
+                                    else
+                                    {
+                                        <!-- TODO: если команда уже подала заявку в эту идею, вызывать подтверждающее модальное окно -->
+                                        <Button Variant="ButtonVariant.Danger" 
+                                                Text="Отозвать заявку" />
+                                    }
+                                </div>
+                            </MainContent>
+                            <ExpandedContent>
+                                <div class="team-request-collapse-info py-1">
+                                    <div class="w-100 d-flex p-2">
+                                        <div class="w-50">
+                                            <div class="d-flex align-items-center text-primary pb-1">
+                                                Состав:
+                                            </div>
+                                            <div class="d-flex flex-wrap gap-2">
+                                                @foreach (var member in team.Members)
+                                                {
+                                                    <div class="p-1 rounded bg-light border">
+                                                        @member.FullName
+                                                    </div>
+                                                }
+                                            </div>
+                                        </div>
+                                        <div class="w-50 border-start ps-3 pb-1">
+                                            <div class="d-flex gap-2 align-items-center text-primary pb-1">
+                                                <input type="checkbox" class="form-check-input" />
+                                                <div>Компетенции:</div>
+                                            </div>
+                                            <div class="d-flex flex-wrap gap-2">
+                                                <div class="d-flex flex-wrap gap-1">
+                                                    @foreach (var skill in team.Skills)
+                                                    {
+                                                        <div class="px-2 py-1 rounded d-flex gap-1 align-items-center @(EnumViewModel<SkillType>.GetStyle(skill.Type))">
+                                                            <Typography FontSize="6">
+                                                                @skill.Name
+                                                            </Typography>
+                                                        </div>
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <TextArea Label="Мотивационное письмо"
+                                              HintText="@_hintText"
+                                              @bind-Value="LetterText"
+                                              Style="resize: none; height: 200px;" />
+                                    <!-- TODO: уже отправляет -->
+                                    <Button Variant="ButtonVariant.Success" Text="Подать заявку" />
+                                </div>
+                            </ExpandedContent>
+                        </Collapse>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+}

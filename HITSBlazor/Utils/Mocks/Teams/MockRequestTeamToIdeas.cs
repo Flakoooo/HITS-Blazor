@@ -125,6 +125,9 @@ namespace HITSBlazor.Utils.Mocks.Teams
             ];
         }
 
+        public static List<RequestTeamToIdea> GetRequestsByIdeaMarketId(Guid ideaMarketId)
+            => [.. _requestTeamToIdeas.Where(rtti => rtti.IdeaMarketId == ideaMarketId)];
+
         public static List<RequestTeamToIdea> GetRequestsTeamToIdeas(Guid teamId)
             => [.. _requestTeamToIdeas.Where(rtti => rtti.TeamId == teamId)];
     }

@@ -17,7 +17,8 @@
         <textarea value="@Value"
                   placeholder="@Placeholder"
                   @oninput="@OnInputChanged"
-                  class="form-control rounded-end @(_showError ? "is-invalid" : string.Empty)">
+                  class="form-control rounded-end @(_showError ? "is-invalid" : string.Empty)"
+                  style="@Style">
         </textarea>
         @if (_showError)
         {

@@ -1,6 +1,7 @@
 ﻿@namespace HITSBlazor.Components.Modals.RightSideModals.IdeaMarketModal
 @using HITSBlazor.Components.ActionMenus.BaseActionMenu
 @using HITSBlazor.Components.Button
+@using HITSBlazor.Components.Forms.RequestTeamToIdeaForm
 @using HITSBlazor.Components.Modals.Components
 @using HITSBlazor.Components.Modals.Components.ModalHeader
 @using HITSBlazor.Components.Modals.Components.RightSideModaCollapselInfo
@@ -194,14 +195,7 @@
         }
         @if (AuthService.CurrentUser?.Role is RoleType.TeamOwner or RoleType.TeamLeader)
         {
-            <div class="d-flex bg-white rounded p-2 w-100 px-3 align-items-center justify-content-between">
-                <Typography FontSize="6" TextColor="TextColor.Danger">
-                     У вас нет команд
-                </Typography>
-                <Button Variant="ButtonVariant.Primary" 
-                        Text="Создать команду?" 
-                        OnButtonClick="@(() => NavigationService.NavigateToAsync("teams/create"))" />
-            </div>            
+            <RequestTeamToIdeaForm IdeaMarketId="_currentIdeaMarket.Id" />          
         }
         <div class="bg-white rounded-3">
             <div class="py-2 w-100 border-bottom">

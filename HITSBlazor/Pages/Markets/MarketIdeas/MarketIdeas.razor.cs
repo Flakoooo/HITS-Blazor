@@ -1,8 +1,10 @@
 ﻿using HITSBlazor.Components.Button;
 using HITSBlazor.Components.Modals.RightSideModals.IdeaMarketModal;
+using HITSBlazor.Components.Modals.RightSideModals.RequestToIdeaModal;
 using HITSBlazor.Components.Typography;
 using HITSBlazor.Models.Markets.Entities;
 using HITSBlazor.Models.Markets.Enums;
+using HITSBlazor.Services.Auth;
 using HITSBlazor.Services.IdeaMarkets;
 using HITSBlazor.Services.Markets;
 using HITSBlazor.Services.Modal;
@@ -16,6 +18,9 @@ namespace HITSBlazor.Pages.Markets.MarketIdeas
     [Route("market/{MarketId}")]
     public partial class MarketIdeas
     {
+        [Inject]
+        private IAuthService AuthService { get; set; } = null!;
+
         [Inject]
         private IMarketService MarketService { get; set; } = null!;
 
@@ -51,7 +56,7 @@ namespace HITSBlazor.Pages.Markets.MarketIdeas
             {
                 _currentMarket = await MarketService.GetMarketByIdAsync(guid);
 
-                _ideaMarkets = await IdeaMarketService.GetIdeasMarketAsync(guid);
+                await LoadMarketIdeasAsync();
 
                 _isLoading = false;
             }
@@ -107,6 +112,14 @@ namespace HITSBlazor.Pages.Markets.MarketIdeas
             parameters: new Dictionary<string, object>
             {
                 [nameof(IdeaMarketModal.IdeaMarketId)] = ideaMarketId
+            }
+        );
+
+        private void ShowCreateTeamRequestModal(IdeaMarket ideaMarket) => ModalService.Show<RequestToIdeaModal>(
+            ModalType.RightSide,
+            parameters: new Dictionary<string, object>
+            {
+                [nameof(RequestToIdeaModal.CurrentIdeaMarket)] = ideaMarket
             }
         );
 

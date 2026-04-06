@@ -25,6 +25,9 @@ namespace HITSBlazor.Components.Inputs.TextArea
         [Parameter]
         public string? ErrorMessage { get; set; } = "Поле не заполнено";
 
+        [Parameter]
+        public string Style { get; set; } = string.Empty;
+
         private bool _showError = false;
 
         protected override void OnParametersSet()

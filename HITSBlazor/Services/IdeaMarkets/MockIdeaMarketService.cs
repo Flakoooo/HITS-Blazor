@@ -1,13 +1,18 @@
 ﻿using HITSBlazor.Models.Markets.Entities;
 using HITSBlazor.Models.Markets.Enums;
+using HITSBlazor.Models.Teams.Entities;
+using HITSBlazor.Services.Auth;
 using HITSBlazor.Utils.Mocks.Markets;
+using HITSBlazor.Utils.Mocks.Teams;
 using HITSBlazor.Utils.Models;
 
 namespace HITSBlazor.Services.IdeaMarkets
 {
     //TODO: Сделать так чтобы при роли инициатор выдало только идеи инициатора
-    public class MockIdeaMarketService : IIdeaMarketService
+    public class MockIdeaMarketService(IAuthService authService) : IIdeaMarketService
     {
+        private readonly IAuthService _authService = authService;
+
         public event Func<Task>? OnIdeasMarketStateChanged;
         public event Action? OnIdeasMarketStateUpdated;
 
@@ -49,5 +54,8 @@ namespace HITSBlazor.Services.IdeaMarkets
 
         public async Task<IdeaMarket?> GetIdeaMarketAsync(Guid guid) 
             => MockIdeaMarkets.GetIdeaMarketById(guid);
+
+        public async Task<List<RequestTeamToIdea>> GetRequestsTeamToIdeaAsync(Guid ideaMarketId)
+            => MockRequestTeamToIdeas.GetRequestsByIdeaMarketId(ideaMarketId);
     }
 }

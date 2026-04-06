@@ -5,6 +5,7 @@ namespace HITSBlazor.Services.Teams
     public interface ITeamService
     {
         Task<List<Team>> GetTeamsAsync(TeamsFilter filter);
+        Task<List<Team>> GetTeamsByOwnerOrLeaderId(Guid userId);
         Task<Team?> GetTeamByIdAsync(Guid teamId);
         Task<bool> DeleteTeamAsync(Team team);
 

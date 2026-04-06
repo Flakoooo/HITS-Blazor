@@ -1,5 +1,6 @@
 ﻿using HITSBlazor.Models.Markets.Entities;
 using HITSBlazor.Models.Markets.Enums;
+using HITSBlazor.Models.Teams.Entities;
 
 namespace HITSBlazor.Services.IdeaMarkets
 {
@@ -16,5 +17,6 @@ namespace HITSBlazor.Services.IdeaMarkets
         );
 
         Task<IdeaMarket?> GetIdeaMarketAsync(Guid guid);
+        Task<List<RequestTeamToIdea>> GetRequestsTeamToIdeaAsync(Guid ideaMarketId);
     }
 }
