@@ -69,8 +69,6 @@ namespace HITSBlazor.Pages.Markets.MarketIdeas
         {
             if (_currentMarket is null) return;
 
-            Console.WriteLine(_category == MarketIdeasCategory.Favorite);
-
             _ideaMarkets = await IdeaMarketService.GetIdeasMarketAsync(
                 _currentMarket.Id,
                 favorite: _category == MarketIdeasCategory.Favorite,

@@ -2,6 +2,7 @@
 @using HITSBlazor.Components.Button
 @using HITSBlazor.Components.Collapse
 @using HITSBlazor.Components.Inputs.TextArea
+@using HITSBlazor.Components.Placeholders.Placeholder
 @using HITSBlazor.Components.Typography
 @using HITSBlazor.Models.Common.Enums
 @using HITSBlazor.Models.Teams.Enums
@@ -10,17 +11,29 @@
 @if (_teams.Count == 0)
 {
     <div class="d-flex bg-white rounded p-2 w-100 px-3 align-items-center justify-content-between">
-        <Typography FontSize="6" TextColor="TextColor.Danger">
-            У вас нет команд
-        </Typography>
-        <Button Variant="ButtonVariant.Primary"
-                Text="Создать команду?"
-                OnButtonClick="@(() => NavigationService.NavigateToAsync("teams/create"))" />
+        @if (_isLoading)
+        {
+            <Placeholder Width="w-25" />
+            <Placeholder Width="w-25" Height="PlaceholderHeight.Smaller" />
+        }
+        else
+        {
+            <Typography FontSize="6" TextColor="TextColor.Danger">
+                У вас нет команд
+            </Typography>
+            <Button Variant="ButtonVariant.Primary"
+                    Text="Создать команду?"
+                    OnButtonClick="@(() => NavigationService.NavigateToAsync("teams/create"))" />
+        }
     </div>
 }
 else
 {
     <div class="w-100 d-flex flex-column bg-white rounded-3">
+        @if (_isLoading)
+        {
+            <Placeholder Width="w-25" />
+        }
         <Typography FontSize="6" CustomClass="py-2 px-3 border-bottom">
             Ваши команды
         </Typography>
@@ -41,16 +54,22 @@ else
                                                 Text="Ваша команда уже участвует в идее или проекте" 
                                                 IsLoading="true" />
                                     }
-                                    else if (_cachedRequests.TryGetValue(team.Id, out var request) && request.Status is not TeamRequestStatus.New)
+                                    else if (!_cachedRequests.TryGetValue(team.Id, out var request) || request.Status is not TeamRequestStatus.New)
                                     {
-                                        <Button Text="@(EnumViewModel<TeamRequestStatus>.GetTranslation(request.Status))"
-                                                Variant="GetStatusButtonVariant(request.Status)"
-                                                OnButtonClick="() => collapse.Toggle()" />
+                                        <Button Text="@GetStatusButtonText(request?.Status)"
+                                                Variant="GetStatusButtonVariant(request?.Status)"
+                                                IsLoading="request?.Status is TeamRequestStatus.Annulled or TeamRequestStatus.Canceled"
+                                                OnButtonClick="async () => {
+                                                    _queuedCollapseMethod = collapse.ExpandedStatus ? null : () => collapse.Toggle();
+                                                    await collapse.Toggle();
+                                                    LetterText = string.Empty;
+                                                }" />
                                     }
                                     else
                                     {
                                         <Button Variant="ButtonVariant.Danger" 
-                                                Text="Отозвать заявку" />
+                                                Text="Отозвать заявку"
+                                                OnButtonClick="() => WithdrawnRequest(team)" />
                                     }
                                 </div>
                             </MainContent>
@@ -72,7 +91,10 @@ else
                                         </div>
                                         <div class="w-50 border-start ps-3 pb-1">
                                             <div class="d-flex gap-2 align-items-center text-primary pb-1">
-                                                <input type="checkbox" class="form-check-input" />
+                                                @if (ShowSkillsCheckbox)
+                                                {
+                                                    <input type="checkbox" class="form-check-input" />
+                                                }
                                                 <div>Компетенции:</div>
                                             </div>
                                             <div class="d-flex flex-wrap gap-2">
@@ -93,8 +115,9 @@ else
                                               HintText="@_hintText"
                                               @bind-Value="LetterText"
                                               Style="resize: none; height: 200px;" />
-                                    <!-- TODO: уже отправляет -->
-                                    <Button Variant="ButtonVariant.Success" Text="Подать заявку" />
+                                    <Button Variant="ButtonVariant.Success" 
+                                            Text="Подать заявку"
+                                            OnButtonClick="() => SendNewRequest(team)" />
                                 </div>
                             </ExpandedContent>
                         </Collapse>

@@ -7,11 +7,11 @@
     <RightSideModalHeader HeaderText="@CurrentIdeaMarket?.Name" />
     @if (CurrentIdeaMarket is not null)
     {
-        <RequestTeamToIdeaForm IdeaMarketId="CurrentIdeaMarket.Id" />
+        <RequestTeamToIdeaForm IdeaMarket="CurrentIdeaMarket" ShowSkillsCheckbox="true" />
     }
 </div>
 
 @code {
     [Parameter]
-    public IdeaMarket? CurrentIdeaMarket { get; set; }
+    public required IdeaMarket CurrentIdeaMarket { get; set; }
 }

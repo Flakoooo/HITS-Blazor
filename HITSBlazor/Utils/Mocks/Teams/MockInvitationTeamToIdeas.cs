@@ -47,7 +47,16 @@ namespace HITSBlazor.Utils.Mocks.Teams
             ];
         }
 
+        public static void AnnulledInvitationByTeamId(Guid teamId)
+        {
+            foreach (var invitation in _invitationTeamToIdeas.Where(i => i.TeamId == teamId))
+                invitation.Status = TeamRequestStatus.Annulled;
+        }
+
         public static List<InvitationTeamToIdea> GetInvitationsTeamToIdeas(Guid teamId)
             => [.. _invitationTeamToIdeas.Where(itti => itti.TeamId == teamId)];
+
+        public static List<InvitationTeamToIdea> GetInvitationTeamsToIdea(Guid ideaId)
+            => [.. _invitationTeamToIdeas.Where(itti => itti.IdeaId == ideaId)];
     }
 }

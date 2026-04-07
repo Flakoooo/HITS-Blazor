@@ -25,6 +25,8 @@ namespace HITSBlazor.Components.Collapse
         private double? _height;
         private ElementReference _collapseElement;
 
+        public bool ExpandedStatus => _isExpanded;
+
         protected override void OnInitialized()
         {
             _isExpanded = !StartCollapsed;

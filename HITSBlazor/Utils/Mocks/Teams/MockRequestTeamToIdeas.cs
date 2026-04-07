@@ -1,5 +1,8 @@
-﻿using HITSBlazor.Models.Teams.Entities;
+﻿using HITSBlazor.Models.Markets.Entities;
+using HITSBlazor.Models.Quests.Entities;
+using HITSBlazor.Models.Teams.Entities;
 using HITSBlazor.Models.Teams.Enums;
+using HITSBlazor.Utils.Mocks.Ideas;
 using HITSBlazor.Utils.Mocks.Markets;
 
 namespace HITSBlazor.Utils.Mocks.Teams
@@ -130,5 +133,51 @@ namespace HITSBlazor.Utils.Mocks.Teams
 
         public static List<RequestTeamToIdea> GetRequestsTeamToIdeas(Guid teamId)
             => [.. _requestTeamToIdeas.Where(rtti => rtti.TeamId == teamId)];
+
+        public static RequestTeamToIdea CreateNewRequest(IdeaMarket ideaMarket, Team team, string letter)
+        {
+            var request = new RequestTeamToIdea
+            {
+                Id = Guid.NewGuid(),
+                IdeaMarketId = ideaMarket.Id,
+                MarketId = ideaMarket.MarketId,
+                TeamId = team.Id,
+                Status = TeamRequestStatus.New,
+                Name = team.Name,
+                MembersCount = team.MembersCount,
+                Skills = team.Skills,
+                Letter = letter
+            };
+
+            _requestTeamToIdeas.Add(request);
+
+            return request;
+        }
+
+        public static void AnnulledRequestByTeamId(Guid teamId)
+        {
+            foreach (var request in _requestTeamToIdeas.Where(r => r.TeamId == teamId))
+                request.Status = TeamRequestStatus.Annulled;
+        }
+
+        public static bool UpdateStatus(Guid requestId, TeamRequestStatus newStatus)
+        {
+            var request = _requestTeamToIdeas.FirstOrDefault(r => r.Id == requestId);
+            if (request is null) return false;
+
+            if (newStatus is TeamRequestStatus.Accepted)
+            {
+                var acceptedTeam = MockTeams.GetTeamById(request.TeamId);
+                acceptedTeam?.IsAcceptedToIdea = true;
+                MockIdeaMarkets.GetIdeaMarketById(request.IdeaMarketId)?.Team = acceptedTeam;
+
+                AnnulledRequestByTeamId(request.TeamId);
+                MockInvitationTeamToIdeas.AnnulledInvitationByTeamId(request.TeamId);
+            }
+
+            request.Status = newStatus;
+
+            return true;
+        }
     }
 }

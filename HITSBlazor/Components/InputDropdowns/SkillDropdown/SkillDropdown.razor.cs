@@ -1,6 +1,5 @@
 ﻿using HITSBlazor.Models.Common.Entities;
 using Microsoft.AspNetCore.Components;
-using Microsoft.JSInterop;
 
 namespace HITSBlazor.Components.InputDropdowns.SkillDropdown
 {
@@ -23,11 +22,5 @@ namespace HITSBlazor.Components.InputDropdowns.SkillDropdown
 
         private async Task CreateNewSkill(string name) 
             => await ValueMustCreated.InvokeAsync(name);
-
-        private async Task RemoveSkill(Skill skill)
-        {
-            if (SelectedSkills.Remove(skill))
-                await SelectedSkillsChanged.InvokeAsync(SelectedSkills);
-        }
     }
 }

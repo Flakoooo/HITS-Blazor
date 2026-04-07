@@ -1,6 +1,7 @@
 ﻿@namespace HITSBlazor.Components.InputDropdowns.SkillDropdown
 @using HITSBlazor.Components.Inputs.CheckboxDropdown
 @using HITSBlazor.Components.Placeholders.Placeholder
+@using HITSBlazor.Components.Skills
 @using HITSBlazor.Components.Typography
 @using HITSBlazor.Models.Common.Entities
 @using HITSBlazor.Models.Common.Enums
@@ -18,17 +19,9 @@
     {
         <div class="mt-2">
             <div class="d-flex flex-wrap gap-1">
-                @foreach (var skill in SelectedSkills)
-                {
-                    <div class="px-2 py-1 rounded d-flex gap-1 align-items-center @(EnumViewModel<SkillType>.GetStyle(skill.Type))">
-                        <Typography FontSize="6">
-                            @skill.Name
-                        </Typography>
-                        <i @onclick="@(() => RemoveSkill(skill))"
-                            class="bi bi-x-lg"
-                            style="cursor: pointer;"></i>
-                    </div>
-                }
+                <Skills RemoveSkillsAllowed="true" 
+                        SkillList="SelectedSkills"
+                        SkillListChanged="(newList) => SelectedSkills = new HashSet<Skill>(newList)" />
             </div>
         </div>
     }

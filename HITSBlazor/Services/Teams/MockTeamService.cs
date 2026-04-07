@@ -1,4 +1,6 @@
-﻿using HITSBlazor.Models.Teams.Entities;
+﻿using HITSBlazor.Models.Markets.Entities;
+using HITSBlazor.Models.Teams.Entities;
+using HITSBlazor.Models.Teams.Enums;
 using HITSBlazor.Utils.Mocks.Teams;
 
 namespace HITSBlazor.Services.Teams
@@ -6,6 +8,8 @@ namespace HITSBlazor.Services.Teams
     public class MockTeamService(GlobalNotificationService globalNotificationService) : ITeamService
     {
         private readonly GlobalNotificationService _globalNotificationService = globalNotificationService;
+
+        public event Action<Guid, TeamRequestStatus>? OnRequestsStatusUpdated;
 
         private List<Team> _cachedTeams = [];
         private DateTime _lastRefreshTime;
@@ -89,5 +93,18 @@ namespace HITSBlazor.Services.Teams
 
         public async Task<List<InvitationTeamToIdea>> GetInvitationsTeamToIdeasAsync(Guid teamId)
             => MockInvitationTeamToIdeas.GetInvitationsTeamToIdeas(teamId);
+
+        public async Task<RequestTeamToIdea> CreateRequestTeamToIdeaAsync(IdeaMarket ideaMarket, Team team, string letter)
+        {
+            return MockRequestTeamToIdeas.CreateNewRequest(ideaMarket, team, letter);
+        }
+
+        public async Task<bool> UpdateRequestTeamToIdeaStatusAsync(Guid requestId, TeamRequestStatus newStatus)
+        {
+            var result = MockRequestTeamToIdeas.UpdateStatus(requestId, newStatus);
+            if (result) OnRequestsStatusUpdated?.Invoke(requestId, newStatus);
+
+            return result;
+        }
     }
 }

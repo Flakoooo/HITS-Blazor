@@ -45,8 +45,10 @@ namespace HITSBlazor.Components.Modals.RightSideModals.IdeaMarketModal
         private Market? _currentMarket;
         private IdeaMarket? _currentIdeaMarket;
 
-        private List<RequestTeamToIdea> _requestsTeamToIdeas = [];
-        private List<InvitationTeamToIdea> _invitationsTeamToIdeas = [];
+        private string _searchText = string.Empty;
+
+        private List<RequestTeamToIdea> _requestsTeamsToIdea = [];
+        private List<InvitationTeamToIdea> _invitationsTeamsToIdea = [];
 
         private IdeaMarketTableCategory _activeTableCategory = IdeaMarketTableCategory.AcceptedTeam;
 
@@ -122,8 +124,7 @@ namespace HITSBlazor.Components.Modals.RightSideModals.IdeaMarketModal
 
             _ideaData = GetIdeaData();
 
-            if (_currentIdeaMarket.Team is not null)
-                _requestsTeamToIdeas = await TeamService.GetRequestsTeamToIdeasAsync(_currentIdeaMarket.Team.Id);
+            await LoadDataAsync();
 
             _infoItems[0].Text = _currentIdeaMarket.Customer;
 
@@ -152,7 +153,27 @@ namespace HITSBlazor.Components.Modals.RightSideModals.IdeaMarketModal
         private string GetTableCategoryClass(IdeaMarketTableCategory category)
             => _activeTableCategory == category ? "active text-primary" : "text-secondary";
 
+        private async Task LoadDataAsync()
+        {
+            if (_currentIdeaMarket is null) return;
+
+            if (_activeTableCategory is IdeaMarketTableCategory.Requests)
+                _requestsTeamsToIdea = await IdeaMarketService.GetRequestsTeamToIdeaAsync(
+                    _currentIdeaMarket.Id
+                );
+            else if (_activeTableCategory is IdeaMarketTableCategory.InvitedTeams)
+                _invitationsTeamsToIdea = await IdeaMarketService.GetInvitationTeamsToIdeaAsync(
+                    _currentIdeaMarket.IdeaId
+                );
+        }
+
         private void ShowTeamModal(Guid teamId) => ModalService.ShowTeamModal(teamId);
+
+        private async Task SearchData(string value)
+        {
+            _searchText = value;
+            await LoadDataAsync();
+        }
 
         private void HandleTableMenuClick(TableActionContext context)
         {
@@ -162,7 +183,7 @@ namespace HITSBlazor.Components.Modals.RightSideModals.IdeaMarketModal
             }
             if (context.Action == MenuAction.ViewLetter)
             {
-                
+                //TODO: реализовать модальное окно
             }
         }
     }

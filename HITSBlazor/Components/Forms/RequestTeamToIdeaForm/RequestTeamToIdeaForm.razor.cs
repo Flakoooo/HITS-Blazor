@@ -1,4 +1,6 @@
 ﻿using HITSBlazor.Components.Button;
+using HITSBlazor.Components.Collapse;
+using HITSBlazor.Models.Markets.Entities;
 using HITSBlazor.Models.Teams.Entities;
 using HITSBlazor.Models.Teams.Enums;
 using HITSBlazor.Services;
@@ -7,10 +9,11 @@ using HITSBlazor.Services.IdeaMarkets;
 using HITSBlazor.Services.Modal;
 using HITSBlazor.Services.Teams;
 using Microsoft.AspNetCore.Components;
+using System.Threading.Tasks;
 
 namespace HITSBlazor.Components.Forms.RequestTeamToIdeaForm
 {
-    public partial class RequestTeamToIdeaForm
+    public partial class RequestTeamToIdeaForm : IDisposable
     {
         [Inject]
         private IAuthService AuthService { get; set; } = null!;
@@ -28,9 +31,16 @@ namespace HITSBlazor.Components.Forms.RequestTeamToIdeaForm
         private IIdeaMarketService IdeaMarketService { get; set; } = null!;
 
         [Parameter]
-        public Guid IdeaMarketId { get; set; }
+        public required IdeaMarket IdeaMarket { get; set; }
+
+        [Parameter]
+        public bool ShowSkillsCheckbox { get; set; } = false;
 
         private bool _isLoading = true;
+        private bool _sumbitted = false;
+        private bool _sumbitting = false;
+
+        private Func<Task>? _queuedCollapseMethod;
 
         private List<Team> _teams = [];
         private Dictionary<Guid, RequestTeamToIdea> _cachedRequests = [];
@@ -49,21 +59,76 @@ namespace HITSBlazor.Components.Forms.RequestTeamToIdeaForm
             if (AuthService.CurrentUser is not null)
             {
                 _teams = await TeamService.GetTeamsByOwnerOrLeaderId(AuthService.CurrentUser.Id);
-                var requestsTeamToIdea = await IdeaMarketService.GetRequestsTeamToIdeaAsync(IdeaMarketId);
+                var requestsTeamToIdea = await IdeaMarketService.GetRequestsTeamToIdeaAsync(IdeaMarket.Id);
 
-                _cachedRequests = (await IdeaMarketService.GetRequestsTeamToIdeaAsync(IdeaMarketId))
+                _cachedRequests = (await IdeaMarketService.GetRequestsTeamToIdeaAsync(IdeaMarket.Id))
                     .Where(r => _teams.Select(t => t.Id).Contains(r.TeamId))
                     .ToDictionary(r => r.TeamId, r => r);
+
+                TeamService.OnRequestsStatusUpdated += EventedRequestUpdate;
 
                 _isLoading = false;
             }
         }
 
-        private static ButtonVariant GetStatusButtonVariant(TeamRequestStatus status) => status switch
+        private static string GetStatusButtonText(TeamRequestStatus? status) => status switch
+        {
+            TeamRequestStatus.Canceled => "Заявка отклонена",
+            TeamRequestStatus.Annulled => "Команда в работе",
+            _ => "Подать заявку"
+        };
+
+        private static ButtonVariant GetStatusButtonVariant(TeamRequestStatus? status) => status switch
         {
             TeamRequestStatus.Canceled => ButtonVariant.Danger,
             TeamRequestStatus.Annulled => ButtonVariant.Secondary,
             _ => ButtonVariant.Primary
         };
+
+        private void WithdrawnRequest(Team team) => ModalService.ShowConfirmModal(
+            $"Вы действительно хотите отозвать заявку команды {team.Name}?",
+            () => TeamService.UpdateRequestTeamToIdeaStatusAsync(_cachedRequests[team.Id].Id, TeamRequestStatus.Withdrawn),
+            confirmButtonVariant: ButtonVariant.Danger,
+            confirmButtonText: "Отклонить заявку"
+        );
+
+        private async Task SendNewRequest(Team team)
+        {
+            _sumbitting = true;
+            _sumbitted = false;
+
+            var isValid = true;
+            if (string.IsNullOrWhiteSpace(LetterText)) isValid = false;
+
+            if (isValid)
+            {
+                var newRequest = await TeamService.CreateRequestTeamToIdeaAsync(IdeaMarket, team, LetterText);
+                _cachedRequests.Add(team.Id, newRequest);
+                if (_queuedCollapseMethod is not null)
+                {
+                    await _queuedCollapseMethod();
+                    _queuedCollapseMethod = null;
+                }
+
+                StateHasChanged();
+            }
+
+            _sumbitted = true;
+            _sumbitting = false;
+        }
+
+        private void EventedRequestUpdate(Guid requestId, TeamRequestStatus newStatus)
+        {
+            foreach (var request in _cachedRequests)
+                if (request.Value.Id == requestId)
+                    request.Value.Status = newStatus;
+            
+            StateHasChanged();
+        }
+
+        public void Dispose()
+        {
+            TeamService.OnRequestsStatusUpdated -= EventedRequestUpdate;
+        }
     }
 }

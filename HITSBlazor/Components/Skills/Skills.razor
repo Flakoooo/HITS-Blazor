@@ -1,0 +1,37 @@
+﻿@namespace HITSBlazor.Components.Skills
+@using HITSBlazor.Components.Typography
+@using HITSBlazor.Models.Common.Entities
+@using HITSBlazor.Models.Common.Enums
+@using HITSBlazor.Utils.Models
+
+@foreach (var skill in SkillList)
+{
+    <div class="px-2 py-1 rounded d-flex gap-1 @(EnumViewModel<SkillType>.GetStyle(skill.Type))">
+        <Typography FontSize="6">
+            @skill.Name
+        </Typography>
+        @if (RemoveSkillsAllowed)
+        {
+            <i @onclick="@(() => RemoveSkill(skill))"
+               class="bi bi-x-lg"
+               style="cursor: pointer;"></i>
+        }
+    </div>
+}
+
+@code {
+    [Parameter]
+    public ICollection<Skill> SkillList { get; set; } = [];
+
+    [Parameter]
+    public EventCallback<ICollection<Skill>> SkillListChanged { get; set; }
+
+    [Parameter]
+    public bool RemoveSkillsAllowed { get; set; } = false;
+
+    private async Task RemoveSkill(Skill skill)
+    {
+        if (SkillList.Remove(skill))
+            await SkillListChanged.InvokeAsync(SkillList);
+    }
+}

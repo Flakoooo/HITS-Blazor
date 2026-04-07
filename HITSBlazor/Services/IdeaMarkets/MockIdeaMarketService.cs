@@ -75,5 +75,8 @@ namespace HITSBlazor.Services.IdeaMarkets
 
         public async Task<List<RequestTeamToIdea>> GetRequestsTeamToIdeaAsync(Guid ideaMarketId)
             => MockRequestTeamToIdeas.GetRequestsByIdeaMarketId(ideaMarketId);
+
+        public async Task<List<InvitationTeamToIdea>> GetInvitationTeamsToIdeaAsync(Guid ideaId)
+            => MockInvitationTeamToIdeas.GetInvitationTeamsToIdea(ideaId);
     }
 }

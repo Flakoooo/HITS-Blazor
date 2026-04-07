@@ -2,6 +2,7 @@
 @using HITSBlazor.Components.ActionMenus.BaseActionMenu
 @using HITSBlazor.Components.Button
 @using HITSBlazor.Components.Collapse
+@using HITSBlazor.Components.ListPageComponents.ListPageSearch
 @using HITSBlazor.Components.Modals.Components
 @using HITSBlazor.Components.Modals.Components.ModalHeader
 @using HITSBlazor.Components.Modals.Components.RightSideModaCollapselInfo
@@ -110,17 +111,8 @@
                 </div>
                 <div class="team-modal-tables">
                     <div class="w-100 bg-white px-3 pb-3 pt-1">
-                        <div class="py-2 d-flex justify-content-between">
-                            <div class="w-50">
-                                <!-- TODO: Реализовать поиск -->
-                                <div class="input-group">
-                                    <Typography FontSize="6" CustomClass="input-group-text">
-                                        <i class="bi bi-search"></i>
-                                    </Typography>
-                                    <input type="text" placeholder="Поиск" class="form-control rounded-end" />
-                                </div>
-                            </div>
-                        </div>
+                        <!-- TODO: реализовать поиск -->
+                        <ListPageSearch IsLoading="_isLoading" ValueChanged="@((value) => SeacrhTag(value))" />
                         <div class="w-100 d-flex">
                             <div class="w-100">
                                 <table class="table table-hover mb-0">
