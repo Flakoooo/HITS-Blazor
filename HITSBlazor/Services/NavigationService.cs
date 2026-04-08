@@ -412,7 +412,7 @@ namespace HITSBlazor.Services
                         }
                     }
                 }
-
+                menuItems.Add(nav);
             }
 
             var questRoles = new HashSet<RoleType>

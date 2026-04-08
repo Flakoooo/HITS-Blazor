@@ -6,6 +6,7 @@ namespace HITSBlazor.Services.Teams
 {
     public interface ITeamService
     {
+        event Func<Task>? OnRequestsStatusCreated;
         event Action<Guid, TeamRequestStatus>? OnRequestsStatusUpdated;
 
         Task<List<Team>> GetTeamsAsync(TeamsFilter filter);

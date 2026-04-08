@@ -45,7 +45,7 @@ namespace HITSBlazor.Services.IdeaMarkets
                     if (isInitiator)
                         ideaMarkets = MockIdeaMarkets.GetIdeaMarketsByMarketIdAndInitiatorId(marketId, _authService.CurrentUser.Id);
                     else
-                        ideaMarkets = MockIdeaMarkets.GetIdeaMarketsByMarketId(marketId);
+                        ideaMarkets = MockIdeaMarkets.GetIdeaMarketsByMarketId(marketId, _authService.CurrentUser.Id);
 
                     _cache[marketId] = new Dictionary<bool, CacheEntry<List<IdeaMarket>>>
                     {
@@ -73,10 +73,48 @@ namespace HITSBlazor.Services.IdeaMarkets
         public async Task<IdeaMarket?> GetIdeaMarketAsync(Guid guid) 
             => MockIdeaMarkets.GetIdeaMarketById(guid);
 
-        public async Task<List<RequestTeamToIdea>> GetRequestsTeamToIdeaAsync(Guid ideaMarketId)
-            => MockRequestTeamToIdeas.GetRequestsByIdeaMarketId(ideaMarketId);
+        public async Task<List<RequestTeamToIdea>> GetRequestsTeamToIdeaAsync(Guid ideaMarketId, string? searchText)
+        {
+            var requests = MockRequestTeamToIdeas.GetRequestsByIdeaMarketId(ideaMarketId);
 
-        public async Task<List<InvitationTeamToIdea>> GetInvitationTeamsToIdeaAsync(Guid ideaId)
-            => MockInvitationTeamToIdeas.GetInvitationTeamsToIdea(ideaId);
+            var query = requests.AsEnumerable();
+
+            if (!string.IsNullOrWhiteSpace(searchText))
+                query = query.Where(r => r.Name.Contains(searchText, StringComparison.CurrentCultureIgnoreCase));
+
+            return [.. query];
+        }
+
+        public async Task<List<InvitationTeamToIdea>> GetInvitationTeamsToIdeaAsync(Guid ideaId, string? searchText)
+        {
+            var invitations = MockInvitationTeamToIdeas.GetInvitationTeamsToIdea(ideaId);
+
+            var query = invitations.AsEnumerable();
+
+            if (!string.IsNullOrWhiteSpace(searchText))
+                query = query.Where(r => r.TeamName.Contains(searchText, StringComparison.CurrentCultureIgnoreCase));
+
+            return [.. query];
+        }
+
+        public async Task<bool> SetIdeaFavorite(Guid userId, IdeaMarket ideaMarket)
+        {
+            var result = MockIdeaMarkets.SetIdeaFavorite(userId, ideaMarket.Id);
+            if (result && _authService.CurrentUser is not null && _cache.TryGetValue(ideaMarket.MarketId, out var marketCache))
+                foreach (var cache in marketCache)
+                    cache.Value.Data.FirstOrDefault(i => i.Id == ideaMarket.Id)?.IsFavorite = true;
+
+            return result;
+        }
+
+        public async Task<bool> UnsetIdeaFromFavorite(Guid userId, IdeaMarket ideaMarket)
+        {
+            var result = MockIdeaMarkets.UnsetIdeaFromFavorite(userId, ideaMarket.Id);
+            if (result && _authService.CurrentUser is not null && _cache.TryGetValue(ideaMarket.MarketId, out var marketCache))
+                foreach (var cache in marketCache)
+                    cache.Value.Data.FirstOrDefault(i => i.Id == ideaMarket.Id)?.IsFavorite = false;
+
+            return result;
+        }
     }
 }

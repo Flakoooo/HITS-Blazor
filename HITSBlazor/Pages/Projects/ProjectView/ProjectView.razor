@@ -1,0 +1,84 @@
+﻿@namespace HITSBlazor.Pages.Projects.ProjectView
+@using HITSBlazor.Components.ActionMenus.BaseActionMenu
+@using HITSBlazor.Components.ListPageComponents.ListPageSearch
+@using HITSBlazor.Components.Modals.Components.RightSideModaCollapselInfo
+@using HITSBlazor.Components.Tables.TableActionMenu
+@using HITSBlazor.Components.Tables.TableBodyRow
+@using HITSBlazor.Components.Tables.TableHeader
+@using HITSBlazor.Components.Typography
+@using HITSBlazor.Models.Projects.Enums
+@using HITSBlazor.Utils.Models
+
+<div class="bg-white h-auto">
+    <div class="px-4 py-3 h-100">
+        <div class="d-flex gap-3 align-items-center mb-2">
+            <Typography FontSize="4" TextColor="TextColor.Primary">
+                @_currentProject.Name
+            </Typography>
+            <div class="px-2 py-1 rounded-4 bg-warning-subtle text-warning">
+                @(EnumViewModel<ProjectStatus>.GetTranslation(_currentProject.Status))
+            </div>
+        </div>
+        <div>
+            <div class="px-3">
+                <ul class="nav nav-tabs">
+                    @foreach (var category in Enum.GetValues<ProjectViewCategory>())
+                    {
+                        <div @onclick="() => ChangeCategory(category)"
+                             class="nav-link fw-normal pb-1 @GetTableCategoryClass(category)">
+                            @(EnumViewModel<ProjectViewCategory>.GetTranslation(category))
+                        </div>
+                    }
+                </ul>
+            </div>
+            <div class="d-flex gap-3 mt-4">
+                <div class="w-75">
+                    <RightSideModaCollapselInfo Data="_projectInfoData" />
+                    <div class="w-100 bg-white p-3">
+                        <ListPageSearch IsLoading="_isLoading" ValueChanged="@((value) => SeacrhMember(value))" />
+                        <div class="w-100 d-flex">
+                            <div class="w-100">
+                                <!-- TODO: перейти на профиль -->
+                                <table class="table table-hover mb-0">
+                                    <TableHeader Items="MembersTableHeader" TableActionMenuIsEnable="true" />
+                                    <tbody>
+                                        @foreach (var member in _currentProject.Members)
+                                        {
+                                            <tr>
+                                                <TableBodyRow>
+                                                    <div class="data-link">
+                                                        @member.Email
+                                                    </div>
+                                                </TableBodyRow>
+                                                <TableBodyRow>
+                                                    @member.FirstName
+                                                </TableBodyRow>
+                                                <TableBodyRow>
+                                                    @member.LastName
+                                                </TableBodyRow>
+                                                <TableBodyRow IsCentered="true">
+                                                    <div class="px-2 py-1 rounded-4 bg-primary-subtle text-primary">
+                                                        @member.ProjectRole
+                                                    </div>
+                                                </TableBodyRow>
+                                                <TableActionMenu ItemId="member.UserId"
+                                                                    StrategyPosition="Strategy.Fixed"
+                                                                    OnAction="@HandleTableMenuClick"
+                                                                    ActionIds="@(new Dictionary<MenuAction, object> {
+                                                                    [MenuAction.ViewProfile] = member.UserId
+                                                                    })" />
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="w-25">
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

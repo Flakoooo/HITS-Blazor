@@ -1,0 +1,53 @@
+﻿@namespace HITSBlazor.Components.Modals.CenterModals.LetterModal
+@using HITSBlazor.Components.Button
+@using HITSBlazor.Components.Modals.Components.CenterModalHeader
+@using HITSBlazor.Components.Typography
+@using HITSBlazor.Services.Modal
+
+<div class="letter-modal p-3 rounded bg-white" @onclick:stopPropagation="true">
+    <CenterModalHeader HeaderText="Мотивационное письмо" />
+    <Typography FontSize="6" CustomClass="p-2 border rounded w-100">
+        @Letter
+    </Typography>
+    @if (AcceptedButtonAllowed)
+    {
+        <Button Text="Принять заявку" 
+                Variant="ButtonVariant.Success"
+                OnButtonClick="OnButtonClick" />
+    }
+</div>
+
+<style>
+    .letter-modal {
+        width: 400px;
+        display: flex;
+        flex-direction: column;
+        flex-wrap: nowrap;
+        align-items: flex-start;
+        justify-content: flex-start;
+        gap: 8px;
+        align-self: center;
+        justify-self: center;
+        transition: all .15s ease-out;
+    }
+</style>
+
+@code {
+    [Inject]
+    private ModalService ModalService { get; set; } = null!;
+
+    [Parameter]
+    public string Letter { get; set; } = string.Empty;
+
+    [Parameter]
+    public bool AcceptedButtonAllowed { get; set; } = false;
+
+    [Parameter]
+    public EventCallback OnAcceptedButtonClick { get; set; }
+
+    private async Task OnButtonClick()
+    {
+        await OnAcceptedButtonClick.InvokeAsync();
+        await ModalService.Close(ModalType.Center);
+    }
+}

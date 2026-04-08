@@ -37,6 +37,10 @@ namespace HITSBlazor.Components.ActionMenus.BaseActionMenu
         [Style("")]
         ViewTeamProfile,
 
+        [Description("Перейти в проект")]
+        [Style("")]
+        ViewProject,
+
         //=== text-success стили ===
         [Description("Принять")]
         [Style("text-success")]

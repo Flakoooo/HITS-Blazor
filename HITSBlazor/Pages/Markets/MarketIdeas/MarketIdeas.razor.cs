@@ -71,7 +71,7 @@ namespace HITSBlazor.Pages.Markets.MarketIdeas
 
             _ideaMarkets = await IdeaMarketService.GetIdeasMarketAsync(
                 _currentMarket.Id,
-                favorite: _category == MarketIdeasCategory.Favorite,
+                favorite: _category == MarketIdeasCategory.Favorite ? true : null,
                 searchText: _searchText,
                 selectedStatus: SelectedStatusType?.Value
             );
@@ -103,6 +103,51 @@ namespace HITSBlazor.Pages.Markets.MarketIdeas
                 confirmButtonVariant: ButtonVariant.Success,
                 confirmButtonText: "Завершить биржу"
             );
+        }
+
+        private async Task ChangeIdeaFavorite(IdeaMarket ideaMarket)
+        {
+            if (AuthService.CurrentUser is not null)
+            {
+                if (ideaMarket.IsFavorite)
+                {
+                    var result = await IdeaMarketService.UnsetIdeaFromFavorite(AuthService.CurrentUser.Id, ideaMarket);
+                    if (result)
+                    {
+                        ideaMarket.IsFavorite = false; 
+                        StateHasChanged();
+                    }
+                }
+                else
+                {
+                    var result = await IdeaMarketService.SetIdeaFavorite(AuthService.CurrentUser.Id, ideaMarket);
+                    if (result)
+                    {
+                        ideaMarket.IsFavorite = true;
+                        StateHasChanged();
+                    }
+                }
+            }
+        }
+
+        private async Task SetIdeaFavorite(IdeaMarket ideaMarket)
+        {
+            if (AuthService.CurrentUser is not null)
+            {
+                var result = await IdeaMarketService.SetIdeaFavorite(AuthService.CurrentUser.Id, ideaMarket);
+                if (result) ideaMarket.IsFavorite = result;
+                StateHasChanged();
+            }
+        }
+
+        private async Task UnsetIdeaFromFavorite(IdeaMarket ideaMarket)
+        {
+            if (AuthService.CurrentUser is not null)
+            {
+                var result = await IdeaMarketService.UnsetIdeaFromFavorite(AuthService.CurrentUser.Id, ideaMarket);
+                if (result) ideaMarket.IsFavorite = !result;
+                StateHasChanged();
+            }
         }
 
         private void ShowIdeaMarketModal(Guid ideaMarketId) => ModalService.Show<IdeaMarketModal>(

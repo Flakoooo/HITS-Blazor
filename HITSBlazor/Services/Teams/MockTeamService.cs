@@ -9,7 +9,8 @@ namespace HITSBlazor.Services.Teams
     {
         private readonly GlobalNotificationService _globalNotificationService = globalNotificationService;
 
-        public event Action<Guid, TeamRequestStatus>? OnRequestsStatusUpdated;
+        public event Func<Task>? OnRequestsStatusCreated;
+        public event Action<Guid, TeamRequestStatus>? OnRequestsStatusUpdated;        
 
         private List<Team> _cachedTeams = [];
         private DateTime _lastRefreshTime;
@@ -96,7 +97,11 @@ namespace HITSBlazor.Services.Teams
 
         public async Task<RequestTeamToIdea> CreateRequestTeamToIdeaAsync(IdeaMarket ideaMarket, Team team, string letter)
         {
-            return MockRequestTeamToIdeas.CreateNewRequest(ideaMarket, team, letter);
+            var newRequest =  MockRequestTeamToIdeas.CreateNewRequest(ideaMarket, team, letter);
+
+            OnRequestsStatusCreated?.Invoke();
+
+            return newRequest;
         }
 
         public async Task<bool> UpdateRequestTeamToIdeaStatusAsync(Guid requestId, TeamRequestStatus newStatus)

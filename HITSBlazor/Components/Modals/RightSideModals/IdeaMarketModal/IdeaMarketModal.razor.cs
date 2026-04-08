@@ -1,10 +1,13 @@
 ﻿using HITSBlazor.Components.ActionMenus.BaseActionMenu;
+using HITSBlazor.Components.Modals.CenterModals.LetterModal;
 using HITSBlazor.Components.Modals.Components.RightSideModaCollapselInfo;
 using HITSBlazor.Components.Modals.Components.RightSideModalInfo;
 using HITSBlazor.Components.Tables.TableHeader;
+using HITSBlazor.Models.Common.Entities;
 using HITSBlazor.Models.Markets.Entities;
 using HITSBlazor.Models.Markets.Enums;
 using HITSBlazor.Models.Teams.Entities;
+using HITSBlazor.Models.Users.Enums;
 using HITSBlazor.Services;
 using HITSBlazor.Services.Auth;
 using HITSBlazor.Services.IdeaMarkets;
@@ -13,17 +16,13 @@ using HITSBlazor.Services.Modal;
 using HITSBlazor.Services.Teams;
 using HITSBlazor.Utils.Models;
 using Microsoft.AspNetCore.Components;
-using System;
 
 namespace HITSBlazor.Components.Modals.RightSideModals.IdeaMarketModal
 {
-    public partial class IdeaMarketModal
+    public partial class IdeaMarketModal : IDisposable
     {
         [Inject]
         private IAuthService AuthService { get; set; } = null!;
-
-        [Inject]
-        private NavigationService NavigationService { get; set; } = null!;
 
         [Inject]
         private IIdeaMarketService IdeaMarketService { get; set; } = null!;
@@ -54,9 +53,11 @@ namespace HITSBlazor.Components.Modals.RightSideModals.IdeaMarketModal
 
         private List<CollapseItem> _ideaData = [];
 
+        private List<Skill> RequestTeamsSkills { get; set; } = [];
+
         private static List<TableHeaderItem> AcceptedTeamTableHeader { get; } =
         [
-            //сделать поле с чекбоксом
+            new() { Text = "" },
             new() { Text = "Название", ColumnClass = "col-3" },
             new() { Text = "Лидер", ColumnClass = "col-3" },
             new() { Text = "Участники", InCentered = true, OrderBy = nameof(Team.MembersCount) },
@@ -65,7 +66,7 @@ namespace HITSBlazor.Components.Modals.RightSideModals.IdeaMarketModal
 
         private static List<TableHeaderItem> RequestsTableHeader { get; } =
         [
-            //сделать поле с чекбоксом
+            new() { Text = "" },
             new() { Text = "Название", ColumnClass = "col-3" },
             new() { Text = "Статус", ColumnClass = "col-3" },
             new() { Text = "Участники", InCentered = true, OrderBy = nameof(Team.MembersCount) },
@@ -74,7 +75,7 @@ namespace HITSBlazor.Components.Modals.RightSideModals.IdeaMarketModal
 
         private static List<TableHeaderItem> InvitedTeamsTableHeader { get; } =
         [
-            //сделать поле с чекбоксом
+            new() { Text = "" },
             new() { Text = "Название", ColumnClass = "col-3" },
             new() { Text = "Статус", ColumnClass = "col-3" },
             new() { Text = "Участники", InCentered = true, OrderBy = nameof(Team.MembersCount) },
@@ -125,6 +126,7 @@ namespace HITSBlazor.Components.Modals.RightSideModals.IdeaMarketModal
             _ideaData = GetIdeaData();
 
             await LoadDataAsync();
+            TeamService.OnRequestsStatusCreated += LoadDataAsync;
 
             _infoItems[0].Text = _currentIdeaMarket.Customer;
 
@@ -159,12 +161,20 @@ namespace HITSBlazor.Components.Modals.RightSideModals.IdeaMarketModal
 
             if (_activeTableCategory is IdeaMarketTableCategory.Requests)
                 _requestsTeamsToIdea = await IdeaMarketService.GetRequestsTeamToIdeaAsync(
-                    _currentIdeaMarket.Id
+                    _currentIdeaMarket.Id,
+                    searchText: _searchText
                 );
             else if (_activeTableCategory is IdeaMarketTableCategory.InvitedTeams)
                 _invitationsTeamsToIdea = await IdeaMarketService.GetInvitationTeamsToIdeaAsync(
-                    _currentIdeaMarket.IdeaId
+                    _currentIdeaMarket.IdeaId,
+                    searchText: _searchText
                 );
+        }
+
+        private async Task ChangeCategory(IdeaMarketTableCategory category)
+        {
+            _activeTableCategory = category;
+            await LoadDataAsync();
         }
 
         private void ShowTeamModal(Guid teamId) => ModalService.ShowTeamModal(teamId);
@@ -183,8 +193,26 @@ namespace HITSBlazor.Components.Modals.RightSideModals.IdeaMarketModal
             }
             if (context.Action == MenuAction.ViewLetter)
             {
-                //TODO: реализовать модальное окно
+                if (_currentIdeaMarket is not null && AuthService.CurrentUser is not null)
+                {
+                    //TODO: сделать назначение команды
+                    bool buttonAllowed = _currentIdeaMarket.Status is not IdeaMarketStatusType.RecruitmentIsClosed
+                        && (AuthService.CurrentUser.Id == _currentIdeaMarket.Initiator.Id || AuthService.CurrentUser.Role is RoleType.Admin);
+                    ModalService.Show<LetterModal>(
+                        ModalType.Center,
+                        parameters: new Dictionary<string, object>
+                        {
+                            [nameof(LetterModal.Letter)] = context.Item,
+                            [nameof(LetterModal.AcceptedButtonAllowed)] = buttonAllowed,
+                            //[nameof(LetterModal.OnAcceptedButtonClick)] = 
+                        });
+                }
             }
+        }
+
+        public void Dispose()
+        {
+            TeamService.OnRequestsStatusCreated -= LoadDataAsync;
         }
     }
 }

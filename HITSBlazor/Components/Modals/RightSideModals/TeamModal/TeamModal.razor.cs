@@ -2,11 +2,13 @@
 using HITSBlazor.Components.Modals.Components;
 using HITSBlazor.Components.Modals.Components.RightSideModaCollapselInfo;
 using HITSBlazor.Components.Modals.Components.RightSideModalInfo;
+using HITSBlazor.Components.Modals.RightSideModals.IdeaMarketModal;
 using HITSBlazor.Components.Modals.RightSideModals.IdeaModal;
 using HITSBlazor.Components.Tables.TableHeader;
 using HITSBlazor.Models.Common.Entities;
 using HITSBlazor.Models.Ideas.Entities;
 using HITSBlazor.Models.Teams.Entities;
+using HITSBlazor.Services.IdeaMarkets;
 using HITSBlazor.Services.Modal;
 using HITSBlazor.Services.Teams;
 using Microsoft.AspNetCore.Components;
@@ -29,6 +31,8 @@ namespace HITSBlazor.Components.Modals.RightSideModals.TeamModal
         private Team? _currentTeam;
 
         private List<CollapseItem> _teamData = [];
+
+        private string _searchText = string.Empty;
 
         private List<TeamInvitation> _teamInvitations = [];
         private List<RequestToTeam> _requestsToTeam = [];
@@ -124,6 +128,27 @@ namespace HITSBlazor.Components.Modals.RightSideModals.TeamModal
             _isLoading = false;
         }
 
+        //TODO: реализовать поиск по тексту
+        private async Task LoadDataAsync()
+        {
+            if (_activeTableCategory is TeamTableCategory.Invitations)
+            {
+                _teamInvitations = await TeamService.GetTeamInvitationsAsync(TeamId);
+            }
+            else if (_activeTableCategory is TeamTableCategory.RequestsToTeam)
+            {
+                _requestsToTeam = await TeamService.GetTeamRequestsToTeamAsync(TeamId);
+            }
+            else if (_activeTableCategory is TeamTableCategory.RequestsTeamToIdeas)
+            {
+                _requestsTeamToIdeas = await TeamService.GetRequestsTeamToIdeasAsync(TeamId);
+            }
+            else if (_activeTableCategory is TeamTableCategory.InvitationsTeamToIdeas)
+            {
+                _invitationsTeamToIdeas = await TeamService.GetInvitationsTeamToIdeasAsync(TeamId);
+            }
+        }
+
         private List<CollapseItem> GetTeamData() => [
             new() { Title = "Описание команды", Data = _currentTeam?.Description },
         ];
@@ -131,6 +156,19 @@ namespace HITSBlazor.Components.Modals.RightSideModals.TeamModal
         private string GetTableCategoryClass(TeamTableCategory category)
             => _activeTableCategory == category ? "active text-primary" : "text-secondary";
 
+        private async Task ChangeCategory(TeamTableCategory category)
+        {
+            _activeTableCategory = category;
+            await LoadDataAsync();
+        }
+
+        private async Task SearchData(string value)
+        {
+            _searchText = value;
+            await LoadDataAsync();
+        }
+
+        //TODO: доделать активное меню
         private void HandleTableMenuClick(TableActionContext context)
         {
             if (context.Action == MenuAction.ViewProfile)

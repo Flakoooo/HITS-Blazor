@@ -32,7 +32,7 @@
                 <ul class="nav nav-underline border-bottom px-3">
                     @foreach (var category in Enum.GetValues<IdeaMarketTableCategory>())
                     {
-                        <div @onclick="@(() => _activeTableCategory = category)" style="cursor: pointer;"
+                        <div @onclick="() => ChangeCategory(category)" style="cursor: pointer;"
                              class="nav-link fw-normal pb-1 @GetTableCategoryClass(category)">
                             @(EnumViewModel<IdeaMarketTableCategory>.GetTranslation(category))
                         </div>
@@ -176,7 +176,9 @@
             && _currentIdeaMarket.Status is IdeaMarketStatusType.RecruitmentIsOpen
         )
         {
-            <RequestTeamToIdeaForm IdeaMarket="_currentIdeaMarket" ShowSkillsCheckbox="true" />          
+            <RequestTeamToIdeaForm IdeaMarket="_currentIdeaMarket"
+                                   ShowSkillsCheckbox="true" 
+                                   @bind-SelectedSkills="RequestTeamsSkills" />          
         }
         <div class="bg-white rounded-3">
             <div class="py-2 w-100 border-bottom">
@@ -192,7 +194,7 @@
     <RightSideModalInfo IsSplitted="true" 
                         Skills1="_currentIdeaMarket?.Stack ?? []" 
                         Skills1Label="Компетенции идеи"
-                        Skills2="_currentIdeaMarket?.Team?.Skills ?? []"
+                        Skills2="_currentIdeaMarket?.Team?.Skills ?? RequestTeamsSkills"
                         Skills2Label="Компетенции команды"
                         Items="_infoItems" 
                         SearhButtonTest="Поделиться идеей" />

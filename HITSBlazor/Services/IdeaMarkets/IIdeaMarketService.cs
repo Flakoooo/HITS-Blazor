@@ -17,7 +17,10 @@ namespace HITSBlazor.Services.IdeaMarkets
         );
 
         Task<IdeaMarket?> GetIdeaMarketAsync(Guid guid);
-        Task<List<RequestTeamToIdea>> GetRequestsTeamToIdeaAsync(Guid ideaMarketId);
-        Task<List<InvitationTeamToIdea>> GetInvitationTeamsToIdeaAsync(Guid ideaId);
+        Task<List<RequestTeamToIdea>> GetRequestsTeamToIdeaAsync(Guid ideaMarketId, string? searchText = null);
+        Task<List<InvitationTeamToIdea>> GetInvitationTeamsToIdeaAsync(Guid ideaId, string? searchText = null);
+
+        Task<bool> SetIdeaFavorite(Guid userId, IdeaMarket ideaMarket);
+        Task<bool> UnsetIdeaFromFavorite(Guid userId, IdeaMarket ideaMarket);
     }
 }

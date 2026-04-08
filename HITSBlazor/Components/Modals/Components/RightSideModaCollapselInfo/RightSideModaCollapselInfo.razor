@@ -1,7 +1,8 @@
-﻿@using HITSBlazor.Components.Button
+﻿@namespace HITSBlazor.Components.Modals.Components.RightSideModaCollapselInfo
+@using HITSBlazor.Components.Button
 @using HITSBlazor.Components.Collapse
 @using HITSBlazor.Components.Modals.RightSideModals.IdeaModal
-@namespace HITSBlazor.Components.Modals.Components.RightSideModaCollapselInfo
+@using HITSBlazor.Components.Skills
 @using HITSBlazor.Components.Typography
 @using HITSBlazor.Models.Common.Entities
 @using HITSBlazor.Models.Common.Enums
@@ -25,14 +26,7 @@
                             @if (data.Data is List<Skill>)
                             {
                                 <div class="d-flex flex-wrap gap-1">
-                                    @foreach (var skill in (List<Skill>)data.Data)
-                                    {
-                                        <div class="px-2 py-1 rounded d-flex gap-1 @(EnumViewModel<SkillType>.GetStyle(skill.Type))">
-                                            <Typography FontSize="6">
-                                                @skill.Name
-                                            </Typography>
-                                        </div>
-                                    }
+                                    <Skills SkillList="(List<Skill>)data.Data" />
                                 </div>
                             }
                             else

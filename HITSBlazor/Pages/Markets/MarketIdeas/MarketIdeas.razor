@@ -94,7 +94,9 @@
                                                 @ideaMarket.Name
                                             </Typography>
                                         </div>
-                                        <i class="bi bi-bookmark@(ideaMarket.IsFavorite ? "-fill" : string.Empty) fs-4 text-warning cursor-pointer"></i>
+                                        <i class="bi bi-bookmark@(ideaMarket.IsFavorite ? "-fill" : string.Empty) fs-4 text-warning" style="cursor: pointer;"
+                                           @onclick="() => ChangeIdeaFavorite(ideaMarket)">
+                                        </i>
                                     </div>
                                     <div class="idea-market-solution">
                                         <Typography FontSize="6" TextColor="TextColor.Secondary">
@@ -145,6 +147,20 @@
                                                 ButtonClass="btn-sm w-25"
                                                 Text="Подать заявку"
                                                 IconStyle="bi-send-fill"
+                                                IconSize="fs-6"
+                                                OnButtonClick="() => ShowCreateTeamRequestModal(ideaMarket)" />
+                                    }
+                                    <!-- TODO: уточнить роли доступа -->
+                                    <!-- TODO: узнать что происходит при нажатии кнопки -->
+                                    @if (ideaMarket.Status is IdeaMarketStatusType.RecruitmentIsClosed
+                                        && AuthService.CurrentUser?.Role is RoleType.Admin
+                                    )
+                                    {
+                                        <Button Variant="ButtonVariant.Success"
+                                                ButtonClass="btn-sm w-25 blink"
+                                                Text="Перевести в проект"
+                                                IconStyle="bi-plus-lg"
+                                                IconSize="fs-6"
                                                 OnButtonClick="() => ShowCreateTeamRequestModal(ideaMarket)" />
                                     }
                                 </div>

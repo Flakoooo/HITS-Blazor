@@ -17,8 +17,8 @@ namespace HITSBlazor.Models.Projects.Entities
         public List<ProjectMember> Members { get; set; } = [];
 
         public ReportProject Report { get; set; } = new();
-        public string StartDate { get; set; } = string.Empty;
-        public string FinishDate { get; set; } = string.Empty;
+        public DateTime StartDate { get; set; }
+        public DateTime FinishDate { get; set; }
         public ProjectStatus Status { get; set; }
     }
 }

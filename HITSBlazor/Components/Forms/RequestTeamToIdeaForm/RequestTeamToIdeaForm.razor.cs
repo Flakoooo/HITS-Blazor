@@ -1,5 +1,6 @@
 ﻿using HITSBlazor.Components.Button;
 using HITSBlazor.Components.Collapse;
+using HITSBlazor.Models.Common.Entities;
 using HITSBlazor.Models.Markets.Entities;
 using HITSBlazor.Models.Teams.Entities;
 using HITSBlazor.Models.Teams.Enums;
@@ -35,6 +36,12 @@ namespace HITSBlazor.Components.Forms.RequestTeamToIdeaForm
 
         [Parameter]
         public bool ShowSkillsCheckbox { get; set; } = false;
+
+        [Parameter]
+        public List<Skill> SelectedSkills { get; set; } = [];
+
+        [Parameter]
+        public EventCallback<List<Skill>> SelectedSkillsChanged { get; set; }
 
         private bool _isLoading = true;
         private bool _sumbitted = false;
@@ -91,6 +98,13 @@ namespace HITSBlazor.Components.Forms.RequestTeamToIdeaForm
             confirmButtonVariant: ButtonVariant.Danger,
             confirmButtonText: "Отклонить заявку"
         );
+
+        private async Task CheckTeamSkills(List<Skill> skills, bool isChecked)
+        {
+            SelectedSkills = isChecked ? skills : [];
+
+            await SelectedSkillsChanged.InvokeAsync(SelectedSkills);
+        }
 
         private async Task SendNewRequest(Team team)
         {

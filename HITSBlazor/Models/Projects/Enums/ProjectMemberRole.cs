@@ -2,8 +2,8 @@
 {
     public enum ProjectMemberRole
     {
-        INITIATOR,
-        TEAM_LEADER,
-        MEMBER
+        Initiator,
+        TeamLeader,
+        Member,
     }
 }

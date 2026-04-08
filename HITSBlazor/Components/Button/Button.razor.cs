@@ -23,6 +23,9 @@ namespace HITSBlazor.Components.Button
         public string IconStyle { get; set; } = string.Empty;
 
         [Parameter]
+        public string IconSize { get; set; } = "fs-5";
+
+        [Parameter]
         public ButtonVariant? Variant { get; set; }
 
         [Parameter]

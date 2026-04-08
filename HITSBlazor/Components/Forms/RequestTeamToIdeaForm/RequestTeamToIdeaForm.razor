@@ -3,6 +3,7 @@
 @using HITSBlazor.Components.Collapse
 @using HITSBlazor.Components.Inputs.TextArea
 @using HITSBlazor.Components.Placeholders.Placeholder
+@using HITSBlazor.Components.Skills
 @using HITSBlazor.Components.Typography
 @using HITSBlazor.Models.Common.Enums
 @using HITSBlazor.Models.Teams.Enums
@@ -63,6 +64,8 @@ else
                                                     _queuedCollapseMethod = collapse.ExpandedStatus ? null : () => collapse.Toggle();
                                                     await collapse.Toggle();
                                                     LetterText = string.Empty;
+                                                    SelectedSkills = [];
+                                                    await SelectedSkillsChanged.InvokeAsync(SelectedSkills);
                                                 }" />
                                     }
                                     else
@@ -93,20 +96,15 @@ else
                                             <div class="d-flex gap-2 align-items-center text-primary pb-1">
                                                 @if (ShowSkillsCheckbox)
                                                 {
-                                                    <input type="checkbox" class="form-check-input" />
+                                                    <input type="checkbox" 
+                                                           class="form-check-input" 
+                                                           @onchange="@(e => CheckTeamSkills(team.Skills, (bool)e.Value!))" />
                                                 }
                                                 <div>Компетенции:</div>
                                             </div>
                                             <div class="d-flex flex-wrap gap-2">
                                                 <div class="d-flex flex-wrap gap-1">
-                                                    @foreach (var skill in team.Skills)
-                                                    {
-                                                        <div class="px-2 py-1 rounded d-flex gap-1 align-items-center @(EnumViewModel<SkillType>.GetStyle(skill.Type))">
-                                                            <Typography FontSize="6">
-                                                                @skill.Name
-                                                            </Typography>
-                                                        </div>
-                                                    }
+                                                    <Skills SkillList="team.Skills" />
                                                 </div>
                                             </div>
                                         </div>

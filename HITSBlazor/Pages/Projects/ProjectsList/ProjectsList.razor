@@ -1,0 +1,62 @@
+﻿@namespace HITSBlazor.Pages.Projects.ProjectsList
+@using HITSBlazor.Components.ActionMenus.BaseActionMenu
+@using HITSBlazor.Components.Filters.RadioFilter
+@using HITSBlazor.Components.Filters.ResetFilterButton
+@using HITSBlazor.Components.ListPageComponents.ListPageHeader
+@using HITSBlazor.Components.ListPageComponents.ListPageSearch
+@using HITSBlazor.Components.ListPageComponents.ListPageTable
+@using HITSBlazor.Components.Tables.TableActionMenu
+@using HITSBlazor.Components.Tables.TableBodyRow
+@using HITSBlazor.Models.Projects.Enums
+@using HITSBlazor.Utils.Models
+
+<div class="h-auto bg-white overflow-y-scroll">
+    <div class="w-100 bg-white p-3">
+        <ListPageHeader IsLoading="_isLoading"
+                        HeaderText="@($"Список проектов: {_projects.Count}")" />
+        <ListPageSearch IsLoading="_isLoading" ValueChanged="@((value) => SearchProject(value))" />
+        <ListPageTable IsLoading="_isLoading" TableActionMenuIsEnable="true" HeaderItems="_projectsTableHeader">
+            <TableContent>
+                <tbody>
+                    @foreach (var project in _projects)
+                    {
+                        <tr>
+                            <TableBodyRow>
+                                <div class="data-link">
+                                    @project.Name
+                                </div>
+                            </TableBodyRow>
+                            <TableBodyRow IsCentered="true">
+                                <div class="px-2 py-1 rounded-4 @(project.Status is ProjectStatus.Done ? "bg-warning-subtle text-warning" : "bg-primary-subtle text-primary")">
+                                    @(EnumViewModel<ProjectStatus>.GetTranslation(project.Status))
+                                </div>
+                            </TableBodyRow>
+                            <TableBodyRow IsCentered="true">
+                                @project.StartDate.ToString("dd.MM.yyyy")
+                            </TableBodyRow>
+                            <TableBodyRow IsCentered="true">
+                                <!-- TODO: либо текст синего цвета что реализуется -->
+                                @project.FinishDate.ToString("dd.MM.yyyy")
+                            </TableBodyRow>
+                            <!-- TODO: преейти в проект -->
+                            <TableActionMenu ItemId="@project.Id"
+                                             OnAction="OnProjectAction"
+                                             ActionIds="@(new Dictionary<MenuAction, object> { 
+                                                 [MenuAction.ViewProject] = project.Id
+                                             })" />
+                        </tr>
+                    }
+                </tbody>
+            </TableContent>
+            <FilterContent>
+                <RadioFilter T="EnumViewModel<ProjectStatus>"
+                             IsLoading="_isLoading"
+                             Label="Статус"
+                             AllValues="_filterProjectStatus"
+                             @bind-Value="SelectedProjectStatus"
+                             OnFilterChanged="LoadProjectsAsync" />
+                <ResetFilterButton IsLoading="_isLoading" ResetMethod="ResetFilters" />
+            </FilterContent>
+        </ListPageTable>
+    </div>
+</div>

@@ -89,9 +89,9 @@ namespace HITSBlazor.Utils.Mocks.Projects
                         Marks = MockAverageMarks.GetAverageMarkByProjectId(ChatBotId),
                         Report = "Это отчет"
                     },
-                    StartDate = new DateTime(2023, 10, 25, 11, 2, 17, DateTimeKind.Utc).ToString(Settings.DateFormat),
-                    FinishDate = "",
-                    Status = ProjectStatus.ACTIVE
+                    StartDate = new DateTime(2023, 10, 25, 11, 2, 17, DateTimeKind.Utc),
+                    FinishDate = new DateTime(2024, 10, 25, 11, 2, 17, DateTimeKind.Utc),
+                    Status = ProjectStatus.Active
                 },
                 new Project
                 {
@@ -137,14 +137,16 @@ namespace HITSBlazor.Utils.Mocks.Projects
                         Marks = [],
                         Report = ""
                     },
-                    StartDate = new DateTime(2023, 10, 25, 11, 2, 17, DateTimeKind.Utc).ToString(Settings.DateFormat),
-                    FinishDate = new DateTime(2024, 1, 18, 11, 2, 17, DateTimeKind.Utc).ToString(Settings.DateFormat),
-                    Status = ProjectStatus.DONE
+                    StartDate = new DateTime(2023, 10, 25, 11, 2, 17, DateTimeKind.Utc),
+                    FinishDate = new DateTime(2024, 1, 18, 11, 2, 17, DateTimeKind.Utc),
+                    Status = ProjectStatus.Done
                 }
             ];
         }
 
+        public static List<Project> GetAllProjects() => [.. _projects];
+
         public static List<Project> GetActiveProjects(Guid id)
-            => [.. _projects.Where(p => p.Id == id && p.Status == ProjectStatus.ACTIVE)];
+            => [.. _projects.Where(p => p.Id == id && p.Status == ProjectStatus.Active)];
     }
 }

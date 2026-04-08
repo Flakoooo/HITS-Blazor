@@ -1,6 +1,7 @@
 ﻿using HITSBlazor.Models.Common.Entities;
 using HITSBlazor.Models.Markets.Entities;
 using HITSBlazor.Models.Markets.Enums;
+using HITSBlazor.Models.Users.Entities;
 using HITSBlazor.Utils.Mocks.Common;
 using HITSBlazor.Utils.Mocks.Ideas;
 using HITSBlazor.Utils.Mocks.Teams;
@@ -9,6 +10,16 @@ namespace HITSBlazor.Utils.Mocks.Markets
 {
     public static class MockIdeaMarkets
     {
+        private class FavoriteIdeas
+        {
+            public Guid UserId { get; set; }
+            public Guid IdeaMarketId { get; set; }
+
+            public override int GetHashCode() => UserId.GetHashCode();
+            public override bool Equals(object? obj)
+                => obj is FavoriteIdeas fi && UserId == fi.UserId && IdeaMarketId == fi.IdeaMarketId;
+        }
+
         public static Guid HelperId { get; } = Guid.NewGuid();
         public static Guid PWTechnologyId { get; } = Guid.NewGuid();
         public static Guid EMetricsViewerId { get; } = Guid.NewGuid();
@@ -17,6 +28,7 @@ namespace HITSBlazor.Utils.Mocks.Markets
         public static Guid ArmatureId { get; } = Guid.NewGuid();
 
         private static readonly List<IdeaMarket> _ideaMarkets = CreateIdeaMarkets();
+        private static readonly HashSet<FavoriteIdeas> _favoriteIdeas = [];
 
         private static List<IdeaMarket> CreateIdeaMarkets()
         {
@@ -188,13 +200,56 @@ namespace HITSBlazor.Utils.Mocks.Markets
             ];
         }
 
-        public static List<IdeaMarket> GetIdeaMarketsByMarketId(Guid marketId) 
-            => [.. _ideaMarkets.Where(im => im.MarketId == marketId)];
+        private static List<IdeaMarket> GetIdeaMarkets(Guid userId, Func<IdeaMarket, bool> predicate)
+        {
+            var favoriteIds = _favoriteIdeas
+                .Where(f => f.UserId == userId)
+                .Select(f => f.IdeaMarketId)
+                .ToHashSet();
+
+            return [.. _ideaMarkets
+                .Where(predicate)
+                .Select(im => new IdeaMarket
+                {
+                    Id = im.Id,
+                    IdeaId = im.IdeaId,
+                    Initiator = im.Initiator,
+                    Team = im.Team,
+                    MarketId = im.MarketId,
+                    Name = im.Name,
+                    Problem = im.Problem,
+                    Description = im.Description,
+                    Solution = im.Solution,
+                    Result = im.Result,
+                    MaxTeamSize = im.MaxTeamSize,
+                    Customer = im.Customer,
+                    Position = im.Position,
+                    Stack = [.. im.Stack],
+                    Status = im.Status,
+                    Requests = im.Requests,
+                    AcceptedRequests = im.AcceptedRequests,
+                    IsFavorite = favoriteIds.Contains(im.Id)
+                })];
+        }
+
+        public static List<IdeaMarket> GetIdeaMarketsByMarketId(Guid marketId, Guid userId)
+            => GetIdeaMarkets(userId, im => im.MarketId == marketId);
 
         public static List<IdeaMarket> GetIdeaMarketsByMarketIdAndInitiatorId(Guid marketId, Guid initiatorId)
-            => [.. _ideaMarkets.Where(im => im.MarketId == marketId && im.Initiator.Id == initiatorId)];
+            => GetIdeaMarkets(initiatorId, im => im.MarketId == marketId && im.Initiator.Id == initiatorId);
 
         public static IdeaMarket? GetIdeaMarketById(Guid id) =>
             _ideaMarkets.FirstOrDefault(im => im.Id == id);
+
+        public static bool SetIdeaFavorite(Guid userId, Guid ideaMarketId)
+            => _favoriteIdeas.Add(new FavoriteIdeas { UserId = userId, IdeaMarketId = ideaMarketId });
+
+        public static bool UnsetIdeaFromFavorite(Guid userId, Guid ideaMarketId)
+        {
+            var favorite = _favoriteIdeas.FirstOrDefault(f => f.UserId == userId && f.IdeaMarketId == ideaMarketId);
+            if (favorite is null) return false;
+
+            return _favoriteIdeas.Remove(favorite);
+        }
     }
 }

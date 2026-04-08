@@ -1,8 +1,13 @@
-﻿namespace HITSBlazor.Models.Projects.Enums
+﻿using System.ComponentModel;
+
+namespace HITSBlazor.Models.Projects.Enums
 {
     public enum ProjectStatus
     {
-        ACTIVE,
-        DONE
+        [Description("Активен")]
+        Active,
+
+        [Description("Завершен")]
+        Done
     }
 }
