@@ -102,7 +102,7 @@
                     <ul class="nav nav-underline">
                         @foreach (var category in Enum.GetValues<TeamTableCategory>())
                         {
-                            <div @onclick="() => ChangeCategory(category)" 
+                            <div @onclick="() => ChangeCategory(category)" style="cursor: pointer;"
                                  class="nav-link fw-normal pb-1 @GetTableCategoryClass(category)">
                                 @(EnumViewModel<TeamTableCategory>.GetTranslation(category))
                             </div>

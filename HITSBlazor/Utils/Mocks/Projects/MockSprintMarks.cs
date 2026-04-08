@@ -22,7 +22,7 @@ namespace HITSBlazor.Utils.Mocks.Projects
                     UserId = kirill.Id,
                     FirstName = kirill.FirstName,
                     LastName = kirill.LastName,
-                    ProjectRole = ProjectMemberRole.TEAM_LEADER,
+                    ProjectRole = ProjectMemberRole.TeamLeader,
                     Mark = null,
                     CountCompletedTasks = 2
                 },
@@ -32,7 +32,7 @@ namespace HITSBlazor.Utils.Mocks.Projects
                     UserId = ivan.Id,
                     FirstName = ivan.FirstName,
                     LastName = ivan.LastName,
-                    ProjectRole = ProjectMemberRole.MEMBER,
+                    ProjectRole = ProjectMemberRole.Member,
                     Mark = null,
                     CountCompletedTasks = 2
                 },
@@ -42,7 +42,7 @@ namespace HITSBlazor.Utils.Mocks.Projects
                     UserId = manager.Id,
                     FirstName = manager.FirstName,
                     LastName = manager.LastName,
-                    ProjectRole = ProjectMemberRole.MEMBER,
+                    ProjectRole = ProjectMemberRole.Member,
                     Mark = null,
                     CountCompletedTasks = 2
                 }

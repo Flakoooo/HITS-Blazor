@@ -3,6 +3,7 @@ using HITSBlazor.Components.Button;
 using HITSBlazor.Components.Tables.TableHeader;
 using HITSBlazor.Models.Projects.Entities;
 using HITSBlazor.Models.Projects.Enums;
+using HITSBlazor.Services;
 using HITSBlazor.Utils.Mocks.Projects;
 using HITSBlazor.Utils.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -14,6 +15,9 @@ namespace HITSBlazor.Pages.Projects.ProjectsList
     [Route("projects/list")]
     public partial class ProjectsList
     {
+        [Inject]
+        private NavigationService NavigationService { get; set; } = null!;
+
         private bool _isLoading = true;
 
         private string _searchText = string.Empty;
@@ -53,14 +57,18 @@ namespace HITSBlazor.Pages.Projects.ProjectsList
             await LoadProjectsAsync();
         }
 
+        private async System.Threading.Tasks.Task NavigateToProject(Guid projectId)
+            => await NavigationService.NavigateToAsync($"projects/{projectId}");
+
         private async System.Threading.Tasks.Task OnProjectAction(TableActionContext context)
         {
             if (context.Action == MenuAction.ViewProject)
             {
                 if (context.Item is Guid projectId)
-                    Console.WriteLine($"переход в проект {projectId}");
+                    await NavigateToProject(projectId);
             }
         }
+
         private async System.Threading.Tasks.Task ResetFilters()
         {
             SelectedProjectStatus = null;

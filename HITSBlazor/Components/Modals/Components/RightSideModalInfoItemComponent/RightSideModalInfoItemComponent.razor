@@ -1,0 +1,63 @@
+﻿@namespace HITSBlazor.Components.Modals.Components.RightSideModalInfoItemComponent
+@using HITSBlazor.Components.Typography
+
+<div class="w-100">
+    <Typography FontSize="6" TextColor="HITSBlazor.Components.Typography.TextColor.Secondary" CustomClass="border-bottom d-block">
+        @Label
+        @if (IsInline)
+        {
+            <Typography FontSize="6" TextColor="TextColor">
+                @($" {Text}")
+            </Typography>
+        }
+    </Typography>
+    @if (!IsInline)
+    {
+        <div class="right-side-modal-info-item pt-2">
+            @if (!string.IsNullOrWhiteSpace(Icon))
+            {
+                <i class="bi @Icon text-secondary fs-3 opacity-25"></i>
+            }
+            @if (IsLinkable)
+            {
+                <Typography FontSize="6" TextColor="TextColor" OnClick="LinkClick">
+                    @Text
+                </Typography>
+            }
+            else
+            {
+                <Typography FontSize="6" TextColor="TextColor">
+                    @Text
+                </Typography>
+            }
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public string Label { get; set; } = string.Empty;
+
+    [Parameter]
+    public string Icon { get; set; } = string.Empty;
+
+    [Parameter]
+    public string Text { get; set; } = string.Empty;
+
+    [Parameter]
+    public TextColor? TextColor { get; set; }
+
+    [Parameter]
+    public bool IsInline { get; set; } = false;
+
+    [Parameter]
+    public bool IsLinkable { get; set; } = false;
+
+    [Parameter]
+    public EventCallback OnLinkClick { get; set; }
+
+    private async Task LinkClick()
+    {
+        if (IsLinkable) await OnLinkClick.InvokeAsync();
+    }
+}

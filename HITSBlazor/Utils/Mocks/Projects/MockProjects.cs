@@ -54,7 +54,7 @@ namespace HITSBlazor.Utils.Mocks.Projects
                             LastName = alex.LastName,
                             StartDate = new DateTime(2023, 10, 25, 11, 2, 17, DateTimeKind.Utc).ToString(Settings.DateFormat),
                             FinishDate = new DateTime(2023, 10, 25, 11, 2, 17, DateTimeKind.Utc).ToString(Settings.DateFormat),
-                            ProjectRole = ProjectMemberRole.INITIATOR
+                            ProjectRole = ProjectMemberRole.Initiator
                         },
                         new ProjectMember
                         {
@@ -67,7 +67,7 @@ namespace HITSBlazor.Utils.Mocks.Projects
                             LastName = kirill.LastName,
                             StartDate = new DateTime(2023, 10, 25, 11, 2, 17, DateTimeKind.Utc).ToString(Settings.DateFormat),
                             FinishDate = new DateTime(2023, 10, 25, 11, 2, 17, DateTimeKind.Utc).ToString(Settings.DateFormat),
-                            ProjectRole = ProjectMemberRole.TEAM_LEADER
+                            ProjectRole = ProjectMemberRole.TeamLeader
                         },
                         new ProjectMember
                         {
@@ -80,7 +80,7 @@ namespace HITSBlazor.Utils.Mocks.Projects
                             LastName = denis.LastName,
                             StartDate = new DateTime(2023, 10, 25, 11, 2, 17, DateTimeKind.Utc).ToString(Settings.DateFormat),
                             FinishDate = new DateTime(2023, 10, 25, 11, 2, 17, DateTimeKind.Utc).ToString(Settings.DateFormat),
-                            ProjectRole = ProjectMemberRole.MEMBER
+                            ProjectRole = ProjectMemberRole.Member
                         }
                     ],
                     Report = new ReportProject
@@ -115,7 +115,7 @@ namespace HITSBlazor.Utils.Mocks.Projects
                             LastName = admin.LastName,
                             StartDate = new DateTime(2023, 10, 25, 11, 2, 17, DateTimeKind.Utc).ToString(Settings.DateFormat),
                             FinishDate = new DateTime(2023, 10, 25, 11, 2, 17, DateTimeKind.Utc).ToString(Settings.DateFormat),
-                            ProjectRole = ProjectMemberRole.INITIATOR
+                            ProjectRole = ProjectMemberRole.Initiator
                         },
                         new ProjectMember
                         {
@@ -128,7 +128,7 @@ namespace HITSBlazor.Utils.Mocks.Projects
                             LastName = timur.LastName,
                             StartDate = new DateTime(2023, 10, 25, 11, 2, 17, DateTimeKind.Utc).ToString(Settings.DateFormat),
                             FinishDate = new DateTime(2023, 10, 25, 11, 2, 17, DateTimeKind.Utc).ToString(Settings.DateFormat),
-                            ProjectRole = ProjectMemberRole.TEAM_LEADER
+                            ProjectRole = ProjectMemberRole.TeamLeader
                         }
                     ],
                     Report = new ReportProject
@@ -148,5 +148,8 @@ namespace HITSBlazor.Utils.Mocks.Projects
 
         public static List<Project> GetActiveProjects(Guid id)
             => [.. _projects.Where(p => p.Id == id && p.Status == ProjectStatus.Active)];
+
+        public static Project? GetProjectById(Guid projectId)
+            => _projects.FirstOrDefault(p => p.Id == projectId);
     }
 }

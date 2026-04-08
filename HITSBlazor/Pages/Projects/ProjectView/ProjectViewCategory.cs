@@ -11,6 +11,9 @@ namespace HITSBlazor.Pages.Projects.ProjectView
         Backlog,
 
         [Description("Спринты")]
-        Sprints
+        Sprints,
+
+        [Description("Активный спринт")]
+        ActiveSprint
     }
 }

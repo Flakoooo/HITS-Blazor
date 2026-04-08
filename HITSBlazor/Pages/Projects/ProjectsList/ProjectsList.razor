@@ -22,12 +22,12 @@
                     {
                         <tr>
                             <TableBodyRow>
-                                <div class="data-link">
+                                <div class="data-link" @onclick="() => NavigateToProject(project.Id)">
                                     @project.Name
                                 </div>
                             </TableBodyRow>
                             <TableBodyRow IsCentered="true">
-                                <div class="px-2 py-1 rounded-4 @(project.Status is ProjectStatus.Done ? "bg-warning-subtle text-warning" : "bg-primary-subtle text-primary")">
+                                <div class="px-2 py-1 rounded-4 @(EnumViewModel<ProjectStatus>.GetStyle(project.Status))">
                                     @(EnumViewModel<ProjectStatus>.GetTranslation(project.Status))
                                 </div>
                             </TableBodyRow>

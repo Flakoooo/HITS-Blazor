@@ -27,7 +27,7 @@ namespace HITSBlazor.Utils.Mocks.Projects
                     UserId = kirill.Id,
                     FirstName = kirill.FirstName,
                     LastName = kirill.LastName,
-                    ProjectRole = ProjectMemberRole.TEAM_LEADER,
+                    ProjectRole = ProjectMemberRole.TeamLeader,
                     Mark = 9.9,
                     Tasks = [authIntegrationTask, templatesTask]
                 },
@@ -37,7 +37,7 @@ namespace HITSBlazor.Utils.Mocks.Projects
                     UserId = ivan.Id,
                     FirstName = ivan.FirstName,
                     LastName = ivan.LastName,
-                    ProjectRole = ProjectMemberRole.MEMBER,
+                    ProjectRole = ProjectMemberRole.Member,
                     Mark = 6.7,
                     Tasks = [blackThemeTask]
                 },
@@ -47,7 +47,7 @@ namespace HITSBlazor.Utils.Mocks.Projects
                     UserId = manager.Id,
                     FirstName = manager.FirstName,
                     LastName = manager.LastName,
-                    ProjectRole = ProjectMemberRole.MEMBER,
+                    ProjectRole = ProjectMemberRole.Member,
                     Mark = 7.8,
                     Tasks = [fileUploadTask]
                 }

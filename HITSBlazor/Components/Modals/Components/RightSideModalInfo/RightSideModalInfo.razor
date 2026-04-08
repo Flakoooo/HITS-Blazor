@@ -1,5 +1,6 @@
 ﻿@namespace HITSBlazor.Components.Modals.Components.RightSideModalInfo
 @using HITSBlazor.Components.Button
+@using HITSBlazor.Components.Modals.Components.RightSideModalInfoItemComponent
 @using HITSBlazor.Components.Typography
 @using HITSBlazor.Models.Common.Entities
 @using HITSBlazor.Models.Common.Enums
@@ -27,38 +28,13 @@
             {
                 @foreach (var item in Items)
                 {
-                    <div class="w-100">
-                        <Typography FontSize="6" TextColor="TextColor.Secondary" CustomClass="border-bottom d-block">
-                            @item.Label
-                            @if (item.IsInline)
-                            {
-                                <Typography FontSize="6" TextColor="item.TextColor">
-                                    @item.Text
-                                </Typography>
-                            }
-                        </Typography>
-                        @if (!item.IsInline)
-                        {
-                            <div class="right-side-modal-info-item pt-2">
-                                @if (!string.IsNullOrWhiteSpace(item.Icon))
-                                {
-                                    <i class="bi @item.Icon text-secondary fs-3 opacity-25"></i>
-                                }
-                                @if (item.IsLinkable)
-                                {
-                                    <Typography FontSize="6" TextColor="item.TextColor" OnClick="() => item.LinkMethod?.Invoke()">
-                                        @item.Text
-                                    </Typography>
-                                }
-                                else
-                                {
-                                    <Typography FontSize="6" TextColor="item.TextColor">
-                                        @item.Text
-                                    </Typography>
-                                }
-                            </div>
-                        }
-                    </div>
+                    <RightSideModalInfoItemComponent Label="@item.Label" 
+                                                     IsInline="@item.IsInline"
+                                                     Icon="@item.Icon"
+                                                     Text="@item.Text"
+                                                     TextColor="@item.TextColor"
+                                                     IsLinkable="@item.IsLinkable"
+                                                     OnLinkClick="() => item.LinkMethod?.Invoke()" />
                 }
                 <Button Text="@SearhButtonTest"
                         Variant="ButtonVariant.Primary" />

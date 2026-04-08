@@ -345,5 +345,8 @@ namespace HITSBlazor.Utils.Mocks.Projects
 
         public static HITSTask? GetTaskById(Guid taskId) =>
             _tasks.FirstOrDefault(t => t.Id == taskId);
+
+        public static List<HITSTask> GetTasksByProjectId(Guid projectId)
+            => [.. _tasks.Where(t => t.ProjectId == projectId)];
     }
 }

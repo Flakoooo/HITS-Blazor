@@ -1,7 +1,9 @@
 ﻿@namespace HITSBlazor.Pages.Projects.ProjectView
 @using HITSBlazor.Components.ActionMenus.BaseActionMenu
+@using HITSBlazor.Components.Button
 @using HITSBlazor.Components.ListPageComponents.ListPageSearch
 @using HITSBlazor.Components.Modals.Components.RightSideModaCollapselInfo
+@using HITSBlazor.Components.Modals.Components.RightSideModalInfoItemComponent
 @using HITSBlazor.Components.Tables.TableActionMenu
 @using HITSBlazor.Components.Tables.TableBodyRow
 @using HITSBlazor.Components.Tables.TableHeader
@@ -13,10 +15,10 @@
     <div class="px-4 py-3 h-100">
         <div class="d-flex gap-3 align-items-center mb-2">
             <Typography FontSize="4" TextColor="TextColor.Primary">
-                @_currentProject.Name
+                @_currentProject?.Name
             </Typography>
-            <div class="px-2 py-1 rounded-4 bg-warning-subtle text-warning">
-                @(EnumViewModel<ProjectStatus>.GetTranslation(_currentProject.Status))
+            <div class="px-2 py-1 rounded-4 @(EnumViewModel<ProjectStatus>.GetStyle(_currentProject?.Status))">
+                @(EnumViewModel<ProjectStatus>.GetTranslation(_currentProject?.Status))
             </div>
         </div>
         <div>
@@ -24,61 +26,189 @@
                 <ul class="nav nav-tabs">
                     @foreach (var category in Enum.GetValues<ProjectViewCategory>())
                     {
-                        <div @onclick="() => ChangeCategory(category)"
+                        <div @onclick="() => ChangeCategory(category)" style="cursor: pointer;"
                              class="nav-link fw-normal pb-1 @GetTableCategoryClass(category)">
                             @(EnumViewModel<ProjectViewCategory>.GetTranslation(category))
                         </div>
                     }
                 </ul>
             </div>
-            <div class="d-flex gap-3 mt-4">
-                <div class="w-75">
-                    <RightSideModaCollapselInfo Data="_projectInfoData" />
-                    <div class="w-100 bg-white p-3">
-                        <ListPageSearch IsLoading="_isLoading" ValueChanged="@((value) => SeacrhMember(value))" />
-                        <div class="w-100 d-flex">
-                            <div class="w-100">
-                                <!-- TODO: перейти на профиль -->
-                                <table class="table table-hover mb-0">
-                                    <TableHeader Items="MembersTableHeader" TableActionMenuIsEnable="true" />
-                                    <tbody>
-                                        @foreach (var member in _currentProject.Members)
-                                        {
-                                            <tr>
-                                                <TableBodyRow>
-                                                    <div class="data-link">
-                                                        @member.Email
-                                                    </div>
-                                                </TableBodyRow>
-                                                <TableBodyRow>
-                                                    @member.FirstName
-                                                </TableBodyRow>
-                                                <TableBodyRow>
-                                                    @member.LastName
-                                                </TableBodyRow>
-                                                <TableBodyRow IsCentered="true">
-                                                    <div class="px-2 py-1 rounded-4 bg-primary-subtle text-primary">
-                                                        @member.ProjectRole
-                                                    </div>
-                                                </TableBodyRow>
-                                                <TableActionMenu ItemId="member.UserId"
-                                                                    StrategyPosition="Strategy.Fixed"
-                                                                    OnAction="@HandleTableMenuClick"
-                                                                    ActionIds="@(new Dictionary<MenuAction, object> {
-                                                                    [MenuAction.ViewProfile] = member.UserId
-                                                                    })" />
-                                            </tr>
-                                        }
-                                    </tbody>
-                                </table>
+            @if (_activeCategory is ProjectViewCategory.Info)
+            {
+                <div class="d-flex gap-3 mt-4">
+                    <div class="w-75">
+                        <RightSideModaCollapselInfo Data="_projectInfoData" />
+                        <div class="w-100 bg-white p-3">
+                            <ListPageSearch IsLoading="_isLoading" ValueChanged="@((value) => SeacrhMember(value))" />
+                            <div class="w-100 d-flex">
+                                <div class="w-100">
+                                    <table class="table table-hover mb-0">
+                                        <TableHeader Items="MembersTableHeader" TableActionMenuIsEnable="true" />
+                                        <tbody>
+                                            @foreach (var member in _currentProject?.Members ?? [])
+                                            {
+                                                <tr>
+                                                    <TableBodyRow>
+                                                        <div class="data-link">
+                                                            @member.Email
+                                                        </div>
+                                                    </TableBodyRow>
+                                                    <TableBodyRow>
+                                                        @member.FirstName
+                                                    </TableBodyRow>
+                                                    <TableBodyRow>
+                                                        @member.LastName
+                                                    </TableBodyRow>
+                                                    <TableBodyRow IsCentered="true">
+                                                        <div class="px-2 py-1 rounded-4 bg-primary-subtle text-primary">
+                                                            @(EnumViewModel<ProjectMemberRole>.GetTranslation(member.ProjectRole))
+                                                        </div>
+                                                    </TableBodyRow>
+                                                    <TableActionMenu ItemId="member.UserId"
+                                                                     StrategyPosition="Strategy.Fixed"
+                                                                     OnAction="@OnMemberAction"
+                                                                     ActionIds="@(new Dictionary<MenuAction, object> {
+                                                                         [MenuAction.ViewProfile] = member.UserId
+                                                                     })" />
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="w-25">
+                        <div class="text-center p-2 bg-primary rounded-top text-white fs-4 border border-bottom-0">
+                            Информация
+                        </div>
+                        <div class="d-flex flex-column gap-2 bg-white rounded-bottom p-3 border border-top-0">
+                            <div class="px-2">
+                                <RightSideModalInfoItemComponent Label="Инициатор" 
+                                                                 Icon="bi-person-circle"
+                                                                 Text="@_currentProject.Initiator.FullName"
+                                                                 TextColor="TextColor.Primary" />
+                            </div>
+                            <div class="px-2">
+                                <RightSideModalInfoItemComponent Label="Заказчик" 
+                                                                 Icon="bi-person-circle"
+                                                                 Text="@_currentProject.Customer"
+                                                                 TextColor="TextColor.Primary" />
+                            </div>
+                            <div class="px-2">
+                                <RightSideModalInfoItemComponent Label="Дата страта" 
+                                                                 Icon="bi-person-circle"
+                                                                 Text="@_currentProject.StartDate.ToString("dd.MM.yyyy")"
+                                                                 TextColor="TextColor.Primary" />
+                            </div>
+                            <div class="px-2">
+                                <RightSideModalInfoItemComponent Label="Дата страта" 
+                                                                 Icon="bi-person-circle"
+                                                                 Text="@_currentProject.FinishDate.ToString("dd.MM.yyyy")"
+                                                                 TextColor="TextColor.Primary" />
+                            </div>
+                            <div class="d-flex flex-column gap-2 mt-2">
+                                 <Button Text="Перейти в идею" 
+                                         Variant="ButtonVariant.Primary"
+                                         OnButtonClick="() => ModalService.ShowIdeaModal(_currentProject.IdeaId)" />
+                                 <Button Text="Информация о проекте" 
+                                         Variant="ButtonVariant.Primary"
+                                         OnButtonClick="@(() => Console.WriteLine("Какое то модальное окно"))" />
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="w-25">
+            }
+            else if (_activeCategory is ProjectViewCategory.Backlog)
+            {
+                <div class="d-flex gap-3 mt-4">
+                    <div class="w-100">
+                        @foreach (var task in _projectTasks)
+                        {
+                            <div class="d-flex gap-2 mb-2 w-100">
+                                <div class="bg-white overflow-hidden rounded border w-100">
+                                    <div class="task">
+                                        <div class="d-flex gap-2 task-left">
+                                            <!-- TODO: при наведении вызывать всплывающий тэг с надписью актинвый или нет таск -->
+                                            <!-- TODO: bg-warning если задача сейчас активна, bg-secondary если завершена -->
+                                            <!-- TODO: bg-primary (синяя), если просто создана, также с цифрой с приоритетом (вроде бы если ее переносить, то приоритет меняется) -->
+                                            <div class="task-left-block text-white fs-5 bg-secondary">
+                                            </div>
+                                            <div class="task-left-name" style="width: max-content;">
+                                                @task.Name
+                                            </div>
+                                        </div>
+                                        <div class="task-left-icon w-100 me-2" style="cursor: pointer;">
+                                            <!-- TODO: сделать всплывающий тэг с названием тэга -->
+                                            <!-- TODO: как то извлечь цвет и вставь в цвет фона -->
+                                            @foreach (var tag in task.Tags)
+                                            {
+                                                <i class="bi bi-circle-fill p-1 rounded-2" 
+                                                   style="background-color: rgba(0, 98, 255, 0.3); color: @tag.Color;">
+                                                </i>
+                                            }
+                                            <i class="bi bi-chevron-down fs-5"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                    <div class="d-flex flex-column gap-3 w-25">
 
+                    </div>
                 </div>
-            </div>
+            }
+            else if (_activeCategory is ProjectViewCategory.Sprints)
+            {
+                <div class="overflow-y-scroll">
+                    <div class="w-100 bg-white p-3">
+
+                    </div>
+                </div>
+            }
         </div>
     </div>
 </div>
+
+<style>
+    .task {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .task-left-block {
+        min-width: 36px;
+        height: 40px;
+    }
+
+    .task-left-name {
+        display: -webkit-box;
+        -webkit-line-clamp: 1;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        transition: .15s ease-out;
+    }
+
+    .task-left-icon {
+        height: 40px;
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 6px;
+    }
+
+    .task-left-block, .task-left {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        align-items: center;
+        justify-content: center;
+    }
+</style>
