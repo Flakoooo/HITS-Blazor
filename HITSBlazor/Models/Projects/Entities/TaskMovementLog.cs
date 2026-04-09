@@ -8,8 +8,8 @@ namespace HITSBlazor.Models.Projects.Entities
         public Task Task { get; set; } = new();
         public User? Executor { get; set; }
         public User User { get; set; } = new();
-        public string StartDate { get; set; } = string.Empty;
-        public string EndDate { get; set; } = string.Empty;
+        public DateTime StartDate { get; set; }
+        public DateTime? EndDate { get; set; }
         public string WastedTime { get; set; } = string.Empty;
         public Enums.TaskStatus Status { get; set; }
     }

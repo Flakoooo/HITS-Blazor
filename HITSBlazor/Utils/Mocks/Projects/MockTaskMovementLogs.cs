@@ -19,29 +19,24 @@ namespace HITSBlazor.Utils.Mocks.Projects
             var kirill = MockUsers.GetUserById(MockUsers.KirillId)!;
             var ivan = MockUsers.GetUserById(MockUsers.IvanId)!;
 
-            DateTime startDate = DateTime.ParseExact(
-                authIntegrationTask.StartDate, Settings.DateFormat, null, DateTimeStyles.AdjustToUniversal);
-            DateTime finishDate = DateTime.ParseExact(
-                authIntegrationTask.FinishDate!, Settings.DateFormat, null, DateTimeStyles.AdjustToUniversal);
-
             var logs = new List<TaskMovementLog>();
 
-            var newTaskEnd = AddWorkingDays(startDate, _random.Next(1, 3), 4);
-            logs.Add(CreateLog(authIntegrationTask, null, kirill, startDate, newTaskEnd, HITSTaskStatus.NewTask, 4.0));
+            var newTaskEnd = AddWorkingDays(authIntegrationTask.StartDate, _random.Next(1, 3), 4);
+            logs.Add(CreateLog(authIntegrationTask, null, kirill, authIntegrationTask.StartDate, newTaskEnd, HITSTaskStatus.NewTask, 4.0));
 
-            var verificationStart = newTaskEnd + ((finishDate - newTaskEnd) * 0.7);
+            DateTime verificationStart = (DateTime)(newTaskEnd + ((authIntegrationTask.FinishDate! - newTaskEnd) * 0.7));
 
             logs.AddRange([
                 CreateLog(authIntegrationTask, ivan, ivan, newTaskEnd, verificationStart, HITSTaskStatus.InProgress, 4.0),
-                CreateLog(authIntegrationTask, ivan, kirill, verificationStart, finishDate, HITSTaskStatus.OnVerification, 4.0),
+                CreateLog(authIntegrationTask, ivan, kirill, verificationStart, authIntegrationTask.FinishDate, HITSTaskStatus.OnVerification, 4.0),
                 new TaskMovementLog
                 {
                     Id = Guid.NewGuid(),
                     Task = authIntegrationTask,
                     Executor = ivan,
                     User = kirill,
-                    StartDate = finishDate.ToString(Settings.DateFormat),
-                    EndDate = string.Empty,
+                    StartDate = (DateTime)authIntegrationTask.FinishDate!,
+                    EndDate = null,
                     WastedTime = string.Empty,
                     Status = HITSTaskStatus.Done
                 }
@@ -93,7 +88,7 @@ namespace HITSBlazor.Utils.Mocks.Projects
             User? executor,
             User user,
             DateTime start,
-            DateTime end,
+            DateTime? end,
             HITSTaskStatus status,
             double workingHours = 8.0) =>
         new()
@@ -102,9 +97,9 @@ namespace HITSBlazor.Utils.Mocks.Projects
             Task = task,
             Executor = executor,
             User = user,
-            StartDate = start.ToString(Settings.DateFormat),
-            EndDate = end.ToString(Settings.DateFormat),
-            WastedTime = FormatWorkingTime(end - start, workingHours),
+            StartDate = start,
+            EndDate = end,
+            WastedTime = end is not null ? FormatWorkingTime((TimeSpan)(end - start), workingHours) : "-",
             Status = status
         };
     }

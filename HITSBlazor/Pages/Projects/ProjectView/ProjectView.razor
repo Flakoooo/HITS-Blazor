@@ -12,6 +12,7 @@
 @using HITSBlazor.Components.Tables.TableActionMenu
 @using HITSBlazor.Components.Tables.TableBodyRow
 @using HITSBlazor.Components.Tables.TableHeader
+@using HITSBlazor.Components.TaskComponent
 @using HITSBlazor.Components.Typography
 @using HITSBlazor.Models.Common.Entities
 @using HITSBlazor.Models.Projects.Enums
@@ -138,37 +139,11 @@
                     <div class="w-100">
                         @foreach (var task in _projectTasks)
                         {
-                            <div class="d-flex gap-2 mb-2 w-100">
-                                <div class="bg-white overflow-hidden rounded border w-100">
-                                    <div class="task">
-                                        <div class="d-flex gap-2 task-left">
-                                            <!-- TODO: при наведении вызывать всплывающий тэг с надписью актинвый или нет таск -->
-                                            <!-- TODO: bg-warning если задача сейчас активна, bg-secondary если завершена -->
-                                            <!-- TODO: bg-primary (синяя), если просто создана, также с цифрой с приоритетом (вроде бы если ее переносить, то приоритет меняется) -->
-                                            <div class="task-left-block text-white fs-5 bg-secondary">
-                                                @(task.Status is Models.Projects.Enums.TaskStatus.InBackLog ? task.Position : string.Empty)
-                                            </div>
-                                            <div class="task-left-name" style="width: max-content;">
-                                                @task.Name
-                                            </div>
-                                        </div>
-                                        <div class="task-left-icon w-100 me-2" style="cursor: pointer;">
-                                            <!-- TODO: сделать всплывающий тэг с названием тэга -->
-                                            @foreach (var tag in task.Tags)
-                                            {
-                                                <i class="bi bi-circle-fill p-1 rounded-2" 
-                                                   style="background-color: @($"{tag.Color}4D"); color: @tag.Color;">
-                                                </i>
-                                            }
-                                            <i class="bi bi-chevron-down fs-5"></i>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                            <TaskComponent Task="task" />
                         }
                     </div>
                     <div class="d-flex flex-column gap-3 w-25">
-                        <Button Variant="ButtonVariant.Primary" ButtonClass="p-2"Text="Создать задачу" />
+                        <Button Variant="ButtonVariant.Primary" ButtonClass="p-2"Text="Создать задачу" OnButtonClick="ModalService.ShowTaskModal" />
                         <div class="filter w-25 bg-white p-2 border-start w-100">
                             <CheckboxFilter T="Tag" 
                                             IsLoading="_isLoading"
@@ -196,8 +171,7 @@
                                     {
                                         <tr>
                                             <TableBodyRow>
-                                                <!-- TODO: добавить перехд в спринт или чет такое -->
-                                                <div class="data-link">
+                                                <div class="data-link" @onclick="ShowSprintModal">
                                                     @sprint.Name
                                                 </div>
                                             </TableBodyRow>
@@ -251,7 +225,7 @@
                                         <div class="d-flex gap-2">
                                             @if (taskCategory is Models.Projects.Enums.TaskStatus.NewTask)
                                             {
-                                                <i class="bi bi-plus active-sprint-add-task p-1 rounded" @onclick="ShowTaskModal"></i>
+                                                <i class="bi bi-plus active-sprint-add-task p-1 rounded" @onclick="ModalService.ShowTaskModal"></i>
                                             }
                                             <Hint Text="@GetHintTaskStatusText(taskCategory)" IconClass="d-flex" IconColor="TextColor.Dark" />
                                         </div>

@@ -1,0 +1,72 @@
+﻿@namespace HITSBlazor.Components.TaskComponent
+@using HITSBlazor.Components.Collapse
+@using HITSBlazor.Components.Hint
+
+<div class="d-flex gap-2 mb-2 w-100">
+    <Collapse StartCollapsed="false">
+        <MainContent Context="collapse">
+            <div class="task">
+                <div class="d-flex gap-2 task-left">
+                    <!-- TODO: при наведении вызывать всплывающий тэг с надписью актинвый или нет таск -->
+                    <!-- TODO: bg-warning если задача сейчас активна, bg-secondary если завершена -->
+                    <!-- TODO: bg-primary (синяя), если просто создана, также с цифрой с приоритетом (вроде бы если ее переносить, то приоритет меняется) -->
+                    @{
+                        var taskStatusHint = GetHintAndColor(Task.Status);
+                        <Hint Text="@taskStatusHint.Hint">
+                            <div class="task-left-block text-white fs-5 @taskStatusHint.Color">
+                                @(Task.Status is Models.Projects.Enums.TaskStatus.InBackLog ? Task.Position : string.Empty)
+                            </div>
+                        </Hint>
+                    }
+                    <div class="task-left-name" style="width: max-content;">
+                        @Task.Name
+                    </div>
+                </div>
+                <div class="task-left-icon w-100 me-2" style="cursor: pointer;">
+                    @foreach (var tag in Task.Tags)
+                    {
+                        <Hint Text="@tag.Name">
+                            <i class="bi bi-circle-fill p-1 rounded-2"
+                               style="background-color: @($"{tag.Color}4D"); color: @tag.Color;">
+                            </i>
+                        </Hint>
+                    }
+                    <i class="bi bi-chevron-down fs-5" @onclick="() => collapse.Toggle()"></i>
+                </div>
+            </div>
+        </MainContent>
+        <ExpandedContent>
+            <div class="list-group">
+                <div class="d-flex border-top text-secondary">
+                    <div class="w-75 p-2 border-end">
+                        @Task.Description
+                    </div>
+                    <div class="w-25 p-2">
+                        <div>Постановщик: @Task.Initiator</div>
+                        <div>Дата создания: @Task.StartDate.ToString("dd.MM.yyyy")</div>
+                        <div>Трудоемкость: @($"{Task.WorkHour}ч")</div>
+                    </div>
+                </div>
+            </div>
+        </ExpandedContent>
+    </Collapse>
+</div>
+
+<style>
+
+</style>
+
+@code {
+    [Parameter]
+    public required HITSBlazor.Models.Projects.Entities.Task Task { get; set; }
+
+    [Parameter]
+    public EventCallback<HITSBlazor.Models.Projects.Entities.Task> TaskChanged { get; set; }
+
+    private (string Hint, string Color) GetHintAndColor(Models.Projects.Enums.TaskStatus status) => status switch
+    {
+        Models.Projects.Enums.TaskStatus.InBackLog => ("Приоритетность задачи", "bg-primary"),
+        Models.Projects.Enums.TaskStatus.Done => ("Задача завершена", "bg-secondary"),
+        _ => ("Задача в активном спринте", "bg-warning")
+    };
+}

@@ -17,8 +17,8 @@ namespace HITSBlazor.Models.Projects.Entities
         public User Initiator { get; set; } = new();
         public User? Executor { get; set; }
         public int WorkHour { get; set; }
-        public string StartDate { get; set; } = string.Empty;
-        public string? FinishDate { get; set; }
+        public DateTime StartDate { get; set; }
+        public DateTime? FinishDate { get; set; }
 
         public List<Tag> Tags { get; set; } = [];
         public Enums.TaskStatus Status { get; set; }

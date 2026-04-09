@@ -1,0 +1,132 @@
+﻿@namespace HITSBlazor.Components.Modals.CenterModals.SprintModal
+@using HITSBlazor.Components.Button
+@using HITSBlazor.Components.Inputs.Input
+@using HITSBlazor.Components.Inputs.TextArea
+@using HITSBlazor.Components.Modals.Components.CenterModalHeader
+@using HITSBlazor.Components.TaskComponent
+@using HITSBlazor.Components.Typography
+
+<div @onclick:stopPropagation="true" class="sprint-modal bg-white rounded px-4 py-3">
+    <div class="sprint-form w-100 mb-1">
+        <!-- TODO: скорее всего еще и создание -->
+        <CenterModalHeader HeaderText="Редактирование спринта" />
+        <div class="sprint-form-content d-flex gap-3 mt-1 w-100">
+            <div class="sprint-form-content-tasks d-flex gap-4">
+                <div class="d-flex flex-column w-100">
+                    <div class="sprint-form-backlog-name border-bottom">
+                        <Typography FontSize="5" TextColor="TextColor.Secondary">
+                            Бэклог
+                        </Typography>
+                        <i class="bi bi-plus sprint-form-backlog-add p-1 rounded" @onclick="ModalService.ShowTaskModal"></i>
+                    </div>
+                    <div class="d-flex flex-column mt-3">
+                        <!-- TODO: настроить коллекции, так как непонятно что тут может и не может быть -->
+                        @foreach (var task in _tasks.Where(t => t.Status is Models.Projects.Enums.TaskStatus.InBackLog))
+                        {
+                            <TaskComponent Task="task" />
+                        }
+                    </div>
+                </div>
+                <div class="d-flex flex-column w-100">
+                    <div class="border-bottom">
+                        <Typography FontSize="5" TextColor="TextColor.Secondary">
+                            Выбранные задачи
+                        </Typography>
+                    </div>
+                    <div class="d-flex flex-column mt-3">
+                        <!-- TODO: настроить коллекции, так как непонятно что тут может и не может быть -->
+                        @foreach (var task in _tasks.Where(t => t.Status is Models.Projects.Enums.TaskStatus.InBackLog))
+                        {
+                            <TaskComponent Task="task" />
+                        }
+                    </div>
+                </div>
+            </div>
+            <div class="sprint-form-form">
+                <div class="d-flex flex-column gap-3 w-100">
+                    <Input Label="Название спринта" 
+                           Placeholder="Введите название спринта" 
+                           @bind-Value="Name" />
+                    <TextArea Label="Цель" 
+                              Placeholder="Введите цель спринта"
+                              @bind-Value="Goal" />
+                    <Input Label="Начало спринта"
+                           InputType="InputType.Date"
+                           @bind-Value="StartDate" />
+                    <Input Label="Конец спринта"
+                           InputType="InputType.Date"
+                           @bind-Value="FinishDate" />
+                    <div>
+                        <div class="d-flex gap-1">
+                            <div class="text-primary">
+                                Трудомкость команды (часы):
+                            </div>
+                            <div>HOURS</div>
+                        </div>
+                    </div>
+                </div>
+                <Button Text="Сохранить изменения" Variant="ButtonVariant.Primary" ButtonClass="w-100" />
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .sprint-modal {
+        width: 85%;
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        align-items: stretch;
+        justify-content: flex-start;
+        gap: 16px;
+        align-self: center;
+        justify-self: center;
+        transition: all .15s ease-out;
+    }
+
+    .sprint-form {
+        display: flex;
+        flex-direction: column;
+        flex-wrap: nowrap;
+        align-items: flex-start;
+        justify-content: flex-start;
+    }
+
+    .sprint-form-content {
+        height: 70vh;
+    }
+
+    .sprint-form-content-tasks {
+        width: 70%;
+        overflow-y: scroll;
+    }
+
+    .sprint-form-backlog-name {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .sprint-form-backlog-add {
+        transition: all .15s linear;
+        -webkit-transition: all .15s linear
+    }
+
+        .sprint-form-backlog-add:hover {
+            cursor: pointer;
+            color: #fff;
+            background-color: #0d6efd
+        }
+
+    .sprint-form-form {
+        display: flex;
+        flex-direction: column;
+        flex-wrap: nowrap;
+        align-items: flex-start;
+        justify-content: space-between;
+        width: 30%;
+    }
+</style>

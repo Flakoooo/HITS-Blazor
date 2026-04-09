@@ -1,6 +1,7 @@
 ﻿using HITSBlazor.Components.Button;
 using HITSBlazor.Components.Modals.CenterModals.ConfirmModal;
 using HITSBlazor.Components.Modals.CenterModals.SelectActiveRoleModal;
+using HITSBlazor.Components.Modals.CenterModals.TaskModal;
 using HITSBlazor.Components.Modals.RightSideModals.IdeaModal;
 using HITSBlazor.Components.Modals.RightSideModals.ProfileModal;
 using HITSBlazor.Components.Modals.RightSideModals.TeamModal;
@@ -200,5 +201,7 @@ namespace HITSBlazor.Services.Modal
             type: ModalType.RightSide,
             parameters: new Dictionary<string, object> { [nameof(TeamModal.TeamId)] = teamId }
         );
+
+        public void ShowTaskModal() => Show<TaskModal>(ModalType.Center);
     }
 }

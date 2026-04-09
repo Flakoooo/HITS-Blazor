@@ -1,6 +1,4 @@
-﻿using HITSBlazor.Services.Skills;
-using Microsoft.AspNetCore.Components;
-using Newtonsoft.Json.Linq;
+﻿using Microsoft.AspNetCore.Components;
 
 namespace HITSBlazor.Components.Filters.CheckboxFilter
 {
@@ -32,18 +30,18 @@ namespace HITSBlazor.Components.Filters.CheckboxFilter
 
         private List<T> _values = [];
 
-        protected override async Task OnParametersSetAsync()
+        protected override void OnParametersSet()
         {
-            if (!string.IsNullOrWhiteSpace(SearchText) && SearchTextChanged.HasDelegate)
-                await LoadDataAsync();
-        }
-
-        private async Task LoadDataAsync()
-        {
-            if (string.IsNullOrWhiteSpace(SearchText)) _values = [.. AllValues];
-            else _values = [.. AllValues.Where(vmb => vmb.MatchesSearch(SearchText))];
-
-            StateHasChanged();
+            if (!SearchTextChanged.HasDelegate)
+            {
+                if (_values.Count == 0) _values = [.. AllValues];
+            }
+            else
+            {
+                _values = string.IsNullOrWhiteSpace(SearchText)
+                    ? [.. AllValues]
+                    : [.. AllValues.Where(v => v.MatchesSearch(SearchText))];
+            }
         }
 
         private async Task SearchData(string value)

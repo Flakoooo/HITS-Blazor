@@ -57,7 +57,7 @@ namespace HITSBlazor.Utils.Mocks.Projects
                     Initiator = kirill,
                     Executor = null,
                     WorkHour = 3,
-                    StartDate = new DateTime(2023, 9, 25, 11, 2, 17, DateTimeKind.Utc).ToString(Settings.DateFormat),
+                    StartDate = new DateTime(2023, 9, 25, 11, 2, 17, DateTimeKind.Utc),
                     Tags = [.. tags015],
                     Status = HITSTaskStatus.NewTask
                 },
@@ -71,7 +71,7 @@ namespace HITSBlazor.Utils.Mocks.Projects
                     Initiator = ivan,
                     Executor = null,
                     WorkHour = 1,
-                    StartDate = new DateTime(2023, 9, 25, 11, 2, 17, DateTimeKind.Utc).ToString(Settings.DateFormat),
+                    StartDate = new DateTime(2023, 9, 25, 11, 2, 17, DateTimeKind.Utc),
                     Tags = [frontendTag, uiuxTag],
                     Status = HITSTaskStatus.NewTask
                 },
@@ -85,7 +85,7 @@ namespace HITSBlazor.Utils.Mocks.Projects
                     Initiator = manager,
                     Executor = null,
                     WorkHour = 3,
-                    StartDate = new DateTime(2023, 9, 25, 11, 2, 17, DateTimeKind.Utc).ToString(Settings.DateFormat),
+                    StartDate = new DateTime(2023, 9, 25, 11, 2, 17, DateTimeKind.Utc),
                     Tags = [backendTag, notificationTag],
                     Status = HITSTaskStatus.NewTask
                 },
@@ -99,7 +99,7 @@ namespace HITSBlazor.Utils.Mocks.Projects
                     Initiator = kirill,
                     Executor = null,
                     WorkHour = 3,
-                    StartDate = new DateTime(2023, 9, 25, 11, 2, 17, DateTimeKind.Utc).ToString(Settings.DateFormat),
+                    StartDate = new DateTime(2023, 9, 25, 11, 2, 17, DateTimeKind.Utc),
                     Tags = [backendTag, MockTags.GetTagById(MockTags.OptimizationId)!],
                     Status = HITSTaskStatus.NewTask
                 },
@@ -113,7 +113,7 @@ namespace HITSBlazor.Utils.Mocks.Projects
                     Initiator = ivan,
                     Executor = winrit,
                     WorkHour = 1,
-                    StartDate = new DateTime(2023, 9, 25, 11, 2, 17, DateTimeKind.Utc).ToString(Settings.DateFormat),
+                    StartDate = new DateTime(2023, 9, 25, 11, 2, 17, DateTimeKind.Utc),
                     Tags = [.. tags015],
                     Status = HITSTaskStatus.OnModification,
                     LeaderComment = "Котята, нужно прибраться!"
@@ -128,7 +128,7 @@ namespace HITSBlazor.Utils.Mocks.Projects
                     Initiator = MockUsers.GetUserById(MockUsers.OwnerId)!,
                     Executor = kirill,
                     WorkHour = 3,
-                    StartDate = new DateTime(2023, 9, 25, 11, 2, 17, DateTimeKind.Utc).ToString(Settings.DateFormat),
+                    StartDate = new DateTime(2023, 9, 25, 11, 2, 17, DateTimeKind.Utc),
                     Tags = [backendTag, MockTags.GetTagById(MockTags.StatisticId)!],
                     Status = HITSTaskStatus.OnModification
                 },
@@ -142,7 +142,7 @@ namespace HITSBlazor.Utils.Mocks.Projects
                     Initiator = kirill,
                     Executor = manager,
                     WorkHour = 3,
-                    StartDate = new DateTime(2023, 9, 25, 11, 2, 17, DateTimeKind.Utc).ToString(Settings.DateFormat),
+                    StartDate = new DateTime(2023, 9, 25, 11, 2, 17, DateTimeKind.Utc),
                     Tags = [frontendTag, backendTag, notificationTag],
                     Status = HITSTaskStatus.InProgress
                 },
@@ -156,7 +156,7 @@ namespace HITSBlazor.Utils.Mocks.Projects
                     Initiator = kirill,
                     Executor = ivan,
                     WorkHour = 3,
-                    StartDate = new DateTime(2023, 9, 25, 11, 2, 17, DateTimeKind.Utc).ToString(Settings.DateFormat),
+                    StartDate = new DateTime(2023, 9, 25, 11, 2, 17, DateTimeKind.Utc),
                     Tags = [frontendTag, integrationTag],
                     Status = HITSTaskStatus.InProgress
                 },
@@ -170,7 +170,7 @@ namespace HITSBlazor.Utils.Mocks.Projects
                     Initiator = ivan,
                     Executor = ivan,
                     WorkHour = 1,
-                    StartDate = new DateTime(2023, 9, 25, 11, 2, 17, DateTimeKind.Utc).ToString(Settings.DateFormat),
+                    StartDate = new DateTime(2023, 9, 25, 11, 2, 17, DateTimeKind.Utc),
                     Tags = [frontendTag, backendTag],
                     Status = HITSTaskStatus.OnVerification
                 },
@@ -184,8 +184,8 @@ namespace HITSBlazor.Utils.Mocks.Projects
                     Initiator = kirill,
                     Executor = kirill,
                     WorkHour = 3,
-                    StartDate = new DateTime(2023, 9, 25, 11, 2, 17, DateTimeKind.Utc).ToString(Settings.DateFormat),
-                    FinishDate = new DateTime(2024, 1, 25, 11, 2, 17, DateTimeKind.Utc).ToString(Settings.DateFormat),
+                    StartDate = new DateTime(2023, 9, 25, 11, 2, 17, DateTimeKind.Utc),
+                    FinishDate = new DateTime(2024, 1, 25, 11, 2, 17, DateTimeKind.Utc),
                     Tags = [backendTag, integrationTag, securityTag],
                     Status = HITSTaskStatus.Done
                 },
@@ -199,8 +199,8 @@ namespace HITSBlazor.Utils.Mocks.Projects
                     Initiator = ivan,
                     Executor = ivan,
                     WorkHour = 1,
-                    StartDate = new DateTime(2023, 9, 25, 11, 2, 17, DateTimeKind.Utc).ToString(Settings.DateFormat),
-                    FinishDate = new DateTime(2024, 1, 22, 11, 2, 17, DateTimeKind.Utc).ToString(Settings.DateFormat),
+                    StartDate = new DateTime(2023, 9, 25, 11, 2, 17, DateTimeKind.Utc),
+                    FinishDate = new DateTime(2024, 1, 22, 11, 2, 17, DateTimeKind.Utc),
                     Tags = [frontendTag, MockTags.GetTagById(MockTags.DesignId)!, uiuxTag],
                     Status = HITSTaskStatus.Done
                 },
@@ -214,8 +214,8 @@ namespace HITSBlazor.Utils.Mocks.Projects
                     Initiator = kirill,
                     Executor = manager,
                     WorkHour = 3,
-                    StartDate = new DateTime(2023, 9, 25, 11, 2, 17, DateTimeKind.Utc).ToString(Settings.DateFormat),
-                    FinishDate = new DateTime(2024, 1, 21, 11, 2, 17, DateTimeKind.Utc).ToString(Settings.DateFormat),
+                    StartDate = new DateTime(2023, 9, 25, 11, 2, 17, DateTimeKind.Utc),
+                    FinishDate = new DateTime(2024, 1, 21, 11, 2, 17, DateTimeKind.Utc),
                     Tags = [backendTag],
                     Status = HITSTaskStatus.Done
                 },
@@ -229,8 +229,8 @@ namespace HITSBlazor.Utils.Mocks.Projects
                     Initiator = manager,
                     Executor = kirill,
                     WorkHour = 3,
-                    StartDate = new DateTime(2023, 9, 25, 11, 2, 17, DateTimeKind.Utc).ToString(Settings.DateFormat),
-                    FinishDate = new DateTime(2024, 1, 25, 11, 2, 17, DateTimeKind.Utc).ToString(Settings.DateFormat),
+                    StartDate = new DateTime(2023, 9, 25, 11, 2, 17, DateTimeKind.Utc),
+                    FinishDate = new DateTime(2024, 1, 25, 11, 2, 17, DateTimeKind.Utc),
                     Tags = [backendTag],
                     Status = HITSTaskStatus.Done
                 },
@@ -245,7 +245,7 @@ namespace HITSBlazor.Utils.Mocks.Projects
                     Initiator = ivan,
                     Executor = null,
                     WorkHour = 8,
-                    StartDate = new DateTime(2023, 9, 25, 11, 2, 17, DateTimeKind.Utc).ToString(Settings.DateFormat),
+                    StartDate = new DateTime(2023, 9, 25, 11, 2, 17, DateTimeKind.Utc),
                     Tags = [frontendTag, uiuxTag],
                     Status = HITSTaskStatus.InBackLog
                 },
@@ -260,7 +260,7 @@ namespace HITSBlazor.Utils.Mocks.Projects
                     Initiator = manager,
                     Executor = null,
                     WorkHour = 4,
-                    StartDate = new DateTime(2023, 9, 25, 11, 2, 17, DateTimeKind.Utc).ToString(Settings.DateFormat),
+                    StartDate = new DateTime(2023, 9, 25, 11, 2, 17, DateTimeKind.Utc),
                     Tags = [backendTag, integrationTag],
                     Status = HITSTaskStatus.InBackLog
                 },
@@ -275,7 +275,7 @@ namespace HITSBlazor.Utils.Mocks.Projects
                     Initiator = winrit,
                     Executor = null,
                     WorkHour = 2,
-                    StartDate = new DateTime(2023, 9, 25, 11, 2, 17, DateTimeKind.Utc).ToString(Settings.DateFormat),
+                    StartDate = new DateTime(2023, 9, 25, 11, 2, 17, DateTimeKind.Utc),
                     Tags = [backendTag, securityTag],
                     Status = HITSTaskStatus.InBackLog
                 }

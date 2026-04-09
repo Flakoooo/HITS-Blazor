@@ -1,4 +1,5 @@
 ﻿using HITSBlazor.Components.ActionMenus.BaseActionMenu;
+using HITSBlazor.Components.Modals.CenterModals.SprintModal;
 using HITSBlazor.Components.Modals.CenterModals.TaskModal;
 using HITSBlazor.Components.Modals.Components.RightSideModaCollapselInfo;
 using HITSBlazor.Components.Modals.RightSideModals.TeamModal;
@@ -145,9 +146,9 @@ namespace HITSBlazor.Pages.Projects.ProjectView
             return "158, 158, 158";
         }
 
-        private void ShowTaskModal()
+        private void ShowSprintModal()
         {
-            ModalService.Show<TaskModal>(ModalType.Center);
+            ModalService.Show<SprintModal>(ModalType.Center);
         }
 
         private async System.Threading.Tasks.Task OnMemberAction(TableActionContext context)
