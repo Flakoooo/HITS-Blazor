@@ -1,6 +1,8 @@
-﻿namespace HITSBlazor.Models.Common.Entities
+﻿using HITSBlazor.Utils.Models;
+
+namespace HITSBlazor.Models.Common.Entities
 {
-    public class Tag
+    public class Tag : ViewModelBase
     {
         public Guid Id { get; set; }
         public string Name { get; set; } = string.Empty;
@@ -9,5 +11,8 @@
         public Guid? CreatorId { get; set; }
         public Guid? UpdaterId { get; set; }
         public Guid? DeleterId { get; set; }
+
+        public override string GetDisplayInfo() => Name;
+        public override object GetId() => Id;
     }
 }

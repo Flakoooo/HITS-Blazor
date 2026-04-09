@@ -13,6 +13,7 @@
 @using HITSBlazor.Components.Tables.TableBodyRow
 @using HITSBlazor.Components.Tables.TableHeader
 @using HITSBlazor.Components.Typography
+@using HITSBlazor.Models.Common.Entities
 @using HITSBlazor.Models.Projects.Enums
 @using HITSBlazor.Utils.Models
 
@@ -169,7 +170,7 @@
                     <div class="d-flex flex-column gap-3 w-25">
                         <Button Variant="ButtonVariant.Primary" ButtonClass="p-2"Text="Создать задачу" />
                         <div class="filter w-25 bg-white p-2 border-start w-100">
-                            <CheckboxFilter T="ValueViewModel<string>" 
+                            <CheckboxFilter T="Tag" 
                                             IsLoading="_isLoading"
                                             Label="Теги" 
                                             @bind-SearchText="SearchTagFilterText"
@@ -250,7 +251,7 @@
                                         <div class="d-flex gap-2">
                                             @if (taskCategory is Models.Projects.Enums.TaskStatus.NewTask)
                                             {
-                                                <i class="bi bi-plus active-sprint-add-task p-1 rounded"></i>
+                                                <i class="bi bi-plus active-sprint-add-task p-1 rounded" @onclick="ShowTaskModal"></i>
                                             }
                                             <Hint Text="@GetHintTaskStatusText(taskCategory)" IconClass="d-flex" IconColor="TextColor.Dark" />
                                         </div>
@@ -261,7 +262,6 @@
                                     {
                                         <div>
                                             <div class="d-flex my-1" style="cursor: pointer;">
-                                                <!-- TODO: цвет у СВОЕЙ задачи другой, синий вроде -->
                                                 <div class="rounded-start" style="width: 6px; background-color: rgb(@GetTaskExecuteColor(task.Executor));">
                                                 </div>
                                                 <div class="bg-white p-2 border-top border-end border-bottom w-100 rounded-end">

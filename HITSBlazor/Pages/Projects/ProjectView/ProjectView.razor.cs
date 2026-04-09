@@ -1,7 +1,9 @@
 ﻿using HITSBlazor.Components.ActionMenus.BaseActionMenu;
+using HITSBlazor.Components.Modals.CenterModals.TaskModal;
 using HITSBlazor.Components.Modals.Components.RightSideModaCollapselInfo;
 using HITSBlazor.Components.Modals.RightSideModals.TeamModal;
 using HITSBlazor.Components.Tables.TableHeader;
+using HITSBlazor.Models.Common.Entities;
 using HITSBlazor.Models.Ideas.Entities;
 using HITSBlazor.Models.Projects.Entities;
 using HITSBlazor.Models.Projects.Enums;
@@ -9,6 +11,7 @@ using HITSBlazor.Models.Users.Entities;
 using HITSBlazor.Services;
 using HITSBlazor.Services.Auth;
 using HITSBlazor.Services.Modal;
+using HITSBlazor.Utils.Mocks.Common;
 using HITSBlazor.Utils.Mocks.Projects;
 using HITSBlazor.Utils.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -40,8 +43,8 @@ namespace HITSBlazor.Pages.Projects.ProjectView
 
         private List<CollapseItem> _projectInfoData = [];
 
-        private List<ValueViewModel<string>> _filterTags = [];
-        private HashSet<ValueViewModel<string>> SelectedTagNames { get; set; } = [];
+        private List<Tag> _filterTags = [];
+        private HashSet<Tag> SelectedTagNames { get; set; } = [];
 
         private string _seacrhMemberText = string.Empty;
         private string SearchTagFilterText { get; set; } = string.Empty;
@@ -90,7 +93,7 @@ namespace HITSBlazor.Pages.Projects.ProjectView
 
                 await LoadTasksAsync();
                 //лучше наверно заменить на один запрос, который получает все теги проекта
-                _filterTags = [.. _projectTasks.SelectMany(t => t.Tags).DistinctBy(t => t.Name).Select(t => new ValueViewModel<string>(t.Name, t.Name))];
+                _filterTags = [.. MockTags.GetTags()];
 
                 _projectSprints = MockSprints.GetSprintsByProjectId(guid);
 
@@ -106,13 +109,8 @@ namespace HITSBlazor.Pages.Projects.ProjectView
 
             if (SelectedTagNames is null) _projectTasks = MockSprints.GetTasksByProjectId(_currentProject.Id);
             else _projectTasks = [.. MockSprints.GetTasksByProjectId(_currentProject.Id)
-                .Where(task => task.Tags
-                    .Any(t => SelectedTagNames
-                        .Select(stn => stn.Value.ToLower())
-                        .Contains(t.Name.ToLower())
-                    )
-                )
-            ];
+                .Where(task => task.Tags.Any(t => SelectedTagNames.Contains(t))
+            )];
         }
 
         private string GetTableCategoryClass(ProjectViewCategory category)
@@ -145,6 +143,11 @@ namespace HITSBlazor.Pages.Projects.ProjectView
             ) return "13, 110, 253";
 
             return "158, 158, 158";
+        }
+
+        private void ShowTaskModal()
+        {
+            ModalService.Show<TaskModal>(ModalType.Center);
         }
 
         private async System.Threading.Tasks.Task OnMemberAction(TableActionContext context)
