@@ -1,15 +1,22 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using HITSBlazor.Components.Typography;
+using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 
 namespace HITSBlazor.Components.Hint
 {
     public partial class Hint
     {
+        [Inject]
+        private IJSRuntime JSRuntime { get; set; } = null!;
+
         [Parameter]
         public string Text { get; set; } = string.Empty;
 
-        [Inject]
-        private IJSRuntime JSRuntime { get; set; } = null!;
+        [Parameter]
+        public string IconClass { get; set; } = string.Empty;
+
+        [Parameter]
+        public TextColor IconColor { get; set; } = TextColor.Primary;
 
         private class DomRect
         {
@@ -25,6 +32,19 @@ namespace HITSBlazor.Components.Hint
         private ElementReference _tooltipRef;
         private string _placement = "top";
         private bool _isVisible;
+
+        private string GetIconClass()
+        {
+            var classes = new List<string>
+            {
+                $"text-{IconColor.ToString().ToLower()}"
+            };
+
+            if (!string.IsNullOrWhiteSpace(IconClass))
+                classes.Add(IconClass);
+
+            return string.Join(" ", classes);
+        }
 
         private async Task ShowTooltip()
         {

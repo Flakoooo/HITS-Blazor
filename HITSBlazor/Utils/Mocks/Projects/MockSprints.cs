@@ -295,10 +295,10 @@ namespace HITSBlazor.Utils.Mocks.Projects
                     Name = "Спринт 1",
                     Goal = "Цель 1",
                     Report = "Отчет 1",
-                    StartDate = firstSprintDate.AddDays(SumSprintDate(0, false)).ToString(Settings.DateFormat),
-                    FinishDate = firstSprintDate.AddDays(SumSprintDate(0, true)).ToString(Settings.DateFormat),
+                    StartDate = firstSprintDate.AddDays(SumSprintDate(0, false)),
+                    FinishDate = firstSprintDate.AddDays(SumSprintDate(0, true)),
                     WorkingHours = 15,
-                    Status = SprintStatus.DONE,
+                    Status = SprintStatus.Done,
                     Tasks = [.. _tasks.Where(t => t.SprintId == Sprint1Id)]
                 },
                 new Sprint
@@ -308,10 +308,10 @@ namespace HITSBlazor.Utils.Mocks.Projects
                     Name = "Спринт 2",
                     Goal = "Цель 2",
                     Report = "Отчет 2",
-                    StartDate = firstSprintDate.AddDays(SumSprintDate(1, false)).ToString(Settings.DateFormat),
-                    FinishDate = firstSprintDate.AddDays(SumSprintDate(1, true)).ToString(Settings.DateFormat),
+                    StartDate = firstSprintDate.AddDays(SumSprintDate(1, false)),
+                    FinishDate = firstSprintDate.AddDays(SumSprintDate(1, true)),
                     WorkingHours = 15,
-                    Status = SprintStatus.DONE,
+                    Status = SprintStatus.Done,
                     Tasks = [.. _tasks.Where(t => t.SprintId == Sprint2Id)]
                 },
                 new Sprint
@@ -321,10 +321,10 @@ namespace HITSBlazor.Utils.Mocks.Projects
                     Name = "Спринт 3",
                     Goal = "Цель 3",
                     Report = "Отчет 3",
-                    StartDate = firstSprintDate.AddDays(SumSprintDate(2, false)).ToString(Settings.DateFormat),
-                    FinishDate = firstSprintDate.AddDays(SumSprintDate(2, true)).ToString(Settings.DateFormat),
+                    StartDate = firstSprintDate.AddDays(SumSprintDate(2, false)),
+                    FinishDate = firstSprintDate.AddDays(SumSprintDate(2, true)),
                     WorkingHours = 15,
-                    Status = SprintStatus.DONE,
+                    Status = SprintStatus.Done,
                     Tasks = [.. _tasks.Where(t => t.SprintId == Sprint3Id)]
                 },
                 new Sprint
@@ -334,14 +334,17 @@ namespace HITSBlazor.Utils.Mocks.Projects
                     Name = "Проектировка скрама",
                     Goal = "Цель 4",
                     Report = "Отчет 4",
-                    StartDate = firstSprintDate.AddDays(SumSprintDate(3, false)).ToString(Settings.DateFormat),
-                    FinishDate = firstSprintDate.AddDays(SumSprintDate(3, true)).ToString(Settings.DateFormat),
+                    StartDate = firstSprintDate.AddDays(SumSprintDate(3, false)),
+                    FinishDate = firstSprintDate.AddDays(SumSprintDate(3, true)),
                     WorkingHours = 20,
-                    Status = SprintStatus.ACTIVE,
-                    Tasks = [.. _tasks.Where(t => t.SprintId == Guid.Empty)] // последний спринт
+                    Status = SprintStatus.Active,
+                    Tasks = [.. _tasks.Where(t => t.SprintId == Guid.Empty)]
                 }
             ];
         }
+
+        public static List<Sprint> GetSprintsByProjectId(Guid projectId)
+            => [.. _sprints.Where(s => s.ProjectId == projectId)];
 
         public static HITSTask? GetTaskById(Guid taskId) =>
             _tasks.FirstOrDefault(t => t.Id == taskId);

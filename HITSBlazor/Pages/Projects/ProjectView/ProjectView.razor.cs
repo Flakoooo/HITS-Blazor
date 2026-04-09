@@ -4,9 +4,13 @@ using HITSBlazor.Components.Modals.RightSideModals.TeamModal;
 using HITSBlazor.Components.Tables.TableHeader;
 using HITSBlazor.Models.Ideas.Entities;
 using HITSBlazor.Models.Projects.Entities;
+using HITSBlazor.Models.Projects.Enums;
+using HITSBlazor.Models.Users.Entities;
 using HITSBlazor.Services;
+using HITSBlazor.Services.Auth;
 using HITSBlazor.Services.Modal;
 using HITSBlazor.Utils.Mocks.Projects;
+using HITSBlazor.Utils.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
 
@@ -17,6 +21,9 @@ namespace HITSBlazor.Pages.Projects.ProjectView
     public partial class ProjectView
     {
         [Inject]
+        private IAuthService AuthService { get; set; } = null!;
+
+        [Inject]
         private ModalService ModalService { get; set; } = null!;
 
         [Parameter]
@@ -26,20 +33,49 @@ namespace HITSBlazor.Pages.Projects.ProjectView
 
         private Project? _currentProject;
         private List<Models.Projects.Entities.Task> _projectTasks = [];
+        private List<Sprint> _projectSprints = [];
+        private Sprint? _activeSprint;
 
         private ProjectViewCategory _activeCategory = ProjectViewCategory.Info;
 
         private List<CollapseItem> _projectInfoData = [];
 
-        private string _seacrhMemberText = string.Empty;
+        private List<ValueViewModel<string>> _filterTags = [];
+        private HashSet<ValueViewModel<string>> SelectedTagNames { get; set; } = [];
 
-        private static List<TableHeaderItem> MembersTableHeader { get; } =
+        private string _seacrhMemberText = string.Empty;
+        private string SearchTagFilterText { get; set; } = string.Empty;
+        private string _searchSprintText = string.Empty;
+
+        private static List<TableHeaderItem> _membersTableHeader =
         [
             new() { Text = "Почта",                     },
             new() { Text = "Имя",                       },
             new() { Text = "Фамилия",                   },
             new() { Text = "Роль", InCentered = true    }
         ];
+
+        private static List<TableHeaderItem> _sprintsTableHeader =
+        [
+            new() { Text = "Название",          ColumnClass = "col-3"   },
+            new() { Text = "Статус",            InCentered = true       },
+            new() { Text = "Дата старта",       InCentered = true       },
+            new() { Text = "Дата окончания",    InCentered = true       }
+        ];
+
+        private static string GetHintTaskStatusText(Models.Projects.Enums.TaskStatus status) => status switch
+        {
+            Models.Projects.Enums.TaskStatus.OnModification => "Здесь находятся задачи, которые были отправлены на доработку для исправления ошибок или улучшения качества."
+                + " Эти задачи нужно выполнить в первую очередь, чтобы не затягивать сроки проекта.",
+            Models.Projects.Enums.TaskStatus.NewTask => "Здесь находятся задачи, которые еще не были назначены разработчику."
+                + " Эти задачи можно выбирать по своему усмотрению, учитывая приоритеты и сложность.",
+            Models.Projects.Enums.TaskStatus.InProgress => "Здесь находятся задачи, которые в данный момент выполняются командой или отдельным разработчиком."
+                + " Данные задачи нужно довести до конца и не переключаться на другие.",
+            Models.Projects.Enums.TaskStatus.OnVerification => "Здесь находятся задачи, которые были выполнены и отправлены тимлиду на проверку качества, функциональности и требованиям.",
+            Models.Projects.Enums.TaskStatus.Done => "Здесь находятся задачи, которые были успешно проверены и одобрены."
+                + " Этизадачи можно считать завершенными и не требующими дальнейшего внимания.",
+            _ => $"{nameof(status)} hint text"
+        };
 
         protected override async System.Threading.Tasks.Task OnInitializedAsync()
         {
@@ -52,10 +88,31 @@ namespace HITSBlazor.Pages.Projects.ProjectView
 
                 _projectInfoData = GetProjectData();
 
-                _projectTasks = MockSprints.GetTasksByProjectId(_currentProject.Id);
+                await LoadTasksAsync();
+                //лучше наверно заменить на один запрос, который получает все теги проекта
+                _filterTags = [.. _projectTasks.SelectMany(t => t.Tags).DistinctBy(t => t.Name).Select(t => new ValueViewModel<string>(t.Name, t.Name))];
+
+                _projectSprints = MockSprints.GetSprintsByProjectId(guid);
+
+                _activeSprint = _projectSprints.FirstOrDefault(s => s.Status is SprintStatus.Active);
             }
 
             _isLoading = false;
+        }
+
+        private async System.Threading.Tasks.Task LoadTasksAsync()
+        {
+            if (_currentProject is null) return;
+
+            if (SelectedTagNames is null) _projectTasks = MockSprints.GetTasksByProjectId(_currentProject.Id);
+            else _projectTasks = [.. MockSprints.GetTasksByProjectId(_currentProject.Id)
+                .Where(task => task.Tags
+                    .Any(t => SelectedTagNames
+                        .Select(stn => stn.Value.ToLower())
+                        .Contains(t.Name.ToLower())
+                    )
+                )
+            ];
         }
 
         private string GetTableCategoryClass(ProjectViewCategory category)
@@ -73,6 +130,21 @@ namespace HITSBlazor.Pages.Projects.ProjectView
         private async System.Threading.Tasks.Task SeacrhMember(string value)
         {
             _seacrhMemberText = value;
+        }
+
+        private async System.Threading.Tasks.Task SeacrhSprint(string value)
+        {
+            _searchSprintText = value;
+        }
+
+        private string GetTaskExecuteColor(User? executor)
+        {
+            if (AuthService.CurrentUser is not null 
+                && executor is not null 
+                && executor.Id == AuthService.CurrentUser.Id
+            ) return "13, 110, 253";
+
+            return "158, 158, 158";
         }
 
         private async System.Threading.Tasks.Task OnMemberAction(TableActionContext context)

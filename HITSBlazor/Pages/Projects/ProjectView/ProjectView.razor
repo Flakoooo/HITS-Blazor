@@ -1,7 +1,12 @@
 ﻿@namespace HITSBlazor.Pages.Projects.ProjectView
 @using HITSBlazor.Components.ActionMenus.BaseActionMenu
 @using HITSBlazor.Components.Button
+@using HITSBlazor.Components.Filters.CheckboxFilter
+@using HITSBlazor.Components.Filters.ResetFilterButton
+@using HITSBlazor.Components.Hint
+@using HITSBlazor.Components.ListPageComponents.ListPageHeader
 @using HITSBlazor.Components.ListPageComponents.ListPageSearch
+@using HITSBlazor.Components.ListPageComponents.ListPageTable
 @using HITSBlazor.Components.Modals.Components.RightSideModaCollapselInfo
 @using HITSBlazor.Components.Modals.Components.RightSideModalInfoItemComponent
 @using HITSBlazor.Components.Tables.TableActionMenu
@@ -24,11 +29,18 @@
         <div>
             <div class="px-3">
                 <ul class="nav nav-tabs">
-                    @foreach (var category in Enum.GetValues<ProjectViewCategory>())
+                    @foreach (var category in Enum.GetValues<ProjectViewCategory>().Where(v => v is not ProjectViewCategory.ActiveSprint))
                     {
                         <div @onclick="() => ChangeCategory(category)" style="cursor: pointer;"
                              class="nav-link fw-normal pb-1 @GetTableCategoryClass(category)">
                             @(EnumViewModel<ProjectViewCategory>.GetTranslation(category))
+                        </div>
+                    }
+                    @if (_activeSprint is not null)
+                    {
+                        <div @onclick="() => ChangeCategory(ProjectViewCategory.ActiveSprint)" style="cursor: pointer;"
+                             class="nav-link fw-normal pb-1 @GetTableCategoryClass(ProjectViewCategory.ActiveSprint)">
+                            @(EnumViewModel<ProjectViewCategory>.GetTranslation(ProjectViewCategory.ActiveSprint))
                         </div>
                     }
                 </ul>
@@ -43,7 +55,7 @@
                             <div class="w-100 d-flex">
                                 <div class="w-100">
                                     <table class="table table-hover mb-0">
-                                        <TableHeader Items="MembersTableHeader" TableActionMenuIsEnable="true" />
+                                        <TableHeader Items="_membersTableHeader" TableActionMenuIsEnable="true" />
                                         <tbody>
                                             @foreach (var member in _currentProject?.Members ?? [])
                                             {
@@ -133,6 +145,7 @@
                                             <!-- TODO: bg-warning если задача сейчас активна, bg-secondary если завершена -->
                                             <!-- TODO: bg-primary (синяя), если просто создана, также с цифрой с приоритетом (вроде бы если ее переносить, то приоритет меняется) -->
                                             <div class="task-left-block text-white fs-5 bg-secondary">
+                                                @(task.Status is Models.Projects.Enums.TaskStatus.InBackLog ? task.Position : string.Empty)
                                             </div>
                                             <div class="task-left-name" style="width: max-content;">
                                                 @task.Name
@@ -140,11 +153,10 @@
                                         </div>
                                         <div class="task-left-icon w-100 me-2" style="cursor: pointer;">
                                             <!-- TODO: сделать всплывающий тэг с названием тэга -->
-                                            <!-- TODO: как то извлечь цвет и вставь в цвет фона -->
                                             @foreach (var tag in task.Tags)
                                             {
                                                 <i class="bi bi-circle-fill p-1 rounded-2" 
-                                                   style="background-color: rgba(0, 98, 255, 0.3); color: @tag.Color;">
+                                                   style="background-color: @($"{tag.Color}4D"); color: @tag.Color;">
                                                 </i>
                                             }
                                             <i class="bi bi-chevron-down fs-5"></i>
@@ -155,7 +167,17 @@
                         }
                     </div>
                     <div class="d-flex flex-column gap-3 w-25">
-
+                        <Button Variant="ButtonVariant.Primary" ButtonClass="p-2"Text="Создать задачу" />
+                        <div class="filter w-25 bg-white p-2 border-start w-100">
+                            <CheckboxFilter T="ValueViewModel<string>" 
+                                            IsLoading="_isLoading"
+                                            Label="Теги" 
+                                            @bind-SearchText="SearchTagFilterText"
+                                            AllValues="_filterTags"
+                                            @bind-SelectedValues="SelectedTagNames"
+                                            FilterChanged="LoadTasksAsync"/>
+                            <ResetFilterButton IsLoading="_isLoading" />
+                        </div>
                     </div>
                 </div>
             }
@@ -163,7 +185,112 @@
             {
                 <div class="overflow-y-scroll">
                     <div class="w-100 bg-white p-3">
-
+                        <ListPageHeader IsLoading="_isLoading"
+                                        HeaderText="@($"Список спринтов: {_projectSprints.Count}")" />
+                        <ListPageSearch IsLoading="_isLoading" ValueChanged="@((value) => SeacrhSprint(value))" />
+                        <ListPageTable IsLoading="_isLoading" HeaderItems="_sprintsTableHeader">
+                            <TableContent>
+                                <tbody>
+                                    @foreach (var sprint in _projectSprints)
+                                    {
+                                        <tr>
+                                            <TableBodyRow>
+                                                <!-- TODO: добавить перехд в спринт или чет такое -->
+                                                <div class="data-link">
+                                                    @sprint.Name
+                                                </div>
+                                            </TableBodyRow>
+                                            <TableBodyRow IsCentered="true">
+                                                <div class="px-2 py-1 rounded-4 @(EnumViewModel<SprintStatus>.GetStyle(sprint.Status))">
+                                                    @(EnumViewModel<SprintStatus>.GetTranslation(sprint.Status))
+                                                </div>
+                                            </TableBodyRow>
+                                            <TableBodyRow IsCentered="true">
+                                                @sprint.StartDate.ToString("dd.MM.yyyy")
+                                            </TableBodyRow>
+                                            <TableBodyRow IsCentered="true">
+                                                @sprint.FinishDate.ToString("dd.MM.yyyy")
+                                            </TableBodyRow>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </TableContent>
+                        </ListPageTable>
+                    </div>
+                </div>
+            }
+            else if (_activeSprint is not null && _activeCategory is ProjectViewCategory.ActiveSprint)
+            {
+                <div>
+                    <div class="active-sprint-header mt-4 mb-2 w-100">
+                        <div class="active-sprint-header-name border-bottom w-100">
+                            <div class="data-link fs-5 fw-semibold text-primary">
+                                @_activeSprint.Name
+                            </div>
+                            <Typography FontSize="6">
+                                (до @_activeSprint.FinishDate)
+                            </Typography>
+                        </div>
+                    </div>
+                    <div class="active-sprint-columns w-100">
+                        @foreach (var taskCategory in Enum.GetValues<HITSBlazor.Models.Projects.Enums.TaskStatus>().Where(s => s is not Models.Projects.Enums.TaskStatus.InBackLog))
+                        {
+                            string color = EnumViewModel<HITSBlazor.Models.Projects.Enums.TaskStatus>.GetStyle(taskCategory);
+                            <div class="w-100">
+                                <div class="mb-1">
+                                    <div class="rounded-top" style="height: 6px; background-color: @color;">
+                                    </div>
+                                    <div class="active-sprint-header p-2 border-start border-end border-bottom rounded-bottom">
+                                        <div class="d-flex gap-2">
+                                            <i class="bi bi-flag-fill fs-6" style="color: @color;"></i>
+                                            <Typography FontSize="6">
+                                                @(EnumViewModel<HITSBlazor.Models.Projects.Enums.TaskStatus>.GetTranslation(taskCategory))
+                                            </Typography>
+                                        </div>
+                                        <div class="d-flex gap-2">
+                                            @if (taskCategory is Models.Projects.Enums.TaskStatus.NewTask)
+                                            {
+                                                <i class="bi bi-plus active-sprint-add-task p-1 rounded"></i>
+                                            }
+                                            <Hint Text="@GetHintTaskStatusText(taskCategory)" IconClass="d-flex" IconColor="TextColor.Dark" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="list-group active-sprint-column">
+                                    @foreach (var task in _activeSprint.Tasks.Where(t => t.Status == taskCategory))
+                                    {
+                                        <div>
+                                            <div class="d-flex my-1" style="cursor: pointer;">
+                                                <!-- TODO: цвет у СВОЕЙ задачи другой, синий вроде -->
+                                                <div class="rounded-start" style="width: 6px; background-color: rgb(@GetTaskExecuteColor(task.Executor));">
+                                                </div>
+                                                <div class="bg-white p-2 border-top border-end border-bottom w-100 rounded-end">
+                                                    <div class="d-flex flex-column border-bottom pb-2">
+                                                        <div class="active-sprint-task">
+                                                            <div class="text-ellipsis">
+                                                                @task.Name
+                                                            </div>
+                                                        </div>
+                                                        <div class="d-flex gap-1 text-secondary">
+                                                            @task.Executor?.FullName
+                                                        </div>
+                                                    </div>
+                                                    <div class="d-flex flex-wrap gap-2 w-100 mt-2">
+                                                        @foreach (var tag in task.Tags)
+                                                        {
+                                                            <div class="px-2 py-1 rounded-2 text-center align-self-start" 
+                                                                 style="background-color: @($"{tag.Color}4D"); color: @tag.Color;">
+                                                                 @tag.Name
+                                                            </div>
+                                                        }
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        }
                     </div>
                 </div>
             }
@@ -210,5 +337,64 @@
         flex-wrap: nowrap;
         align-items: center;
         justify-content: center;
+    }
+
+    .filter {
+        display: flex;
+        flex-direction: column;
+        flex-wrap: nowrap;
+        align-items: stretch;
+        justify-content: flex-start;
+        gap: 8px;
+    }
+
+    .active-sprint-header {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .active-sprint-header-name {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 12px;
+    }
+
+    .active-sprint-columns {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 16px;
+    }
+
+    .active-sprint-column {
+        height: calc(100vh - 320px);
+        overflow-y: scroll;
+    }
+
+    .active-sprint-add-task {
+        transition: all .15s linear;
+        -webkit-transition: all .15s linear
+    }
+
+    .active-sprint-add-task:hover {
+        cursor: pointer;
+        color: #fff;
+        background-color: #0d6efd
+    }
+
+    .active-sprint-task {
+        display:-webkit-box;
+        -webkit-line-clamp:2;
+        -webkit-box-orient:vertical;
+        overflow:hidden;
+        text-overflow:ellipsis
     }
 </style>

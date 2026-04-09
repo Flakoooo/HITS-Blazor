@@ -1,4 +1,5 @@
 ﻿@namespace HITSBlazor.Components.Filters.CheckboxFilter
+@using HITSBlazor.Components.Inputs.Input
 @using HITSBlazor.Components.Placeholders.Placeholder
 @using HITSBlazor.Components.Typography
 @using HITSBlazor.Utils.Models
@@ -24,8 +25,12 @@
                 @Label
             </Typography>
         }
+        @if (!string.IsNullOrWhiteSpace(SearchText) && SearchTextChanged.HasDelegate)
+        {
+            <Input Placeholder="Найти" CustomClass="my-1" Value="@SearchText" ValueChanged="@((value) => SearchData(value))" />
+        }
         <div class="list-page-filter-choices">
-            @foreach (var value in AllValues)
+            @foreach (var value in _values)
             {
                 <div class="list-page-filter-choice px-2 py-1 rounded-1" @onclick="() => SelectValue(value)">
                     <div class="d-flex">

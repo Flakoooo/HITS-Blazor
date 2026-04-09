@@ -1,8 +1,16 @@
-﻿namespace HITSBlazor.Models.Projects.Enums
+﻿using HITSBlazor.Utils.Attributes;
+using System.ComponentModel;
+
+namespace HITSBlazor.Models.Projects.Enums
 {
     public enum SprintStatus
     {
-        ACTIVE,
-        DONE
+        [Description("Активен")]
+        [Style("bg-success-subtle text-success")]
+        Active,
+
+        [Description("Завершен")]
+        [Style("bg-warning-subtle text-warning")]
+        Done
     }
 }
