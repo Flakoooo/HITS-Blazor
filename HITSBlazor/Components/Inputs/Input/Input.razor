@@ -5,8 +5,8 @@
 <div class="w-100">
     @if (!string.IsNullOrWhiteSpace(Label))
     {
-        <label class="form-label text-primary">
-            @($"{Label}{(!string.IsNullOrWhiteSpace(HintText) ? " " : "")}")
+        <label class="form-label text-primary d-flex gap-1 align-items-center">
+            @Label
             @if (!string.IsNullOrWhiteSpace(HintText))
             {
                 <Hint Text="@HintText" />

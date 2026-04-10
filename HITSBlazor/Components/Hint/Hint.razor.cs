@@ -1,13 +1,13 @@
 ﻿using HITSBlazor.Components.Typography;
+using KristofferStrube.Blazor.Popper;
 using Microsoft.AspNetCore.Components;
-using Microsoft.JSInterop;
 
 namespace HITSBlazor.Components.Hint
 {
-    public partial class Hint
+    public partial class Hint : IAsyncDisposable
     {
         [Inject]
-        private IJSRuntime JSRuntime { get; set; } = null!;
+        protected Popper PopperService { get; set; } = null!;
 
         [Parameter]
         public RenderFragment? ChildContent { get; set; }
@@ -22,98 +22,166 @@ namespace HITSBlazor.Components.Hint
         public TextColor IconColor { get; set; } = TextColor.Primary;
 
         [Parameter]
-        public string Placement { get; set; } = string.Empty; 
+        public Placement Placement { get; set; } = Placement.Top;
 
-        private class DomRect
-        {
-            public float Left { get; set; }
-            public float Top { get; set; }
-            public float Width { get; set; }
-            public float Height { get; set; }
-            public float Right { get; set; }
-            public float Bottom { get; set; }
-        }
+        [Parameter]
+        public Strategy StrategyPosition { get; set; } = Strategy.Fixed;
 
-        private ElementReference _containerRef;
+        private ElementReference _triggerRef;
         private ElementReference _tooltipRef;
-        private string _placement = "top";
+        private Instance? _popperInstance;
         private bool _isVisible;
+        private bool _isDisposed;
+        private bool _isReady;
+        private CancellationTokenSource? _cts;
+
+        private static readonly Modifier[] HintModifiers =
+        [
+            new(ModifierName.Offset)
+            {
+                Options = new { offset = new[] { 0, 8 } }
+            },
+            new(ModifierName.PreventOverflow)
+            {
+                Options = new
+                {
+                    padding = 8,
+                    altAxis = true
+                }
+            },
+            new(ModifierName.Flip)
+            {
+                Options = new
+                {
+                    fallbackPlacements = new[]
+                    {
+                        Placement.Top, Placement.Bottom,
+                        Placement.Left, Placement.Right
+                    },
+                    padding = 8
+                }
+            }
+        ];
 
         private string GetIconClass()
         {
-            var classes = new List<string>
-            {
-                $"text-{IconColor.ToString().ToLower()}"
-            };
-
+            var classes = new List<string> { $"text-{IconColor.ToString().ToLower()}" };
             if (!string.IsNullOrWhiteSpace(IconClass))
                 classes.Add(IconClass);
-
             return string.Join(" ", classes);
         }
 
         private async Task ShowTooltip()
         {
-            if (_isVisible) return;
+            _cts?.Cancel();
+            _cts?.Dispose();
+            _cts = new CancellationTokenSource();
+            var token = _cts.Token;
+
+            if (_isDisposed) return;
 
             _isVisible = true;
-            _placement = string.IsNullOrWhiteSpace(Placement) ? "top" : Placement;
+            _isReady = false;
             StateHasChanged();
 
-            await Task.Delay(16);
-            if (string.IsNullOrWhiteSpace(Placement))
-                await CalculateBestPlacement();
+            try
+            {
+                await Task.Delay(16, token);
+                if (token.IsCancellationRequested) return;
 
-            StateHasChanged();
+                await CreatePopper();
+                if (token.IsCancellationRequested)
+                {
+                    await DestroyPopper();
+                    _isVisible = false;
+                    StateHasChanged();
+                    return;
+                }
+
+                await Task.Delay(20, token);
+                if (token.IsCancellationRequested)
+                {
+                    _isReady = false;
+                    StateHasChanged();
+                    await Task.Delay(150, CancellationToken.None);
+                    await DestroyPopper();
+                    _isVisible = false;
+                    StateHasChanged();
+                    return;
+                }
+
+                _isReady = true;
+                StateHasChanged();
+            }
+            catch (OperationCanceledException) { }
         }
 
         private async Task HideTooltip()
         {
-            _isVisible = false;
+            _cts?.Cancel();
+            _cts?.Dispose();
+            _cts = null;
+
+            if (!_isVisible || _isDisposed) return;
+
+            _isReady = false;
             StateHasChanged();
+
+            await Task.Delay(150);
+
+            if (_cts == null)
+            {
+                await DestroyPopper();
+                _isVisible = false;
+                StateHasChanged();
+            }
         }
 
-        private async Task CalculateBestPlacement()
+        private async Task CreatePopper()
         {
-            if (!string.IsNullOrWhiteSpace(Placement)) return;
+            await DestroyPopper();
 
             try
             {
-                var rect = await JSRuntime.InvokeAsync<DomRect>("hintHelper.getBoundingClientRect", _containerRef);
-                var tooltipRect = await JSRuntime.InvokeAsync<DomRect>("hintHelper.getBoundingClientRect", _tooltipRef);
-
-                var windowHeight = await JSRuntime.InvokeAsync<double>("hintHelper.getWindowHeight");
-                var windowWidth = await JSRuntime.InvokeAsync<double>("hintHelper.getWindowWidth");
-
-                if (rect.Top > tooltipRect.Height + 10)
-                {
-                    _placement = "top";
-                    return;
-                }
-
-                if ((windowWidth - rect.Right) > tooltipRect.Width + 10)
-                {
-                    double tooltipTop = rect.Top + (rect.Height / 2) - (tooltipRect.Height / 2);
-
-                    if (tooltipTop > 0 && (tooltipTop + tooltipRect.Height) < windowHeight)
+                _popperInstance = await PopperService.CreatePopperAsync(
+                    reference: _triggerRef,
+                    popper: _tooltipRef,
+                    options: new Options
                     {
-                        _placement = "right";
-                        return;
+                        Placement = Placement,
+                        Strategy = StrategyPosition,
+                        Modifiers = HintModifiers
                     }
-                }
+                );
 
-                if ((windowHeight - rect.Bottom) > tooltipRect.Height + 10)
-                {
-                    _placement = "bottom";
-                    return;
-                }
-
-                _placement = "top";
+                await _popperInstance.Update();
             }
-            catch (Exception)
+            catch (Exception) { }
+        }
+
+        private async Task DestroyPopper()
+        {
+            if (_popperInstance != null)
             {
-                _placement = "top";
+                try
+                {
+                    await _popperInstance.Destroy();
+                }
+                catch { }
+                _popperInstance = null;
             }
+        }
+
+        public async ValueTask DisposeAsync()
+        {
+            if (_isDisposed) return;
+            _isDisposed = true;
+
+            _cts?.Cancel();
+            _cts?.Dispose();
+            _cts = null;
+
+            await DestroyPopper();
         }
     }
 }

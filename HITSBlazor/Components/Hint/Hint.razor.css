@@ -1,15 +1,10 @@
-﻿.hint-container {
-    display: inline-block;
-}
-
-.hint-trigger {
-    display: inline-flex;
-    position: relative;
+﻿.hint-trigger {
+    display: inline;
     cursor: help;
 }
 
 .hint-tooltip {
-    position: absolute;
+    position: fixed;
     background: rgba(0, 0, 0, 0.7);
     color: white;
     padding: 8px 12px;
@@ -33,58 +28,46 @@
         opacity: 1;
     }
 
-    .hint-tooltip.top {
-        bottom: 100%;
-        left: 50%;
-        transform: translateX(-50%) translateY(-8px);
-    }
-
-        .hint-tooltip.top::after {
-            content: '';
-            position: absolute;
-            top: 100%;
-            left: 50%;
-            transform: translateX(-50%);
-            border-width: 5px;
-            border-style: solid;
-            border-color: rgba(0, 0, 0, 0.7) transparent transparent transparent;
-        }
-
-    .hint-tooltip.right {
-        left: 100%;
-        top: 50%;
-        transform: translateY(-50%) translateX(8px);
-    }
-
-        .hint-tooltip.right::after {
-            content: '';
-            position: absolute;
-            right: 100%;
-            top: 50%;
-            transform: translateY(-50%);
-            border-width: 5px;
-            border-style: solid;
-            border-color: transparent rgba(0, 0, 0, 0.7) transparent transparent;
-        }
-
-    .hint-tooltip.bottom {
+    .hint-tooltip[data-popper-placement^="top"]::after {
+        content: '';
+        position: absolute;
         top: 100%;
         left: 50%;
-        transform: translateX(-50%) translateY(8px);
+        transform: translateX(-50%);
+        border-width: 5px;
+        border-style: solid;
+        border-color: rgba(0, 0, 0, 0.7) transparent transparent transparent;
     }
 
-        .hint-tooltip.bottom::after {
-            content: '';
-            position: absolute;
-            bottom: 100%;
-            left: 50%;
-            transform: translateX(-50%);
-            border-width: 5px;
-            border-style: solid;
-            border-color: transparent transparent rgba(0, 0, 0, 0.7) transparent;
-        }
+    .hint-tooltip[data-popper-placement^="bottom"]::after {
+        content: '';
+        position: absolute;
+        bottom: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+        border-width: 5px;
+        border-style: solid;
+        border-color: transparent transparent rgba(0, 0, 0, 0.7) transparent;
+    }
 
-.hint-icon {
-    display: inline-block;
-    vertical-align: middle;
-}
+    .hint-tooltip[data-popper-placement^="right"]::after {
+        content: '';
+        position: absolute;
+        right: 100%;
+        top: 50%;
+        transform: translateY(-50%);
+        border-width: 5px;
+        border-style: solid;
+        border-color: transparent rgba(0, 0, 0, 0.7) transparent transparent;
+    }
+
+    .hint-tooltip[data-popper-placement^="left"]::after {
+        content: '';
+        position: absolute;
+        left: 100%;
+        top: 50%;
+        transform: translateY(-50%);
+        border-width: 5px;
+        border-style: solid;
+        border-color: transparent transparent transparent rgba(0, 0, 0, 0.7);
+    }

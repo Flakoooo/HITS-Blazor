@@ -3,17 +3,14 @@
 @using HITSBlazor.Components.Hint
 
 <div class="d-flex gap-2 mb-2 w-100">
-    <div class="bg-white rounded border w-100" style="cursor: pointer;">
+    <div class="bg-white overflow-hidden rounded border w-100" style="cursor: pointer;">
         <Collapse>
             <MainContent Context="collapse">
                 <div class="task" @onclick="() => collapse.Toggle()">
                     <div class="d-flex gap-2 task-left">
-                        <!-- TODO: при наведении вызывать всплывающий тэг с надписью актинвый или нет таск -->
-                        <!-- TODO: bg-warning если задача сейчас активна, bg-secondary если завершена -->
-                        <!-- TODO: bg-primary (синяя), если просто создана, также с цифрой с приоритетом (вроде бы если ее переносить, то приоритет меняется) -->
                         @{
                             var taskStatusHint = GetHintAndColor(Task.Status);
-                            <Hint Text="@taskStatusHint.Hint" Placement="right">
+                            <Hint Text="@taskStatusHint.Hint">
                                 <div class="task-left-block text-white fs-5 @taskStatusHint.Color">
                                     @(Task.Status is Models.Projects.Enums.TaskStatus.InBackLog ? Task.Position : string.Empty)
                                 </div>

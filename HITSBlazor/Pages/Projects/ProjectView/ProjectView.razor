@@ -222,12 +222,12 @@
                                                 @(EnumViewModel<HITSBlazor.Models.Projects.Enums.TaskStatus>.GetTranslation(taskCategory))
                                             </Typography>
                                         </div>
-                                        <div class="d-flex gap-2">
+                                        <div class="d-flex align-items-center gap-2">
                                             @if (taskCategory is Models.Projects.Enums.TaskStatus.NewTask)
                                             {
                                                 <i class="bi bi-plus active-sprint-add-task p-1 rounded" @onclick="ModalService.ShowTaskModal"></i>
                                             }
-                                            <Hint Text="@GetHintTaskStatusText(taskCategory)" IconClass="d-flex" IconColor="TextColor.Dark" />
+                                            <Hint Text="@GetHintTaskStatusText(taskCategory)" IconColor="TextColor.Dark" />
                                         </div>
                                     </div>
                                 </div>

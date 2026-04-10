@@ -52,10 +52,12 @@
                           Placeholder="Укажите список требуемых для выполнения проекта ресурсов"
                           @bind-Value="@IdeasCreateModel.Description" />
                 <div>
-                    <Typography FontSize="6" TextColor="TextColor.Primary">
-                        Желаемое количество участников в команде*
-                    </Typography>
-                    <Hint Text="@_hints["TeamSize"]" />
+                    <div class="d-flex gap-1 align-items-center">
+                        <Typography FontSize="6" TextColor="TextColor.Primary">
+                            Желаемое количество участников в команде*
+                        </Typography>
+                        <Hint Text="@_hints["TeamSize"]" />
+                    </div>
                     <div class="mt-2 d-flex gap-3">
                         <Number MinValue="2" 
                                 MaxValue="30" 
@@ -80,10 +82,12 @@
                 }
                 else
                 {
-                    <Typography FontSize="6" TextColor="TextColor.Primary">
-                        Стек технологий
-                    </Typography>
-                    <Hint Text="@_hints["Skills"]" />
+                    <div class="d-flex gap-1 align-items-center">
+                        <Typography FontSize="6" TextColor="TextColor.Primary">
+                            Стек технологий
+                        </Typography>
+                        <Hint Text="@_hints["Skills"]" />
+                    </div>
                     <div class="mt-2 w-100 stack-categories">
                         <SkillDropdown Placeholder="@(EnumViewModel<SkillType>.GetTranslation(SkillType.Language))"
                                        AllSkills="LanguageSkills"

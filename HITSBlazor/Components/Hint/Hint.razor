@@ -1,17 +1,18 @@
 ﻿@namespace HITSBlazor.Components.Hint
 
-<span class="hint-container" @ref="_containerRef">
-    <span class="hint-trigger" @onmouseenter="ShowTooltip" @onmouseleave="HideTooltip">
-        @if (ChildContent is null)
-        {
-            <i class="bi bi-patch-question hint-icon @GetIconClass()"></i>
-        }
-        else
-        {
-            @ChildContent
-        }
-        <span class="hint-tooltip @_placement @(_isVisible ? "visible" : string.Empty)" @ref="_tooltipRef">
-            @((MarkupString)Text)
-        </span>
-    </span>
+<span class="hint-trigger"
+      @ref="_triggerRef"
+      @onmouseenter="ShowTooltip"
+      @onmouseleave="HideTooltip">
+    @if (ChildContent is null)
+    {
+        <i class="bi bi-patch-question @GetIconClass()"></i>
+    }
+    else
+    {
+        @ChildContent
+    }
+</span>
+<span class="hint-tooltip @(_isReady ? "visible" : "")" @ref="_tooltipRef">
+    @((MarkupString)Text)
 </span>

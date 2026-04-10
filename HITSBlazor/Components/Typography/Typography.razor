@@ -2,7 +2,9 @@
 @using HITSBlazor.Utils
 @using HITSBlazor.Utils.Models
 
-<span class="@GetClass()" @onclick="OnClickHandler">@ChildContent</span>
+<span class="@GetClass()" @onclick="OnClickHandler">
+    @ChildContent
+</span>
 
 @code {
     [Parameter]
