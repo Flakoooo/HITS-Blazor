@@ -21,6 +21,9 @@ namespace HITSBlazor.Components.Hint
         [Parameter]
         public TextColor IconColor { get; set; } = TextColor.Primary;
 
+        [Parameter]
+        public string Placement { get; set; } = string.Empty; 
+
         private class DomRect
         {
             public float Left { get; set; }
@@ -54,11 +57,12 @@ namespace HITSBlazor.Components.Hint
             if (_isVisible) return;
 
             _isVisible = true;
-            _placement = "top";
+            _placement = string.IsNullOrWhiteSpace(Placement) ? "top" : Placement;
             StateHasChanged();
 
             await Task.Delay(16);
-            await CalculateBestPlacement();
+            if (string.IsNullOrWhiteSpace(Placement))
+                await CalculateBestPlacement();
 
             StateHasChanged();
         }
@@ -71,6 +75,8 @@ namespace HITSBlazor.Components.Hint
 
         private async Task CalculateBestPlacement()
         {
+            if (!string.IsNullOrWhiteSpace(Placement)) return;
+
             try
             {
                 var rect = await JSRuntime.InvokeAsync<DomRect>("hintHelper.getBoundingClientRect", _containerRef);

@@ -3,58 +3,56 @@
 @using HITSBlazor.Components.Hint
 
 <div class="d-flex gap-2 mb-2 w-100">
-    <Collapse StartCollapsed="false">
-        <MainContent Context="collapse">
-            <div class="task">
-                <div class="d-flex gap-2 task-left">
-                    <!-- TODO: при наведении вызывать всплывающий тэг с надписью актинвый или нет таск -->
-                    <!-- TODO: bg-warning если задача сейчас активна, bg-secondary если завершена -->
-                    <!-- TODO: bg-primary (синяя), если просто создана, также с цифрой с приоритетом (вроде бы если ее переносить, то приоритет меняется) -->
-                    @{
-                        var taskStatusHint = GetHintAndColor(Task.Status);
-                        <Hint Text="@taskStatusHint.Hint">
-                            <div class="task-left-block text-white fs-5 @taskStatusHint.Color">
-                                @(Task.Status is Models.Projects.Enums.TaskStatus.InBackLog ? Task.Position : string.Empty)
-                            </div>
-                        </Hint>
-                    }
-                    <div class="task-left-name" style="width: max-content;">
-                        @Task.Name
+    <div class="bg-white rounded border w-100" style="cursor: pointer;">
+        <Collapse>
+            <MainContent Context="collapse">
+                <div class="task" @onclick="() => collapse.Toggle()">
+                    <div class="d-flex gap-2 task-left">
+                        <!-- TODO: при наведении вызывать всплывающий тэг с надписью актинвый или нет таск -->
+                        <!-- TODO: bg-warning если задача сейчас активна, bg-secondary если завершена -->
+                        <!-- TODO: bg-primary (синяя), если просто создана, также с цифрой с приоритетом (вроде бы если ее переносить, то приоритет меняется) -->
+                        @{
+                            var taskStatusHint = GetHintAndColor(Task.Status);
+                            <Hint Text="@taskStatusHint.Hint" Placement="right">
+                                <div class="task-left-block text-white fs-5 @taskStatusHint.Color">
+                                    @(Task.Status is Models.Projects.Enums.TaskStatus.InBackLog ? Task.Position : string.Empty)
+                                </div>
+                            </Hint>
+                        }
+                        <div class="task-left-name" style="width: max-content;">
+                            @Task.Name
+                        </div>
+                    </div>
+                    <div class="task-left-icon w-100 me-2">
+                        @foreach (var tag in Task.Tags)
+                        {
+                            <Hint Text="@tag.Name">
+                                <i class="bi bi-circle-fill p-1 rounded-2"
+                                   style="background-color: @($"{tag.Color}4D"); color: @tag.Color;">
+                                </i>
+                            </Hint>
+                        }
+                        <i class="bi bi-chevron-down fs-5 flip-icon @(collapse.ExpandedStatus ? "active" : string.Empty)"></i>
                     </div>
                 </div>
-                <div class="task-left-icon w-100 me-2" style="cursor: pointer;">
-                    @foreach (var tag in Task.Tags)
-                    {
-                        <Hint Text="@tag.Name">
-                            <i class="bi bi-circle-fill p-1 rounded-2"
-                               style="background-color: @($"{tag.Color}4D"); color: @tag.Color;">
-                            </i>
-                        </Hint>
-                    }
-                    <i class="bi bi-chevron-down fs-5" @onclick="() => collapse.Toggle()"></i>
-                </div>
-            </div>
-        </MainContent>
-        <ExpandedContent>
-            <div class="list-group">
-                <div class="d-flex border-top text-secondary">
-                    <div class="w-75 p-2 border-end">
-                        @Task.Description
-                    </div>
-                    <div class="w-25 p-2">
-                        <div>Постановщик: @Task.Initiator</div>
-                        <div>Дата создания: @Task.StartDate.ToString("dd.MM.yyyy")</div>
-                        <div>Трудоемкость: @($"{Task.WorkHour}ч")</div>
+            </MainContent>
+            <ExpandedContent>
+                <div class="list-group">
+                    <div class="d-flex border-top text-secondary">
+                        <div class="w-75 p-2 border-end">
+                            @Task.Description
+                        </div>
+                        <div class="w-25 p-2">
+                            <div>Постановщик: @Task.Initiator.FullName</div>
+                            <div>Дата создания: @Task.StartDate.ToString("dd.MM.yyyy")</div>
+                            <div>Трудоемкость: @($"{Task.WorkHour}ч")</div>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </ExpandedContent>
-    </Collapse>
+            </ExpandedContent>
+        </Collapse>
+    </div>
 </div>
-
-<style>
-
-</style>
 
 @code {
     [Parameter]

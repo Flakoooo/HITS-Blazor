@@ -108,7 +108,7 @@ namespace HITSBlazor.Pages.Projects.ProjectView
         {
             if (_currentProject is null) return;
 
-            if (SelectedTagNames is null) _projectTasks = MockSprints.GetTasksByProjectId(_currentProject.Id);
+            if (SelectedTagNames.Count == 0) _projectTasks = MockSprints.GetTasksByProjectId(_currentProject.Id);
             else _projectTasks = [.. MockSprints.GetTasksByProjectId(_currentProject.Id)
                 .Where(task => task.Tags.Any(t => SelectedTagNames.Contains(t))
             )];
