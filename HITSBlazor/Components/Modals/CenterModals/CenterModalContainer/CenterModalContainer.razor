@@ -1,13 +1,16 @@
 ﻿@namespace HITSBlazor.Components.Modals.CenterModals.CenterModalContainer
 
-@if (_isContainerVisible)
+@if (ModalService.CenterModals.Count > 0)
 {
-    <div @onclick="CloseModalIfAllowed"
-         class="modal-layout modal-layout-@(_isContainerClosing ? "leave" : "enter")-active">
-        @if (_currentComponentType != null)
-        {
-            <DynamicComponent Type="@_currentComponentType"
-                              Parameters="@_parameters" />
-        }
-    </div>
+    @for (int i = 0; i < ModalService.CenterModals.Count; ++i)
+    {
+        var modal = ModalService.CenterModals[i];
+        int zIndex = (i + 1) * 500;
+        <div @onclick="() => CloseModalIfAllowed(modal.BlockCloseModal)"
+             class="modal-layout modal-layout-@modal.State.ToString().ToLower()-active"
+             style="z-index: @zIndex;">
+            <DynamicComponent Type="@modal.ComponentType"
+                              Parameters="@modal.Parameters" />
+        </div>
+    }
 }

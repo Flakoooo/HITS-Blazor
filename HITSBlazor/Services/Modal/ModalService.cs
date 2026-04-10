@@ -12,23 +12,16 @@ namespace HITSBlazor.Services.Modal
 {
     public class ModalService
     {
-        public event Action<ModalData>? OnShowCenterModal;
+        public event Action? OnCenterModalsUpdated;
+
         public event Action<ModalData>? OnShowSideModal;
 
-        public event Action? OnCloseCenterModal;
         public event Action? OnCloseSideModal;
 
-        public event Action? OnCloseCenterModalContainer;
         public event Action? OnCloseSideModalContainer;
 
-        private Stack<ModalData> _centerModals = [];
-        private Stack<ModalData> _sideModals = [];
-
-        private ModalData? _currentCenterModal;
-        private ModalData? _currentSideModal;
-
-        public bool HasActiveCenterModal => _currentCenterModal != null;
-        public bool HasActiveSideModal => _currentSideModal != null;
+        public List<ModalData> CenterModals { get; private set; } = [];
+        public Stack<ModalData> SideModals { get; private set; } = [];
 
         public void Show<TComponent>(
             ModalType type,
@@ -60,14 +53,12 @@ namespace HITSBlazor.Services.Modal
             switch (type)
             {
                 case ModalType.Center:
-                    _centerModals.Push(modalData);
-                    _currentCenterModal = modalData;
-                    OnShowCenterModal?.Invoke(modalData);
+                    CenterModals.Add(modalData);
+                    OnCenterModalsUpdated?.Invoke();
                     break;
 
                 case ModalType.RightSide:
-                    _sideModals.Push(modalData);
-                    _currentSideModal = modalData;
+                    SideModals.Push(modalData);
                     OnShowSideModal?.Invoke(modalData);
                     break;
 
@@ -81,34 +72,29 @@ namespace HITSBlazor.Services.Modal
             switch (type)
             {
                 case ModalType.Center:
-                    if (_centerModals.Count == 0)
+                    if (CenterModals.Count == 0)
                         return;
 
-                    _centerModals.Pop();
+                    CenterModals.Last().State = ModalState.Leave;
+                    OnCenterModalsUpdated?.Invoke();
+                    await Task.Delay(100);
 
-                    OnCloseCenterModal?.Invoke();
-
-                    await Task.Delay(100).ContinueWith(_ =>
-                    {
-                        if (_centerModals.Count > 0)
-                            OnShowCenterModal?.Invoke(_centerModals.Peek());
-                        else
-                            OnCloseCenterModalContainer?.Invoke();
-                    });
+                    CenterModals.Remove(CenterModals.Last());
+                    OnCenterModalsUpdated?.Invoke();
                     break;
 
                 case ModalType.RightSide:
-                    if (_sideModals.Count == 0)
+                    if (SideModals.Count == 0)
                         return;
 
-                    _sideModals.Pop();
+                    SideModals.Pop();
 
                     OnCloseSideModal?.Invoke();
 
                     await Task.Delay(100).ContinueWith(_ =>
                     {
-                        if (_sideModals.Count > 0)
-                            OnShowSideModal?.Invoke(_sideModals.Peek());
+                        if (SideModals.Count > 0)
+                            OnShowSideModal?.Invoke(SideModals.Peek());
                         else
                             OnCloseSideModalContainer?.Invoke();
                     });
@@ -119,18 +105,24 @@ namespace HITSBlazor.Services.Modal
             }
         }
 
-        public void CloseAll(ModalType type)
+        public async Task CloseAll(ModalType type)
         {
             switch (type)
             {
                 case ModalType.Center:
-                    _centerModals.Clear();
-                    OnCloseCenterModal?.Invoke();
-                    OnCloseCenterModalContainer?.Invoke();
+                    for (int i = CenterModals.Count - 1; i >= 0; i--)
+                        CenterModals[i].State = ModalState.Leave;
+
+                    OnCenterModalsUpdated?.Invoke();
+
+                    await Task.Delay(100);
+
+                    CenterModals.Clear();
+                    OnCenterModalsUpdated?.Invoke();
                     break;
 
                 case ModalType.RightSide:
-                    _sideModals.Clear();
+                    SideModals.Clear();
                     OnCloseSideModal?.Invoke();
                     OnCloseSideModalContainer?.Invoke();
                     break;

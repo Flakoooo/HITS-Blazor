@@ -6,6 +6,7 @@
         public bool BlockCloseModal { get; set; } = false;
         public Dictionary<string, object> Parameters { get; set; } = [];
         public ModalType Type { get; set; } = ModalType.Center;
+        public ModalState State { get; set; } = ModalState.Enter;
         public string? CustomClass { get; set; }
     }
 }

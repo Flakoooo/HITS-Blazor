@@ -3,7 +3,8 @@
 @if (_isContainerVisible)
 {
     <div @onclick="CloseModalIfAllowed"
-         class="modal-layout modal-layout-@(_isContainerClosing ? "leave" : "enter")-active">
+         class="modal-layout modal-layout-@(_isContainerClosing ? "leave" : "enter")-active"
+         style="z-index: 500;">
         @if (_currentComponentType != null)
         {
             <DynamicComponent Type="@_currentComponentType"

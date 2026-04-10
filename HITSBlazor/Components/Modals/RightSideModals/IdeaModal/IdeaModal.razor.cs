@@ -303,7 +303,7 @@ namespace HITSBlazor.Components.Modals.RightSideModals.IdeaModal
 
         private async Task NavigateToCreateIdea()
         {
-            ModalService.CloseAll(ModalType.RightSide);
+            await ModalService.CloseAll(ModalType.RightSide);
             await NavigationService.NavigateToAsync($"/ideas/create/{CurrentIdea?.Id}");
         }
     }
