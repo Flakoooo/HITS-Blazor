@@ -13,12 +13,7 @@ namespace HITSBlazor.Services.Modal
     public class ModalService
     {
         public event Action? OnCenterModalsUpdated;
-
-        public event Action<ModalData>? OnShowSideModal;
-
-        public event Action? OnCloseSideModal;
-
-        public event Action? OnCloseSideModalContainer;
+        public event Action? OnRightSideModalsUpdated;
 
         public List<ModalData> CenterModals { get; private set; } = [];
         public Stack<ModalData> SideModals { get; private set; } = [];
@@ -59,7 +54,7 @@ namespace HITSBlazor.Services.Modal
 
                 case ModalType.RightSide:
                     SideModals.Push(modalData);
-                    OnShowSideModal?.Invoke(modalData);
+                    OnRightSideModalsUpdated?.Invoke();
                     break;
 
                 default:
@@ -87,17 +82,12 @@ namespace HITSBlazor.Services.Modal
                     if (SideModals.Count == 0)
                         return;
 
+                    SideModals.Peek().State = ModalState.Leave;
+                    OnRightSideModalsUpdated?.Invoke();
+                    await Task.Delay(100);
+
                     SideModals.Pop();
-
-                    OnCloseSideModal?.Invoke();
-
-                    await Task.Delay(100).ContinueWith(_ =>
-                    {
-                        if (SideModals.Count > 0)
-                            OnShowSideModal?.Invoke(SideModals.Peek());
-                        else
-                            OnCloseSideModalContainer?.Invoke();
-                    });
+                    OnRightSideModalsUpdated?.Invoke();
                     break;
 
                 default: 
@@ -110,7 +100,7 @@ namespace HITSBlazor.Services.Modal
             switch (type)
             {
                 case ModalType.Center:
-                    for (int i = CenterModals.Count - 1; i >= 0; i--)
+                    for (int i = CenterModals.Count - 1; i >= 0; --i)
                         CenterModals[i].State = ModalState.Leave;
 
                     OnCenterModalsUpdated?.Invoke();
@@ -122,9 +112,15 @@ namespace HITSBlazor.Services.Modal
                     break;
 
                 case ModalType.RightSide:
+                    foreach (var modal in SideModals)
+                        SideModals.Peek().State |= ModalState.Leave;
+
+                    OnRightSideModalsUpdated?.Invoke();
+
+                    await Task.Delay(100);
+
                     SideModals.Clear();
-                    OnCloseSideModal?.Invoke();
-                    OnCloseSideModalContainer?.Invoke();
+                    OnRightSideModalsUpdated?.Invoke();
                     break;
 
                 default:

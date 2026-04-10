@@ -1,11 +1,11 @@
 ﻿@namespace HITSBlazor.Components.Modals.CenterModals.CenterModalContainer
 
-@if (ModalService.CenterModals.Count > 0)
+@if (ModalService.CenterModals.Count != 0)
 {
     @for (int i = 0; i < ModalService.CenterModals.Count; ++i)
     {
         var modal = ModalService.CenterModals[i];
-        int zIndex = (i + 1) * 500;
+        int zIndex = (i + 1) * 600;
         <div @onclick="() => CloseModalIfAllowed(modal.BlockCloseModal)"
              class="modal-layout modal-layout-@modal.State.ToString().ToLower()-active"
              style="z-index: @zIndex;">

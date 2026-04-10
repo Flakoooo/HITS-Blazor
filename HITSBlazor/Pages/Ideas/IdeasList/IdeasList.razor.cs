@@ -67,7 +67,7 @@ namespace HITSBlazor.Pages.Ideas.IdeasList
 
             AuthService.OnActiveRoleChanged += UserRoleHasChanged;
             IdeasService.OnIdeasStateChanged += StateHasChanged;
-            ModalService.OnCloseSideModalContainer += IdeaModalHasClosed;
+            ModalService.OnRightSideModalsUpdated += IdeaModalHasClosed;
 
             var currentUser = AuthService.CurrentUser;
             if (currentUser?.Role == RoleType.Member)
@@ -158,14 +158,18 @@ namespace HITSBlazor.Pages.Ideas.IdeasList
             StateHasChanged();
         }
 
-        private async void IdeaModalHasClosed() 
-            => await NavigationService.NavigateToAsync($"/ideas/list");
+        private async void IdeaModalHasClosed()
+        {
+            if (ModalService.SideModals.Count != 0) return;
+
+            await NavigationService.NavigateToAsync($"/ideas/list");
+        }
 
         public void Dispose()
         {
             AuthService.OnActiveRoleChanged -= UserRoleHasChanged;
             IdeasService.OnIdeasStateChanged -= StateHasChanged;
-            ModalService.OnCloseSideModalContainer -= IdeaModalHasClosed;
+            ModalService.OnRightSideModalsUpdated -= IdeaModalHasClosed;
         }
     }
 }
