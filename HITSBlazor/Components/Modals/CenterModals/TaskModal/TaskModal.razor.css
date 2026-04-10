@@ -1,0 +1,11 @@
+﻿.add-task-modal {
+    width: 500px;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: flex-start;
+    justify-content: flex-start;
+    gap: 12px;
+    align-self: center;
+    justify-self: center;
+}

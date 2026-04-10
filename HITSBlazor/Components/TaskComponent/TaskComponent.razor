@@ -1,6 +1,7 @@
 ﻿@namespace HITSBlazor.Components.TaskComponent
 @using HITSBlazor.Components.Collapse
 @using HITSBlazor.Components.Hint
+@using HITSBlazor.Services.Modal
 
 <div class="d-flex gap-2 mb-2 w-100">
     <div class="bg-white overflow-hidden rounded border w-100" style="cursor: pointer;">
@@ -16,7 +17,8 @@
                                 </div>
                             </Hint>
                         }
-                        <div class="task-left-name" style="width: max-content;">
+                        <div class="task-left-name @(Task.Status is Models.Projects.Enums.TaskStatus.InBackLog ? "active" : string.Empty)" 
+                             style="width: max-content;" @onclick="ShowTaskModal" @onclick:stopPropagation="true">
                             @Task.Name
                         </div>
                     </div>
@@ -52,6 +54,9 @@
 </div>
 
 @code {
+    [Inject]
+    private ModalService ModalService { get; set; } = null!;
+
     [Parameter]
     public required HITSBlazor.Models.Projects.Entities.Task Task { get; set; }
 
@@ -64,4 +69,10 @@
         Models.Projects.Enums.TaskStatus.Done => ("Задача завершена", "bg-secondary"),
         _ => ("Задача в активном спринте", "bg-warning")
     };
+
+    private void ShowTaskModal()
+    {
+        if (Task.Status is not Models.Projects.Enums.TaskStatus.InBackLog)
+            ModalService.ShowTaskModal(Task);
+    }
 }

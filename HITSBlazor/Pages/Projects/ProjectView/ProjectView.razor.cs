@@ -146,6 +146,10 @@ namespace HITSBlazor.Pages.Projects.ProjectView
             return "158, 158, 158";
         }
 
+        private void ShowProfileModal(Guid userId) => ModalService.ShowProfileModal(userId);
+
+        private void ShowTaskModal(Models.Projects.Entities.Task? task = null) => ModalService.ShowTaskModal(task);
+
         private void ShowSprintModal()
         {
             ModalService.Show<SprintModal>(ModalType.Center);
@@ -156,7 +160,7 @@ namespace HITSBlazor.Pages.Projects.ProjectView
             if (context.Action == MenuAction.ViewProfile)
             {
                 if (context.Item is Guid memberId)
-                    ModalService.ShowProfileModal(memberId);
+                    ShowProfileModal(memberId);
             }
         }
     }

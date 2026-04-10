@@ -19,6 +19,10 @@
     text-overflow: ellipsis;
     transition: .15s ease-out;
 }
+    .task-left-name.active:hover {
+        cursor: pointer;
+        color: #0d6efd;
+    }
 
 .task-left-icon {
     height: 40px;

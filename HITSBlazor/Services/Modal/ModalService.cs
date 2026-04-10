@@ -6,6 +6,8 @@ using HITSBlazor.Components.Modals.RightSideModals.IdeaModal;
 using HITSBlazor.Components.Modals.RightSideModals.ProfileModal;
 using HITSBlazor.Components.Modals.RightSideModals.TeamModal;
 using HITSBlazor.Components.Typography;
+using HITSBlazor.Models.Projects.Entities;
+using HITSBlazor.Models.Teams.Entities;
 using Microsoft.AspNetCore.Components;
 
 namespace HITSBlazor.Services.Modal
@@ -62,7 +64,7 @@ namespace HITSBlazor.Services.Modal
             }
         }
 
-        public async Task Close(ModalType type)
+        public async System.Threading.Tasks.Task Close(ModalType type)
         {
             switch (type)
             {
@@ -72,7 +74,7 @@ namespace HITSBlazor.Services.Modal
 
                     CenterModals.Last().State = ModalState.Leave;
                     OnCenterModalsUpdated?.Invoke();
-                    await Task.Delay(100);
+                    await System.Threading.Tasks.Task.Delay(100);
 
                     CenterModals.Remove(CenterModals.Last());
                     OnCenterModalsUpdated?.Invoke();
@@ -84,7 +86,7 @@ namespace HITSBlazor.Services.Modal
 
                     SideModals.Peek().State = ModalState.Leave;
                     OnRightSideModalsUpdated?.Invoke();
-                    await Task.Delay(100);
+                    await System.Threading.Tasks.Task.Delay(100);
 
                     SideModals.Pop();
                     OnRightSideModalsUpdated?.Invoke();
@@ -95,7 +97,7 @@ namespace HITSBlazor.Services.Modal
             }
         }
 
-        public async Task CloseAll(ModalType type)
+        public async System.Threading.Tasks.Task CloseAll(ModalType type)
         {
             switch (type)
             {
@@ -105,7 +107,7 @@ namespace HITSBlazor.Services.Modal
 
                     OnCenterModalsUpdated?.Invoke();
 
-                    await Task.Delay(100);
+                    await System.Threading.Tasks.Task.Delay(100);
 
                     CenterModals.Clear();
                     OnCenterModalsUpdated?.Invoke();
@@ -117,7 +119,7 @@ namespace HITSBlazor.Services.Modal
 
                     OnRightSideModalsUpdated?.Invoke();
 
-                    await Task.Delay(100);
+                    await System.Threading.Tasks.Task.Delay(100);
 
                     SideModals.Clear();
                     OnRightSideModalsUpdated?.Invoke();
@@ -135,7 +137,7 @@ namespace HITSBlazor.Services.Modal
 
         public void ShowConfirmModal(
             string questionText,
-            Func<Task> confirmMethod,
+            Func<System.Threading.Tasks.Task> confirmMethod,
             int? questionTextFontSize = null,
             TextColor? questionTextColor = null,
             string? questionTextCustomClass = null,
@@ -190,6 +192,9 @@ namespace HITSBlazor.Services.Modal
             parameters: new Dictionary<string, object> { [nameof(TeamModal.TeamId)] = teamId }
         );
 
-        public void ShowTaskModal() => Show<TaskModal>(ModalType.Center);
+        public void ShowTaskModal(Models.Projects.Entities.Task? task = null) => Show<TaskModal>(
+            ModalType.Center,
+            parameters: task is not null ? new Dictionary<string, object> { [nameof(TaskModal.CurrentTask)] = task } : null
+        );
     }
 }

@@ -2,6 +2,7 @@
 @using HITSBlazor.Components.Button
 @using HITSBlazor.Components.Inputs.CheckboxDropdown
 @using HITSBlazor.Components.Inputs.Input
+@using HITSBlazor.Components.Inputs.Number
 @using HITSBlazor.Components.Inputs.TextArea
 @using HITSBlazor.Components.Modals.Components.CenterModalHeader
 @using HITSBlazor.Components.Typography
@@ -9,7 +10,7 @@
 @using HITSBlazor.Utils.Models
 
 <div @onclick:stopPropagation="true" class="add-task-modal border rounded-3 bg-white px-3 py-2">
-    <CenterModalHeader HeaderText="Создание задачи" FontSize="4" />
+    <CenterModalHeader HeaderText="@(CurrentTask is null ? "Создание задачи" : "Редактирвоание задачи")" FontSize="4" />
     <Input Label="Название задачи*" Placeholder="Название" @bind-Value="TaskName" />
     <TextArea Label="Описание задачи*" Placeholder="Описание" @bind-Value="TaskDescription" Style="resize: none; height: 100px;" />
     <CheckboxDropdown T="Tag" AllValues="_tags" @bind-SelectedValues="SelectedTags" Placeholder="Теги" />
@@ -26,22 +27,7 @@
         <Typography FontSize="6" TextColor="TextColor.Primary">
             Трудоёмкость*
         </Typography>
-        <!-- TODO: сделать ввод только цифр? -->
-        <Input Placeholder="Часы" @bind-Value="Hours" />
+        <Number Placeholder="Часы" @bind-Value="Hours" MinValue="0" />
     </div>
     <Button Variant="ButtonVariant.Primary" Text="Создать задачу" ButtonClass="w-100 mb-1" />
 </div>
-
-<style>
-    .add-task-modal {
-        width: 500px;
-        display: flex;
-        flex-direction: column;
-        flex-wrap: nowrap;
-        align-items: flex-start;
-        justify-content: flex-start;
-        gap: 12px;
-        align-self: center;
-        justify-self: center;
-    }
-</style>
