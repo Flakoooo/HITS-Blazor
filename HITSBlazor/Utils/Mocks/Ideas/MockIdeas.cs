@@ -318,8 +318,8 @@ namespace HITSBlazor.Utils.Mocks.Ideas
                 Solution = model.Solution,
                 Result = model.Result,
                 Status = model.Status,
-                MaxTeamSize = model.MaxTeamSize,
-                MinTeamSize = model.MinTeamSize,
+                MaxTeamSize = model.MaxTeamSize ?? 2,
+                MinTeamSize = model.MinTeamSize ?? 30,
 
                 ProjectOffice = MockUsersGroups.GetGroupById(MockUsersGroups.ProjectOfficeId)!.WithUsers(
                     MockUsersGroups.GetRandomGroupUsersById(MockUsersGroups.ProjectOfficeId, 1)
@@ -363,8 +363,8 @@ namespace HITSBlazor.Utils.Mocks.Ideas
             idea.Solution = model.Solution;
             idea.Result = model.Result;
 
-            idea.MaxTeamSize = model.MaxTeamSize;
-            idea.MinTeamSize = model.MinTeamSize;
+            idea.MaxTeamSize = model.MaxTeamSize ?? 2;
+            idea.MinTeamSize = model.MinTeamSize ?? 30;
 
             idea.Customer = model.Customer;
             idea.ContactPerson = model.ContactPerson;

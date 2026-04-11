@@ -18,7 +18,8 @@
                   placeholder="@Placeholder"
                   @oninput="@OnInputChanged"
                   class="form-control rounded-end @(_showError ? "is-invalid" : string.Empty)"
-                  style="@Style">
+                  style="@Style"
+                  @attributes="GetInputAttributes()">
         </textarea>
         @if (_showError)
         {

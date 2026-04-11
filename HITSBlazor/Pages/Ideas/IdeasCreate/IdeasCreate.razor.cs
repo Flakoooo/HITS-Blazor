@@ -133,46 +133,45 @@ namespace HITSBlazor.Pages.Ideas.IdeasCreate
 
             Companies = await CompanyService.GetCompaniesAsync(role: AuthService.CurrentUser?.Role);
 
-            _isLoading = false;
-        }
-
-        protected override async Task OnParametersSetAsync()
-        {
-            if (!Guid.TryParse(IdeaId, out Guid guid)) return;
-
-            var idea = await IdeasService.GetIdeaByIdAsync(guid);
-            if (idea is null) return;
-
-            IdeasCreateModel = new()
+            if (Guid.TryParse(IdeaId, out Guid guid))
             {
-                Name = idea.Name,
-                Problem = idea.Problem,
-                Description = idea.Description,
-                Solution = idea.Solution,
-                Result = idea.Result,
-                Status = idea.Status,
-                MaxTeamSize = idea.MaxTeamSize,
-                MinTeamSize = idea.MinTeamSize,
-                Customer = idea.Customer,
-                ContactPerson = idea.ContactPerson
-            };
+                var idea = await IdeasService.GetIdeaByIdAsync(guid);
+                if (idea is not null)
+                {
+                    IdeasCreateModel = new()
+                    {
+                        Name = idea.Name,
+                        Problem = idea.Problem,
+                        Description = idea.Description,
+                        Solution = idea.Solution,
+                        Result = idea.Result,
+                        Status = idea.Status,
+                        MaxTeamSize = idea.MaxTeamSize,
+                        MinTeamSize = idea.MinTeamSize,
+                        Customer = idea.Customer,
+                        ContactPerson = idea.ContactPerson
+                    };
 
-            SelectedCompany = await CompanyService.GetCompanyByNameAsync(idea.Customer);
-            if (SelectedCompany != null)
-            {
-                SelectedContactPerson = SelectedCompany.Members.FirstOrDefault(
-                    u => u.FullName.Equals(idea.ContactPerson)
-                );
+                    SelectedCompany = await CompanyService.GetCompanyByNameAsync(idea.Customer);
+                    if (SelectedCompany != null)
+                    {
+                        SelectedContactPerson = SelectedCompany.Members.FirstOrDefault(
+                            u => u.FullName.Equals(idea.ContactPerson)
+                        );
+                    }
+
+                    SuitabilityScore = idea.Suitability.ToString();
+                    BudgetScore = idea.Budget.ToString();
+
+                    var ideaSkills = await IdeasService.GetAllIdeaSkillsAsync(guid);
+                    SelectedLanguageSkills = [.. ideaSkills.Where(s => s.Type == SkillType.Language)];
+                    SelectedFrameworkSkills = [.. ideaSkills.Where(s => s.Type == SkillType.Framework)];
+                    SelectedDatabaseSkills = [.. ideaSkills.Where(s => s.Type == SkillType.Database)];
+                    SelectedDevopsSkills = [.. ideaSkills.Where(s => s.Type == SkillType.Devops)];
+                }
             }
 
-            SuitabilityScore = idea.Suitability.ToString();
-            BudgetScore = idea.Budget.ToString();
-
-            var ideaSkills = await IdeasService.GetAllIdeaSkillsAsync(guid);
-            SelectedLanguageSkills = [.. ideaSkills.Where(s => s.Type == SkillType.Language)];
-            SelectedFrameworkSkills = [.. ideaSkills.Where(s => s.Type == SkillType.Framework)];
-            SelectedDatabaseSkills = [.. ideaSkills.Where(s => s.Type == SkillType.Database)];
-            SelectedDevopsSkills = [.. ideaSkills.Where(s => s.Type == SkillType.Devops)];
+            _isLoading = false;
         }
 
         private async Task CreateNewSkill(string name, SkillType skillType)
@@ -222,8 +221,8 @@ namespace HITSBlazor.Pages.Ideas.IdeasCreate
                 if (string.IsNullOrWhiteSpace(IdeasCreateModel.Solution)) isInvalid = true;
                 if (string.IsNullOrWhiteSpace(IdeasCreateModel.Result)) isInvalid = true;
 
-                if (IdeasCreateModel.MaxTeamSize is > 30 or < 2) isInvalid = true;
-                if (IdeasCreateModel.MinTeamSize is > 30 or < 2) isInvalid = true;
+                if (IdeasCreateModel.MaxTeamSize.HasValue && IdeasCreateModel.MaxTeamSize.Value is > 30 or < 2) isInvalid = true;
+                if (IdeasCreateModel.MinTeamSize.HasValue && IdeasCreateModel.MinTeamSize.Value is > 30 or < 2) isInvalid = true;
 
                 if (SelectedCompany is null) isInvalid = true;
                 if (SelectedContactPerson is null) isInvalid = true;

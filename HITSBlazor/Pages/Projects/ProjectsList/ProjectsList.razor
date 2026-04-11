@@ -5,6 +5,7 @@
 @using HITSBlazor.Components.ListPageComponents.ListPageHeader
 @using HITSBlazor.Components.ListPageComponents.ListPageSearch
 @using HITSBlazor.Components.ListPageComponents.ListPageTable
+@using HITSBlazor.Components.Statuses.EnumStatus
 @using HITSBlazor.Components.Tables.TableActionMenu
 @using HITSBlazor.Components.Tables.TableBodyRow
 @using HITSBlazor.Models.Projects.Enums
@@ -27,9 +28,7 @@
                                 </div>
                             </TableBodyRow>
                             <TableBodyRow IsCentered="true">
-                                <div class="px-2 py-1 rounded-4 @(EnumViewModel<ProjectStatus>.GetStyle(project.Status))">
-                                    @(EnumViewModel<ProjectStatus>.GetTranslation(project.Status))
-                                </div>
+                                <EnumStatus Statustype="project.Status" />
                             </TableBodyRow>
                             <TableBodyRow IsCentered="true">
                                 @project.StartDate.ToString("dd.MM.yyyy")

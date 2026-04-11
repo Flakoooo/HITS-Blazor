@@ -10,6 +10,7 @@
 @using HITSBlazor.Components.ListPageComponents.ListPageTable
 @using HITSBlazor.Components.Placeholders.Placeholder
 @using HITSBlazor.Components.Placeholders.TablePlaceholder
+@using HITSBlazor.Components.Statuses.BoolStatus
 @using HITSBlazor.Components.Tables.TableActionMenu
 @using HITSBlazor.Components.Tables.TableBodyRow
 @using HITSBlazor.Components.Tables.TableHeader
@@ -36,12 +37,9 @@
                     <tbody>
                         @foreach (var team in _teams)
                         {
-                            <!-- TODO: реализовать компонент для вывода состояния статуса, так как у них стиль одинаков -->
                             <tr>
                                 <TableBodyRow IsCentered="true">
-                                    <div class="px-2 py-1 rounded-4 @(team.Closed ? "bg-danger-subtle text-danger" : "bg-success-subtle text-success")">
-                                        @(team.Closed ? "Закрыта" : "Открыта")
-                                    </div>
+                                    <BoolStatus Value="team.Closed" StatusType="BoolStatusType.TeamClosed"  />
                                 </TableBodyRow>
                                 <TableBodyRow>
                                     <div class="data-link" @onclick="@(() => ShowTeam(team.Id))">
@@ -49,9 +47,7 @@
                                     </div>
                                 </TableBodyRow>
                                 <TableBodyRow IsCentered="true">
-                                    <div class="px-2 py-1 rounded-4 @(team.HasActiveProject ? "bg-warning-subtle text-warning" : "bg-primary-subtle text-primary")">
-                                        @(team.HasActiveProject ? "В работе" : "В поисках")
-                                    </div>
+                                    <BoolStatus Value="team.HasActiveProject" StatusType="BoolStatusType.TeamActiveProject"  />
                                 </TableBodyRow>
                                 <TableBodyRow IsCentered="true">
                                     @team.MembersCount

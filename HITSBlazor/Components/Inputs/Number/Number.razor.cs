@@ -5,10 +5,10 @@ namespace HITSBlazor.Components.Inputs.Number
     public partial class Number
     {
         [Parameter]
-        public int MinValue { get; set; }
+        public int? MinValue { get; set; }
 
         [Parameter]
-        public int MaxValue { get; set; }
+        public int? MaxValue { get; set; }
 
         [Parameter]
         public string Placeholder { get; set; } = string.Empty;
@@ -17,7 +17,7 @@ namespace HITSBlazor.Components.Inputs.Number
         public int? Value { get; set; }
 
         [Parameter]
-        public EventCallback<int> ValueChanged { get; set; }
+        public EventCallback<int?> ValueChanged { get; set; }
 
         [Parameter]
         public bool NeedValidation { get; set; } = false;

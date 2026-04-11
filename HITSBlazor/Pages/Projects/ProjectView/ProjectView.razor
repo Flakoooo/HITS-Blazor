@@ -9,6 +9,7 @@
 @using HITSBlazor.Components.ListPageComponents.ListPageTable
 @using HITSBlazor.Components.Modals.Components.RightSideModaCollapselInfo
 @using HITSBlazor.Components.Modals.Components.RightSideModalInfoItemComponent
+@using HITSBlazor.Components.Statuses.EnumStatus
 @using HITSBlazor.Components.Tables.TableActionMenu
 @using HITSBlazor.Components.Tables.TableBodyRow
 @using HITSBlazor.Components.Tables.TableHeader
@@ -16,6 +17,7 @@
 @using HITSBlazor.Components.Typography
 @using HITSBlazor.Models.Common.Entities
 @using HITSBlazor.Models.Projects.Enums
+@using HITSBlazor.Models.Users.Enums
 @using HITSBlazor.Utils.Models
 
 <div class="bg-white h-auto">
@@ -24,9 +26,7 @@
             <Typography FontSize="4" TextColor="TextColor.Primary">
                 @_currentProject?.Name
             </Typography>
-            <div class="px-2 py-1 rounded-4 @(EnumViewModel<ProjectStatus>.GetStyle(_currentProject?.Status))">
-                @(EnumViewModel<ProjectStatus>.GetTranslation(_currentProject?.Status))
-            </div>
+            <EnumStatus Statustype="_currentProject?.Status" />
         </div>
         <div>
             <div class="px-3">
@@ -74,9 +74,7 @@
                                                         @member.LastName
                                                     </TableBodyRow>
                                                     <TableBodyRow IsCentered="true">
-                                                        <div class="px-2 py-1 rounded-4 bg-primary-subtle text-primary">
-                                                            @(EnumViewModel<ProjectMemberRole>.GetTranslation(member.ProjectRole))
-                                                        </div>
+                                                        <EnumStatus Statustype="member.ProjectRole" />
                                                     </TableBodyRow>
                                                     <TableActionMenu ItemId="member.UserId"
                                                                      StrategyPosition="Strategy.Fixed"
@@ -100,25 +98,25 @@
                             <div class="px-2">
                                 <RightSideModalInfoItemComponent Label="Инициатор" 
                                                                  Icon="bi-person-circle"
-                                                                 Text="@_currentProject.Initiator.FullName"
+                                                                 Text="@_currentProject?.Initiator.FullName"
                                                                  TextColor="TextColor.Primary" />
                             </div>
                             <div class="px-2">
                                 <RightSideModalInfoItemComponent Label="Заказчик" 
                                                                  Icon="bi-person-circle"
-                                                                 Text="@_currentProject.Customer"
+                                                                 Text="@_currentProject?.Customer"
                                                                  TextColor="TextColor.Primary" />
                             </div>
                             <div class="px-2">
                                 <RightSideModalInfoItemComponent Label="Дата страта" 
                                                                  Icon="bi-person-circle"
-                                                                 Text="@_currentProject.StartDate.ToString("dd.MM.yyyy")"
+                                                                 Text="@_currentProject?.StartDate.ToString("dd.MM.yyyy")"
                                                                  TextColor="TextColor.Primary" />
                             </div>
                             <div class="px-2">
                                 <RightSideModalInfoItemComponent Label="Дата страта" 
                                                                  Icon="bi-person-circle"
-                                                                 Text="@_currentProject.FinishDate.ToString("dd.MM.yyyy")"
+                                                                 Text="@_currentProject?.FinishDate.ToString("dd.MM.yyyy")"
                                                                  TextColor="TextColor.Primary" />
                             </div>
                             <div class="d-flex flex-column gap-2 mt-2">
@@ -139,7 +137,10 @@
                     <div class="w-100">
                         @foreach (var task in _projectTasks)
                         {
-                            <TaskComponent Task="task" />
+                            <TaskComponent Task="task" 
+                                           CollapseTaskAllowed="true"
+                                           ShowTaskModalAllowed="task.Status is Models.Projects.Enums.TaskStatus.InBackLog"
+                                           DeleteTaskAllowed="AuthService.CurrentUser?.Role is RoleType.TeamLeader or RoleType.Admin" />
                         }
                     </div>
                     <div class="d-flex flex-column gap-3 w-25">
@@ -162,7 +163,10 @@
                 <div class="overflow-y-scroll">
                     <div class="w-100 bg-white p-3">
                         <ListPageHeader IsLoading="_isLoading"
-                                        HeaderText="@($"Список спринтов: {_projectSprints.Count}")" />
+                                        HeaderText="@($"Список спринтов: {_projectSprints.Count}")"
+                                        ShowCreateButton="AuthService.CurrentUser?.Role is RoleType.TeamLeader or RoleType.Initiator or RoleType.Admin"
+                                        CreateButtonText="Создать спринт" 
+                                        OnButtonClick="() => ShowSprintModal()"/>
                         <ListPageSearch IsLoading="_isLoading" ValueChanged="@((value) => SeacrhSprint(value))" />
                         <ListPageTable IsLoading="_isLoading" HeaderItems="_sprintsTableHeader">
                             <TableContent>
@@ -171,14 +175,12 @@
                                     {
                                         <tr>
                                             <TableBodyRow>
-                                                <div class="data-link" @onclick="ShowSprintModal">
+                                                <div class="data-link" @onclick="() => ShowSprintModal(sprint)">
                                                     @sprint.Name
                                                 </div>
                                             </TableBodyRow>
                                             <TableBodyRow IsCentered="true">
-                                                <div class="px-2 py-1 rounded-4 @(EnumViewModel<SprintStatus>.GetStyle(sprint.Status))">
-                                                    @(EnumViewModel<SprintStatus>.GetTranslation(sprint.Status))
-                                                </div>
+                                                <EnumStatus Statustype="sprint.Status" />
                                             </TableBodyRow>
                                             <TableBodyRow IsCentered="true">
                                                 @sprint.StartDate.ToString("dd.MM.yyyy")
@@ -203,9 +205,16 @@
                                 @_activeSprint.Name
                             </div>
                             <Typography FontSize="6">
-                                (до @_activeSprint.FinishDate)
+                                (до @_activeSprint.FinishDate.ToString("dd.MM.yyyy"))
                             </Typography>
                         </div>
+                        @if (AuthService.CurrentUser?.Role is RoleType.TeamLeader or RoleType.Initiator or RoleType.Admin)
+                        {
+                            <Button Variant="ButtonVariant.Danger" 
+                                    Text="Завершить спринт" 
+                                    Style="width: 100%; margin-left: 16px; max-width: fit-content;"
+                                    OnButtonClick="ShowFinishSprintModal" />                            
+                        }
                     </div>
                     <div class="active-sprint-columns w-100">
                         @foreach (var taskCategory in Enum.GetValues<HITSBlazor.Models.Projects.Enums.TaskStatus>().Where(s => s is not Models.Projects.Enums.TaskStatus.InBackLog))
@@ -271,64 +280,3 @@
         </div>
     </div>
 </div>
-
-<style>
-    .filter {
-        display: flex;
-        flex-direction: column;
-        flex-wrap: nowrap;
-        align-items: stretch;
-        justify-content: flex-start;
-        gap: 8px;
-    }
-
-    .active-sprint-header {
-        display: flex;
-        flex-direction: row;
-        flex-wrap: nowrap;
-        align-items: center;
-        justify-content: space-between;
-    }
-
-    .active-sprint-header-name {
-        display: flex;
-        flex-direction: row;
-        flex-wrap: nowrap;
-        align-items: center;
-        justify-content: flex-start;
-        gap: 12px;
-    }
-
-    .active-sprint-columns {
-        display: flex;
-        flex-direction: row;
-        flex-wrap: nowrap;
-        align-items: flex-start;
-        justify-content: space-between;
-        gap: 16px;
-    }
-
-    .active-sprint-column {
-        height: calc(100vh - 320px);
-        overflow-y: scroll;
-    }
-
-    .active-sprint-add-task {
-        transition: all .15s linear;
-        -webkit-transition: all .15s linear
-    }
-
-    .active-sprint-add-task:hover {
-        cursor: pointer;
-        color: #fff;
-        background-color: #0d6efd
-    }
-
-    .active-sprint-task {
-        display:-webkit-box;
-        -webkit-line-clamp:2;
-        -webkit-box-orient:vertical;
-        overflow:hidden;
-        text-overflow:ellipsis
-    }
-</style>

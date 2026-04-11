@@ -7,7 +7,7 @@
 @using HITSBlazor.Components.ListPageComponents.ListPageSearch
 @using HITSBlazor.Components.ListPageComponents.ListPageTable
 @using HITSBlazor.Components.Placeholders.TablePlaceholder
-@using HITSBlazor.Components.Status
+@using HITSBlazor.Components.Statuses.EnumStatus
 @using HITSBlazor.Components.Tables.TableActionMenu
 @using HITSBlazor.Components.Tables.TableBodyRow
 @using HITSBlazor.Components.Tables.TableHeader
@@ -41,7 +41,7 @@
                                     </div>
                                 </TableBodyRow>
                                 <TableBodyRow IsCentered="true">
-                                    <Status Statustype="market.Status" />
+                                    <EnumStatus Statustype="market.Status" />
                                 </TableBodyRow>
                                 <TableBodyRow IsCentered="true">
                                     @market.StartDate.ToString("dd.MM.yyyy")

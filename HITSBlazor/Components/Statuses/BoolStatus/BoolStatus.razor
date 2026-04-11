@@ -1,0 +1,37 @@
+﻿@namespace HITSBlazor.Components.Statuses.BoolStatus
+
+<div class="px-2 py-1 rounded-4 @CustomClass @_elementClass">
+    @_displayText
+</div>
+
+@code {
+    [Parameter]
+    public bool Value { get; set; } = false;
+
+    [Parameter]
+    public BoolStatusType StatusType { get; set; }
+
+    [Parameter]
+    public string CustomClass { get; set; } = string.Empty;
+
+    private string _elementClass = string.Empty;
+    private string _displayText = string.Empty;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        GetBooleanStyle();
+    }
+
+    private void GetBooleanStyle()
+    {
+        (string colorClass, string text) = StatusType switch
+        {
+            BoolStatusType.TeamClosed => Value ? ("danger", "Закрыта") : ("success", "Открыта"),
+            BoolStatusType.TeamActiveProject => Value ? ("warning", "В работе") : ("primary", "В поисках"),
+            _ => (string.Empty, string.Empty)
+        };
+
+        _elementClass = $"bg-{colorClass}-subtle text-{colorClass}";
+        _displayText = text;
+    }
+}

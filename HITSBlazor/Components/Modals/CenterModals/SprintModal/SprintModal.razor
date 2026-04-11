@@ -9,7 +9,7 @@
 <div @onclick:stopPropagation="true" class="sprint-modal bg-white rounded px-4 py-3">
     <div class="sprint-form w-100 mb-1">
         <!-- TODO: скорее всего еще и создание -->
-        <CenterModalHeader HeaderText="Редактирование спринта" />
+        <CenterModalHeader HeaderText="@(CurrentSprint is null ? "Создание спринта" : "Редактирование спринта")" />
         <div class="sprint-form-content d-flex gap-3 mt-1 w-100">
             <div class="sprint-form-content-tasks d-flex gap-4">
                 <div class="d-flex flex-column w-100">
@@ -20,10 +20,9 @@
                         <i class="bi bi-plus sprint-form-backlog-add p-1 rounded" @onclick="() => ModalService.ShowTaskModal()"></i>
                     </div>
                     <div class="d-flex flex-column mt-3">
-                        <!-- TODO: настроить коллекции, так как непонятно что тут может и не может быть -->
-                        @foreach (var task in _tasks.Where(t => t.Status is Models.Projects.Enums.TaskStatus.InBackLog))
+                        @foreach (var task in _allTasksInBacklog)
                         {
-                            <TaskComponent Task="task" />
+                            <TaskComponent Task="task" StripTaskName="true" />
                         }
                     </div>
                 </div>
@@ -34,10 +33,9 @@
                         </Typography>
                     </div>
                     <div class="d-flex flex-column mt-3">
-                        <!-- TODO: настроить коллекции, так как непонятно что тут может и не может быть -->
-                        @foreach (var task in _tasks.Where(t => t.Status is Models.Projects.Enums.TaskStatus.InBackLog))
+                        @foreach (var task in _sprintTasks)
                         {
-                            <TaskComponent Task="task" />
+                            <TaskComponent Task="task" StripTaskName="true" />
                         }
                     </div>
                 </div>

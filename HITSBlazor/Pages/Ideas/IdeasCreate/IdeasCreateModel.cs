@@ -11,8 +11,8 @@ namespace HITSBlazor.Pages.Ideas.IdeasCreate
         public string Result { get; set; } = string.Empty;
         public IdeaStatusType Status { get; set; }
 
-        public int MaxTeamSize { get; set; }
-        public int MinTeamSize { get; set; }
+        public int? MaxTeamSize { get; set; }
+        public int? MinTeamSize { get; set; }
 
         public string Customer { get; set; } = string.Empty;
         public string ContactPerson { get; set; } = string.Empty;

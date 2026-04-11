@@ -1,0 +1,51 @@
+﻿@namespace HITSBlazor.Components.Modals.CenterModals.FinishSprintModal
+@using HITSBlazor.Components.Button
+@using HITSBlazor.Components.Hint
+@using HITSBlazor.Components.Inputs.Number
+@using HITSBlazor.Components.Inputs.TextArea
+@using HITSBlazor.Components.Modals.Components.CenterModalHeader
+@using HITSBlazor.Components.Statuses.EnumStatus
+@using HITSBlazor.Utils.Models
+
+<div class="finish-sprint-modal bg-white rounded p-3 w-1" @onclick:stopPropagation="true">
+    <CenterModalHeader HeaderText="Завершение спринта" />
+    <div class="d-flex flex-column gap-2 w-100">
+        <div class="d-flex gap-3 text-primary">
+            <div class="d-flex gap-1 w-25">
+                Оценка
+                <Hint Text="Оценка - число вещественное от 0 до 10" />
+            </div>
+            <div class="w-75">
+                Участник
+            </div>
+        </div>
+        <div class="finish-sprint-modal-mark d-flex flex-column gap-2">
+            @foreach (var member in ProjectMembers)
+            {
+                Guid userId = member.UserId;
+                <div class="d-flex gap-3">
+                    <div class="w-25">
+                        <Number MinValue="0"
+                                MaxValue="10" 
+                                Placeholder="Оценка" 
+                                Value="_projectMembersScores[userId]"
+                                ValueChanged="(value) => _projectMembersScores[userId] = value" />
+                    </div>
+                    <div class="finish-project-modal-member border rounded px-2 w-75">
+                        <div class="finish-project-modal-member-name">
+                            @member.FullName
+                        </div>
+                        <EnumStatus Statustype="member.ProjectRole" />
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+    <TextArea Label="Отчет" Placeholder="Отчет" IsDisabled="true" />
+    <div class="d-flex gap-2 align-items-center">
+        <Button Variant="ButtonVariant.Primary" Text="Завершить спринт" />
+        <div class="text-danger">
+            Незавершенные задачи будут перенесены в бэклог
+        </div>
+    </div>
+</div>

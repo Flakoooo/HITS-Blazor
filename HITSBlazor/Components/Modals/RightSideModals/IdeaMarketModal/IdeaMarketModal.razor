@@ -8,7 +8,7 @@
 @using HITSBlazor.Components.Modals.Components.RightSideModaCollapselInfo
 @using HITSBlazor.Components.Modals.Components.RightSideModalInfo
 @using HITSBlazor.Components.Skills
-@using HITSBlazor.Components.Status
+@using HITSBlazor.Components.Statuses.EnumStatus
 @using HITSBlazor.Components.Tables.TableActionMenu
 @using HITSBlazor.Components.Tables.TableBodyRow
 @using HITSBlazor.Components.Tables.TableHeader
@@ -105,7 +105,7 @@
                                                         </div>
                                                     </TableBodyRow>
                                                     <TableBodyRow>
-                                                        <Status Statustype="request.Status" />
+                                                        <EnumStatus Statustype="request.Status" />
                                                     </TableBodyRow>
                                                     <TableBodyRow IsCentered="true">
                                                         @request.MembersCount
@@ -139,7 +139,7 @@
                                                         </div>
                                                     </TableBodyRow>
                                                     <TableBodyRow>
-                                                        <Status Statustype="invitation.Status" />
+                                                        <EnumStatus Statustype="invitation.Status" />
                                                     </TableBodyRow>
                                                     <TableBodyRow IsCentered="true">
                                                         @invitation.TeamMembersCount

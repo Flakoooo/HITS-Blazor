@@ -8,7 +8,8 @@
 @using HITSBlazor.Components.Modals.Components.RightSideModaCollapselInfo
 @using HITSBlazor.Components.Modals.Components.RightSideModalInfo
 @using HITSBlazor.Components.Placeholders.Placeholder
-@using HITSBlazor.Components.Status
+@using HITSBlazor.Components.Skills
+@using HITSBlazor.Components.Statuses.EnumStatus
 @using HITSBlazor.Components.Tables.TableActionMenu
 @using HITSBlazor.Components.Tables.TableBodyRow
 @using HITSBlazor.Components.Tables.TableHeader
@@ -168,7 +169,7 @@
                                             {
                                                 <tr>
                                                     <TableBodyRow IsCentered="true">
-                                                        <Status Statustype="invitation.Status" />
+                                                        <EnumStatus Statustype="invitation.Status" />
                                                     </TableBodyRow>
                                                     <TableBodyRow IsCentered="true">
                                                         <div class="data-link">
@@ -196,7 +197,7 @@
                                             {
                                                 <tr>
                                                     <TableBodyRow IsCentered="true">
-                                                        <Status Statustype="request.Status" />
+                                                        <EnumStatus Statustype="request.Status" />
                                                     </TableBodyRow>
                                                     <TableBodyRow IsCentered="true">
                                                         <div class="data-link">
@@ -231,7 +232,7 @@
                                                         </div>
                                                     </TableBodyRow>
                                                     <TableBodyRow IsCentered="true">
-                                                        <Status Statustype="request.Status" />
+                                                        <EnumStatus Statustype="request.Status" />
                                                     </TableBodyRow>
                                                     <TableActionMenu ItemId="request.Id"
                                                                      StrategyPosition="Strategy.Fixed"
@@ -249,7 +250,7 @@
                                             {
                                                 <tr>
                                                     <TableBodyRow IsCentered="true">
-                                                        <Status Statustype="invitation.Status" />
+                                                        <EnumStatus Statustype="invitation.Status" />
                                                     </TableBodyRow>
                                                     <TableBodyRow>
                                                         <div class="data-link">
@@ -257,12 +258,7 @@
                                                         </div>
                                                     </TableBodyRow>
                                                     <TableBodyRow IsCentered="true">
-                                                        @foreach (var skill in invitation.Skills)
-                                                        {
-                                                            <div class="px-2 py-1 rounded d-flex gap-1 @(EnumViewModel<SkillType>.GetStyle(skill.Type))">
-                                                                @skill.Name
-                                                            </div>
-                                                        }
+                                                        <Skills SkillList="invitation.Skills" />
                                                     </TableBodyRow>
                                                     <TableActionMenu ItemId="invitation.Id"
                                                                      StrategyPosition="Strategy.Fixed"
@@ -282,15 +278,9 @@
             </div>
             <!-- TODO: реализовать нажатие кнопок -->
             <div class="rounded-3 bg-white p-3 d-flex flex-wrap gap-3">
-                <button type="button" class="btn d-flex btn-light">
-                    Редактировать
-                </button>
-                <button type="button" class="btn d-flex btn-danger">
-                    Удалить команду
-                </button>
-                <button type="button" class="btn d-flex btn-primary">
-                    Пригласить пользователя
-                </button>
+                <Button Variant="ButtonVariant.Light" Text="Редактировать" />
+                <Button Variant="ButtonVariant.Danger" Text="Удалить команду" />
+                <Button Variant="ButtonVariant.Primary" Text="Пригласить пользователя" />
             </div>
         </div>
         <RightSideModalInfo Skills1="_currentTeam.Skills" 

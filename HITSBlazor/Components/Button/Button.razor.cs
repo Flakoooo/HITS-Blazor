@@ -31,6 +31,9 @@ namespace HITSBlazor.Components.Button
         [Parameter]
         public string? ButtonClass { get; set; }
 
+        [Parameter]
+        public string Style { get; set; } = string.Empty;
+
         private async Task ButtonClick() => await OnButtonClick.InvokeAsync();
 
         private string GetClass()

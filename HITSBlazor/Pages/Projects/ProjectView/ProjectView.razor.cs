@@ -1,4 +1,5 @@
 ﻿using HITSBlazor.Components.ActionMenus.BaseActionMenu;
+using HITSBlazor.Components.Modals.CenterModals.FinishSprintModal;
 using HITSBlazor.Components.Modals.CenterModals.SprintModal;
 using HITSBlazor.Components.Modals.CenterModals.TaskModal;
 using HITSBlazor.Components.Modals.Components.RightSideModaCollapselInfo;
@@ -150,10 +151,31 @@ namespace HITSBlazor.Pages.Projects.ProjectView
 
         private void ShowTaskModal(Models.Projects.Entities.Task? task = null) => ModalService.ShowTaskModal(task);
 
-        private void ShowSprintModal()
+        private void ShowSprintModal(Sprint? sprint = null)
         {
-            ModalService.Show<SprintModal>(ModalType.Center);
+            if (_currentProject is null) return;
+
+            var parameters = new Dictionary<string, object>
+            {
+                [nameof(SprintModal.ProjectId)] = _currentProject.Id
+            };
+
+            if (sprint is not null)
+                parameters.Add(nameof(SprintModal.CurrentSprint), sprint);
+
+            ModalService.Show<SprintModal>(
+                ModalType.Center,
+                parameters: parameters
+            );
         }
+
+        private void ShowFinishSprintModal() => ModalService.Show<FinishSprintModal>(
+            ModalType.Center,
+            parameters: new Dictionary<string, object> { 
+                [nameof(FinishSprintModal.ProjectMembers)] = _currentProject?.Members ?? []
+            }
+        );
+
 
         private async System.Threading.Tasks.Task OnMemberAction(TableActionContext context)
         {

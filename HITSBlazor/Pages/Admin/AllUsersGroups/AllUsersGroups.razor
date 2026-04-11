@@ -7,7 +7,7 @@
 @using HITSBlazor.Components.ListPageComponents.ListPageSearch
 @using HITSBlazor.Components.ListPageComponents.ListPageTable
 @using HITSBlazor.Components.Placeholders.TablePlaceholder
-@using HITSBlazor.Components.Status
+@using HITSBlazor.Components.Statuses.EnumStatus
 @using HITSBlazor.Components.Tables.TableActionMenu
 @using HITSBlazor.Components.Tables.TableBodyRow
 @using HITSBlazor.Components.Tables.TableHeader
@@ -44,7 +44,7 @@
                                 <TableBodyRow>
                                     @foreach (var role in usersGroup.Roles)
                                     {
-                                        <Status Statustype="role" />
+                                        <EnumStatus Statustype="role" />
                                     }
                                 </TableBodyRow>
                                 <TableActionMenu ItemId="usersGroup.Id"

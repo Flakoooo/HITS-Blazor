@@ -28,12 +28,25 @@ namespace HITSBlazor.Components.Inputs.TextArea
         [Parameter]
         public string Style { get; set; } = string.Empty;
 
+        [Parameter]
+        public bool? IsDisabled { get; set; }
+
         private bool _showError = false;
 
         protected override void OnParametersSet()
         {
             _showError = NeedValidation && string.IsNullOrWhiteSpace(Value);
             StateHasChanged();
+        }
+
+        private Dictionary<string, object> GetInputAttributes()
+        {
+            var attributes = new Dictionary<string, object>();
+
+            if (IsDisabled.HasValue && IsDisabled.Value)
+                attributes["disabled"] = "disabled";
+
+            return attributes;
         }
 
         private async Task OnInputChanged(ChangeEventArgs e)
