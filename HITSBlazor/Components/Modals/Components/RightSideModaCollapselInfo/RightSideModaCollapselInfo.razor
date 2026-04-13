@@ -13,7 +13,7 @@
     @foreach (var data in Data)
     {
         <li class="list-group-item p-0 overflow-hidden">
-            <Collapse StartCollapsed="false">
+            <Collapse StartCollapsed="StartCollapsed">
                 <MainContent Context="collapse">
                     <Button Text="@data.Title"
                             Variant="ButtonVariant.Light"
@@ -44,4 +44,7 @@
 @code {
     [Parameter]
     public List<CollapseItem> Data { get; set; } = [];
+
+    [Parameter]
+    public bool StartCollapsed { get; set; } = false;
 }

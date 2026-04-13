@@ -39,7 +39,7 @@ namespace HITSBlazor.Components.Modals.RightSideModals.TeamModal
         private List<RequestTeamToIdea> _requestsTeamToIdeas = [];
         private List<InvitationTeamToIdea> _invitationsTeamToIdeas = [];
 
-        private TeamTableCategory _activeTableCategory = TeamTableCategory.Members;
+        private TeamTableCategory _activeTableCategory  = TeamTableCategory.Members;
 
         private static List<TableHeaderItem> MembersTableHeader { get; } =
         [
@@ -152,9 +152,6 @@ namespace HITSBlazor.Components.Modals.RightSideModals.TeamModal
         private List<CollapseItem> GetTeamData() => [
             new() { Title = "Описание команды", Data = _currentTeam?.Description },
         ];
-
-        private string GetTableCategoryClass(TeamTableCategory category)
-            => _activeTableCategory == category ? "active text-primary" : "text-secondary";
 
         private async Task ChangeCategory(TeamTableCategory category)
         {

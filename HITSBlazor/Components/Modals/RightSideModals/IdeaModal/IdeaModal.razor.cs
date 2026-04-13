@@ -134,7 +134,15 @@ namespace HITSBlazor.Components.Modals.RightSideModals.IdeaModal
 
             CurrentIdea = await IdeasService.GetIdeaByIdAsync(IdeaId);
             IdeaSkills = await IdeasService.GetAllIdeaSkillsAsync(IdeaId);
-            ideaData = GetIdeaData();
+
+            ideaData = [
+                new() { Title = "Проблема",                                     Data = CurrentIdea?.Problem        },
+                new() { Title = "Предлагаемое решение",                         Data = CurrentIdea?.Solution       },
+                new() { Title = "Ожидаемый результат",                          Data = CurrentIdea?.Result         },
+                new() { Title = "Описание необходимых ресурсов для реализации", Data = CurrentIdea?.Description    },
+                new() { Title = "Стек технологий",                              Data = IdeaSkills                  }
+            ];
+
             IdeaRatings = await IdeasService.GetIdeaRatingsAsync(IdeaId);
             IdeaComments = await IdeasService.GetIdeasCommentsAsync(IdeaId);
 
@@ -167,14 +175,6 @@ namespace HITSBlazor.Components.Modals.RightSideModals.IdeaModal
 
             isLoading = false;
         }
-
-        private List<CollapseItem> GetIdeaData() => [
-            new() { Title = "Проблема",                                     Data = CurrentIdea?.Problem        },
-            new() { Title = "Предлагаемое решение",                         Data = CurrentIdea?.Solution       },
-            new() { Title = "Ожидаемый результат",                          Data = CurrentIdea?.Result         },
-            new() { Title = "Описание необходимых ресурсов для реализации", Data = CurrentIdea?.Description    },
-            new() { Title = "Стек технологий",                              Data = IdeaSkills               }
-        ];
 
         private void UpdateRatingScore()
         {

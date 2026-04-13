@@ -1,8 +1,9 @@
 ﻿using HITSBlazor.Models.Projects.Enums;
+using HITSBlazor.Utils.Models;
 
 namespace HITSBlazor.Models.Projects.Entities
 {
-    public class ProjectMember
+    public class ProjectMember : ViewModelBase
     {
         public Guid TeamId { get; set; }
         public string TeamName { get; set; } = string.Empty;
@@ -17,5 +18,8 @@ namespace HITSBlazor.Models.Projects.Entities
 
 
         public string FullName => $"{FirstName} {LastName}";
+
+        public override string GetDisplayInfo() => FullName;
+        public override object GetId() => UserId;
     }
 }

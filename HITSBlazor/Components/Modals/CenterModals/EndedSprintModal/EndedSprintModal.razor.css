@@ -1,0 +1,24 @@
+﻿.spint-info-modal {
+    width: 85%;
+    height: 85dvh;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: flex-start;
+    justify-content: flex-start;
+    gap: 8px;
+    align-self: center;
+    justify-self: center;
+    transition: all .15s ease-out;
+}
+
+.spint-info-modal-content {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    flex-grow: 1;
+    height: 0;
+}

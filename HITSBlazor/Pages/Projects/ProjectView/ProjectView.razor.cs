@@ -1,4 +1,5 @@
 ﻿using HITSBlazor.Components.ActionMenus.BaseActionMenu;
+using HITSBlazor.Components.Modals.CenterModals.EndedSprintModal;
 using HITSBlazor.Components.Modals.CenterModals.FinishSprintModal;
 using HITSBlazor.Components.Modals.CenterModals.SprintModal;
 using HITSBlazor.Components.Modals.CenterModals.TaskModal;
@@ -10,6 +11,7 @@ using HITSBlazor.Models.Ideas.Entities;
 using HITSBlazor.Models.Projects.Entities;
 using HITSBlazor.Models.Projects.Enums;
 using HITSBlazor.Models.Users.Entities;
+using HITSBlazor.Pages.Markets.MarketIdeas;
 using HITSBlazor.Services;
 using HITSBlazor.Services.Auth;
 using HITSBlazor.Services.Modal;
@@ -115,12 +117,24 @@ namespace HITSBlazor.Pages.Projects.ProjectView
             )];
         }
 
-        private string GetTableCategoryClass(ProjectViewCategory category)
-            => _activeCategory == category ? "active text-primary" : "text-secondary";
-
         private List<CollapseItem> GetProjectData() => [
             new() { Title = "Описание необходимых ресурсов для реализации", Data = _currentProject?.Description },
         ];
+
+        private List<ProjectViewCategory> GetCategoryTabs()
+        {
+            var tabs = new List<ProjectViewCategory>
+            {
+                ProjectViewCategory.Info,
+                ProjectViewCategory.Backlog,
+                ProjectViewCategory.Sprints
+            };
+
+            if (_activeSprint is not null)
+                tabs.Add(ProjectViewCategory.ActiveSprint);
+
+            return tabs;
+        }
 
         private async System.Threading.Tasks.Task ChangeCategory(ProjectViewCategory category)
         {
@@ -155,18 +169,41 @@ namespace HITSBlazor.Pages.Projects.ProjectView
         {
             if (_currentProject is null) return;
 
-            var parameters = new Dictionary<string, object>
-            {
-                [nameof(SprintModal.ProjectId)] = _currentProject.Id
-            };
-
             if (sprint is not null)
-                parameters.Add(nameof(SprintModal.CurrentSprint), sprint);
-
-            ModalService.Show<SprintModal>(
-                ModalType.Center,
-                parameters: parameters
-            );
+            {
+                if (sprint.Status is SprintStatus.Done)
+                {
+                    ModalService.Show<EndedSprintModal>(
+                        ModalType.Center,
+                        parameters: new Dictionary<string, object>
+                        {
+                            [nameof(EndedSprintModal.ProjectId)] = _currentProject.Id,
+                            [nameof(EndedSprintModal.CurrentSprint)] = sprint
+                        }
+                    );
+                }
+                else
+                {
+                    ModalService.Show<SprintModal>(
+                        ModalType.Center,
+                        parameters: new Dictionary<string, object>
+                        {
+                            [nameof(SprintModal.ProjectId)] = _currentProject.Id,
+                            [nameof(SprintModal.CurrentSprint)] = sprint
+                        }
+                    );
+                }
+            }
+            else
+            {
+                ModalService.Show<SprintModal>(
+                    ModalType.Center,
+                    parameters: new Dictionary<string, object>
+                    {
+                        [nameof(SprintModal.ProjectId)] = _currentProject.Id
+                    }
+                );
+            }
         }
 
         private void ShowFinishSprintModal() => ModalService.Show<FinishSprintModal>(

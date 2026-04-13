@@ -1,0 +1,178 @@
+﻿@namespace HITSBlazor.Components.Modals.CenterModals.EndedSprintModal
+@using HITSBlazor.Components.Button
+@using HITSBlazor.Components.Collapse
+@using HITSBlazor.Components.Hint
+@using HITSBlazor.Components.Inputs.CheckboxDropdown
+@using HITSBlazor.Components.Inputs.Input
+@using HITSBlazor.Components.Inputs.RadioDropdown
+@using HITSBlazor.Components.Modals.Components.CenterModalHeader
+@using HITSBlazor.Components.Modals.Components.RightSideModaCollapselInfo
+@using HITSBlazor.Components.Modals.Components.RightSideModalInfo
+@using HITSBlazor.Components.Modals.Components.RightSideModalInfoItemComponent
+@using HITSBlazor.Components.NavigationTabs
+@using HITSBlazor.Components.TaskComponent
+@using HITSBlazor.Components.Typography
+@using HITSBlazor.Models.Common.Entities
+@using HITSBlazor.Models.Projects.Entities
+@using HITSBlazor.Models.Teams.Entities
+@using HITSBlazor.Utils.Models
+
+<div @onclick:stopPropagation="true" class="spint-info-modal bg-white rounded p-3">
+    <div class="d-flex flex-column gap-2 w-100 h-100">
+        <CenterModalHeader HeaderText="@CurrentSprint.Name" />
+        <div class="spint-info-modal-content w-100">
+            <div class="h-100 w-25">
+                <div class="d-flex flex-column gap-3 w-100 h-100">
+                    <div class="border-bottom w-100 fs-5 text-primary">
+                        Задачи: @CurrentSprint.Tasks.Count
+                    </div>
+                    <div class="d-flex flex-column gap-2 border-bottom pb-3 w-100">
+                        <!-- TODO: реализовать поиск заадач по этим фильтрам -->
+                        <Input Placeholder="Поиск" ValueChanged="(value) => SeacrhTask(value)" />
+                        <div class="d-flex flex-column gap-1">
+                            <CheckboxDropdown T="Tag" AllValues="_tags" Placeholder="Теги" @bind-SelectedValues="SelectedTags" />
+                            <div class="d-flex flex-wrap gap-1">
+                                @foreach (var tag in SelectedTags)
+                                {
+                                    <div class="px-2 py-1 rounded-2 text-center align-self-start" style="background-color: @($"{tag.Color}4D"); color: @tag.Color;">
+                                        @tag.Name
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                        <RadioDropdown T="ProjectMember" AllValues="_members" Placeholder="" @bind-Value="SelectedMember" />
+                    </div>
+                    <div class="d-flex flex-column gap-2 w-100 overflow-y-scroll">
+                        @foreach (var task in CurrentSprint.Tasks)
+                        {
+                            <div style="cursor: pointer;" @onclick="() => SelectTask(task)">
+                                <div class="d-flex gap-2 p-2 border rounded @(_selectedTask?.Id == task.Id)">
+                                    <div class="w-100">
+                                        @task.Name
+                                    </div>
+                                    <div class="d-flex flex-column gap-1">
+                                        @foreach (var tag in task.Tags)
+                                        {
+                                            <Hint Text="@tag.Name">
+                                                <i class="bi bi-circle-fill p-1 rounded-2"
+                                                   style="background-color: @($"{tag.Color}4D"); color: @tag.Color;">
+                                                </i>
+                                            </Hint>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+            <div class="h-100 w-75">
+                <div class="d-flex flex-column w-100 h-100 overflow-y-scroll">
+                    <NavigationTabs T="EndedSprintModalStatCategory"
+                                    Tabs="GetCategoryTabs()"
+                                    ActiveTab="_activeStatCategory"
+                                    ActiveTabChanged="(value) => ChangeCategory(value)"
+                                    NavType="NavigationTabType.Underline"
+                                    NavClass="d-flex border-bottom"
+                                    NavLinkClass="fs-5" />
+                    <div class="mt-3 w-100 h-100">
+                        <div class="d-flex gap-3 w-100">
+                            <div class="w-75">
+                                @if (CurrentSprint.Tasks.Count > 0)
+                                {
+                                    <ApexChart TItem="Models.Projects.Entities.Task"
+                                               Options="@GetSprintBurndownOptions()"
+                                               Width="880"
+                                               Height="545">
+
+                                        @{
+                                            var sprintDays = GetSprintDays();
+                                            var completedByDay = GetCompletedTasksByDay(sprintDays);
+                                            var idealBurndown = GetIdealBurndown(sprintDays);
+                                            var remainingByDay = GetRemainingTasksByDay(sprintDays);
+
+                                            <ApexPointSeries TItem="DatePoint"
+                                                             Items="idealBurndown ?? []"
+                                                             Name="План"
+                                                             SeriesType="SeriesType.Area"
+                                                             XValue="@(d => d.Date.ToOADate())"
+                                                             YValue="@(d => d.Value)"
+                                                             Color="#0d6dfd" />
+
+                                            <ApexPointSeries TItem="DatePoint"
+                                                             Items="remainingByDay ?? []"
+                                                             Name="Количество невыполненных"
+                                                             SeriesType="SeriesType.Area"
+                                                             XValue="@(d => d.Date.ToOADate())"
+                                                             YValue="@(d => d.Value)"
+                                                             Color="#dc3545" />
+
+                                            <ApexPointSeries TItem="DatePoint"
+                                                             Items="completedByDay ?? []"
+                                                             Name="Количество выполненных"
+                                                             SeriesType="SeriesType.Area"
+                                                             XValue="@(d => d.Date.ToOADate())"
+                                                             YValue="@(d => d.Value)"
+                                                             Color="#ffa800" />
+                                        }
+                                    </ApexChart>
+                                }
+                                <RightSideModaCollapselInfo Data="_sprintData" StartCollapsed="true" />
+                            </div>
+                            <div class="d-flex flex-column gap-3 w-25">
+                                <div class="d-flex gap-1">
+                                    @{
+                                        (ButtonVariant Variant1, ButtonVariant Variant2) variants 
+                                            = _activeInfoCategory is EndedSprintModalInfoCategory.Scores 
+                                            ? (ButtonVariant.Primary, ButtonVariant.Secondary) 
+                                            : (ButtonVariant.Secondary, ButtonVariant.Primary);
+                                        <Button Variant="variants.Variant1" Text="@(EnumViewModel<EndedSprintModalInfoCategory>.GetTranslation(EndedSprintModalInfoCategory.Scores))" ButtonClass="w-100" />
+                                        <Button Variant="variants.Variant2" Text="@(EnumViewModel<EndedSprintModalInfoCategory>.GetTranslation(EndedSprintModalInfoCategory.Info))" ButtonClass="w-100" />
+                                    }
+                                </div>
+                                <div>
+                                    <div class="text-center p-2 bg-primary rounded-top text-white fs-5 border border-bottom-0">
+                                        @(EnumViewModel<EndedSprintModalInfoCategory>.GetTranslation(_activeInfoCategory))
+                                    </div>
+                                    @if (_activeInfoCategory is EndedSprintModalInfoCategory.Scores)
+                                    {
+                                        
+                                    }
+                                    else if (_activeInfoCategory is EndedSprintModalInfoCategory.Info)
+                                    {
+                                        <div class="d-flex flex-column gap-2 bg-white rounded-bottom p-2 border border-top-0">
+                                            <div class="px-2">
+                                                <RightSideModalInfoItemComponent Icon="bi-clock"
+                                                                                 Label="Начало спринта"
+                                                                                 TextColor="TextColor.Primary"
+                                                                                 Text="@CurrentSprint.StartDate.ToString("dd.MM.yyyy")" />
+                                            </div>
+                                            <div class="px-2">
+                                                <RightSideModalInfoItemComponent Icon="bi-clock"
+                                                                                 Label="Конец спринта"
+                                                                                 TextColor="TextColor.Primary"
+                                                                                 Text="@CurrentSprint.FinishDate.ToString("dd.MM.yyyy")" />
+                                            </div>
+                                            <div class="px-2">
+                                                <RightSideModalInfoItemComponent Icon="bi-check2-circle"
+                                                                                 Label="Выполнено задач"
+                                                                                 TextColor="TextColor.Primary"
+                                                                                 Text="@CurrentSprint.Tasks.Where(t => t.Status is not Models.Projects.Enums.TaskStatus.InBackLog).Count().ToString()" />
+                                            </div>
+                                            <div class="px-2">
+                                                <RightSideModalInfoItemComponent Icon="bi-clock"
+                                                                                 Label="Потрачено часов"
+                                                                                 TextColor="TextColor.Primary"
+                                                                                 Text="@CurrentSprint.Tasks.Sum(t => t.WorkHour).ToString()" />
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

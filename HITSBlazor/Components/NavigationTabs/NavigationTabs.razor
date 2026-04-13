@@ -1,0 +1,39 @@
+﻿@namespace HITSBlazor.Components.NavigationTabs
+@using HITSBlazor.Utils.Models
+@typeparam T where T : Enum
+
+<div class="nav nav-@NavType.ToString().ToLower() @NavClass">
+    @foreach (var category in Tabs)
+    {
+        <div @onclick="() => ChangeCategory(category)" style="cursor: pointer;"
+             class="nav-link @NavLinkClass @GetTableCategoryClass(category)">
+            @(EnumViewModel<Enum>.GetTranslation(category))
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public IEnumerable<T> Tabs { get; set; } = [];
+
+    [Parameter]
+    public required T ActiveTab { get; set; }
+
+    [Parameter]
+    public EventCallback<T> ActiveTabChanged { get; set; }
+
+    [Parameter]
+    public NavigationTabType NavType { get; set; } = NavigationTabType.Underline;
+
+    [Parameter]
+    public string NavClass { get; set; } = string.Empty;
+
+    [Parameter]
+    public string NavLinkClass { get; set; } = string.Empty;
+
+    private string GetTableCategoryClass(T category) 
+        => ActiveTab.Equals(category) ? "active text-primary" : "text-secondary";
+
+    private async Task ChangeCategory(T newCategory)
+        => await ActiveTabChanged.InvokeAsync(newCategory);
+}

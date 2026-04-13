@@ -77,9 +77,6 @@ namespace HITSBlazor.Pages.Markets.MarketIdeas
             );
         }
 
-        private string GetActiveCategoryClass(MarketIdeasCategory category)
-            => category == _category? "active text-primary" : "text-dark";
-
         private async Task SelectActiveCategory(MarketIdeasCategory category)
         {
             _category = category;

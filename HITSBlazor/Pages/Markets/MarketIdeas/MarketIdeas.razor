@@ -4,6 +4,7 @@
 @using HITSBlazor.Components.Filters.ResetFilterButton
 @using HITSBlazor.Components.Filters.SkillFilter
 @using HITSBlazor.Components.Inputs.Input
+@using HITSBlazor.Components.NavigationTabs
 @using HITSBlazor.Components.Placeholders.Placeholder
 @using HITSBlazor.Components.Typography
 @using HITSBlazor.Models.Common.Enums
@@ -33,15 +34,12 @@
             </Typography>
         }
     </div>
-    <div class="nav nav-underline mb-3 w-100 d-flex justify-content-center">
-        @foreach (var category in Enum.GetValues<MarketIdeasCategory>())
-        {
-            <div @onclick="@(() => SelectActiveCategory(category))" style="cursor: pointer;"
-                 class="nav-link @GetActiveCategoryClass(category)">
-                @(EnumViewModel<MarketIdeasCategory>.GetTranslation(category))
-            </div>
-        }
-    </div>
+    <NavigationTabs T="MarketIdeasCategory"
+                    Tabs="Enum.GetValues<MarketIdeasCategory>()"
+                    ActiveTab="_category"
+                    ActiveTabChanged="(value) => SelectActiveCategory(value)"
+                    NavType="NavigationTabType.Underline"
+                    NavClass="mb-3 w-100 d-flex justify-content-center" />
     <div class="d-flex justify-content-between align-items-center mb-3 w-100">
         <div class="w-50">
             <Input IconStyle="bi-search" Placeholder="Поиск" ValueChanged="@((value) => SearchMarketIdeas(value))" />

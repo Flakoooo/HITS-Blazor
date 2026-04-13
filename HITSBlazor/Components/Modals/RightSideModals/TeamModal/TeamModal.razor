@@ -7,6 +7,7 @@
 @using HITSBlazor.Components.Modals.Components.ModalHeader
 @using HITSBlazor.Components.Modals.Components.RightSideModaCollapselInfo
 @using HITSBlazor.Components.Modals.Components.RightSideModalInfo
+@using HITSBlazor.Components.NavigationTabs
 @using HITSBlazor.Components.Placeholders.Placeholder
 @using HITSBlazor.Components.Skills
 @using HITSBlazor.Components.Statuses.EnumStatus
@@ -100,15 +101,12 @@
             <RightSideModaCollapselInfo Data="_teamData" />
             <div class="bg-white rounded-3">
                 <div class="border-bottom px-3">
-                    <ul class="nav nav-underline">
-                        @foreach (var category in Enum.GetValues<TeamTableCategory>())
-                        {
-                            <div @onclick="() => ChangeCategory(category)" style="cursor: pointer;"
-                                 class="nav-link fw-normal pb-1 @GetTableCategoryClass(category)">
-                                @(EnumViewModel<TeamTableCategory>.GetTranslation(category))
-                            </div>
-                        }
-                    </ul>
+                    <NavigationTabs T="TeamTableCategory" 
+                                    Tabs="Enum.GetValues<TeamTableCategory>()" 
+                                    ActiveTab="_activeTableCategory"
+                                    ActiveTabChanged="(value) => ChangeCategory(value)"
+                                    NavType="NavigationTabType.Underline"
+                                    NavLinkClass="fw-normal pb-1" />
                 </div>
                 <div class="team-modal-tables">
                     <div class="w-100 bg-white px-3 pb-3 pt-1">

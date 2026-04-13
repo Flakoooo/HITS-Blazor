@@ -9,6 +9,7 @@
 @using HITSBlazor.Components.ListPageComponents.ListPageTable
 @using HITSBlazor.Components.Modals.Components.RightSideModaCollapselInfo
 @using HITSBlazor.Components.Modals.Components.RightSideModalInfoItemComponent
+@using HITSBlazor.Components.NavigationTabs
 @using HITSBlazor.Components.Statuses.EnumStatus
 @using HITSBlazor.Components.Tables.TableActionMenu
 @using HITSBlazor.Components.Tables.TableBodyRow
@@ -30,22 +31,12 @@
         </div>
         <div>
             <div class="px-3">
-                <ul class="nav nav-tabs">
-                    @foreach (var category in Enum.GetValues<ProjectViewCategory>().Where(v => v is not ProjectViewCategory.ActiveSprint))
-                    {
-                        <div @onclick="() => ChangeCategory(category)" style="cursor: pointer;"
-                             class="nav-link fw-normal pb-1 @GetTableCategoryClass(category)">
-                            @(EnumViewModel<ProjectViewCategory>.GetTranslation(category))
-                        </div>
-                    }
-                    @if (_activeSprint is not null)
-                    {
-                        <div @onclick="() => ChangeCategory(ProjectViewCategory.ActiveSprint)" style="cursor: pointer;"
-                             class="nav-link fw-normal pb-1 @GetTableCategoryClass(ProjectViewCategory.ActiveSprint)">
-                            @(EnumViewModel<ProjectViewCategory>.GetTranslation(ProjectViewCategory.ActiveSprint))
-                        </div>
-                    }
-                </ul>
+                <NavigationTabs T="ProjectViewCategory"
+                                Tabs="GetCategoryTabs()"
+                                ActiveTab="_activeCategory"
+                                ActiveTabChanged="(value) => ChangeCategory(value)"
+                                NavType="NavigationTabType.Tabs"
+                                NavLinkClass="fw-normal pb-1" />
             </div>
             @if (_activeCategory is ProjectViewCategory.Info)
             {
