@@ -5,27 +5,28 @@ namespace HITSBlazor.Models.Projects.Enums
 {
     public enum TaskStatus
     {
-        [Description("")]
+        [Description("В бэклоге")]
+        [Style("bg-success-subtle text-success")]
         InBackLog,
 
-        [Description("На доработке")]
-        [Style("#8a2be2")]
-        OnModification,
-
         [Description("Новые")]
-        [Style("#0d6efd")]
+        [Style("bg-primary-subtle text-primary")]
         NewTask,
 
         [Description("На выполнении")]
-        [Style("#f5ec0a")]
+        [Style("bg-warning-subtle text-warning")]
         InProgress,
 
         [Description("На проверке")]
-        [Style("#ffa800")]
+        [Style("bg-warning-subtle text-warning")]
         OnVerification,
 
+        [Description("На доработке")]
+        [Style("bg-warning-subtle text-warning")]
+        OnModification,
+
         [Description("Выполненные")]
-        [Style("#13c63a")]
+        [Style("bg-success-subtle text-success")]
         Done
     }
 }

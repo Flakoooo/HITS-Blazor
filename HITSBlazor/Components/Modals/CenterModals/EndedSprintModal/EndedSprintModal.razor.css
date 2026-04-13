@@ -22,3 +22,16 @@
     flex-grow: 1;
     height: 0;
 }
+
+.sprint-info-modal-task-error {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: center;
+}
+
+.sprint-info-modal-task-error-img {
+    width: 200px;
+    animation: img-67cca1a0 5s ease-out infinite;
+}

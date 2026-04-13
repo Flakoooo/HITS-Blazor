@@ -343,6 +343,8 @@ namespace HITSBlazor.Utils.Mocks.Projects
             ];
         }
 
+        public static List<Sprint> GetAllSprints() => [.. _sprints];
+
         public static List<Sprint> GetSprintsByProjectId(Guid projectId)
             => [.. _sprints.Where(s => s.ProjectId == projectId)];
 

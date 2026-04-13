@@ -210,7 +210,7 @@
                     <div class="active-sprint-columns w-100">
                         @foreach (var taskCategory in Enum.GetValues<HITSBlazor.Models.Projects.Enums.TaskStatus>().Where(s => s is not Models.Projects.Enums.TaskStatus.InBackLog))
                         {
-                            string color = EnumViewModel<HITSBlazor.Models.Projects.Enums.TaskStatus>.GetStyle(taskCategory);
+                            string color = GetTaskCategoryColor(taskCategory);
                             <div class="w-100">
                                 <div class="mb-1">
                                     <div class="rounded-top" style="height: 6px; background-color: @color;">

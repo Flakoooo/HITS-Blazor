@@ -151,6 +151,16 @@ namespace HITSBlazor.Pages.Projects.ProjectView
             _searchSprintText = value;
         }
 
+        private static string GetTaskCategoryColor(Models.Projects.Enums.TaskStatus taskCategory) => taskCategory switch
+        {
+            Models.Projects.Enums.TaskStatus.NewTask => "#0d6efd",
+            Models.Projects.Enums.TaskStatus.InProgress => "#f5ec0a",
+            Models.Projects.Enums.TaskStatus.OnVerification => "#ffa800",
+            Models.Projects.Enums.TaskStatus.OnModification => "#8a2be2",
+            Models.Projects.Enums.TaskStatus.Done => "#13c63a",
+            _ => string.Empty
+        };
+
         private string GetTaskExecuteColor(User? executor)
         {
             if (AuthService.CurrentUser is not null 
