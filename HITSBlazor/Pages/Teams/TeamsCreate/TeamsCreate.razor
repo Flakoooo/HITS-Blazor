@@ -1,13 +1,16 @@
 ﻿@namespace HITSBlazor.Pages.Teams.TeamsCreate
 @using HITSBlazor.Components.Button
 @using HITSBlazor.Components.InputDropdowns.SkillDropdown
+@using HITSBlazor.Components.Inputs.CheckboxDropdown
 @using HITSBlazor.Components.Inputs.Input
 @using HITSBlazor.Components.Inputs.RadioDropdown
 @using HITSBlazor.Components.Inputs.TextArea
 @using HITSBlazor.Components.Typography
+@using HITSBlazor.Models.Common.Entities
 @using HITSBlazor.Models.Common.Enums
 @using HITSBlazor.Models.Users.Entities
 @using HITSBlazor.Utils
+@using HITSBlazor.Utils.EnumStyles
 @using HITSBlazor.Utils.Models
 
 <div class="bg-white page-content-with-header">
@@ -62,14 +65,22 @@
                     Желаемые компетенции*
                 </Typography>
                 <div class="mt-2 w-100 stack-categories">
-                    <SkillDropdown SkillType="SkillType.Language"
-                                   @bind-SelectedSkills="@SelectedLanguageSkills" />
-                    <SkillDropdown SkillType="SkillType.Framework"
-                                   @bind-SelectedSkills="@SelectedFrameworkSkills" />
-                    <SkillDropdown SkillType="SkillType.Database"
-                                   @bind-SelectedSkills="@SelectedDatabaseSkills" />
-                    <SkillDropdown SkillType="SkillType.Devops"
-                                   @bind-SelectedSkills="@SelectedDevopsSkills" />
+                    <SkillDropdown Placeholder="@(EnumViewModel<SkillType>.GetTranslation(SkillType.Language))"
+                                   AllSkills="LanguageSkills"
+                                   @bind-SelectedSkills="@SelectedLanguageSkills"
+                                   ValueMustCreated="(value) => CreateNewSkill(value, SkillType.Language)" />
+                    <SkillDropdown Placeholder="@(EnumViewModel<SkillType>.GetTranslation(SkillType.Framework))"
+                                   AllSkills="FrameworkSkills"
+                                   @bind-SelectedSkills="@SelectedFrameworkSkills"
+                                   ValueMustCreated="(value) => CreateNewSkill(value, SkillType.Framework)" />
+                    <SkillDropdown Placeholder="@(EnumViewModel<SkillType>.GetTranslation(SkillType.Database))"
+                                   AllSkills="DatabaseSkills"
+                                   @bind-SelectedSkills="@SelectedDatabaseSkills"
+                                   ValueMustCreated="(value) => CreateNewSkill(value, SkillType.Database)" />
+                    <SkillDropdown Placeholder="@(EnumViewModel<SkillType>.GetTranslation(SkillType.Devops))"
+                                   AllSkills="DevopsSkills"
+                                   @bind-SelectedSkills="@SelectedDevopsSkills"
+                                   ValueMustCreated="(value) => CreateNewSkill(value, SkillType.Devops)" />
                 </div>
             </div>
             <div class="team w-100">             
@@ -80,17 +91,86 @@
                                @bind-Value="TeamsCreateModel.Owner"
                                AllValues="TeamMembers"/>
                 <RadioDropdown T="User"
-                               Label="Владелец команды*"
-                               Placeholder="Выберите владельца"
-                               IsDisabled="true"
+                               Label="Тим-лидер команды"
+                               Placeholder="Выберите тим-лидера"
                                @bind-Value="TeamsCreateModel.Leader"
                                AllValues="TeamMembers" />
-                <!-- combobox поле с выбором участников -->
+                <div class="w-100 d-flex flex-column">
+                    <CheckboxDropdown T="User"
+                                      Label="Участники команды*"
+                                      Placeholder="Выберите участников"
+                                      @bind-SelectedValues="TeamsCreateModel.Members"
+                                      AllValues="TeamMembers" />
+                    @if (TeamsCreateModel.Members.Count > 0)
+                    {
+                        <div class="team-members mt-2">
+                            @foreach (var member in TeamsCreateModel.Members)
+                            {
+                                <div class="team-member p-1 rounded-3 bg-opacity-25 bg-danger">
+                                    <Typography FontSize="6">
+                                        @member.FullName
+                                    </Typography>
+                                    <i class="bi bi-x-lg" style="cursor: pointer;"></i>
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
             </div>
-            <div>
-                <!-- Блок с какимито графиками? -->
-            </div>
-            <Button BtnType="ButtonType.Button" Variant="ButtonVariant.Success" Text="Создать команду" />
+            @if (TeamSkills.Count > 0 || TeamsCreateModel.WantedSkills.Count > 0)
+            {
+                <div class="radar-charts">
+                    @foreach (var type in Enum.GetValues<SkillType>())
+                    {
+                        var teamSkills = TeamSkills.Where(s => s.Type == type).ToList();
+                        var teamWantedSkills = TeamsCreateModel.WantedSkills.Where(s => s.Type == type).ToList();
+                        var intersectSkills = teamWantedSkills.IntersectBy(teamSkills.Select(s => s.Id), ws => ws.Id).ToList();
+
+                        var allSkills = teamSkills
+                        .UnionBy(teamWantedSkills, s => s.Id)
+                        .OrderBy(s => s.Name)
+                        .ToList();
+
+                        if (allSkills?.Count > 0)
+                        {
+                            <ApexChart TItem="Skill"
+                                       Options="@GetRadarChartOptions()"
+                                       Width="250"
+                                       Height="275">
+                                <ApexPointSeries TItem="Skill"
+                                                 Items="allSkills"
+                                                 Name="Желаемые компетенции"
+                                                 SeriesType="SeriesType.Radar"
+                                                 XValue="@(s => s.Name)"
+                                                 YValue="@(s => teamWantedSkills.Contains(s) ? 1 : 0)"
+                                                 Color="@type.GetWantedColor()" />
+                                <ApexPointSeries TItem="Skill"
+                                                 Items="allSkills"
+                                                 Name="Фактические компетенции"
+                                                 SeriesType="SeriesType.Radar"
+                                                 XValue="@(s => s.Name)"
+                                                 YValue="@(s => teamSkills.Contains(s) ? 1 : 0)"
+                                                 Color="@type.GetColor()" />
+                                <ApexPointSeries TItem="Skill"
+                                                 Items="allSkills"
+                                                 Name="Пересечение"
+                                                 SeriesType="SeriesType.Radar"
+                                                 XValue="@(s => s.Name)"
+                                                 YValue="@(s => intersectSkills.Contains(s) ? 1 : 0)"
+                                                 Color="#bfbfbf" />
+                            </ApexChart>
+                        }
+                    }
+                </div>
+            }
+            @if (string.IsNullOrWhiteSpace(TeamId))
+            {
+                <Button Variant="ButtonVariant.Success" Text="Создать команду" />                
+            }
+            else
+            {
+                <Button Variant="ButtonVariant.Primary" Text="Сохранить изменения" />
+            }
         </div>
     </div>
 </div>

@@ -1,0 +1,80 @@
+﻿@namespace HITSBlazor.Components.Modals.CenterModals.AddTeamMembersModal
+@using HITSBlazor.Components.ActionMenus.BaseActionMenu
+@using HITSBlazor.Components.Button
+@using HITSBlazor.Components.Filters.ResetFilterButton
+@using HITSBlazor.Components.Filters.SkillFilter
+@using HITSBlazor.Components.ListPageComponents.ListPageSearch
+@using HITSBlazor.Components.Modals.Components.CenterModalHeader
+@using HITSBlazor.Components.Tables.TableActionMenu
+@using HITSBlazor.Components.Tables.TableBodyRow
+@using HITSBlazor.Components.Tables.TableHeader
+@using HITSBlazor.Components.Typography
+
+<div @onclick:stopPropagation="true" class="invitation-modal p-3 bg-white rounded">
+    <CenterModalHeader HeaderText="Выберите пользователей для приглашения" />
+    <div class="invitation-modal-table">
+        <div>
+            <div class="w-100 bg-white">
+                <ListPageSearch />
+                <div class="w-100 d-flex">
+                    <div class="w-100">
+                        <table class="table table-hover mb-0">
+                            <TableHeader TableActionMenuIsEnable="true" Items="_tableHeader" />
+                            <tbody>
+                                @foreach (var user in _users)
+                                {
+                                    <tr>
+                                        <TableBodyRow>
+                                            <div class="data-link">
+                                                @user.Email
+                                            </div>
+                                        </TableBodyRow>
+                                        <TableBodyRow>
+                                            @user.FirstName
+                                        </TableBodyRow>
+                                        <TableBodyRow>
+                                            @user.LastName
+                                        </TableBodyRow>
+                                        <TableActionMenu ItemId="user.Id"
+                                                         OnAction="OnTeamAction"
+                                                         ActionIds="GetActions(user)" />
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="filter w-25 bg-white p-2 ms-2 border-start">
+                        <SkillFilter OnFilterChanged="LoadUsersAsync" @bind-SeacrhSkillText="SearchSkillText" @bind-SelectedSkillIds="SelectedSkillIds" />
+                        <ResetFilterButton />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="w-100 p-2 border rounded">
+        @if (_selectedUsers.Count > 0)
+        {
+            @foreach (var user in _selectedUsers)
+            {
+                <div class="d-flex gap-2 flex-wrap">
+                    <div class="invitation-modal-selected-users p-1 rounded-3 bg-primary bg-opacity-25">
+                        <Typography FontSize="6">
+                            @user.FullName
+                        </Typography>
+                        <i class="bi bi-x-lg" style="cursor: pointer;"></i>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="m-1 w-100 text-center">
+                Никто не выбран
+            </div>
+        }
+    </div>
+    <div class="invitation-modal-buttons">
+        <Button Variant="ButtonVariant.Success" Text="Сохранить выбор" />
+        <Button Variant="ButtonVariant.Danger" Text="Отменить выбор" />
+    </div>
+</div>

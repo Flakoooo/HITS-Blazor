@@ -12,7 +12,7 @@ namespace HITSBlazor.Pages.Teams.TeamsCreate
         public User Owner { get; set; } = new();
         public User Leader { get; set; } = new();
 
-        public List<User> Members { get; set; } = [];
+        public HashSet<User> Members { get; set; } = [];
         public List<Skill> WantedSkills { get; set; } = [];
     }
 }

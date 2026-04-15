@@ -42,6 +42,10 @@ namespace HITSBlazor.Components.ActionMenus.BaseActionMenu
         ViewProject,
 
         //=== text-success стили ===
+        [Description("Выбрать")]
+        [Style("text-success")]
+        TeamCreateSelectMember,
+
         [Description("Принять")]
         [Style("text-success")]
         TeamRequestAccept,
@@ -63,6 +67,10 @@ namespace HITSBlazor.Components.ActionMenus.BaseActionMenu
         [Description("Удалить")]
         [Style("text-danger")]
         Delete,
+
+        [Description("Отменить выбор")]
+        [Style("text-danger")]
+        TeamCreateRemoveMember,
 
         [Description("Отклонить")]
         [Style("text-danger")]

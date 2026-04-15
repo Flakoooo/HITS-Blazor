@@ -30,6 +30,7 @@
             <EnumStatus Statustype="_currentProject?.Status" />
         </div>
         <div>
+            <!-- TODO: сделать категорию со всей статистикой проекта, кто сколько сделал, какой прогресс спринтов и так далее -->
             <div class="px-3">
                 <NavigationTabs T="ProjectViewCategory"
                                 Tabs="GetCategoryTabs()"
@@ -99,24 +100,35 @@
                                                                  TextColor="TextColor.Primary" />
                             </div>
                             <div class="px-2">
-                                <RightSideModalInfoItemComponent Label="Дата страта" 
+                                <RightSideModalInfoItemComponent Label="Дата старта" 
                                                                  Icon="bi-person-circle"
                                                                  Text="@_currentProject?.StartDate.ToString("dd.MM.yyyy")"
                                                                  TextColor="TextColor.Primary" />
                             </div>
                             <div class="px-2">
-                                <RightSideModalInfoItemComponent Label="Дата страта" 
+                                <RightSideModalInfoItemComponent Label="Дата окончания" 
                                                                  Icon="bi-person-circle"
                                                                  Text="@_currentProject?.FinishDate.ToString("dd.MM.yyyy")"
                                                                  TextColor="TextColor.Primary" />
                             </div>
                             <div class="d-flex flex-column gap-2 mt-2">
-                                 <Button Text="Перейти в идею" 
-                                         Variant="ButtonVariant.Primary"
-                                         OnButtonClick="() => ModalService.ShowIdeaModal(_currentProject.IdeaId)" />
-                                 <Button Text="Информация о проекте" 
-                                         Variant="ButtonVariant.Primary"
-                                         OnButtonClick="@(() => Console.WriteLine("Какое то модальное окно"))" />
+
+                                <Button Text="Перейти в идею" 
+                                        Variant="ButtonVariant.Primary"
+                                        OnButtonClick="() => ModalService.ShowIdeaModal(_currentProject.IdeaId)" />
+                                @if (_currentProject.Status is ProjectStatus.Done)
+                                {
+                                    <Button Text="Информация о проекте" 
+                                            Variant="ButtonVariant.Primary"
+                                            OnButtonClick="@(() => Console.WriteLine("Какое то модальное окно"))" />
+                                }
+                                //TODO: тут вызывается модальное окно завершения спринта, но я думаю надо сделать лучше
+                                else
+                                {
+                                    <Button Text="Завершить проект" 
+                                            Variant="ButtonVariant.Primary"
+                                            OnButtonClick="@(() => Console.WriteLine("Какое то модальное окно"))" />
+                                }
                             </div>
                         </div>
                     </div>
