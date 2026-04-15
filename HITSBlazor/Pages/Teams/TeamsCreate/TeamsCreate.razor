@@ -116,6 +116,26 @@
                         </div>
                     }
                 </div>
+                <div class="d-flex flex-column">
+                    <div class="d-flex gap-2 text-primary" style="cursor: pointer;">
+                        <div class="data-link">Пригласить пользователей</div>
+                        <i class="bi bi-person-plus"></i>
+                    </div>
+                    @if (TeamsCreateModel.Members.Count > 0)
+                    {
+                        <div class="team-members mt-2">
+                            @foreach (var member in TeamsCreateModel.Members)
+                            {
+                                <div class="team-member p-1 rounded-3 bg-opacity-25 bg-primary">
+                                    <Typography FontSize="6">
+                                        @member.FullName
+                                    </Typography>
+                                    <i class="bi bi-x-lg" style="cursor: pointer;"></i>
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
             </div>
             @if (TeamSkills.Count > 0 || TeamsCreateModel.WantedSkills.Count > 0)
             {

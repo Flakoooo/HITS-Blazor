@@ -147,6 +147,73 @@ namespace HITSBlazor.Services
 
             var userRole = (RoleType) role;
 
+            if (userRole is RoleType.Teacher or RoleType.Admin)
+            {
+                var nav = new NavigationItem
+                {
+                    Id = menuItems.Count,
+                    Icon = "bi-ui-checks-grid",
+                    Title = "Админ панель",
+                    SubItems =
+                    [
+                        new NavigationSubItem
+                        {
+                            Id = 0,
+                            Icon = "bi-person-gear",
+                            Title = "Пользователи",
+                            Url = "/users"
+                        }
+                    ],
+                    BaseUrl = "admin"
+                };
+
+                if (userRole == RoleType.Admin)
+                {
+                    var subItems = new List<NavigationSubItem>()
+                    {
+                        new()
+                        {
+                            Id = 1,
+                            Icon = "bi-person-add",
+                            Title = "Добавить пользователей",
+                            Url = "/add-users"
+                        },
+                        new()
+                        {
+                            Id = 2,
+                            Icon = "bi-building-add",
+                            Title = "Компании",
+                            Url = "/companies"
+                        },
+                        new()
+                        {
+                            Id = 3,
+                            Icon = "bi-people",
+                            Title = "Группы пользователей",
+                            Url = "/users-groups"
+                        },
+                        new()
+                        {
+                            Id = 4,
+                            Icon = "bi-person-badge",
+                            Title = "Справочник компетенций",
+                            Url = "/skills"
+                        },
+                        new()
+                        {
+                            Id = 5,
+                            Icon = "bi-tags",
+                            Title = "Справочник тегов",
+                            Url = "/tags"
+                        }
+                    };
+
+                    nav.SubItems.AddRange(subItems);
+                }
+
+                menuItems.Add(nav);
+            }
+
             var ideasRoles = new HashSet<RoleType>
             {
                 RoleType.Initiator,
@@ -293,73 +360,6 @@ namespace HITSBlazor.Services
                 menuItems.Add(nav);
             }
 
-            if (userRole is RoleType.Teacher or RoleType.Admin)
-            {
-                var nav = new NavigationItem
-                {
-                    Id = menuItems.Count,
-                    Icon = "bi-ui-checks-grid",
-                    Title = "Админ панель",
-                    SubItems =
-                    [
-                        new NavigationSubItem
-                        {
-                            Id = 0,
-                            Icon = "bi-person-gear",
-                            Title = "Пользователи",
-                            Url = "/users"
-                        }
-                    ],
-                    BaseUrl = "admin"
-                };
-
-                if (userRole == RoleType.Admin)
-                {
-                    var subItems = new List<NavigationSubItem>() 
-                    {
-                        new() 
-                        {
-                            Id = 1,
-                            Icon = "bi-person-add",
-                            Title = "Добавить пользователей",
-                            Url = "/add-users"
-                        },
-                        new()
-                        {
-                            Id = 2,
-                            Icon = "bi-building-add",
-                            Title = "Компании",
-                            Url = "/companies"
-                        },
-                        new()
-                        {
-                            Id = 3,
-                            Icon = "bi-people",
-                            Title = "Группы пользователей",
-                            Url = "/users-groups"
-                        },
-                        new()
-                        {
-                            Id = 4,
-                            Icon = "bi-person-badge",
-                            Title = "Справочник компетенций",
-                            Url = "/skills"
-                        },
-                        new()
-                        {
-                            Id = 5,
-                            Icon = "bi-tags",
-                            Title = "Справочник тегов",
-                            Url = "/tags"
-                        }
-                    };
-
-                    nav.SubItems.AddRange(subItems);
-                }
-
-                menuItems.Add(nav);
-            }
-
             if (teamsRolesAllowed)
             {
                 var nav = new NavigationItem
@@ -415,67 +415,43 @@ namespace HITSBlazor.Services
                 menuItems.Add(nav);
             }
 
-            var questRoles = new HashSet<RoleType>
-            {
-                RoleType.ProjectOffice,
-                RoleType.Initiator,
-                RoleType.TeamLeader,
-                RoleType.Member,
-                RoleType.Teacher,
-                RoleType.Admin
-            };
+            //var testRoles = new HashSet<RoleType>
+            //{
+            //    RoleType.Admin,
+            //    RoleType.Member,
+            //    RoleType.TeamLeader,
+            //    RoleType.ProjectOffice
+            //};
 
-            if (questRoles.Contains(userRole))
-            {
-                var nav = new NavigationItem
-                {
-                    Id = menuItems.Count,
-                    Icon = "bi-patch-question",
-                    Title = "Управление опросами",
-                    SubItems = [],
-                    BaseUrl = "questionnaire"
-                };
+            //if (testRoles.Contains(userRole))
+            //{
+            //    var nav = new NavigationItem
+            //    {
+            //        Id = menuItems.Count,
+            //        Icon = "bi-clipboard",
+            //        Title = "Тесты",
+            //        SubItems =
+            //        [
+            //            new NavigationSubItem
+            //            {
+            //                Id = 0,
+            //                Icon = "bi-list",
+            //                Title = "Список тестов",
+            //                Url = "/list"
+            //            },
+            //            new NavigationSubItem
+            //            {
+            //                Id = 1,
+            //                Icon = "bi-journal-text",
+            //                Title = "Результаты тестов",
+            //                Url = "/results"
+            //            }
+            //        ],
+            //        BaseUrl = "tests"
+            //    };
 
-                menuItems.Add(nav);
-            }
-
-            var testRoles = new HashSet<RoleType>
-            {
-                RoleType.Admin,
-                RoleType.Member,
-                RoleType.TeamLeader,
-                RoleType.ProjectOffice
-            };
-
-            if (testRoles.Contains(userRole))
-            {
-                var nav = new NavigationItem
-                {
-                    Id = menuItems.Count,
-                    Icon = "bi-clipboard",
-                    Title = "Тесты",
-                    SubItems =
-                    [
-                        new NavigationSubItem
-                        {
-                            Id = 0,
-                            Icon = "bi-list",
-                            Title = "Список тестов",
-                            Url = "/list"
-                        },
-                        new NavigationSubItem
-                        {
-                            Id = 1,
-                            Icon = "bi-journal-text",
-                            Title = "Результаты тестов",
-                            Url = "/results"
-                        }
-                    ],
-                    BaseUrl = "tests"
-                };
-
-                menuItems.Add(nav);
-            }
+            //    menuItems.Add(nav);
+            //}
 
             MenuItems = menuItems;
         }
