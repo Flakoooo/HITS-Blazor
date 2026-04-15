@@ -6,6 +6,9 @@ namespace HITSBlazor.Components.Inputs.Input
     public partial class Input
     {
         [Parameter]
+        public int Width { get; set; } = 100;
+
+        [Parameter]
         public string? Label { get; set; }
 
         [Parameter]

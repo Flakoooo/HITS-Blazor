@@ -1,0 +1,78 @@
+﻿@namespace HITSBlazor.Components.Tables.TableComponent
+@using HITSBlazor.Components.ActionMenus.BaseActionMenu
+@using HITSBlazor.Components.Statuses.BoolStatus
+@using HITSBlazor.Components.Tables.TableActionMenu
+@using HITSBlazor.Components.Tables.TableBodyRow
+@using HITSBlazor.Components.Tables.TableHeader
+@using System.Reflection
+@using HITSBlazor.Models.Teams.Entities
+@using HITSBlazor.Utils.Attributes
+@typeparam T
+
+<table class="table table-hover mb-0">
+    <TableHeader TableActionMenuIsEnable="HasActions || TableActionMenuIsEnable" Items="HeaderItems" />
+    <tbody>
+        @foreach (var item in TableData)
+        {
+            <tr>
+                @if (item is TeamExperience teamExp)
+                {
+                    Actions = new Dictionary<MenuAction, object> { [MenuAction.ViewTeamProfile] = teamExp.TeamId };
+                    <TableBodyRow>
+                        <div @onclick="@(() => OnAction(new() { Action = MenuAction.ViewTeamProfile, Item = teamExp.TeamId }))" class="data-link">
+                            <div>@teamExp.TeamName</div>
+                        </div>
+                    </TableBodyRow>
+                    <TableBodyRow IsCentered="true">
+                        @teamExp.StartDate.ToString("dd.MM.yyyy")
+                    </TableBodyRow>
+                    <TableBodyRow IsCentered="true">
+                        <div class="@(teamExp.FinishDate is null ? "text-primary" : string.Empty)">
+                            @(teamExp.FinishDate is null ? "В команде" : teamExp.FinishDate.Value.ToString("dd.MM.yyyy"))
+                        </div>
+                    </TableBodyRow>
+                    <TableBodyRow IsCentered="true">
+                        <BoolStatus Value="teamExp.HasActiveProject" StatusType="BoolStatusType.TeamActiveProject" />
+                    </TableBodyRow>
+                    @if (HasActions)
+                    {
+                        <TableActionMenu ItemId="@GetItemId(item)"
+                                         StrategyPosition="Strategy.Fixed"
+                                         OnAction="OnAction"
+                                         ActionIds="Actions" />
+                    }
+                }
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+    [Parameter]
+    public List<TableHeaderItem> HeaderItems { get; set; } = [];
+
+    [Parameter]
+    public List<T> TableData { get; set; } = [];
+
+    [Parameter]
+    public RenderFragment<T> RowTemplate { get; set; } = default!;
+
+    [Parameter]
+    public Func<T, Guid>? ItemIdSelector { get; set; }
+
+    [Parameter]
+    public EventCallback<TableActionContext> OnActionMenuEvent { get; set; }
+
+    [Parameter]
+    public Dictionary<MenuAction, object> Actions { get; set; } = [];
+
+    [Parameter]
+    public bool TableActionMenuIsEnable { get; set; } = false;
+
+    private bool HasActions => Actions.Count > 0;
+
+    private Guid GetItemId(T item) => ItemIdSelector!(item);
+
+    private async Task OnAction(TableActionContext context)
+        => await OnActionMenuEvent.InvokeAsync(context);
+}

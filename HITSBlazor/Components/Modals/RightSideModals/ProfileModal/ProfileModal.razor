@@ -4,16 +4,21 @@
 @using HITSBlazor.Components.Charts.SkillRadarChart
 @using HITSBlazor.Components.Collapse
 @using HITSBlazor.Components.InputDropdowns.SkillDropdown
+@using HITSBlazor.Components.InputSearch
+@using HITSBlazor.Components.Inputs.Input
 @using HITSBlazor.Components.Modals.Components.ModalHeader
+@using HITSBlazor.Components.NavigationTabs
 @using HITSBlazor.Components.Placeholders.Placeholder
 @using HITSBlazor.Components.Tables.TableActionMenu
 @using HITSBlazor.Components.Tables.TableBodyRow
+@using HITSBlazor.Components.Tables.TableComponent
 @using HITSBlazor.Components.Tables.TableHeader
 @using HITSBlazor.Components.Typography
 @using HITSBlazor.Components.UserInfoField
 @using HITSBlazor.Models.Common.Entities
 @using HITSBlazor.Models.Common.Enums
 @using HITSBlazor.Models.Ideas.Enums
+@using HITSBlazor.Models.Teams.Entities
 @using HITSBlazor.Models.Users.Enums
 @using HITSBlazor.Services.Modal
 @using HITSBlazor.Utils.EnumStyles
@@ -110,161 +115,175 @@
         </div>
         <div class="user-info mb-3">
             <div class="w-100 bg-white border p-3 rounded-3">
-                <div class="user-info-header border-bottom pb-1">
-                    <Typography FontSize="5" TextColor="TextColor.Primary">
-                        Компетенции
-                    </Typography>
-                    @if (_isCurrentUser)
-                    {
-                        @if (_isChangeSkills)
-                        {
-                            <div class="d-flex gap-2">
-                                <Button BtnType="ButtonType.Button"
-                                        Variant="ButtonVariant.Primary"
-                                        Text="Сохранить"
-                                        OnButtonClick="UpdateUserSkills" />
-                                <Button BtnType="ButtonType.Button"
-                                        Variant="ButtonVariant.Danger"
-                                        Text="Отменить"
-                                        OnButtonClick="() => _isChangeSkills = !_isChangeSkills" />
-                            </div>
-                        }
-                        else
-                        {
-                            <Button BtnType="ButtonType.Button"
-                                    Variant="ButtonVariant.Light"
-                                    Text="Изменить стек"
-                                    OnButtonClick="ChangeToUpdateSkills" />
-                        }
-                    }
+                <div class="px-3">
+                    <NavigationTabs T="ProfileModalCategory"
+                                    Tabs="Enum.GetValues<ProfileModalCategory>()"
+                                    ActiveTab="_activeCategory"
+                                    ActiveTabChanged="(value) => ChangeCategory(value)"
+                                    NavType="NavigationTabType.Tabs"
+                                    NavLinkClass="fw-normal pb-1" />
                 </div>
-                <div>
-                    @if (_isCurrentUser && _isChangeSkills)
-                    {
-                        @if (_isSkillsLoading)
+                @if (_activeCategory is ProfileModalCategory.General)
+                {
+                    <div class="d-flex gap-2">
+                    </div>
+                }
+                else if (_activeCategory is ProfileModalCategory.Skills)
+                {
+                    <div class="d-flex gap-2 flex-column">
+                        @if (_isCurrentUser && _isChangeSkills)
                         {
-                            <div class="mt-2 w-100 d-flex gap-3">
-                                @for (int p = 0; p < 4; ++p)
-                                {
-                                    <Placeholder Height="PlaceholderHeight.Small" />
-                                }
-                            </div>
-                        }
-                        else
-                        {
-                            <div class="mt-2 w-100 stack-categories">
-                                <SkillDropdown Placeholder="@(EnumViewModel<SkillType>.GetTranslation(SkillType.Language))"
-                                               AllSkills="LanguageSkills"
-                                               @bind-SelectedSkills="@SelectedLanguageSkills"
-                                               ValueMustCreated="(value) => CreateNewSkill(value, SkillType.Language)" />
-                                <SkillDropdown Placeholder="@(EnumViewModel<SkillType>.GetTranslation(SkillType.Framework))"
-                                               AllSkills="FrameworkSkills"
-                                               @bind-SelectedSkills="@SelectedFrameworkSkills"
-                                               ValueMustCreated="(value) => CreateNewSkill(value, SkillType.Framework)" />
-                                <SkillDropdown Placeholder="@(EnumViewModel<SkillType>.GetTranslation(SkillType.Database))"
-                                               AllSkills="DatabaseSkills"
-                                               @bind-SelectedSkills="@SelectedDatabaseSkills"
-                                               ValueMustCreated="(value) => CreateNewSkill(value, SkillType.Database)" />
-                                <SkillDropdown Placeholder="@(EnumViewModel<SkillType>.GetTranslation(SkillType.Devops))"
-                                               AllSkills="DevopsSkills"
-                                               @bind-SelectedSkills="@SelectedDevopsSkills"
-                                               ValueMustCreated="(value) => CreateNewSkill(value, SkillType.Devops)" />
-                            </div>
-                        }
-                    }
-                    else
-                    {
-                        @if (Profile?.Skills.Count == 0)
-                        {
-                            <Typography FontSize="6" TextColor="TextColor.Secondary" CustomClass="d-flex w-100 justify-content-center mt-3">
-                                Компетенции не выбраны
-                            </Typography>
-                        }
-                        else
-                        {
-                            <div class="radar-charts">
-                                @if (Profile?.Skills.Count > 0)
-                                {
-                                    <SkillRadarChart Options="_skillRadarOptions[SkillType.Language]"
-                                                     Skills="Profile?.Skills.Where(s => s.Type == SkillType.Language).ToList()"
-                                                     Color="@SkillType.Language.GetColor()" />
-                                    <SkillRadarChart Options="_skillRadarOptions[SkillType.Framework]"
-                                                     Skills="Profile?.Skills.Where(s => s.Type == SkillType.Framework).ToList()"
-                                                     Color="@SkillType.Framework.GetColor()" />
-                                    <SkillRadarChart Options="_skillRadarOptions[SkillType.Database]"
-                                                     Skills="Profile?.Skills.Where(s => s.Type == SkillType.Database).ToList()"
-                                                     Color="@SkillType.Database.GetColor()" />
-                                    <SkillRadarChart Options="_skillRadarOptions[SkillType.Devops]"
-                                                     Skills="Profile?.Skills.Where(s => s.Type == SkillType.Devops).ToList()"
-                                                     Color="@SkillType.Devops.GetColor()" />
-                                }
-                            </div>
-                        }
-                    }
-                </div>
-            </div>
-            <div class="w-100 bg-white border p-3 rounded-3">
-                <div class="user-ideas-header border-bottom">
-                    <Typography FontSize="5" TextColor="TextColor.Primary">
-                        Идеи
-                    </Typography>
-                </div>
-                <div class="user-ideas-content @(ideasIsLoading ? "p-3" : "mt-3")">
-                    @if (ideasIsLoading)
-                    {
-                        @for (int i = 0; i < 3; ++i)
-                        {
-                            <div class="w-100 p-2 d-flex flex-column border rounded">
-                                <Placeholder Width="w-75" />
-                                <Placeholder Width="w-50" />
-                            </div>
-                        }
-                    }
-                    else
-                    {
-                        @if (Profile?.Ideas.Count == 0)
-                        {
-                            <Typography FontSize="6" TextColor="TextColor.Secondary">
-                                Идей пока нет
-                            </Typography>
-                        }
-                        else
-                        {
-                            @foreach (var idea in Profile?.Ideas ?? [])
+                            @if (_isSkillsLoading)
                             {
-                                <div class="user-ideas-idea w-100 p-2 bg-white border rounded">
-                                    <Collapse ExpandedClass="w-100" StartCollapsed="true">
-                                        <MainContent Context="collapse">
-                                            <div class="w-100 d-flex justify-content-between align-items-center gap-3">
-                                                <div class="w-100 d-flex gap-2 align-items-center justify-content-between">
-                                                    <div @onclick="@(() => ShowIdea(idea.Id))" class="user-ideas-idea-link data-link fs-6 w-100">
-                                                        @idea.Name
-                                                    </div>
-                                                    <div class="px-2 py-1 rounded-4 fs-6 text-center @(EnumViewModel<IdeaStatusType>.GetStyle(idea.Status))">
-                                                        @(EnumViewModel<IdeaStatusType>.GetTranslation(idea.Status))
-                                                    </div>
-                                                </div>
-                                                <div @onclick="@(() => collapse.Toggle())" class="d-flex align-items-center gap-1" style="cursor: pointer;">
-                                                    <Typography FontSize="6" TextColor="TextColor.Primary">
-                                                        Описание
-                                                    </Typography>
-                                                    <i class="bi bi-caret-down text-primary"></i>
-                                                </div>
-                                            </div>
-                                        </MainContent>
-                                        <ExpandedContent>
-                                            <div class="list-group">
-                                                <Typography FontSize="6" TextColor="TextColor.Secondary" CustomClass="w-100 mt-1 border-top">
-                                                    @idea.Description
-                                                </Typography>
-                                            </div>
-                                        </ExpandedContent>
-                                    </Collapse>
+                                <div class="mt-2 w-100 d-flex gap-3">
+                                    @for (int p = 0; p < 4; ++p)
+                                    {
+                                        <Placeholder Height="PlaceholderHeight.Small" />
+                                    }
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="mt-2 w-100 stack-categories">
+                                    <SkillDropdown Placeholder="@(EnumViewModel<SkillType>.GetTranslation(SkillType.Language))"
+                                                   AllSkills="LanguageSkills"
+                                                   @bind-SelectedSkills="@SelectedLanguageSkills"
+                                                   ValueMustCreated="(value) => CreateNewSkill(value, SkillType.Language)" />
+                                    <SkillDropdown Placeholder="@(EnumViewModel<SkillType>.GetTranslation(SkillType.Framework))"
+                                                   AllSkills="FrameworkSkills"
+                                                   @bind-SelectedSkills="@SelectedFrameworkSkills"
+                                                   ValueMustCreated="(value) => CreateNewSkill(value, SkillType.Framework)" />
+                                    <SkillDropdown Placeholder="@(EnumViewModel<SkillType>.GetTranslation(SkillType.Database))"
+                                                   AllSkills="DatabaseSkills"
+                                                   @bind-SelectedSkills="@SelectedDatabaseSkills"
+                                                   ValueMustCreated="(value) => CreateNewSkill(value, SkillType.Database)" />
+                                    <SkillDropdown Placeholder="@(EnumViewModel<SkillType>.GetTranslation(SkillType.Devops))"
+                                                   AllSkills="DevopsSkills"
+                                                   @bind-SelectedSkills="@SelectedDevopsSkills"
+                                                   ValueMustCreated="(value) => CreateNewSkill(value, SkillType.Devops)" />
                                 </div>
                             }
                         }
-                    }
-                </div>
+                        else
+                        {
+                            @if (Profile?.Skills.Count == 0)
+                            {
+                                <Typography FontSize="6" TextColor="TextColor.Secondary" CustomClass="d-flex w-100 justify-content-center mt-3">
+                                    Компетенции не выбраны
+                                </Typography>
+                            }
+                            else
+                            {
+                                <div class="radar-charts">
+                                    @if (Profile?.Skills.Count > 0)
+                                    {
+                                        <SkillRadarChart Options="_skillRadarOptions[SkillType.Language]"
+                                                         Skills="Profile?.Skills.Where(s => s.Type == SkillType.Language).ToList()"
+                                                         Color="@SkillType.Language.GetColor()" />
+                                        <SkillRadarChart Options="_skillRadarOptions[SkillType.Framework]"
+                                                         Skills="Profile?.Skills.Where(s => s.Type == SkillType.Framework).ToList()"
+                                                         Color="@SkillType.Framework.GetColor()" />
+                                        <SkillRadarChart Options="_skillRadarOptions[SkillType.Database]"
+                                                         Skills="Profile?.Skills.Where(s => s.Type == SkillType.Database).ToList()"
+                                                         Color="@SkillType.Database.GetColor()" />
+                                        <SkillRadarChart Options="_skillRadarOptions[SkillType.Devops]"
+                                                         Skills="Profile?.Skills.Where(s => s.Type == SkillType.Devops).ToList()"
+                                                         Color="@SkillType.Devops.GetColor()" />
+                                    }
+                                </div>
+                            }
+                        }
+                        <div class="w-100 d-flex flex-row flex-nowrap justify-content-end mt-3">
+                            @if (_isCurrentUser)
+                            {
+                                @if (_isChangeSkills)
+                                {
+                                    <div class="d-flex gap-2">
+                                        <Button BtnType="ButtonType.Button"
+                                                Variant="ButtonVariant.Primary"
+                                                Text="Сохранить"
+                                                OnButtonClick="UpdateUserSkills" />
+                                        <Button BtnType="ButtonType.Button"
+                                                Variant="ButtonVariant.Danger"
+                                                Text="Отменить"
+                                                OnButtonClick="() => _isChangeSkills = !_isChangeSkills" />
+                                    </div>
+                                }
+                                else
+                                {
+                                    <Button BtnType="ButtonType.Button"
+                                            Variant="ButtonVariant.Light"
+                                            Text="Изменить стек"
+                                            OnButtonClick="ChangeToUpdateSkills" />
+                                }
+                            }
+                        </div>
+                    </div>
+                }
+                else if (_activeCategory is ProfileModalCategory.Ideas)
+                {
+                    <div class="d-flex gap-2 mt-3">
+                        <div class="w-100 d-flex flex-column flex-nowrap gap-2">
+                            @if (Profile?.Ideas.Count == 0)
+                            {
+                                <Typography FontSize="6" TextColor="TextColor.Secondary">
+                                    Идей пока нет
+                                </Typography>
+                            }
+                            else
+                            {
+                                @foreach (var idea in Profile?.Ideas ?? [])
+                                {
+                                    <div class="user-ideas-idea w-100 p-2 bg-white border rounded">
+                                        <Collapse ExpandedClass="w-100" StartCollapsed="true">
+                                            <MainContent Context="collapse">
+                                                <div class="w-100 d-flex justify-content-between align-items-center gap-3">
+                                                    <div class="w-100 d-flex gap-2 align-items-center justify-content-between">
+                                                        <div @onclick="@(() => ShowIdea(idea.Id))" class="user-ideas-idea-link data-link fs-6 w-100">
+                                                            @idea.Name
+                                                        </div>
+                                                        <div class="px-2 py-1 rounded-4 fs-6 text-center @(EnumViewModel<IdeaStatusType>.GetStyle(idea.Status))">
+                                                            @(EnumViewModel<IdeaStatusType>.GetTranslation(idea.Status))
+                                                        </div>
+                                                    </div>
+                                                    <div @onclick="@(() => collapse.Toggle())" class="d-flex align-items-center gap-1" style="cursor: pointer;">
+                                                        <Typography FontSize="6" TextColor="TextColor.Primary">
+                                                            Описание
+                                                        </Typography>
+                                                        <i class="bi bi-caret-down text-primary"></i>
+                                                    </div>
+                                                </div>
+                                            </MainContent>
+                                            <ExpandedContent>
+                                                <div class="list-group">
+                                                    <Typography FontSize="6" TextColor="TextColor.Secondary" CustomClass="w-100 mt-1 border-top">
+                                                        @idea.Description
+                                                    </Typography>
+                                                </div>
+                                            </ExpandedContent>
+                                        </Collapse>
+                                    </div>
+                                }
+                            }
+                        </div>
+                    </div>
+                }
+                else if (_activeCategory is ProfileModalCategory.Teams)
+                {
+                    <div class="d-flex gap-2 flex-column">
+                        <InputSearch IsLoading="_isLoading" ValueChanged="(value) => SearchTeamExperience(value)" />
+                        <div class="w-100 d-flex">
+                            <div class="w-100">
+                                <TableComponent T="TeamExperience"
+                                                HeaderItems="HeaderItems"
+                                                TableData="Profile?.Teams ?? []"
+                                                ItemIdSelector="@(item => item.TeamId)"
+                                                TableActionMenuIsEnable="true"
+                                                OnActionMenuEvent="(context) => OnTeamAction(context)" />
+                            </div>
+                        </div>
+                    </div>
+                }
             </div>
             <div class="w-100 bg-white border p-3 rounded-3">
                 <div class="user-ideas-header border-bottom mb-2">

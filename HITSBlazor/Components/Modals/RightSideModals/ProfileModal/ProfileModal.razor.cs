@@ -6,6 +6,7 @@ using HITSBlazor.Models.Common.Entities;
 using HITSBlazor.Models.Common.Enums;
 using HITSBlazor.Models.Tests.Entities;
 using HITSBlazor.Models.Users.Entities;
+using HITSBlazor.Pages.Projects.ProjectView;
 using HITSBlazor.Services.Auth;
 using HITSBlazor.Services.Modal;
 using HITSBlazor.Services.Profiles;
@@ -13,6 +14,7 @@ using HITSBlazor.Services.Skills;
 using HITSBlazor.Services.TestResults;
 using HITSBlazor.Services.UserSkills;
 using Microsoft.AspNetCore.Components;
+using Microsoft.Extensions.Primitives;
 
 namespace HITSBlazor.Components.Modals.RightSideModals.ProfileModal
 {
@@ -50,8 +52,7 @@ namespace HITSBlazor.Components.Modals.RightSideModals.ProfileModal
         private bool _isChangeSkills = false;
         private bool _isSkillsLoading = true;
 
-        //нужно как то продемонстрировать процесс загрузки идей, но как, если это одна модель, хмммм
-        private bool ideasIsLoading = false;
+        private ProfileModalCategory _activeCategory = ProfileModalCategory.General;
 
         private Profile? Profile { get; set; }
         private UserDataForm? _userDataForm;
@@ -66,7 +67,9 @@ namespace HITSBlazor.Components.Modals.RightSideModals.ProfileModal
         private HashSet<Skill> SelectedDatabaseSkills { get; set; } = [];
         private HashSet<Skill> SelectedDevopsSkills { get; set; } = [];
 
-        private Dictionary<SkillType, ApexChartOptions<Skill>> _skillRadarOptions = [];
+        private readonly Dictionary<SkillType, ApexChartOptions<Skill>> _skillRadarOptions = [];
+
+        private string _searchTeamText = string.Empty;
 
         private static List<TableHeaderItem> HeaderItems { get; } =
         [
@@ -107,6 +110,11 @@ namespace HITSBlazor.Components.Modals.RightSideModals.ProfileModal
                 _skillRadarOptions.Add(skillType, GetRadarChartOptions());
 
             _isLoading = false;
+        }
+
+        private async Task ChangeCategory(ProfileModalCategory category)
+        {
+            _activeCategory = category;
         }
 
         private static UserDataForm ResetUserForm(Profile original) => new()
@@ -213,6 +221,11 @@ namespace HITSBlazor.Components.Modals.RightSideModals.ProfileModal
             _isChangeSkills = false;
         }
 
+        private void SearchTeamExperience(string value)
+        {
+            _searchTeamText = value;
+        }
+
         private static ApexChartOptions<Skill> GetRadarChartOptions() => new()
         {
             Chart = new Chart
@@ -257,7 +270,7 @@ namespace HITSBlazor.Components.Modals.RightSideModals.ProfileModal
 
         private void ShowTeam(Guid teamId) => ModalService.ShowTeamModal(teamId);
 
-        private async Task OnTeamAction(TableActionContext context)
+        private void OnTeamAction(TableActionContext context)
         {
             if (context.Action == MenuAction.View)
                 if (context.Item is Guid guid)
