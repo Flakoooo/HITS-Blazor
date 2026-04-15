@@ -66,6 +66,8 @@ namespace HITSBlazor.Components.Modals.RightSideModals.ProfileModal
         private HashSet<Skill> SelectedDatabaseSkills { get; set; } = [];
         private HashSet<Skill> SelectedDevopsSkills { get; set; } = [];
 
+        private Dictionary<SkillType, ApexChartOptions<Skill>> _skillRadarOptions = [];
+
         private static List<TableHeaderItem> HeaderItems { get; } =
         [
             new TableHeaderItem { Text = "Команда"                              },
@@ -100,6 +102,9 @@ namespace HITSBlazor.Components.Modals.RightSideModals.ProfileModal
                 _isCurrentUser = true;
 
             AuthService.OnAuthStateChanged += _isCurrentUser ? UpdateCurrentProfile : null;
+
+            foreach (var skillType in Enum.GetValues<SkillType>())
+                _skillRadarOptions.Add(skillType, GetRadarChartOptions());
 
             _isLoading = false;
         }

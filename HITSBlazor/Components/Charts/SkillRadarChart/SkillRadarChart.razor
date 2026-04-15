@@ -1,0 +1,29 @@
+﻿@namespace HITSBlazor.Components.Charts.SkillRadarChart
+@using HITSBlazor.Models.Common.Entities
+
+@if (Skills.Count > 0)
+{
+    <ApexChart TItem="Skill"
+               Options="Options"
+               Width="300"
+               Height="200">
+        <ApexPointSeries TItem="Skill"
+                         Items="Skills"
+                         Name="Фактические компетенции"
+                         SeriesType="SeriesType.Radar"
+                         XValue="@(s => s.Name)"
+                         YValue="@(s => 1)"
+                         Color="@Color" />
+    </ApexChart>
+}
+
+@code {
+    [Parameter]
+    public ApexChartOptions<Skill> Options { get; set; } = new();
+
+    [Parameter]
+    public List<Skill> Skills { get; set; } = [];
+
+    [Parameter]
+    public string Color { get; set; } = string.Empty;
+}

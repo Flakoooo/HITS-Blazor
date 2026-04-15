@@ -39,6 +39,8 @@ namespace HITSBlazor.Components.Modals.CenterModals.EndedSprintModal
         private List<CollapseItem> _taskData = [];
         private List<TaskMovementLog> _taskLogs = [];
 
+        private ApexChartOptions<DatePoint> _taskApexChart = new();
+
         private List<TableHeaderItem> _tableTaskLogHeader = 
         [
             new() { Text = "Статус",            InCentered = true,  ColumnClass = "col-3"   },
@@ -60,6 +62,8 @@ namespace HITSBlazor.Components.Modals.CenterModals.EndedSprintModal
                 //TODO: узнать потом у Сани что и как по отчетам
                 new() { Title = "Отчет",    Data = "ну тут нужно брать наверно репорт спринта, при завершении" },
             ];
+
+            _taskApexChart = GetSprintBurndownOptions();
 
             _isLoading = false;
         }
