@@ -6,8 +6,6 @@ using HITSBlazor.Components.Modals.RightSideModals.IdeaModal;
 using HITSBlazor.Components.Modals.RightSideModals.ProfileModal;
 using HITSBlazor.Components.Modals.RightSideModals.TeamModal;
 using HITSBlazor.Components.Typography;
-using HITSBlazor.Models.Projects.Entities;
-using HITSBlazor.Models.Teams.Entities;
 using Microsoft.AspNetCore.Components;
 
 namespace HITSBlazor.Services.Modal

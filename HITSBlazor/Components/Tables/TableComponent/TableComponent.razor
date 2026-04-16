@@ -1,55 +1,119 @@
 ﻿@namespace HITSBlazor.Components.Tables.TableComponent
 @using HITSBlazor.Components.ActionMenus.BaseActionMenu
 @using HITSBlazor.Components.Statuses.BoolStatus
+@using HITSBlazor.Components.Statuses.EnumStatus
 @using HITSBlazor.Components.Tables.TableActionMenu
 @using HITSBlazor.Components.Tables.TableBodyRow
 @using HITSBlazor.Components.Tables.TableHeader
 @using System.Reflection
+@using HITSBlazor.Models.Ideas.Entities
 @using HITSBlazor.Models.Teams.Entities
+@using HITSBlazor.Models.Users.Enums
+@using HITSBlazor.Services.Auth
 @using HITSBlazor.Utils.Attributes
+@using HITSBlazor.Utils.EnumStyles
 @typeparam T
 
-<table class="table table-hover mb-0">
-    <TableHeader TableActionMenuIsEnable="HasActions || TableActionMenuIsEnable" Items="HeaderItems" />
-    <tbody>
-        @foreach (var item in TableData)
-        {
-            <tr>
-                @if (item is TeamExperience teamExp)
+<div class="w-100 d-flex">
+    <div class="w-100">
+        <table class="table table-hover mb-0">
+            @if (HeaderItems.Count > 0)
+            {
+                <TableHeader TableActionMenuIsEnable="HasActions || TableActionMenuIsEnable" 
+                             Items="HeaderItems"
+                             OrderChanged="(value) => ExecuteOrder(value.Item1, value.Item2)" />
+            }
+            <tbody>
+                @foreach (var item in TableData)
                 {
-                    Actions = new Dictionary<MenuAction, object> { [MenuAction.ViewTeamProfile] = teamExp.TeamId };
-                    <TableBodyRow>
-                        <div @onclick="@(() => OnAction(new() { Action = MenuAction.ViewTeamProfile, Item = teamExp.TeamId }))" class="data-link">
-                            <div>@teamExp.TeamName</div>
-                        </div>
-                    </TableBodyRow>
-                    <TableBodyRow IsCentered="true">
-                        @teamExp.StartDate.ToString("dd.MM.yyyy")
-                    </TableBodyRow>
-                    <TableBodyRow IsCentered="true">
-                        <div class="@(teamExp.FinishDate is null ? "text-primary" : string.Empty)">
-                            @(teamExp.FinishDate is null ? "В команде" : teamExp.FinishDate.Value.ToString("dd.MM.yyyy"))
-                        </div>
-                    </TableBodyRow>
-                    <TableBodyRow IsCentered="true">
-                        <BoolStatus Value="teamExp.HasActiveProject" StatusType="BoolStatusType.TeamActiveProject" />
-                    </TableBodyRow>
-                    @if (HasActions)
-                    {
-                        <TableActionMenu ItemId="@GetItemId(item)"
-                                         StrategyPosition="Strategy.Fixed"
-                                         OnAction="OnAction"
-                                         ActionIds="Actions" />
-                    }
+                    <tr>
+                        @if (item is TeamExperience teamExp)
+                        {
+                            Actions = new Dictionary<MenuAction, object> { [MenuAction.View] = teamExp.TeamId };
+                            <TableBodyRow>
+                                <div @onclick="() => OnAction(new() { Action = MenuAction.View, Item = teamExp.TeamId })" class="data-link">
+                                    <div>@teamExp.TeamName</div>
+                                </div>
+                            </TableBodyRow>
+                            <TableBodyRow IsCentered="true">
+                                @teamExp.StartDate.ToString("dd.MM.yyyy")
+                            </TableBodyRow>
+                            <TableBodyRow IsCentered="true">
+                                <div class="@(teamExp.FinishDate is null ? "text-primary" : string.Empty)">
+                                    @(teamExp.FinishDate is null ? "В команде" : teamExp.FinishDate.Value.ToString("dd.MM.yyyy"))
+                                </div>
+                            </TableBodyRow>
+                            <TableBodyRow IsCentered="true">
+                                <BoolStatus Value="teamExp.HasActiveProject" StatusType="BoolStatusType.TeamActiveProject" />
+                            </TableBodyRow>
+                        }
+                        else if (item is Idea idea)
+                        {
+                            Actions = new Dictionary<MenuAction, object> { [MenuAction.View] = idea.Id };
+                            if (AuthService.CurrentUser?.Id == idea.Initiator.Id || AuthService.CurrentUser?.Role is RoleType.Admin)
+                            {
+                                Actions.Add(MenuAction.Edit, idea.Id);
+                                Actions.Add(MenuAction.Delete, idea);
+                            }
+                            <TableBodyRow>
+                                <div class="bi bi-circle-fill fs-6 mt-1 @(idea.IsChecked ? "text-success" : "text-secondary")">
+                                    <div></div>
+                                </div>
+                            </TableBodyRow>
+                            <TableBodyRow>
+                                <div @onclick="() => OnAction(new() { Action = MenuAction.View, Item = idea.Id })" class="data-link">
+                                    @idea.Name
+                                </div>
+                            </TableBodyRow>
+                            <TableBodyRow IsCentered="true">
+                                <EnumStatus Statustype="idea.Status" />
+                            </TableBodyRow>
+                            <TableBodyRow IsCentered="true">
+                                @idea.CreatedAt.ToString("dd.MM.yyyy")
+                            </TableBodyRow>
+                            <TableBodyRow IsCentered="true">
+                                @idea.ModifiedAt.ToString("dd.MM.yyyy")
+                            </TableBodyRow>
+                            <TableBodyRow IsCentered="true">
+                                <div class="@idea.PreAssessment.GetStyle()">
+                                    @idea.PreAssessment
+                                </div>
+                            </TableBodyRow>
+                            <TableBodyRow IsCentered="true">
+                                <div class="@idea.Rating.GetStyle()">
+                                    @idea.Rating
+                                </div>
+                            </TableBodyRow>
+                        }
+                        @if (HasActions)
+                        {
+                            <TableActionMenu ItemId="@GetItemId(item)"
+                                             StrategyPosition="Strategy.Fixed"
+                                             OnAction="OnAction"
+                                             ActionIds="Actions" />
+                        }
+                    </tr>
                 }
-            </tr>
-        }
-    </tbody>
-</table>
+            </tbody>
+        </table>
+    </div>
+    @if (FilterContent is not null)
+    {
+        <div class="d-flex flex-column flex-nowrap gap-2 justify-content-start align-items-stretch w-25 bg-white p-2 ms-2 border-start">
+            @FilterContent
+        </div>
+    }
+</div>
 
 @code {
+    [Inject]
+    private IAuthService AuthService { get; set; } = null!;
+
     [Parameter]
     public List<TableHeaderItem> HeaderItems { get; set; } = [];
+
+    [Parameter]
+    public Func<string?, bool?, Task>? OrderMethod { get; set; }
 
     [Parameter]
     public List<T> TableData { get; set; } = [];
@@ -69,10 +133,20 @@
     [Parameter]
     public bool TableActionMenuIsEnable { get; set; } = false;
 
+    [Parameter]
+    public RenderFragment? FilterContent { get; set; }
+
     private bool HasActions => Actions.Count > 0;
 
     private Guid GetItemId(T item) => ItemIdSelector!(item);
 
     private async Task OnAction(TableActionContext context)
         => await OnActionMenuEvent.InvokeAsync(context);
+
+    private async Task ExecuteOrder(string? value1, bool? value2)
+    {
+        if (OrderMethod is null) return;
+
+        await OrderMethod(value1, value2);
+    }
 }

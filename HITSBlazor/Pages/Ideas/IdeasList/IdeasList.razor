@@ -13,8 +13,10 @@
 @using HITSBlazor.Components.Statuses.EnumStatus
 @using HITSBlazor.Components.Tables.TableActionMenu
 @using HITSBlazor.Components.Tables.TableBodyRow
+@using HITSBlazor.Components.Tables.TableComponent
 @using HITSBlazor.Components.Tables.TableHeader
 @using HITSBlazor.Components.Typography
+@using HITSBlazor.Models.Ideas.Entities
 @using HITSBlazor.Models.Ideas.Enums
 @using HITSBlazor.Models.Users.Enums
 @using HITSBlazor.Utils
@@ -30,6 +32,46 @@
                         OnButtonClick="@(() => NavigationService.NavigateToAsync("ideas/create"))" />
         <ListPageSearch IsLoading="_isLoading" ValueChanged="@((value) => SearchIdea(value))" />
         <!-- TODO: если идей нет, то сообщить пользователю, что идеи не найдены, н это как ИДЕЯ -->
+        <TableComponent T="Idea">
+            <FilterContent>
+                <CheckboxFilter T="EnumViewModel<IdeaStatusType>" 
+                                IsLoading="_isLoading"
+                                Label="Статус" 
+                                AllValues="_filterIdeaStatus"
+                                FilterChanged="LoadIdeasAsync"
+                                @bind-SelectedValues="SelectedStatuses" />
+                @if (AuthService.CurrentUser?.Role is RoleType.Admin or RoleType.Expert)
+                {
+                    <div class="w-100">
+                        @if (_isLoading)
+                        {
+                            <Placeholder Width="w-25" />
+                            <Placeholder />
+                        }
+                        else
+                        {
+                            <Typography FontSize="6" CustomClass="fw-semibold">
+                                Экспертиза
+                            </Typography>
+                            <div class="list-page-filter-choices">
+                                <div class="px-2 py-1 rounded-1 list-page-filter-choice">
+                                    <div class="d-flex">
+                                        <input type="checkbox"
+                                                checked="@_unapprovedIdeasByCurrentUser"
+                                                @onchange="@(e => FindOnConfirmation((bool)e.Value!))"
+                                                class="form-check-input" />
+                                        <Typography CustomClass="form-check-label ms-2">
+                                            Неутвержденные идеи
+                                        </Typography>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+                <ResetFilterButton IsLoading="_isLoading" ResetMethod="ResetFilters" />
+            </FilterContent>
+        </TableComponent>
         <ListPageTable IsLoading="_isLoading">
             <TableContent>
                 <tbody>
@@ -76,44 +118,6 @@
                     }
                 </tbody>
             </TableContent>
-            <FilterContent>
-                <CheckboxFilter T="EnumViewModel<IdeaStatusType>" 
-                                IsLoading="_isLoading"
-                                Label="Статус" 
-                                AllValues="_filterIdeaStatus"
-                                FilterChanged="LoadIdeasAsync"
-                                @bind-SelectedValues="SelectedStatuses" />
-                @if (AuthService.CurrentUser?.Role is RoleType.Admin or RoleType.Expert)
-                {
-                    <div class="w-100">
-                        @if (_isLoading)
-                        {
-                            <Placeholder Width="w-25" />
-                            <Placeholder />
-                        }
-                        else
-                        {
-                            <Typography FontSize="6" CustomClass="fw-semibold">
-                                Экспертиза
-                            </Typography>
-                            <div class="list-page-filter-choices">
-                                <div class="px-2 py-1 rounded-1 list-page-filter-choice">
-                                    <div class="d-flex">
-                                        <input type="checkbox"
-                                                checked="@_unapprovedIdeasByCurrentUser"
-                                                @onchange="@(e => FindOnConfirmation((bool)e.Value!))"
-                                                class="form-check-input" />
-                                        <Typography CustomClass="form-check-label ms-2">
-                                            Неутвержденные идеи
-                                        </Typography>
-                                    </div>
-                                </div>
-                            </div>
-                        }
-                    </div>
-                }
-                <ResetFilterButton IsLoading="_isLoading" ResetMethod="ResetFilters" />
-            </FilterContent>
         </ListPageTable>
     </div>
 </div>

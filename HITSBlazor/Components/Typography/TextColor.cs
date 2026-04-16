@@ -12,6 +12,7 @@
         Dark, //Черный
         Body,
         Black,
-        White
+        White,
+        Inherit
     }
 }

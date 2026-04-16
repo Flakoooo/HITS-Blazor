@@ -9,6 +9,7 @@
 @using HITSBlazor.Components.Modals.Components.ModalHeader
 @using HITSBlazor.Components.NavigationTabs
 @using HITSBlazor.Components.Placeholders.Placeholder
+@using HITSBlazor.Components.Statuses.EnumStatus
 @using HITSBlazor.Components.Tables.TableActionMenu
 @using HITSBlazor.Components.Tables.TableBodyRow
 @using HITSBlazor.Components.Tables.TableComponent
@@ -23,8 +24,6 @@
 @using HITSBlazor.Services.Modal
 @using HITSBlazor.Utils.EnumStyles
 @using HITSBlazor.Utils.Models
-
-<!-- TODO: Когда нужно будет добавлять что то в профиль, те же достижения, думаю сделать справа навигацию как выбор таблиц в модалке команд -->
 
 <div class="right-side-modal flex-column p-3 overflow-y-scroll" @onclick:stopPropagation="true">
     <RightSideModalHeader IsLoading="_isLoading" HeaderText="@($"{Profile?.FirstName} {Profile?.LastName}")" />
@@ -125,7 +124,161 @@
                 </div>
                 @if (_activeCategory is ProfileModalCategory.General)
                 {
-                    <div class="d-flex gap-2">
+                    <div class="d-flex gap-2 mt-3">
+                        <div class="bg-white border rounded-3 p-3 w-100">
+                            <Typography FontSize="5" TextColor="TextColor.Primary" CustomClass="d-block border-bottom pb-2 mb-3">
+                                Компетенции
+                            </Typography>
+                            @if (Profile?.Skills == null || Profile.Skills.Count == 0)
+                            {
+                                <Typography FontSize="6" TextColor="TextColor.Secondary" CustomClass="text-center py-2">
+                                    Компетенции не выбраны
+                                </Typography>
+                            }
+                            else
+                            {
+                                var languageCount = Profile.Skills.Count(s => s.Type == SkillType.Language);
+                                var frameworkCount = Profile.Skills.Count(s => s.Type == SkillType.Framework);
+                                var databaseCount = Profile.Skills.Count(s => s.Type == SkillType.Database);
+                                var devopsCount = Profile.Skills.Count(s => s.Type == SkillType.Devops);
+                
+                                <div class="d-flex flex-wrap gap-3">
+                                    @if (languageCount > 0)
+                                    {
+                                        <div class="d-flex align-items-center gap-2 px-3 py-2 rounded-3 @(EnumViewModel<SkillType>.GetStyle(SkillType.Language))">
+                                            <Typography FontSize="6" TextColor="TextColor.Inherit">
+                                                @(EnumViewModel<SkillType>.GetTranslation(SkillType.Language))
+                                            </Typography>
+                                            <span class="fw-bold">@languageCount</span>
+                                        </div>
+                                    }
+                                    @if (frameworkCount > 0)
+                                    {
+                                        <div class="d-flex align-items-center gap-2 px-3 py-2 rounded-3 @(EnumViewModel<SkillType>.GetStyle(SkillType.Framework))">
+                                            <Typography FontSize="6" TextColor="TextColor.Inherit">
+                                                @(EnumViewModel<SkillType>.GetTranslation(SkillType.Framework))
+                                            </Typography>
+                                            <span class="fw-bold">@frameworkCount</span>
+                                        </div>
+                                    }
+                                    @if (databaseCount > 0)
+                                    {
+                                        <div class="d-flex align-items-center gap-2 px-3 py-2 rounded-3 @(EnumViewModel<SkillType>.GetStyle(SkillType.Database))">
+                                            <Typography FontSize="6" TextColor="TextColor.Inherit">
+                                                @(EnumViewModel<SkillType>.GetTranslation(SkillType.Database))
+                                            </Typography>
+                                            <span class="fw-bold">@databaseCount</span>
+                                        </div>
+                                    }
+                                    @if (devopsCount > 0)
+                                    {
+                                        <div class="d-flex align-items-center gap-2 px-3 py-2 rounded-3 @(EnumViewModel<SkillType>.GetStyle(SkillType.Devops))">
+                                            <Typography FontSize="6" TextColor="TextColor.Inherit">
+                                                @(EnumViewModel<SkillType>.GetTranslation(SkillType.Devops))
+                                            </Typography>
+                                            <span class="fw-bold">@devopsCount</span>
+                                        </div>
+                                    }
+                                </div>
+                            }
+                        </div>
+                        <div class="bg-white border rounded-3 p-3 w-100">
+                            <Typography FontSize="5" TextColor="TextColor.Primary" CustomClass="d-block border-bottom pb-2 mb-3">
+                                Идеи
+                            </Typography>
+                            @if (Profile?.Ideas is null || Profile.Ideas.Count == 0)
+                            {
+                                <Typography FontSize="6" TextColor="TextColor.Secondary" CustomClass="text-center py-2">
+                                    Идей пока нет
+                                </Typography>
+                            }
+                            else
+                            {
+                                var ideasByStatus = Profile.Ideas
+                                    .GroupBy(i => i.Status)
+                                    .ToDictionary(g => g.Key, g => g.Count());
+
+                                <div class="d-flex flex-column gap-2">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <Typography FontSize="5" TextColor="TextColor.Primary">
+                                            Всего идей:
+                                        </Typography>
+                                        <span class="text-dark">@Profile.Ideas.Count</span>
+                                    </div>
+                                    <div class="d-flex flex-wrap gap-3">
+                                        @foreach (var statusGroup in ideasByStatus.OrderBy(x => x.Key))
+                                        {
+                                            <div class="d-flex align-items-center gap-2">
+                                                <EnumStatus Statustype="statusGroup.Key" />
+                                                <span class="text-dark">@statusGroup.Value</span>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                        <div class="bg-white border rounded-3 p-3 w-100">
+                            <Typography FontSize="5" TextColor="TextColor.Primary" CustomClass="d-block border-bottom pb-2 mb-3">
+                                Команды
+                            </Typography>
+                            @if (Profile?.Teams == null || Profile.Teams.Count == 0)
+                            {
+                                <Typography FontSize="6" TextColor="TextColor.Secondary" CustomClass="text-center py-2">
+                                    Нет участия в командах
+                                </Typography>
+                            }
+                            else
+                            {
+                                var activeTeams = Profile.Teams.Count(t => t.FinishDate is null);
+
+                                TimeSpan totalTime = TimeSpan.Zero;
+                                foreach (var team in Profile.Teams)
+                                {
+                                    totalTime += (team.FinishDate ?? DateTime.Now) - team.StartDate;
+                                }
+
+                                var years = totalTime.Days / 365;
+                                var months = (totalTime.Days % 365) / 30;
+
+                                <div class="d-flex flex-wrap gap-4">
+                                    <div class="d-flex flex-column">
+                                        <Typography FontSize="6" TextColor="TextColor.Secondary">
+                                            Всего команд
+                                        </Typography>
+                                        <Typography FontSize="4" TextColor="TextColor.Primary">
+                                            @Profile.Teams.Count
+                                        </Typography>
+                                    </div>
+                                    <div class="d-flex flex-column">
+                                        <Typography FontSize="6" TextColor="TextColor.Secondary">
+                                            Активных команд
+                                        </Typography>
+                                        <Typography FontSize="4" TextColor="TextColor.Primary">
+                                            @activeTeams
+                                        </Typography>
+                                    </div>
+                                    <div class="d-flex flex-column">
+                                        <Typography FontSize="6" TextColor="TextColor.Secondary">
+                                            Общий опыт
+                                        </Typography>
+                                        <Typography FontSize="4" TextColor="TextColor.Primary">
+                                            @if (years > 0)
+                                            {
+                                                <div>@years г. @months мес.</div>
+                                            }
+                                            else if (months > 0)
+                                            {
+                                                <div>@months мес.</div>
+                                            }
+                                            else
+                                            {
+                                                <div>@totalTime.Days дн.</div>
+                                            }
+                                        </Typography>
+                                    </div>
+                                </div>
+                            }
+                        </div>
                     </div>
                 }
                 else if (_activeCategory is ProfileModalCategory.Skills)
@@ -193,40 +346,37 @@
                                 </div>
                             }
                         }
-                        <div class="w-100 d-flex flex-row flex-nowrap justify-content-end mt-3">
-                            @if (_isCurrentUser)
-                            {
+                        @if (_isCurrentUser)
+                        {
+                            <div class="w-100 d-flex flex-row flex-nowrap justify-content-end mt-3">
                                 @if (_isChangeSkills)
                                 {
                                     <div class="d-flex gap-2">
-                                        <Button BtnType="ButtonType.Button"
-                                                Variant="ButtonVariant.Primary"
+                                        <Button Variant="ButtonVariant.Primary"
                                                 Text="Сохранить"
                                                 OnButtonClick="UpdateUserSkills" />
-                                        <Button BtnType="ButtonType.Button"
-                                                Variant="ButtonVariant.Danger"
+                                        <Button Variant="ButtonVariant.Danger"
                                                 Text="Отменить"
                                                 OnButtonClick="() => _isChangeSkills = !_isChangeSkills" />
                                     </div>
                                 }
                                 else
                                 {
-                                    <Button BtnType="ButtonType.Button"
-                                            Variant="ButtonVariant.Light"
+                                    <Button Variant="ButtonVariant.Light"
                                             Text="Изменить стек"
                                             OnButtonClick="ChangeToUpdateSkills" />
                                 }
-                            }
-                        </div>
+                            </div>                            
+                        }
                     </div>
                 }
                 else if (_activeCategory is ProfileModalCategory.Ideas)
                 {
-                    <div class="d-flex gap-2 mt-3">
+                    <div class="d-flex gap-2 @(Profile?.Ideas.Count > 0 ? "mt-3" : string.Empty)">
                         <div class="w-100 d-flex flex-column flex-nowrap gap-2">
                             @if (Profile?.Ideas.Count == 0)
                             {
-                                <Typography FontSize="6" TextColor="TextColor.Secondary">
+                                <Typography FontSize="6" TextColor="TextColor.Secondary" CustomClass="d-flex w-100 justify-content-center mt-3">
                                     Идей пока нет
                                 </Typography>
                             }
@@ -242,15 +392,13 @@
                                                         <div @onclick="@(() => ShowIdea(idea.Id))" class="user-ideas-idea-link data-link fs-6 w-100">
                                                             @idea.Name
                                                         </div>
-                                                        <div class="px-2 py-1 rounded-4 fs-6 text-center @(EnumViewModel<IdeaStatusType>.GetStyle(idea.Status))">
-                                                            @(EnumViewModel<IdeaStatusType>.GetTranslation(idea.Status))
-                                                        </div>
+                                                        <EnumStatus Statustype="idea.Status" CustomClass="fs-6 text-center" />
                                                     </div>
                                                     <div @onclick="@(() => collapse.Toggle())" class="d-flex align-items-center gap-1" style="cursor: pointer;">
                                                         <Typography FontSize="6" TextColor="TextColor.Primary">
                                                             Описание
                                                         </Typography>
-                                                        <i class="bi bi-caret-down text-primary"></i>
+                                                        <i class="bi bi-caret-down text-primary flip-icon @(collapse.ExpandedStatus ? "active" : string.Empty)"></i>
                                                     </div>
                                                 </div>
                                             </MainContent>
@@ -271,137 +419,74 @@
                 else if (_activeCategory is ProfileModalCategory.Teams)
                 {
                     <div class="d-flex gap-2 flex-column">
-                        <InputSearch IsLoading="_isLoading" ValueChanged="(value) => SearchTeamExperience(value)" />
-                        <div class="w-100 d-flex">
-                            <div class="w-100">
-                                <TableComponent T="TeamExperience"
-                                                HeaderItems="HeaderItems"
-                                                TableData="Profile?.Teams ?? []"
-                                                ItemIdSelector="@(item => item.TeamId)"
-                                                TableActionMenuIsEnable="true"
-                                                OnActionMenuEvent="(context) => OnTeamAction(context)" />
-                            </div>
+                        @if (Profile?.Teams.Count == 0)
+                        {
+                            <Typography FontSize="6" TextColor="TextColor.Secondary" CustomClass="d-flex w-100 justify-content-center mt-3">
+                                Нет участия в командах
+                            </Typography>
+                        }
+                        else
+                        {
+                            <InputSearch IsLoading="_isLoading" ValueChanged="(value) => SearchTeamExperience(value)" />
+                            <TableComponent T="TeamExperience"
+                                            HeaderItems="HeaderItems"
+                                            TableData="Profile?.Teams ?? []"
+                                            ItemIdSelector="@(item => item.TeamId)"
+                                            TableActionMenuIsEnable="true"
+                                            OnActionMenuEvent="(context) => OnTeamAction(context)" />
+                        }
+                    </div>
+                }
+                else if (_activeCategory is ProfileModalCategory.Tests)
+                {
+                    <div class="d-flex gap-2 flex-column">
+                        <div class="user-tests-content mt-3">
+                            <Typography FontSize="6" CustomClass="text-decoration-underline">
+                                Тест Белбина:
+                            </Typography>
+                            @if (BelbinTestResult is null)
+                            {
+                                <Typography FontSize="6" TextColor="TextColor.Secondary">
+                                    Вы не прошли тест
+                                </Typography>
+                            }
+                            else
+                            {
+                                <p>@((MarkupString)BelbinTestResult.TestResultValue.Replace("\n", "<br>"))</p>
+                            }
+                        </div>
+                        <div class="user-tests-content mt-3">
+                            <Typography FontSize="6" CustomClass="text-decoration-underline">
+                                Айзенка личностный опросник:
+                            </Typography>
+                            @if (TemperTestResult is null)
+                            {
+                                <Typography FontSize="6" TextColor="TextColor.Secondary">
+                                    Вы не прошли тест
+                                </Typography>
+                            }
+                            else
+                            {
+                                <p>@((MarkupString)TemperTestResult.TestResultValue.Replace("\n", "<br>"))</p>
+                            }
+                        </div>
+                        <div class="user-tests-content mt-3">
+                            <Typography FontSize="6" CustomClass="text-decoration-underline">
+                                Опросник «Стиль мышления»:
+                            </Typography>
+                            @if (MindTestResult is null)
+                            {
+                                <Typography FontSize="6" TextColor="TextColor.Secondary">
+                                    Вы не прошли тест
+                                </Typography>
+                            }
+                            else
+                            {
+                                <p>@((MarkupString)MindTestResult.TestResultValue.Replace("\n", "<br>"))</p>
+                            }
                         </div>
                     </div>
                 }
-            </div>
-            <div class="w-100 bg-white border p-3 rounded-3">
-                <div class="user-ideas-header border-bottom mb-2">
-                    <Typography FontSize="5" TextColor="TextColor.Primary">
-                        Портфолио
-                    </Typography>
-                </div>
-                <div class="w-100 bg-white">
-                    <div class="py-2 d-flex justify-content-between">
-                        <div class="w-50">
-                            <div class="w-100">
-                                <div class="input-group">
-                                    <Typography FontSize="6" CustomClass="input-group-text">
-                                        <i class="bi bi-search"></i>
-                                    </Typography>
-                                    <input type="text" placeholder="Поиск" class="form-control rounded-end" />
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="w-100 d-flex">
-                        <div class="w-100">
-                            <table class="table table-hover mb-0">
-                                <TableHeader TableActionMenuIsEnable="true" Items="HeaderItems" />
-                                <tbody>
-                                    @foreach (var teamExp in Profile?.Teams ?? [])
-                                    {
-                                        <tr>
-                                            <TableBodyRow>
-                                                <div @onclick="@(() => ShowTeam(teamExp.TeamId))" class="data-link">
-                                                    <div>@teamExp.TeamName</div>
-                                                </div>
-                                            </TableBodyRow>
-                                            <TableBodyRow IsCentered="true">
-                                                <div>@teamExp.StartDate.ToString("dd.MM.yyyy")</div>
-                                            </TableBodyRow>
-                                            <TableBodyRow IsCentered="true">
-                                                <div class="@(teamExp.FinishDate is null ? "text-primary" : string.Empty)">
-                                                    <div>@(teamExp.FinishDate is null ? "В команде" : teamExp.FinishDate.Value.ToString("dd.MM.yyyy"))</div>
-                                                </div>
-                                            </TableBodyRow>
-                                            <TableBodyRow IsCentered="true">
-                                                @if (teamExp.HasActiveProject)
-                                                {
-                                                    <div class="px-2 py-1 rounded-4 bg-warning-subtle text-warning">
-                                                        <div>В работе</div>
-                                                    </div>
-                                                }
-                                                else
-                                                {
-                                                    <div class="px-2 py-1 rounded-4 bg-primary-subtle text-primary">
-                                                        <div>В поисках</div>
-                                                    </div>
-                                                }
-                                            </TableBodyRow>
-                                            <TableActionMenu ItemId="@teamExp.TeamId"
-                                                             StrategyPosition="Strategy.Fixed"
-                                                             OnAction="OnTeamAction"
-                                                             ActionIds="@(new Dictionary<MenuAction, object> { [MenuAction.View] = teamExp.TeamId })" />
-                                        </tr>
-                                    }
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="w-100 bg-white border p-3 rounded-3">
-                <div class="user-test-header border-bottom">
-                    <Typography FontSize="5" TextColor="TextColor.Primary">
-                        Результаты тестирований
-                    </Typography>
-                </div>
-                <div class="user-tests-content mt-3">
-                    <Typography FontSize="6" CustomClass="text-decoration-underline">
-                        Тест Белбина:
-                    </Typography>
-                    @if (BelbinTestResult is null)
-                    {
-                        <Typography FontSize="6" TextColor="TextColor.Secondary">
-                            Вы не прошли тест
-                        </Typography>
-                    }
-                    else
-                    {
-                        <p>@((MarkupString)BelbinTestResult.TestResultValue.Replace("\n", "<br>"))</p>
-                    }
-                </div>
-                <div class="user-tests-content mt-3">
-                    <Typography FontSize="6" CustomClass="text-decoration-underline">
-                        Айзенка личностный опросник:
-                    </Typography>
-                    @if (TemperTestResult is null)
-                    {
-                        <Typography FontSize="6" TextColor="TextColor.Secondary">
-                            Вы не прошли тест
-                        </Typography>
-                    }
-                    else
-                    {
-                        <p>@((MarkupString)TemperTestResult.TestResultValue.Replace("\n", "<br>"))</p>
-                    }
-                </div>
-                <div class="user-tests-content mt-3">
-                    <Typography FontSize="6" CustomClass="text-decoration-underline">
-                        Опросник «Стиль мышления»:
-                    </Typography>
-                    @if (MindTestResult is null)
-                    {
-                        <Typography FontSize="6" TextColor="TextColor.Secondary">
-                            Вы не прошли тест
-                        </Typography>
-                    }
-                    else
-                    {
-                        <p>@((MarkupString)MindTestResult.TestResultValue.Replace("\n", "<br>"))</p>
-                    }
-                </div>
             </div>
         </div>
     </div>

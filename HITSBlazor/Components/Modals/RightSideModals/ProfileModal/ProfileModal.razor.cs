@@ -52,7 +52,7 @@ namespace HITSBlazor.Components.Modals.RightSideModals.ProfileModal
         private bool _isChangeSkills = false;
         private bool _isSkillsLoading = true;
 
-        private ProfileModalCategory _activeCategory = ProfileModalCategory.General;
+        private static ProfileModalCategory _activeCategory = ProfileModalCategory.General;
 
         private Profile? Profile { get; set; }
         private UserDataForm? _userDataForm;
