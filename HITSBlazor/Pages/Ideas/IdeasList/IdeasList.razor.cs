@@ -113,6 +113,18 @@ namespace HITSBlazor.Pages.Ideas.IdeasList
         private async Task ShowIdea(Guid ideaId)
             => await NavigationService.NavigateToAsync($"/ideas/list/{ideaId}");
 
+        private Dictionary<MenuAction, object> GetTableActions(Idea idea)
+        {
+            var actions = new Dictionary<MenuAction, object> { [MenuAction.View] = idea.Id };
+            if (AuthService.CurrentUser?.Id == idea.Initiator.Id || AuthService.CurrentUser?.Role is RoleType.Admin)
+            {
+                actions.Add(MenuAction.Edit, idea.Id);
+                actions.Add(MenuAction.Delete, idea);
+            }
+
+            return actions;
+        }
+
         private async Task OnIdeaAction(TableActionContext context)
         {
             if (context.Action == MenuAction.View)

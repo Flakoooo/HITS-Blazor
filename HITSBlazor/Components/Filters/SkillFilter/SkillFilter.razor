@@ -23,10 +23,10 @@
             Стек технологий
         </Typography>
         <Input Placeholder="Найти" CustomClass="my-1" Value="@SeacrhSkillText" ValueChanged="@((value) => SearchSkill(value))" />
-        <div class="list-page-filter-choices">
+        <div class="filter-choices">
             @foreach (var skill in _skills)
             {
-                <div class="list-page-filter-choice px-2 py-1 rounded-1">
+                <div class="filter-choice px-2 py-1 rounded-1">
                     <div class="d-flex">
                         <input type="checkbox"
                                checked="@SelectedSkillIds.Contains(skill.Id)"
@@ -40,7 +40,7 @@
                     </div>
                     @if (_userSkillIds.Contains(skill.Id))
                     {
-                        <i class="icon bi bi-star-fill text-warning"></i>
+                        <i class="bi bi-star-fill text-warning"></i>
                     }
                 </div>
             }

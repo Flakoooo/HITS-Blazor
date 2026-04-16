@@ -15,14 +15,14 @@
 @using HITSBlazor.Models.Users.Enums
 @using HITSBlazor.Utils.Models
 
-<div class="page-content-with-header overflow-y-scroll bg-white">
+<div class="overflow-y-scroll bg-white h-auto">
     @if (_isLoading)
     {
         <TablePlaceholder />
     }
     else
     {
-        <div class="w-100 bg-white p-3">
+        <div class="w-100 p-3">
             <ListPageHeader IsLoading="_isLoading"
                             HeaderText="@($"Список бирж: {_markets.Count}")" 
                             ShowCreateButton="true"

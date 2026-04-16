@@ -29,10 +29,10 @@
         {
             <Input Placeholder="Найти" CustomClass="my-1" Value="@SearchText" ValueChanged="@((value) => SearchData(value))" />
         }
-        <div class="list-page-filter-choices">
+        <div class="filter-choices">
             @foreach (var value in _values)
             {
-                <div class="list-page-filter-choice px-2 py-1 rounded-1" @onclick="() => SelectValue(value)">
+                <div class="filter-choice px-2 py-1 rounded-1" @onclick="() => SelectValue(value)">
                     <div class="d-flex">
                         <input type="checkbox"
                                checked="@SelectedValues.Contains(value)"

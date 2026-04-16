@@ -1,0 +1,10 @@
+﻿@namespace HITSBlazor.Components.Filters.FilterContainer
+
+<div class="filter w-25 bg-white p-2 ms-2 border-start">
+    @ChildContent
+</div>
+
+@code {
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+}

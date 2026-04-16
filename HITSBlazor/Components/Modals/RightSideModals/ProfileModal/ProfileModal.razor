@@ -9,6 +9,7 @@
 @using HITSBlazor.Components.Modals.Components.ModalHeader
 @using HITSBlazor.Components.NavigationTabs
 @using HITSBlazor.Components.Placeholders.Placeholder
+@using HITSBlazor.Components.Statuses.BoolStatus
 @using HITSBlazor.Components.Statuses.EnumStatus
 @using HITSBlazor.Components.Tables.TableActionMenu
 @using HITSBlazor.Components.Tables.TableBodyRow
@@ -428,12 +429,36 @@
                         else
                         {
                             <InputSearch IsLoading="_isLoading" ValueChanged="(value) => SearchTeamExperience(value)" />
-                            <TableComponent T="TeamExperience"
-                                            HeaderItems="HeaderItems"
-                                            TableData="Profile?.Teams ?? []"
-                                            ItemIdSelector="@(item => item.TeamId)"
-                                            TableActionMenuIsEnable="true"
-                                            OnActionMenuEvent="(context) => OnTeamAction(context)" />
+                            <TableComponent HeaderItems="HeaderItems" TableActionMenuIsEnable="true">
+                                <TableContent>
+                                    @foreach (var teamExp in Profile?.Teams ?? [])
+                                    {
+                                        <tr>
+                                            <TableBodyRow>
+                                                <div class="data-link" 
+                                                     @onclick="() => OnTeamAction(new() { Action = MenuAction.View, Item = teamExp.TeamId })">
+                                                    @teamExp.TeamName
+                                                </div>
+                                            </TableBodyRow>
+                                            <TableBodyRow IsCentered="true">
+                                                @teamExp.StartDate.ToString("dd.MM.yyyy")
+                                            </TableBodyRow>
+                                            <TableBodyRow IsCentered="true">
+                                                <div class="@(teamExp.FinishDate is null ? "text-primary" : string.Empty)">
+                                                    @(teamExp.FinishDate is null ? "В команде" : teamExp.FinishDate.Value.ToString("dd.MM.yyyy"))
+                                                </div>
+                                            </TableBodyRow>
+                                            <TableBodyRow IsCentered="true">
+                                                <BoolStatus Value="teamExp.HasActiveProject" StatusType="BoolStatusType.TeamActiveProject" />
+                                            </TableBodyRow>
+                                            <TableActionMenu ItemId="@teamExp.TeamId"
+                                                             StrategyPosition="Strategy.Fixed"
+                                                             OnAction="OnTeamAction"
+                                                             ActionIds="new() { [MenuAction.View] = teamExp.TeamId }" />
+                                        </tr>
+                                    }
+                                </TableContent>
+                            </TableComponent>
                         }
                     </div>
                 }
