@@ -1,5 +1,4 @@
 ﻿using HITSBlazor.Components.ActionMenus.BaseActionMenu;
-using HITSBlazor.Models.Common.Enums;
 using HITSBlazor.Models.Ideas.Entities;
 using HITSBlazor.Models.Ideas.Enums;
 using HITSBlazor.Models.Users.Enums;
@@ -10,13 +9,14 @@ using HITSBlazor.Services.Modal;
 using HITSBlazor.Utils.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
 
 namespace HITSBlazor.Pages.Ideas.IdeasList
 {
     [Authorize]
     [Route("/ideas/list")]
     [Route("/ideas/list/{IdeaId}")]
-    public partial class IdeasList : IDisposable
+    public partial class IdeasList : IDisposable, IAsyncDisposable
     {
         [Inject]
         private IAuthService AuthService { get; set; } = null!;
@@ -30,36 +30,31 @@ namespace HITSBlazor.Pages.Ideas.IdeasList
         [Inject]
         private ModalService ModalService { get; set; } = null!;
 
+        [Inject] 
+        private IJSRuntime JSRuntime { get; set; } = null!;
+
         [Parameter]
         public string IdeaId { get; set; } = string.Empty;
 
         private bool _isLoading = true;
+        private bool _isLoadingMore = false;
+
+        private ElementReference _tableContainer;
+        private DotNetObjectReference<IdeasList>? _dotNetHelper;
+        private IJSObjectReference? _jsModule;
+        private bool _isInitialized = false;
 
         private string? _searchText = null;
+
         private List<Idea> _ideas = [];
+        private int _currentPage = 1;
+        private const int PageSize = 20;
+        private int _totalCount = 0;
 
         private readonly List<EnumViewModel<IdeaStatusType>> _filterIdeaStatus
             = [.. Enum.GetValues<IdeaStatusType>().Select(s => new EnumViewModel<IdeaStatusType>(s))];
 
         private HashSet<EnumViewModel<IdeaStatusType>> SelectedStatuses { get; set; } = [];
-        private bool _unapprovedIdeasByCurrentUser = false;
-
-        private async Task LoadIdeasAsync()
-        {
-            IdeasQueryType queryType = IdeasQueryType.All;
-
-            if (AuthService.CurrentUser?.Role is RoleType.Initiator)
-                queryType = IdeasQueryType.Initiator;
-            else if (_unapprovedIdeasByCurrentUser)
-                queryType = IdeasQueryType.OnConfirmation;
-
-            _ideas = await IdeasService.GetIdeasAsync(
-                    queryType: queryType,
-                    searchText: _searchText,
-                    statusTypes: [.. SelectedStatuses.Select(s => s.Value)]
-                );
-            StateHasChanged();
-        }
 
         protected override async Task OnInitializedAsync()
         {
@@ -69,49 +64,148 @@ namespace HITSBlazor.Pages.Ideas.IdeasList
             IdeasService.OnIdeasStateChanged += StateHasChanged;
             ModalService.OnRightSideModalsUpdated += IdeaModalHasClosed;
 
-            var currentUser = AuthService.CurrentUser;
-            if (currentUser?.Role == RoleType.Member)
+            _totalCount = await IdeasService.GetTotalIdeaCount();
+
+            SetFilterByRole(AuthService.CurrentUser?.Role);
+
+            await LoadIdeasAsync();
+
+            if (!string.IsNullOrWhiteSpace(IdeaId) && Guid.TryParse(IdeaId, out Guid ideaId))
+                await ShowIdea(ideaId);
+
+            _isLoading = false;
+            _isInitialized = true;
+        }
+
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            if (firstRender && _isInitialized)
+            {
+                _dotNetHelper = DotNetObjectReference.Create(this);
+                try
+                {
+                    _jsModule = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "./js/infiniteScroll.js");
+                    await _jsModule.InvokeVoidAsync("initializeInfiniteScroll", _tableContainer, _dotNetHelper);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Failed to initialize infinite scroll: {ex.Message}");
+                }
+            }
+        }
+
+        [JSInvokable]
+        public async Task LoadMoreItems()
+        {
+            if (_isLoadingMore || _isLoading) return;
+
+            if (_ideas.Count >= _totalCount)
+            {
+                if (_jsModule != null)
+                {
+                    await _jsModule.InvokeVoidAsync("stopInfiniteScroll");
+                }
+                return;
+            }
+
+            await LoadIdeasAsync(append: true);
+        }
+
+        private async Task LoadIdeasAsync(bool append = false, int page = 1)
+        {
+            if (!append)
+            {
+                _isLoading = true;
+                _currentPage = page;
+                _ideas.Clear();
+            }
+            else
+            {
+                _isLoadingMore = true;
+            }
+
+            StateHasChanged();
+
+            var newIdeas = await IdeasService.GetIdeasAsync(
+                _currentPage,
+                searchText: _searchText,
+                statusTypes: [.. SelectedStatuses.Select(s => s.Value)]
+            );
+
+            if (newIdeas.Count > 0)
+            {
+                if (append)
+                    _ideas.AddRange(newIdeas);
+                else
+                {
+                    _ideas.Clear();
+                    _ideas.AddRange(newIdeas);
+                }
+                ++_currentPage;
+            }
+
+            if (!append)
+            {
+                _totalCount = await IdeasService.GetTotalIdeaCount(
+                    searchText: _searchText,
+                    statusTypes: [.. SelectedStatuses.Select(s => s.Value)]
+                );
+            }
+            else
+            {
+                if (_ideas.Count > _totalCount)
+                    _totalCount = _ideas.Count;
+            }
+
+            _isLoadingMore = false;
+
+            StateHasChanged();
+        }
+
+        private void SetFilterByRole(RoleType? activeRole)
+        {
+            if (activeRole is RoleType.Member)
             {
                 SelectedStatuses.Add(new(IdeaStatusType.Confirmed));
                 SelectedStatuses.Add(new(IdeaStatusType.OnMarket));
             }
-            else if (currentUser?.Role == RoleType.ProjectOffice)
+            else if (activeRole is RoleType.ProjectOffice)
             {
                 SelectedStatuses.Add(new(IdeaStatusType.OnApproval));
                 SelectedStatuses.Add(new(IdeaStatusType.Confirmed));
             }
-
-            await LoadIdeasAsync();
-
-            _isLoading = false;
-        }
-
-        protected override async Task OnParametersSetAsync()
-        {
-            if (Guid.TryParse(IdeaId, out Guid guid))
-                ModalService.ShowIdeaModal(guid);
+            else if (activeRole is RoleType.Expert)
+            {
+                SelectedStatuses.Add(new(IdeaStatusType.OnConfirmation));
+            }
+            else
+            {
+                SelectedStatuses.Clear();
+            }
         }
 
         private async Task SearchIdea(string value)
         {
             _searchText = value;
-            await LoadIdeasAsync();
-        }
-
-        private async Task FindOnConfirmation(bool isChecked)
-        {
-            _unapprovedIdeasByCurrentUser = isChecked;
+            _currentPage = 1;
+            _totalCount = 0;
             await LoadIdeasAsync();
         }
 
         private async Task ResetFilters()
         {
             SelectedStatuses.Clear();
+            _currentPage = 1;
+            _totalCount = 0;
             await LoadIdeasAsync();
         }
 
         private async Task ShowIdea(Guid ideaId)
-            => await NavigationService.NavigateToAsync($"/ideas/list/{ideaId}");
+        {
+            if (AuthService.CurrentUser?.Role is RoleType.Admin)
+                await NavigationService.NavigateToAsync($"/ideas/list/{ideaId}");
+            else ModalService.ShowIdeaModal(ideaId);
+        }
 
         private Dictionary<MenuAction, object> GetTableActions(Idea idea)
         {
@@ -127,14 +221,11 @@ namespace HITSBlazor.Pages.Ideas.IdeasList
 
         private async Task OnIdeaAction(TableActionContext context)
         {
-            if (context.Action == MenuAction.View)
+            if (context.Item is Guid guid)
             {
-                if (context.Item is Guid guid)
+                if (context.Action == MenuAction.View)
                     await ShowIdea(guid);
-            }
-            else if (context.Action == MenuAction.Edit)
-            {
-                if (context.Item is Guid guid)
+                else if (context.Action == MenuAction.Edit)
                     await NavigationService.NavigateToAsync($"/ideas/create/{guid}");
             }
             else if (context.Action == MenuAction.Delete)
@@ -148,33 +239,17 @@ namespace HITSBlazor.Pages.Ideas.IdeasList
 
         private async void UserRoleHasChanged(RoleType? role)
         {
-            if (role is RoleType.Expert)
-                _unapprovedIdeasByCurrentUser = true;
-            else
-                _unapprovedIdeasByCurrentUser = false;
-
-            var currentUser = AuthService.CurrentUser;
-            if (currentUser?.Role == RoleType.Member)
-            {
-                SelectedStatuses.Add(new(IdeaStatusType.Confirmed));
-                SelectedStatuses.Add(new(IdeaStatusType.OnMarket));
-            }
-            else if (currentUser?.Role == RoleType.ProjectOffice)
-            {
-                SelectedStatuses.Add(new(IdeaStatusType.OnApproval));
-                SelectedStatuses.Add(new(IdeaStatusType.Confirmed));
-            }
-            else SelectedStatuses.Clear();
+            SetFilterByRole(AuthService.CurrentUser?.Role);
 
             await LoadIdeasAsync();
+
             StateHasChanged();
         }
 
         private async void IdeaModalHasClosed()
         {
-            if (ModalService.SideModals.Count != 0) return;
-
-            await NavigationService.NavigateToAsync($"/ideas/list");
+            if (AuthService.CurrentUser?.Role is RoleType.Admin && ModalService.SideModals.Count == 0)
+                await NavigationService.NavigateToAsync($"/ideas/list");
         }
 
         public void Dispose()
@@ -182,6 +257,14 @@ namespace HITSBlazor.Pages.Ideas.IdeasList
             AuthService.OnActiveRoleChanged -= UserRoleHasChanged;
             IdeasService.OnIdeasStateChanged -= StateHasChanged;
             ModalService.OnRightSideModalsUpdated -= IdeaModalHasClosed;
+
+            _dotNetHelper?.Dispose();
+        }
+
+        public async ValueTask DisposeAsync()
+        {
+            if (_jsModule != null)
+                await _jsModule.DisposeAsync();
         }
     }
 }

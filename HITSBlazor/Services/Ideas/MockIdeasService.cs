@@ -11,70 +11,68 @@ using HITSBlazor.Utils.Models;
 
 namespace HITSBlazor.Services.Ideas
 {
+    //TODO: реализовать получение идей постранично, подгружая нужное количество
     public class MockIdeasService(IAuthService authService, GlobalNotificationService globalNotificationService) : IIdeasService
     {
         private readonly IAuthService _authService = authService;
         private readonly GlobalNotificationService _globalNotificationService = globalNotificationService;
 
-        private readonly Dictionary<IdeasQueryType, CacheEntry<List<Idea>>> _cache = [];
-        private readonly TimeSpan _cacheLifetime = TimeSpan.FromMinutes(5);
-
         public event Action? OnIdeasStateChanged;
 
-        private List<Idea> GetCurrentIdeas(IdeasQueryType queryType)
-        {
-            return queryType switch
-            {
-                IdeasQueryType.All => MockIdeas.GetAllIdeas(),
-                IdeasQueryType.Initiator => _authService.CurrentUser is not null
-                    ? MockIdeas.GetIdeasByInitiatorId(_authService.CurrentUser.Id)
-                    : [],
-                IdeasQueryType.OnConfirmation => MockIdeas.GetIdeasOnCofirmation(),
-                _ => [],
-            };
-        }
-
-        private async Task<bool> CanAccessAsync(IdeasQueryType queryType) 
-            => _authService.CurrentUser is not null && queryType switch 
-            {
-                IdeasQueryType.All => true,
-                IdeasQueryType.Initiator => _authService.CurrentUser.Role is RoleType.Initiator or RoleType.Admin,
-                IdeasQueryType.OnConfirmation => _authService.CurrentUser.Role is RoleType.Expert or RoleType.Admin,
-                _ => false
-            };
+        private HashSet<RoleType> _acceptableRoles =
+        [
+            RoleType.Initiator,
+            RoleType.Member,
+            RoleType.ProjectOffice,
+            RoleType.Expert,
+            RoleType.Admin,
+            RoleType.Teacher
+        ];
 
         public async Task<List<Idea>> GetIdeasAsync(
-            IdeasQueryType queryType,
-            string? searchText = null,
-            HashSet<IdeaStatusType>? statusTypes = null
+            int page,
+            string? searchText,
+            HashSet<IdeaStatusType>? statusTypes
         )
         {
-            if (!await CanAccessAsync(queryType)) return [];
+            var activeRole = _authService.CurrentUser?.Role;
+            if (activeRole is null || !_acceptableRoles.Contains((RoleType)activeRole)) return [];
 
-            List<Idea> ideas;
+            if (activeRole is RoleType.Initiator && _authService.CurrentUser is not null)
+                return MockIdeas.GetInitiatorIdeasByQueryParams(
+                    _authService.CurrentUser.Id,
+                    page,
+                    searchText: searchText,
+                    statusTypes: statusTypes
+                );
 
-            if (_cache.TryGetValue(queryType, out var cache) && !cache.IsExpired(_cacheLifetime))
-            {
-                ideas = cache.Data;
-            }
-            else
-            {
-                ideas = GetCurrentIdeas(queryType);
-                _cache[queryType] = new CacheEntry<List<Idea>>(ideas);
-            }
-
-            var query = ideas.AsEnumerable();
-
-            if (statusTypes?.Count > 0)
-                query = query.Where(i => statusTypes.Contains(i.Status));
-
-            if (!string.IsNullOrWhiteSpace(searchText))
-                query = query.Where(i => i.Name.Contains(searchText, StringComparison.CurrentCultureIgnoreCase));
-
-            return [.. query];
+            return MockIdeas.GetAllIdeasByQueryParams(
+                    page,
+                    searchText: searchText,
+                    statusTypes: statusTypes
+                );
         }
 
         public async Task<Idea?> GetIdeaByIdAsync(Guid id) => MockIdeas.GetIdeaById(id);
+        public async Task<int> GetTotalIdeaCount(
+            string? searchText, HashSet<IdeaStatusType>? statusTypes
+        )
+        {
+            var activeRole = _authService.CurrentUser?.Role;
+            if (activeRole is null || !_acceptableRoles.Contains((RoleType)activeRole)) return 0;
+
+            if (activeRole is RoleType.Initiator && _authService.CurrentUser is not null)
+                return MockIdeas.GetTotalInitiatorIdeasCount(
+                    _authService.CurrentUser.Id,
+                    searchText: searchText,
+                    statusTypes: statusTypes
+                );
+
+            return MockIdeas.GetTotalIdeasCount(
+                    searchText: searchText,
+                    statusTypes: statusTypes
+                );
+        }
 
         public async Task<Idea?> CreateNewIdeaAsync(IdeasCreateModel ideasCreateModel)
         {
@@ -96,20 +94,13 @@ namespace HITSBlazor.Services.Ideas
             else if (ideasCreateModel.Status == IdeaStatusType.OnApproval)
                 _globalNotificationService.ShowSuccess("Идея отправлена на согласование");
 
-            _cache.Clear();
-
             return newIdea;
         }
 
+        //TODO: как то в UI отслеживать изменение, походу передавать туда Id идеи и true
         public async Task<bool> UpdateCheckedIdeaAsync(Guid ideaId)
         {
             if (!MockIdeas.CheckIdea(ideaId)) return false;
-
-            foreach (var cache in _cache.Values)
-            {
-                var index = cache.Data.FindIndex(i => i.Id == ideaId);
-                if (index >= 0) cache.Data[index].IsChecked = true;
-            }
 
             OnIdeasStateChanged?.Invoke();
             return true;
@@ -130,12 +121,12 @@ namespace HITSBlazor.Services.Ideas
                 return false;
             }
 
-            _cache.Clear();
             _globalNotificationService.ShowSuccess("Идея изменена");
 
             return true;
         }
 
+        //TODO: как то обновлять в UI статус идеи
         public async Task<bool> UpdateIdeaStatusAsync(Guid ideaId, IdeaStatusType ideaStatus)
         {
             var updatedIdea = MockIdeas.UpdateIdeaStatus(ideaId, ideaStatus);
@@ -145,20 +136,11 @@ namespace HITSBlazor.Services.Ideas
                 return false;
             }
 
-            foreach (var cache in _cache)
-            {
-                var index = cache.Value.Data.FindIndex(i => i.Id == ideaId);
-                if (index >= 0)
-                {
-                    cache.Value.Data[index].Status = updatedIdea.Status;
-                    cache.Value.Data[index].ModifiedAt = updatedIdea.ModifiedAt;
-                }
-            }
-
             OnIdeasStateChanged?.Invoke();
             return true;
         }
 
+        //TODO: как то удалять из UI
         public async Task<bool> DeleteIdeaAsync(Idea idea)
         {
             if (!MockIdeas.DeleteIdea(idea))
@@ -166,8 +148,6 @@ namespace HITSBlazor.Services.Ideas
                 _globalNotificationService.ShowError("Не удалось удалить идею");
                 return false;
             }
-
-            foreach (var cache in _cache) cache.Value.Data.Remove(idea);
 
             return true;
         }

@@ -41,7 +41,7 @@ namespace HITSBlazor.Utils.Mocks.Users
                 StudyGroup = user.StudyGroup,
 
                 Skills = MockUsersSkills.GetUserSkillsById(user.Id) ?? [],
-                Ideas = MockIdeas.GetIdeasByInitiatorId(user.Id),
+                Ideas = MockIdeas.GetInitiatorIdeasByQueryParams(user.Id, 1),
                 Teams = MockTeamExperiences.GetTeamExperiencesByUserId(user.Id),
                 UserTag = userTag?.UserTag,
                 IsUserTagVisible = userTag?.IsVisible

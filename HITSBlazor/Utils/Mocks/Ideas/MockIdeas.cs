@@ -28,7 +28,7 @@ namespace HITSBlazor.Utils.Mocks.Ideas
         public static Guid ArmatureId { get; } = Guid.NewGuid();
 
         private static readonly Random _random = new();
-        private static readonly List<Idea> _ideas = CreateIdeas();
+        private static readonly List<Idea> _ideas = [.. CreateIdeas(), .. CreateIdeas(), .. CreateIdeas()];
 
         private static List<Idea> CreateIdeas()
         {
@@ -290,16 +290,78 @@ namespace HITSBlazor.Utils.Mocks.Ideas
             return ideas;
         }
 
-        public static List<Idea> GetAllIdeas() => [.. _ideas];
+        public static List<Idea> GetAllIdeasByQueryParams(
+            int page,
+            int pageSize = 20,
+            string? searchText = null, 
+            HashSet<IdeaStatusType>? statusTypes = null
+        )
+        {
+            var query = _ideas.Skip((page - 1) * pageSize).Take(pageSize);
+
+            if (statusTypes?.Count > 0)
+                query = query.Where(i => statusTypes.Contains(i.Status));
+
+            if (!string.IsNullOrWhiteSpace(searchText))
+                query = query.Where(i => i.Name.Contains(searchText, StringComparison.CurrentCultureIgnoreCase));
+
+            return query.ToList();
+        }
+
+        public static List<Idea> GetInitiatorIdeasByQueryParams(
+            Guid initiatorId,
+            int page,
+            int pageSize = 20,
+            string? searchText = null,
+            HashSet<IdeaStatusType>? statusTypes = null
+        )
+        {
+            var query = _ideas.Where(i => i.Initiator.Id == initiatorId).Skip((page - 1) * pageSize).Take(pageSize);
+
+            if (statusTypes?.Count > 0)
+                query = query.Where(i => statusTypes.Contains(i.Status));
+
+            if (!string.IsNullOrWhiteSpace(searchText))
+                query = query.Where(i => i.Name.Contains(searchText, StringComparison.CurrentCultureIgnoreCase));
+
+            return query.ToList();
+        }
 
         public static Idea? GetIdeaById(Guid id)
             => _ideas.FirstOrDefault(i => i.Id == id);
 
-        public static List<Idea> GetIdeasByInitiatorId(Guid initiatorId)
-            => [.. _ideas.Where(i => i.Initiator.Id == initiatorId)];
+        public static int GetTotalIdeasCount(
+            string? searchText = null,
+            HashSet<IdeaStatusType>? statusTypes = null
+        )
+        {
+            var query = _ideas.AsEnumerable();
 
-        public static List<Idea> GetIdeasOnCofirmation()
-            => [.. _ideas.Where(i => i.Status == IdeaStatusType.OnConfirmation)];
+            if (statusTypes?.Count > 0)
+                query = query.Where(i => statusTypes.Contains(i.Status));
+
+            if (!string.IsNullOrWhiteSpace(searchText))
+                query = query.Where(i => i.Name.Contains(searchText, StringComparison.CurrentCultureIgnoreCase));
+
+            return query.Count();
+        }
+
+        public static int GetTotalInitiatorIdeasCount(
+            Guid initiatorId,
+            string? searchText = null,
+            HashSet<IdeaStatusType>? statusTypes = null
+        )
+        {
+            var query = _ideas.Where(i => i.Initiator.Id == initiatorId);
+
+            if (statusTypes?.Count > 0)
+                query = query.Where(i => statusTypes.Contains(i.Status));
+
+            if (!string.IsNullOrWhiteSpace(searchText))
+                query = query.Where(i => i.Name.Contains(searchText, StringComparison.CurrentCultureIgnoreCase));
+
+            return query.Count();
+        }
 
         public static Idea? CreateNewIdea(IdeasCreateModel model, User initiator)
         {

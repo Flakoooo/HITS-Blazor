@@ -9,7 +9,7 @@
     }
     else
     {
-        <Input Width="Width" IconStyle="bi-search" Placeholder="Поиск" ValueChanged="@((value) => ValueChanged.InvokeAsync(value))" />
+        <Input Width="Width" IconStyle="bi-search" Placeholder="Поиск" Value="@Value" ValueChanged="@((value) => ValueChanged.InvokeAsync(value))" />
     }
 </div>
 
@@ -19,6 +19,9 @@
 
     [Parameter]
     public bool IsLoading { get; set; } = false;
+
+    [Parameter]
+    public string Value { get; set; } = string.Empty;
 
     [Parameter]
     public EventCallback<string> ValueChanged { get; set; }

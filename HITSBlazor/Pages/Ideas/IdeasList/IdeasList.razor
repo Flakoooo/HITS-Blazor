@@ -24,14 +24,14 @@
 @using HITSBlazor.Utils.EnumStyles
 @using HITSBlazor.Utils.Models
 
-<div class="bg-white h-auto overflow-y-scroll">
+<div class="bg-white h-auto overflow-y-scroll" @ref="_tableContainer">
     <div class="w-100 p-3">
         <ListPageHeader IsLoading="_isLoading"
-                        HeaderText="@($"Список идей: {_ideas.Count}")" 
+                        HeaderText="@($"Список идей: {_totalCount}")"
                         ShowCreateButton="AuthService.CurrentUser?.Role is RoleType.Initiator or RoleType.Admin"
                         CreateButtonText="Создать идею" 
                         OnButtonClick="@(() => NavigationService.NavigateToAsync("ideas/create"))" />
-        <InputSearch Width="50" IsLoading="_isLoading" ValueChanged="@((value) => SearchIdea(value))" />
+        <InputSearch Width="50" IsLoading="_isLoading" Value="@_searchText" ValueChanged="@((value) => SearchIdea(value))" />
         <!-- TODO: если идей нет, то сообщить пользователю, что идеи не найдены, но это как ИДЕЯ -->
         <TableComponent IsLoading="_isLoading" TableActionMenuIsEnable="true">
             <TableContent>
@@ -80,39 +80,18 @@
                                 IsLoading="_isLoading"
                                 Label="Статус" 
                                 AllValues="_filterIdeaStatus"
-                                FilterChanged="LoadIdeasAsync"
+                                FilterChanged="() => LoadIdeasAsync()"
                                 @bind-SelectedValues="SelectedStatuses" />
-                @if (AuthService.CurrentUser?.Role is RoleType.Admin or RoleType.Expert)
-                {
-                    <div class="w-100">
-                        @if (_isLoading)
-                        {
-                            <Placeholder Width="w-25" />
-                            <Placeholder />
-                        }
-                        else
-                        {
-                            <Typography FontSize="6" CustomClass="fw-semibold">
-                                Экспертиза
-                            </Typography>
-                            <div class="filter-choices">
-                                <div class="px-2 py-1 rounded-1 filter-choice">
-                                    <div class="d-flex">
-                                        <input type="checkbox"
-                                               checked="@_unapprovedIdeasByCurrentUser"
-                                               @onchange="@(e => FindOnConfirmation((bool)e.Value!))"
-                                               class="form-check-input" />
-                                        <Typography CustomClass="form-check-label ms-2">
-                                            Неутвержденные идеи
-                                        </Typography>
-                                    </div>
-                                </div>
-                            </div>
-                        }
-                    </div>
-                }
                 <ResetFilterButton IsLoading="_isLoading" ResetMethod="ResetFilters" />
             </FilterContent>
         </TableComponent>
+        @if (_isLoadingMore)
+        {
+            <div class="text-center py-3">
+                <div class="spinner-border spinner-border-sm text-primary" role="status">
+                    <span class="visually-hidden">Загрузка...</span>
+                </div>
+            </div>
+        }
     </div>
 </div>
