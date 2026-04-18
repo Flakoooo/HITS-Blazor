@@ -1,9 +1,11 @@
 ﻿using HITSBlazor.Utils.Validation;
 using Microsoft.AspNetCore.Components;
+using System.Timers;
+using Timer = System.Timers.Timer;
 
 namespace HITSBlazor.Components.Inputs.Input
 {
-    public partial class Input
+    public partial class Input : IDisposable
     {
         [Parameter]
         public int Width { get; set; } = 100;
@@ -47,7 +49,22 @@ namespace HITSBlazor.Components.Inputs.Input
         [Parameter]
         public string? ErrorMessage { get; set; } = "Поле не заполнено";
 
+        [Parameter]
+        public int DebounceDelay { get; set; } = 0;
+
         private bool _showError = false;
+        private Timer? _debounceTimer;
+        private string _pendingValue = string.Empty;
+
+        protected override void OnInitialized()
+        {
+            if (DebounceDelay > 0)
+            {
+                _debounceTimer = new Timer(DebounceDelay);
+                _debounceTimer.Elapsed += OnDebounceTimerElapsed;
+                _debounceTimer.AutoReset = false;
+            }
+        }
 
         protected override void OnParametersSet()
         {
@@ -79,8 +96,43 @@ namespace HITSBlazor.Components.Inputs.Input
 
         private async Task OnInputChanged(ChangeEventArgs e)
         {
+            var newValue = e.Value?.ToString() ?? string.Empty;
+
+            if (DebounceDelay > 0 && ValueChanged.HasDelegate)
+            {
+                _pendingValue = newValue;
+
+                _debounceTimer?.Stop();
+
+                _debounceTimer?.Start();
+            }
+            else
+            {
+                if (ValueChanged.HasDelegate)
+                    await ValueChanged.InvokeAsync(newValue);
+            }
+        }
+
+        private async void OnDebounceTimerElapsed(object? sender, ElapsedEventArgs e)
+        {
             if (ValueChanged.HasDelegate)
-                await ValueChanged.InvokeAsync(e.Value?.ToString());
+            {
+                await InvokeAsync(async () =>
+                {
+                    await ValueChanged.InvokeAsync(_pendingValue);
+                });
+            }
+        }
+
+        public void Dispose()
+        {
+            if (_debounceTimer != null)
+            {
+                _debounceTimer.Stop();
+                _debounceTimer.Elapsed -= OnDebounceTimerElapsed;
+                _debounceTimer.Dispose();
+                _debounceTimer = null;
+            }
         }
     }
 }

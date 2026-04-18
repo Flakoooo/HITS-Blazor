@@ -18,7 +18,7 @@ namespace HITSBlazor.Pages.Ideas.IdeasList
     [Authorize]
     [Route("/ideas/list")]
     [Route("/ideas/list/{IdeaId}")]
-    public partial class IdeasList : IDisposable, IAsyncDisposable
+    public partial class IdeasList : IAsyncDisposable
     {
         [Inject]
         private IAuthService AuthService { get; set; } = null!;
@@ -49,7 +49,7 @@ namespace HITSBlazor.Pages.Ideas.IdeasList
         private IJSObjectReference? _jsModule;
         private bool _isInitialized = false;
 
-        private string? _searchText = null;
+        private string _searchText = string.Empty;
 
         private readonly List<Idea> _ideas = [];
         private HashSet<Idea> _selectedIdeas = [];
@@ -76,11 +76,14 @@ namespace HITSBlazor.Pages.Ideas.IdeasList
 
             await LoadIdeasAsync();
 
-            if (!string.IsNullOrWhiteSpace(IdeaId) && Guid.TryParse(IdeaId, out Guid ideaId))
-                await ShowIdea(ideaId);
-
             _isLoading = false;
             _isInitialized = true;
+        }
+
+        protected override async Task OnParametersSetAsync()
+        {
+            if (!string.IsNullOrWhiteSpace(IdeaId) && Guid.TryParse(IdeaId, out Guid ideaId))
+                ModalService.ShowIdeaModal(ideaId);
         }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -120,7 +123,6 @@ namespace HITSBlazor.Pages.Ideas.IdeasList
         {
             if (!append)
             {
-                _isLoading = true;
                 _currentPage = page;
                 _ideas.Clear();
             }
@@ -197,6 +199,7 @@ namespace HITSBlazor.Pages.Ideas.IdeasList
 
         private async Task SearchIdea(string value)
         {
+            Console.WriteLine($"новое {value}");
             _searchText = value;
             _currentPage = 1;
             _totalCount = 0;
@@ -215,7 +218,8 @@ namespace HITSBlazor.Pages.Ideas.IdeasList
         {
             if (AuthService.CurrentUser?.Role is RoleType.Admin)
                 await NavigationService.NavigateToAsync($"/ideas/list/{ideaId}");
-            else ModalService.ShowIdeaModal(ideaId);
+            else
+                ModalService.ShowIdeaModal(ideaId);
         }
 
         private void ShowSendIdeaOnMarket()
@@ -232,7 +236,6 @@ namespace HITSBlazor.Pages.Ideas.IdeasList
                     [nameof(SendIdeaOnMarketModal.IdeaForMarket)] = _selectedIdeas
                 }
             );
-
         }
 
         private Dictionary<MenuAction, object> GetTableActions(Idea idea)
@@ -293,7 +296,7 @@ namespace HITSBlazor.Pages.Ideas.IdeasList
             StateHasChanged();
         }
 
-        public void Dispose()
+        public async ValueTask DisposeAsync()
         {
             AuthService.OnActiveRoleChanged -= UserRoleHasChanged;
             IdeasService.OnIdeasStateChanged -= StateHasChanged;
@@ -301,10 +304,7 @@ namespace HITSBlazor.Pages.Ideas.IdeasList
             ModalService.OnRightSideModalsUpdated -= IdeaModalHasClosed;
 
             _dotNetHelper?.Dispose();
-        }
 
-        public async ValueTask DisposeAsync()
-        {
             if (_jsModule != null)
                 await _jsModule.DisposeAsync();
         }

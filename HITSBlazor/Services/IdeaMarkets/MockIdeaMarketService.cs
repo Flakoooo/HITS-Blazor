@@ -1,4 +1,5 @@
-﻿using HITSBlazor.Models.Markets.Entities;
+﻿using HITSBlazor.Models.Ideas.Entities;
+using HITSBlazor.Models.Markets.Entities;
 using HITSBlazor.Models.Markets.Enums;
 using HITSBlazor.Models.Teams.Entities;
 using HITSBlazor.Models.Users.Enums;
@@ -95,6 +96,13 @@ namespace HITSBlazor.Services.IdeaMarkets
                 query = query.Where(r => r.TeamName.Contains(searchText, StringComparison.CurrentCultureIgnoreCase));
 
             return [.. query];
+        }
+
+        public async Task<bool> SendIdeasOnMarket(ICollection<Idea> ideas, Market market)
+        {
+            var count = MockIdeaMarkets.SendIdeasOnMarket(ideas, market);
+
+            return count > 0;
         }
 
         public async Task<bool> SetIdeaFavorite(Guid userId, IdeaMarket ideaMarket)

@@ -1,10 +1,13 @@
 ﻿using HITSBlazor.Models.Common.Entities;
+using HITSBlazor.Models.Ideas.Entities;
+using HITSBlazor.Models.Ideas.Enums;
 using HITSBlazor.Models.Markets.Entities;
 using HITSBlazor.Models.Markets.Enums;
 using HITSBlazor.Models.Users.Entities;
 using HITSBlazor.Utils.Mocks.Common;
 using HITSBlazor.Utils.Mocks.Ideas;
 using HITSBlazor.Utils.Mocks.Teams;
+using System.Collections;
 
 namespace HITSBlazor.Utils.Mocks.Markets
 {
@@ -240,6 +243,42 @@ namespace HITSBlazor.Utils.Mocks.Markets
 
         public static IdeaMarket? GetIdeaMarketById(Guid id) =>
             _ideaMarkets.FirstOrDefault(im => im.Id == id);
+
+        public static int SendIdeasOnMarket(ICollection<Idea> ideas, Market market)
+        {
+            int count = 0;
+            foreach (var idea in ideas)
+            {
+                if (_ideaMarkets.Any(im => im.IdeaId == idea.Id && im.MarketId == market.Id))
+                    continue;
+
+                _ideaMarkets.Add(new IdeaMarket
+                {
+                    Id = Guid.NewGuid(),
+                    IdeaId = idea.Id,
+                    Initiator = idea.Initiator,
+                    Team = null,
+                    MarketId = market.Id,
+                    Name = idea.Name,
+                    Problem = idea.Problem,
+                    Description = idea.Description,
+                    Solution = idea.Solution,
+                    Result = idea.Result,
+                    MaxTeamSize = idea.MaxTeamSize,
+                    Customer = idea.Customer,
+                    Position = 0,
+                    Stack = MockIdeaSkills.GetIdeaSkillsByIdeaId(idea.Id),
+                    Status = IdeaMarketStatusType.RecruitmentIsOpen,
+                    Requests = 0,
+                    AcceptedRequests = 0,
+                    IsFavorite = false
+                });
+                idea.Status = IdeaStatusType.OnMarket;
+                ++count;
+            }
+
+            return count;
+        }
 
         public static bool SetIdeaFavorite(Guid userId, Guid ideaMarketId)
             => _favoriteIdeas.Add(new FavoriteIdeas { UserId = userId, IdeaMarketId = ideaMarketId });

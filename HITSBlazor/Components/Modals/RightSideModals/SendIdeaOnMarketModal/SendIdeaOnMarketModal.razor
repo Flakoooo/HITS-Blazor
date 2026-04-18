@@ -6,7 +6,9 @@
 @using HITSBlazor.Models.Ideas.Entities
 @using HITSBlazor.Models.Markets.Entities
 @using HITSBlazor.Models.Markets.Enums
+@using HITSBlazor.Services.IdeaMarkets
 @using HITSBlazor.Services.Markets
+@using HITSBlazor.Services.Modal
 
 <div class="send-ideas-on-market-modal bg-white rounded p-3" @onclick:stopPropagation="true">
     <CenterModalHeader FontSize="5" 
@@ -61,8 +63,14 @@
     [Inject]
     private IMarketService MarketService { get; set; } = null!;
 
+    [Inject]
+    private IIdeaMarketService IdeaMarketService { get; set; } = null!;
+
+    [Inject]
+    private ModalService ModalService { get; set; } = null!;
+
     [Parameter]
-    public HashSet<Idea> IdeaForMarket { get; set; } = [];
+    public ICollection<Idea> IdeaForMarket { get; set; } = [];
 
     private bool _isLoading = true;
 
@@ -80,8 +88,14 @@
         _isLoading = false;
     }
 
-    private void SendIdeas()
+    private async Task SendIdeas()
     {
-        //TODO: выбранным идеям сменить статус на Опубликована, создавать IdeaMarket модели
+        if (SelectedMarket is null)
+            return;
+
+        var result = await IdeaMarketService.SendIdeasOnMarket(IdeaForMarket, SelectedMarket);
+
+        if (result)
+            await ModalService.Close(ModalType.RightSide);
     }
 }
