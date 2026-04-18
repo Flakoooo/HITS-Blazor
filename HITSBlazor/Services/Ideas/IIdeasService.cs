@@ -9,6 +9,7 @@ namespace HITSBlazor.Services.Ideas
     public interface IIdeasService
     {
         event Action? OnIdeasStateChanged;
+        event Action<Idea>? OnIdeaHasDeleted;
 
         //Ideas
         Task<List<Idea>> GetIdeasAsync(

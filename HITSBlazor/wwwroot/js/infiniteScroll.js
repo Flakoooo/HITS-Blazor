@@ -1,26 +1,34 @@
-﻿export function initializeInfiniteScroll(container, dotNetHelper) {
+﻿let currentObserver = null;
+let currentSentinel = null;
+
+export function initializeInfiniteScroll(container, dotNetHelper) {
     if (!container) return;
 
-    const sentinel = document.createElement('div');
-    sentinel.style.height = '10px';
-    sentinel.style.width = '100%';
-    sentinel.style.marginTop = '-10px';
+    if (currentSentinel) {
+        currentSentinel.remove();
+    }
+    if (currentObserver) {
+        currentObserver.disconnect();
+    }
+
+    currentSentinel = document.createElement('div');
+    currentSentinel.style.height = '10px';
+    currentSentinel.style.width = '100%';
 
     const table = container.querySelector('table');
     if (table && table.parentElement) {
-        table.parentElement.appendChild(sentinel);
+        table.parentElement.appendChild(currentSentinel);
     } else {
-        container.appendChild(sentinel);
+        container.appendChild(currentSentinel);
     }
 
     let isLoading = false;
-    let hasMorePages = true;
 
-    const observer = new IntersectionObserver(
+    currentObserver = new IntersectionObserver(
         async (entries) => {
             const entry = entries[0];
 
-            if (entry.isIntersecting && !isLoading && hasMorePages) {
+            if (entry.isIntersecting && !isLoading) {
                 isLoading = true;
 
                 try {
@@ -28,7 +36,9 @@
                 } catch (error) {
                     console.error('Error loading more items:', error);
                 } finally {
-                    isLoading = false;
+                    setTimeout(() => {
+                        isLoading = false;
+                    }, 500);
                 }
             }
         },
@@ -39,12 +49,20 @@
         }
     );
 
-    observer.observe(sentinel);
+    currentObserver.observe(currentSentinel);
+}
 
-    return {
-        dispose: () => {
-            observer.disconnect();
-            sentinel.remove();
-        }
-    };
+export function stopInfiniteScroll() {
+    if (currentObserver) {
+        currentObserver.disconnect();
+        currentObserver = null;
+    }
+    if (currentSentinel) {
+        currentSentinel.remove();
+        currentSentinel = null;
+    }
+}
+
+export function dispose() {
+    stopInfiniteScroll();
 }

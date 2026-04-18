@@ -42,7 +42,7 @@
         {
             <div class="list-group w-100 dropdown-list"
                  style="top: 42px; right: auto; z-index: 10000; max-height: 173px; overflow-y: scroll; position: absolute; bottom: auto; left: auto;"
-                 @onclick:stopPropagation>
+                 @onclick:stopPropagation="true">
 
                 @foreach (var value in _values)
                 {
@@ -50,14 +50,8 @@
                          class="d-flex list-group-item list-group-item-action focusable-item"
                          style="padding: 8px 12px; cursor: pointer;"
                          tabindex="-1">
-                        <div class="d-flex align-items-center" @onclick:stopPropagation>
-                            <input type="checkbox"
-                                   @onchange="@(e => OnCheckboxChange(value, (bool)e.Value!))"
-                                   checked="@IsValueSelected(value)"
-                                   @onclick:stopPropagation
-                                   class="form-check-input" />
-                            <span class="form-check-label ms-2" @onclick="@(() => OnItemClick(value))">@value.GetDisplayInfo()</span>
-                        </div>
+                        <Checkbox Checked="SelectedValues.Contains(value)" 
+                                  DisplayText="@value.GetDisplayInfo()" />
                     </div>
                 }
             </div>

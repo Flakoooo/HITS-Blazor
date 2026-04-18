@@ -1,0 +1,32 @@
+﻿@namespace HITSBlazor.Components.Inputs.Checkbox
+@using HITSBlazor.Components.Typography
+
+<div class="d-flex">
+    <input type="checkbox"
+           checked="@Checked"
+           class="form-check-input"
+           @onclick="() => SelectCheckbox()" />
+    @if (!string.IsNullOrWhiteSpace(DisplayText))
+    {
+        <Typography CustomClass="form-check-label ms-2">
+            @DisplayText
+        </Typography>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public bool Checked { get; set; } = false;
+
+    [Parameter]
+    public EventCallback OnClick { get; set; }
+
+    [Parameter]
+    public string DisplayText { get; set; } = string.Empty;
+
+    private async Task SelectCheckbox()
+    {
+        if (OnClick.HasDelegate)
+            await OnClick.InvokeAsync();
+    }
+}

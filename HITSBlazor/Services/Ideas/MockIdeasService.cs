@@ -18,6 +18,7 @@ namespace HITSBlazor.Services.Ideas
         private readonly GlobalNotificationService _globalNotificationService = globalNotificationService;
 
         public event Action? OnIdeasStateChanged;
+        public event Action<Idea>? OnIdeaHasDeleted;
 
         private HashSet<RoleType> _acceptableRoles =
         [
@@ -140,7 +141,6 @@ namespace HITSBlazor.Services.Ideas
             return true;
         }
 
-        //TODO: как то удалять из UI
         public async Task<bool> DeleteIdeaAsync(Idea idea)
         {
             if (!MockIdeas.DeleteIdea(idea))
@@ -148,6 +148,8 @@ namespace HITSBlazor.Services.Ideas
                 _globalNotificationService.ShowError("Не удалось удалить идею");
                 return false;
             }
+
+            OnIdeaHasDeleted?.Invoke(idea);
 
             return true;
         }

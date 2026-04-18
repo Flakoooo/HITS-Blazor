@@ -4,6 +4,7 @@
 @using HITSBlazor.Components.Filters.CheckboxFilter
 @using HITSBlazor.Components.Filters.ResetFilterButton
 @using HITSBlazor.Components.InputSearch
+@using HITSBlazor.Components.Inputs.Checkbox
 @using HITSBlazor.Components.Inputs.CheckboxDropdown
 @using HITSBlazor.Components.Inputs.Input
 @using HITSBlazor.Components.ListPageComponents.ListPageHeader
@@ -31,13 +32,35 @@
                         ShowCreateButton="AuthService.CurrentUser?.Role is RoleType.Initiator or RoleType.Admin"
                         CreateButtonText="Создать идею" 
                         OnButtonClick="@(() => NavigationService.NavigateToAsync("ideas/create"))" />
-        <InputSearch Width="50" IsLoading="_isLoading" Value="@_searchText" ValueChanged="@((value) => SearchIdea(value))" />
+        <div class="py-2 d-flex justify-content-between">
+            <Input Width="50" 
+                   IconStyle="bi-search" 
+                   Placeholder="Поиск" 
+                   Value="@_searchText" 
+                   ValueChanged="@((value) => SearchIdea(value))" />
+            @if (AuthService.CurrentUser?.Role is RoleType.ProjectOffice or RoleType.Admin)
+            {
+                <Button Text="Отправить на биржу" 
+                        Variant="ButtonVariant.Primary" 
+                        OnButtonClick="() => ShowSendIdeaOnMarket()" /> @* отправка на биржу, нужно модальное окно найти *@
+            }
+        </div>
         <!-- TODO: если идей нет, то сообщить пользователю, что идеи не найдены, но это как ИДЕЯ -->
         <TableComponent IsLoading="_isLoading" TableActionMenuIsEnable="true">
             <TableContent>
                 @foreach (var idea in _ideas)
                 {
                     <tr>
+                        @if (AuthService.CurrentUser?.Role is RoleType.ProjectOffice or RoleType.Admin)
+                        {
+                            <TableBodyRow>
+                                @if (idea.Status is IdeaStatusType.Confirmed)
+                                {
+                                    <Checkbox Checked="_selectedIdeas.Contains(idea)" 
+                                              OnClick="() => SelectIdea(idea)" />
+                                }
+                            </TableBodyRow>
+                        }
                         <TableBodyRow>
                             <div class="bi bi-circle-fill fs-6 mt-1 @(idea.IsChecked ? "text-success" : "text-secondary")">
                                 <div></div>

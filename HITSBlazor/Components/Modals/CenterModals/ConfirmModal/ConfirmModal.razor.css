@@ -8,4 +8,15 @@
     gap: 16px;
     align-self: center;
     justify-self: center;
+    transition: all .15s ease-out;
+}
+
+.modal-layout-enter-active .confirm-modal {
+    transform: scale(1);
+    animation: scaleIn 0.15s ease-out;
+}
+
+.modal-layout-leave-active .confirm-modal {
+    transform: scale(0.9);
+    animation: scaleOut 0.15s ease-out;
 }

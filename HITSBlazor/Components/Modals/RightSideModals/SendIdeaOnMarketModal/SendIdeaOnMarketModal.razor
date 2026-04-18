@@ -1,0 +1,87 @@
+﻿@namespace HITSBlazor.Components.Modals.RightSideModals.SendIdeaOnMarketModal
+@using HITSBlazor.Components.Button
+@using HITSBlazor.Components.Inputs.RadioDropdown
+@using HITSBlazor.Components.Modals.Components.CenterModalHeader
+@using HITSBlazor.Components.Typography
+@using HITSBlazor.Models.Ideas.Entities
+@using HITSBlazor.Models.Markets.Entities
+@using HITSBlazor.Models.Markets.Enums
+@using HITSBlazor.Services.Markets
+
+<div class="send-ideas-on-market-modal bg-white rounded p-3" @onclick:stopPropagation="true">
+    <CenterModalHeader FontSize="5" 
+                       HeaderText="@String.Format("Отправить иде{0} на биржу", IdeaForMarket.Count == 1 ? 'ю' : 'и')" />
+    <RadioDropdown T="Market" 
+                   AllValues="_market"
+                   Label="Биржа"
+                   Placeholder="Выберите биржу"
+                   @bind-Value="SelectedMarket" />
+    <div class="send-ideas-on-market-modal-ideas d-flex flex-column gap-2 w-100">
+        <Typography TextColor="TextColor.Primary" CustomClass="w-100">
+            @(IdeaForMarket.Count == 1 ? "Выбранная идея" : "Выбранные идеи")
+        </Typography>
+        @foreach (var idea in IdeaForMarket)
+        {
+            <div class="d-flex gap-2 w-100">
+                <Typography CustomClass="w-100 border rounded p-2 text-ellipsis">
+                    @idea.Name
+                </Typography>
+                <Button ButtonClass="btn-outline-danger" 
+                        IconStyle="bi-x"
+                        OnButtonClick="() => IdeaForMarket.Remove(idea)" />
+            </div>
+        }
+    </div>
+    <Button Variant="ButtonVariant.Success" 
+            Text="Отправить на биржу"
+            OnButtonClick="() => SendIdeas()" />
+</div>
+
+<style>
+    .send-ideas-on-market-modal {
+        width: 500px;
+        display: flex;
+        flex-direction: column;
+        flex-wrap: nowrap;
+        align-items: stretch;
+        justify-content: flex-start;
+        gap: 8px;
+        align-self: center;
+        justify-self: center;
+        transition: all .15s ease-out;
+    }
+
+    .send-ideas-on-market-modal-ideas{
+        max-height: 192px;
+        overflow-y: scroll;
+    }
+</style>
+
+@code {
+    [Inject]
+    private IMarketService MarketService { get; set; } = null!;
+
+    [Parameter]
+    public HashSet<Idea> IdeaForMarket { get; set; } = [];
+
+    private bool _isLoading = true;
+
+    private List<Market> _market = [];
+    private Market? SelectedMarket { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        _isLoading = true;
+
+        _market = await MarketService.GetMarketsAsync(
+            selectedStatuses: new HashSet<MarketStatus> { MarketStatus.Active }
+        );
+
+        _isLoading = false;
+    }
+
+    private void SendIdeas()
+    {
+        //TODO: выбранным идеям сменить статус на Опубликована, создавать IdeaMarket модели
+    }
+}

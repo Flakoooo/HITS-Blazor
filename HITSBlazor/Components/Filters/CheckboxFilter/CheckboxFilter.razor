@@ -1,4 +1,5 @@
 ﻿@namespace HITSBlazor.Components.Filters.CheckboxFilter
+@using HITSBlazor.Components.Inputs.Checkbox
 @using HITSBlazor.Components.Inputs.Input
 @using HITSBlazor.Components.Placeholders.Placeholder
 @using HITSBlazor.Components.Typography
@@ -33,14 +34,8 @@
             @foreach (var value in _values)
             {
                 <div class="filter-choice px-2 py-1 rounded-1" @onclick="() => SelectValue(value)">
-                    <div class="d-flex">
-                        <input type="checkbox"
-                               checked="@SelectedValues.Contains(value)"
-                               class="form-check-input" />
-                        <Typography CustomClass="form-check-label ms-2">
-                            @value.GetDisplayInfo()
-                        </Typography>
-                    </div>
+                    <Checkbox Checked="@SelectedValues.Contains(value)" 
+                              DisplayText="@value.GetDisplayInfo()" />
                 </div>
             }
         </div>

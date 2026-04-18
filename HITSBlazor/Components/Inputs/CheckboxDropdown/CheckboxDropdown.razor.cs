@@ -99,24 +99,6 @@ namespace HITSBlazor.Components.Inputs.CheckboxDropdown
             await SelectedValuesChanged.InvokeAsync(SelectedValues);
         }
 
-        private async Task OnCheckboxChange(T value, bool isChecked)
-        {
-            if (isChecked)
-                SelectedValues.Add(value);
-            else
-                SelectedValues.Remove(value);
-
-            await SelectedValuesChanged.InvokeAsync(SelectedValues);
-        }
-
-        private bool IsValueSelected(T value) => SelectedValues.Contains(value);
-
-        private async Task RemoveValue(T value)
-        {
-            SelectedValues.Remove(value);
-            await SelectedValuesChanged.InvokeAsync(SelectedValues);
-        }
-
         public async ValueTask DisposeAsync()
         {
             if (_dotNetHelper != null)

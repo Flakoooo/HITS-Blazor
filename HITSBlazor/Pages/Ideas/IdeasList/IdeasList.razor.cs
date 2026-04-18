@@ -1,4 +1,6 @@
 ﻿using HITSBlazor.Components.ActionMenus.BaseActionMenu;
+using HITSBlazor.Components.Button;
+using HITSBlazor.Components.Modals.RightSideModals.SendIdeaOnMarketModal;
 using HITSBlazor.Models.Ideas.Entities;
 using HITSBlazor.Models.Ideas.Enums;
 using HITSBlazor.Models.Users.Enums;
@@ -33,6 +35,9 @@ namespace HITSBlazor.Pages.Ideas.IdeasList
         [Inject] 
         private IJSRuntime JSRuntime { get; set; } = null!;
 
+        [Inject]
+        private GlobalNotificationService NotificationService { get; set; } = null!;
+
         [Parameter]
         public string IdeaId { get; set; } = string.Empty;
 
@@ -46,9 +51,9 @@ namespace HITSBlazor.Pages.Ideas.IdeasList
 
         private string? _searchText = null;
 
-        private List<Idea> _ideas = [];
+        private readonly List<Idea> _ideas = [];
+        private HashSet<Idea> _selectedIdeas = [];
         private int _currentPage = 1;
-        private const int PageSize = 20;
         private int _totalCount = 0;
 
         private readonly List<EnumViewModel<IdeaStatusType>> _filterIdeaStatus
@@ -62,6 +67,7 @@ namespace HITSBlazor.Pages.Ideas.IdeasList
 
             AuthService.OnActiveRoleChanged += UserRoleHasChanged;
             IdeasService.OnIdeasStateChanged += StateHasChanged;
+            IdeasService.OnIdeaHasDeleted += IdeaHasDeleted;
             ModalService.OnRightSideModalsUpdated += IdeaModalHasClosed;
 
             _totalCount = await IdeasService.GetTotalIdeaCount();
@@ -101,10 +107,9 @@ namespace HITSBlazor.Pages.Ideas.IdeasList
 
             if (_ideas.Count >= _totalCount)
             {
-                if (_jsModule != null)
-                {
+                if (_jsModule is not null)
                     await _jsModule.InvokeVoidAsync("stopInfiniteScroll");
-                }
+
                 return;
             }
 
@@ -184,6 +189,12 @@ namespace HITSBlazor.Pages.Ideas.IdeasList
             }
         }
 
+        private void SelectIdea(Idea idea)
+        {
+            if (!_selectedIdeas.Add(idea))
+                _selectedIdeas.Remove(idea);
+        }
+
         private async Task SearchIdea(string value)
         {
             _searchText = value;
@@ -205,6 +216,23 @@ namespace HITSBlazor.Pages.Ideas.IdeasList
             if (AuthService.CurrentUser?.Role is RoleType.Admin)
                 await NavigationService.NavigateToAsync($"/ideas/list/{ideaId}");
             else ModalService.ShowIdeaModal(ideaId);
+        }
+
+        private void ShowSendIdeaOnMarket()
+        {
+            if (_selectedIdeas.Count == 0)
+            {
+                NotificationService.ShowError("Выберите хотя бы одну идею со статусом \"Утверждена\"");
+                return;
+            }
+
+            ModalService.Show<SendIdeaOnMarketModal>(
+                ModalType.RightSide,
+                parameters: new Dictionary<string, object> { 
+                    [nameof(SendIdeaOnMarketModal.IdeaForMarket)] = _selectedIdeas
+                }
+            );
+
         }
 
         private Dictionary<MenuAction, object> GetTableActions(Idea idea)
@@ -230,10 +258,14 @@ namespace HITSBlazor.Pages.Ideas.IdeasList
             }
             else if (context.Action == MenuAction.Delete)
             {
-                if (context.Item is not Idea idea || !await IdeasService.DeleteIdeaAsync(idea)) 
-                    return;
+                if (context.Item is not Idea idea) return;
 
-                _ideas.Remove(idea);
+                ModalService.ShowConfirmModal(
+                    $"Вы действительно хотите удалить {idea.Name}?",
+                    () => IdeasService.DeleteIdeaAsync(idea),
+                    confirmButtonVariant: ButtonVariant.Danger,
+                    confirmButtonText: "Удалить"
+                );
             }
         }
 
@@ -250,12 +282,22 @@ namespace HITSBlazor.Pages.Ideas.IdeasList
         {
             if (AuthService.CurrentUser?.Role is RoleType.Admin && ModalService.SideModals.Count == 0)
                 await NavigationService.NavigateToAsync($"/ideas/list");
+
+            StateHasChanged();
+        }
+
+        private async void IdeaHasDeleted(Idea idea)
+        {
+            _ideas.Remove(idea);
+            --_totalCount;
+            StateHasChanged();
         }
 
         public void Dispose()
         {
             AuthService.OnActiveRoleChanged -= UserRoleHasChanged;
             IdeasService.OnIdeasStateChanged -= StateHasChanged;
+            IdeasService.OnIdeaHasDeleted -= IdeaHasDeleted;
             ModalService.OnRightSideModalsUpdated -= IdeaModalHasClosed;
 
             _dotNetHelper?.Dispose();

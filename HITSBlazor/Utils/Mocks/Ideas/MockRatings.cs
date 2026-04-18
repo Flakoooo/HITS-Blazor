@@ -60,7 +60,8 @@ namespace HITSBlazor.Utils.Mocks.Ideas
                         ]
                     ) : null;
                 }
-                if (ideaState && rating.RatingValue.HasValue) expertsRating += rating.RatingValue.Value;
+                if (ideaState && rating.RatingValue.HasValue) 
+                    expertsRating = Math.Round(expertsRating + rating.RatingValue.Value, 1);
 
                 _ratings.Add(rating);
             }
