@@ -45,8 +45,8 @@ namespace HITSBlazor.Utils.Mocks.Common
             ];
         }
 
-        public static List<Skill>? GetUserSkillsById(Guid userId)
-            => _usersSkills.FirstOrDefault(us => us.IdUsers == userId)?.Skills;
+        public static List<Skill> GetUserSkillsById(Guid userId)
+            => _usersSkills.FirstOrDefault(us => us.IdUsers == userId)?.Skills ?? [];
 
         public static void UpdateUserSkillsById(Guid userId, List<Skill> skills)
             => _usersSkills.FirstOrDefault(us => us.IdUsers == userId)?.Skills = skills;

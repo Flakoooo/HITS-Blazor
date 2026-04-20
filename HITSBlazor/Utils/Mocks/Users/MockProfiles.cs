@@ -40,8 +40,8 @@ namespace HITSBlazor.Utils.Mocks.Users
                 Telephone = user.Telephone,
                 StudyGroup = user.StudyGroup,
 
-                Skills = MockUsersSkills.GetUserSkillsById(user.Id) ?? [],
-                Ideas = MockIdeas.GetInitiatorIdeasByQueryParams(user.Id, 1),
+                Skills = MockUsersSkills.GetUserSkillsById(user.Id),
+                Ideas = MockIdeas.GetInitiatorIdeasForProfile(user.Id),
                 Teams = MockTeamExperiences.GetTeamExperiencesByUserId(user.Id),
                 UserTag = userTag?.UserTag,
                 IsUserTagVisible = userTag?.IsVisible

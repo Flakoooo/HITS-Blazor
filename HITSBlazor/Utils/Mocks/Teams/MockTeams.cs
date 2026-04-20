@@ -32,7 +32,7 @@ namespace HITSBlazor.Utils.Mocks.Teams
                     Email = user.Email,
                     FirstName = user.FirstName,
                     LastName = user.LastName,
-                    Skills = MockUsersSkills.GetUserSkillsById(user.Id) ?? []
+                    Skills = MockUsersSkills.GetUserSkillsById(user.Id)
                 });
             }
 

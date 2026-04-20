@@ -6,7 +6,6 @@ using HITSBlazor.Models.Common.Entities;
 using HITSBlazor.Models.Common.Enums;
 using HITSBlazor.Models.Tests.Entities;
 using HITSBlazor.Models.Users.Entities;
-using HITSBlazor.Pages.Projects.ProjectView;
 using HITSBlazor.Services.Auth;
 using HITSBlazor.Services.Modal;
 using HITSBlazor.Services.Profiles;
@@ -14,7 +13,6 @@ using HITSBlazor.Services.Skills;
 using HITSBlazor.Services.TestResults;
 using HITSBlazor.Services.UserSkills;
 using Microsoft.AspNetCore.Components;
-using Microsoft.Extensions.Primitives;
 
 namespace HITSBlazor.Components.Modals.RightSideModals.ProfileModal
 {

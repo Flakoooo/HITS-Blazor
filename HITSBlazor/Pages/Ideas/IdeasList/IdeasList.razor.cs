@@ -66,11 +66,10 @@ namespace HITSBlazor.Pages.Ideas.IdeasList
             _isLoading = true;
 
             AuthService.OnActiveRoleChanged += UserRoleHasChanged;
-            IdeasService.OnIdeasStateChanged += StateHasChanged;
             IdeasService.OnIdeaHasDeleted += IdeaHasDeleted;
+            IdeasService.OnIdeaHasOpened += ChangeIdeasCheckStatus;
+            IdeasService.OnIdeasStatusHasChanged += ChangeIdeasStatus;
             ModalService.OnRightSideModalsUpdated += IdeaModalHasClosed;
-
-            _totalCount = await IdeasService.GetTotalIdeaCount();
 
             SetFilterByRole(AuthService.CurrentUser?.Role);
 
@@ -98,7 +97,7 @@ namespace HITSBlazor.Pages.Ideas.IdeasList
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"Failed to initialize infinite scroll: {ex.Message}");
+                    Console.WriteLine($"Ошибка инициализации дозагрузки данных: {ex.Message}");
                 }
             }
         }
@@ -133,35 +132,23 @@ namespace HITSBlazor.Pages.Ideas.IdeasList
 
             StateHasChanged();
 
-            var newIdeas = await IdeasService.GetIdeasAsync(
+            var listResponse = await IdeasService.GetIdeasAsync(
                 _currentPage,
                 searchText: _searchText,
                 statusTypes: [.. SelectedStatuses.Select(s => s.Value)]
             );
 
-            if (newIdeas.Count > 0)
+            if (listResponse.List.Count > 0)
             {
                 if (append)
-                    _ideas.AddRange(newIdeas);
+                    _ideas.AddRange(listResponse.List);
                 else
                 {
                     _ideas.Clear();
-                    _ideas.AddRange(newIdeas);
+                    _ideas.AddRange(listResponse.List);
                 }
+                _totalCount = listResponse.Count;
                 ++_currentPage;
-            }
-
-            if (!append)
-            {
-                _totalCount = await IdeasService.GetTotalIdeaCount(
-                    searchText: _searchText,
-                    statusTypes: [.. SelectedStatuses.Select(s => s.Value)]
-                );
-            }
-            else
-            {
-                if (_ideas.Count > _totalCount)
-                    _totalCount = _ideas.Count;
             }
 
             _isLoadingMore = false;
@@ -289,18 +276,29 @@ namespace HITSBlazor.Pages.Ideas.IdeasList
             StateHasChanged();
         }
 
-        private async void IdeaHasDeleted(Idea idea)
+        private void IdeaHasDeleted(Idea idea)
         {
             _ideas.Remove(idea);
             --_totalCount;
             StateHasChanged();
         }
 
+        private void ChangeIdeasCheckStatus(Guid ideaId, bool isChecked)
+        {
+            _ideas.FirstOrDefault(i => i.Id == ideaId)?.IsChecked = isChecked;
+        }
+
+        private void ChangeIdeasStatus(Guid ideaId, IdeaStatusType ideaStatus)
+        {
+            _ideas.FirstOrDefault(i => i.Id == ideaId)?.Status = ideaStatus;
+        }
+
         public async ValueTask DisposeAsync()
         {
             AuthService.OnActiveRoleChanged -= UserRoleHasChanged;
-            IdeasService.OnIdeasStateChanged -= StateHasChanged;
             IdeasService.OnIdeaHasDeleted -= IdeaHasDeleted;
+            IdeasService.OnIdeaHasOpened -= ChangeIdeasCheckStatus;
+            IdeasService.OnIdeasStatusHasChanged -= ChangeIdeasStatus;
             ModalService.OnRightSideModalsUpdated -= IdeaModalHasClosed;
 
             _dotNetHelper?.Dispose();

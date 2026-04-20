@@ -1,4 +1,5 @@
 ﻿using HITSBlazor.Models.Common.Entities;
+using HITSBlazor.Models.Common.Responses;
 using HITSBlazor.Models.Ideas.Entities;
 using HITSBlazor.Models.Ideas.Enums;
 using HITSBlazor.Models.Users.Entities;
@@ -290,7 +291,7 @@ namespace HITSBlazor.Utils.Mocks.Ideas
             return ideas;
         }
 
-        public static List<Idea> GetAllIdeasByQueryParams(
+        public static ListDataResponse<Idea> GetAllIdeasByQueryParams(
             int page,
             int pageSize = 20,
             string? searchText = null, 
@@ -299,16 +300,18 @@ namespace HITSBlazor.Utils.Mocks.Ideas
         {
             var query = _ideas.Skip((page - 1) * pageSize).Take(pageSize);
 
+            int count = query.Count();
+
             if (statusTypes?.Count > 0)
                 query = query.Where(i => statusTypes.Contains(i.Status));
 
             if (!string.IsNullOrWhiteSpace(searchText))
                 query = query.Where(i => i.Name.Contains(searchText, StringComparison.CurrentCultureIgnoreCase));
 
-            return query.ToList();
+            return new ListDataResponse<Idea> { Count = count, List = query.ToList() };
         }
 
-        public static List<Idea> GetInitiatorIdeasByQueryParams(
+        public static ListDataResponse<Idea> GetInitiatorIdeasByQueryParams(
             Guid initiatorId,
             int page,
             int pageSize = 20,
@@ -318,50 +321,24 @@ namespace HITSBlazor.Utils.Mocks.Ideas
         {
             var query = _ideas.Where(i => i.Initiator.Id == initiatorId).Skip((page - 1) * pageSize).Take(pageSize);
 
+            int count = query.Count();
+
             if (statusTypes?.Count > 0)
                 query = query.Where(i => statusTypes.Contains(i.Status));
 
             if (!string.IsNullOrWhiteSpace(searchText))
                 query = query.Where(i => i.Name.Contains(searchText, StringComparison.CurrentCultureIgnoreCase));
 
-            return query.ToList();
+            return new ListDataResponse<Idea> { Count = count, List = query.ToList() };
+        }
+
+        public static List<Idea> GetInitiatorIdeasForProfile(Guid initiatorId)
+        {
+            return _ideas.Where(i => i.Initiator.Id == initiatorId).ToList();
         }
 
         public static Idea? GetIdeaById(Guid id)
             => _ideas.FirstOrDefault(i => i.Id == id);
-
-        public static int GetTotalIdeasCount(
-            string? searchText = null,
-            HashSet<IdeaStatusType>? statusTypes = null
-        )
-        {
-            var query = _ideas.AsEnumerable();
-
-            if (statusTypes?.Count > 0)
-                query = query.Where(i => statusTypes.Contains(i.Status));
-
-            if (!string.IsNullOrWhiteSpace(searchText))
-                query = query.Where(i => i.Name.Contains(searchText, StringComparison.CurrentCultureIgnoreCase));
-
-            return query.Count();
-        }
-
-        public static int GetTotalInitiatorIdeasCount(
-            Guid initiatorId,
-            string? searchText = null,
-            HashSet<IdeaStatusType>? statusTypes = null
-        )
-        {
-            var query = _ideas.Where(i => i.Initiator.Id == initiatorId);
-
-            if (statusTypes?.Count > 0)
-                query = query.Where(i => statusTypes.Contains(i.Status));
-
-            if (!string.IsNullOrWhiteSpace(searchText))
-                query = query.Where(i => i.Name.Contains(searchText, StringComparison.CurrentCultureIgnoreCase));
-
-            return query.Count();
-        }
 
         public static Idea? CreateNewIdea(IdeasCreateModel model, User initiator)
         {

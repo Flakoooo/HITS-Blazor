@@ -1,5 +1,6 @@
 ﻿using HITSBlazor.Components.Modals.RightSideModals.IdeaModal;
 using HITSBlazor.Models.Common.Entities;
+using HITSBlazor.Models.Common.Responses;
 using HITSBlazor.Models.Ideas.Entities;
 using HITSBlazor.Models.Ideas.Enums;
 using HITSBlazor.Pages.Ideas.IdeasCreate;
@@ -8,20 +9,17 @@ namespace HITSBlazor.Services.Ideas
 {
     public interface IIdeasService
     {
-        event Action? OnIdeasStateChanged;
         event Action<Idea>? OnIdeaHasDeleted;
+        event Action<Guid, bool>? OnIdeaHasOpened;
+        event Action<Guid, IdeaStatusType>? OnIdeasStatusHasChanged;
 
         //Ideas
-        Task<List<Idea>> GetIdeasAsync(
+        Task<ListDataResponse<Idea>> GetIdeasAsync(
             int page,
             string? searchText = null,
             HashSet<IdeaStatusType>? statusTypes = null
         );
         Task<Idea?> GetIdeaByIdAsync(Guid id);
-        Task<int> GetTotalIdeaCount(
-            string? searchText = null,
-            HashSet<IdeaStatusType>? statusTypes = null
-        );
         Task<Idea?> CreateNewIdeaAsync(IdeasCreateModel ideasCreateModel);
         Task<bool> UpdateCheckedIdeaAsync(Guid ideaId);
         Task<bool> UpdateIdeaAsync(Guid ideaId, IdeasCreateModel ideasCreateModel);

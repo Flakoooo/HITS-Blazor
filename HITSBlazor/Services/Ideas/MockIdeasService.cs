@@ -1,5 +1,6 @@
 ﻿using HITSBlazor.Components.Modals.RightSideModals.IdeaModal;
 using HITSBlazor.Models.Common.Entities;
+using HITSBlazor.Models.Common.Responses;
 using HITSBlazor.Models.Ideas.Entities;
 using HITSBlazor.Models.Ideas.Enums;
 using HITSBlazor.Models.Users.Enums;
@@ -11,16 +12,16 @@ using HITSBlazor.Utils.Models;
 
 namespace HITSBlazor.Services.Ideas
 {
-    //TODO: реализовать получение идей постранично, подгружая нужное количество
     public class MockIdeasService(IAuthService authService, GlobalNotificationService globalNotificationService) : IIdeasService
     {
         private readonly IAuthService _authService = authService;
         private readonly GlobalNotificationService _globalNotificationService = globalNotificationService;
 
-        public event Action? OnIdeasStateChanged;
         public event Action<Idea>? OnIdeaHasDeleted;
+        public event Action<Guid, bool>? OnIdeaHasOpened;
+        public event Action<Guid, IdeaStatusType>? OnIdeasStatusHasChanged;
 
-        private HashSet<RoleType> _acceptableRoles =
+        private readonly HashSet<RoleType> _acceptableRoles =
         [
             RoleType.Initiator,
             RoleType.Member,
@@ -30,14 +31,15 @@ namespace HITSBlazor.Services.Ideas
             RoleType.Teacher
         ];
 
-        public async Task<List<Idea>> GetIdeasAsync(
+        public async Task<ListDataResponse<Idea>> GetIdeasAsync(
             int page,
             string? searchText,
             HashSet<IdeaStatusType>? statusTypes
         )
         {
             var activeRole = _authService.CurrentUser?.Role;
-            if (activeRole is null || !_acceptableRoles.Contains((RoleType)activeRole)) return [];
+            if (activeRole is null || !_acceptableRoles.Contains((RoleType)activeRole)) 
+                return new ListDataResponse<Idea>();
 
             if (activeRole is RoleType.Initiator && _authService.CurrentUser is not null)
                 return MockIdeas.GetInitiatorIdeasByQueryParams(
@@ -55,25 +57,6 @@ namespace HITSBlazor.Services.Ideas
         }
 
         public async Task<Idea?> GetIdeaByIdAsync(Guid id) => MockIdeas.GetIdeaById(id);
-        public async Task<int> GetTotalIdeaCount(
-            string? searchText, HashSet<IdeaStatusType>? statusTypes
-        )
-        {
-            var activeRole = _authService.CurrentUser?.Role;
-            if (activeRole is null || !_acceptableRoles.Contains((RoleType)activeRole)) return 0;
-
-            if (activeRole is RoleType.Initiator && _authService.CurrentUser is not null)
-                return MockIdeas.GetTotalInitiatorIdeasCount(
-                    _authService.CurrentUser.Id,
-                    searchText: searchText,
-                    statusTypes: statusTypes
-                );
-
-            return MockIdeas.GetTotalIdeasCount(
-                    searchText: searchText,
-                    statusTypes: statusTypes
-                );
-        }
 
         public async Task<Idea?> CreateNewIdeaAsync(IdeasCreateModel ideasCreateModel)
         {
@@ -103,7 +86,7 @@ namespace HITSBlazor.Services.Ideas
         {
             if (!MockIdeas.CheckIdea(ideaId)) return false;
 
-            OnIdeasStateChanged?.Invoke();
+            OnIdeaHasOpened?.Invoke(ideaId, true);
             return true;
         }
 
@@ -137,7 +120,7 @@ namespace HITSBlazor.Services.Ideas
                 return false;
             }
 
-            OnIdeasStateChanged?.Invoke();
+            OnIdeasStatusHasChanged?.Invoke(ideaId, ideaStatus);
             return true;
         }
 
