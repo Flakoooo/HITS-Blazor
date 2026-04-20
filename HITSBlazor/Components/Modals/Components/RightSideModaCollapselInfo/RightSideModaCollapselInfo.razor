@@ -2,6 +2,7 @@
 @using HITSBlazor.Components.Button
 @using HITSBlazor.Components.Collapse
 @using HITSBlazor.Components.Modals.RightSideModals.IdeaModal
+@using HITSBlazor.Components.Placeholders.Placeholder
 @using HITSBlazor.Components.Skills
 @using HITSBlazor.Components.Typography
 @using HITSBlazor.Models.Common.Entities
@@ -9,39 +10,52 @@
 @using HITSBlazor.Models.Ideas.Entities
 @using HITSBlazor.Utils.Models
 
-<ul class="list-group rounded-3">
-    @foreach (var data in Data)
+<ul class="rounded-3 @(IsLoading ? "p-2 bg-white d-flex flex-column gap-1" : "list-group")">
+    @if (IsLoading)
     {
-        <li class="list-group-item p-0 overflow-hidden">
-            <Collapse StartCollapsed="StartCollapsed">
-                <MainContent Context="collapse">
-                    <Button Text="@data.Title"
-                            Variant="ButtonVariant.Light"
-                            ButtonClass="w-100 collapse-controller"
-                            OnButtonClick="() => collapse.Toggle()" />
-                </MainContent>
-                <ExpandedContent>
-                    <div class="list-group">
-                        <div class="p-2">
-                            @if (data.Data is List<Skill>)
-                            {
-                                <div class="d-flex flex-wrap gap-1">
-                                    <Skills SkillList="(List<Skill>)data.Data" />
-                                </div>
-                            }
-                            else
-                            {
-                                @data.Data
-                            }
+        @for (int i = 0; i < Data.Count; ++i)
+        {
+            <Placeholder Height="PlaceholderHeight.Smaller" />
+        }
+    }
+    else
+    {
+        @foreach (var data in Data)
+        {
+            <li class="list-group-item p-0 overflow-hidden">
+                <Collapse StartCollapsed="StartCollapsed">
+                    <MainContent Context="collapse">
+                        <Button Text="@data.Title"
+                                Variant="ButtonVariant.Light"
+                                ButtonClass="w-100 collapse-controller"
+                                OnButtonClick="() => collapse.Toggle()" />
+                    </MainContent>
+                    <ExpandedContent>
+                        <div class="list-group">
+                            <div class="p-2">
+                                @if (data.Data is List<Skill>)
+                                {
+                                    <div class="d-flex flex-wrap gap-1">
+                                        <Skills SkillList="(List<Skill>)data.Data" />
+                                    </div>
+                                }
+                                else
+                                {
+                                    @data.Data
+                                }
+                            </div>
                         </div>
-                    </div>
-                </ExpandedContent>
-            </Collapse>
-        </li>
+                    </ExpandedContent>
+                </Collapse>
+            </li>
+        }
     }
 </ul>
 
 @code {
+    [Parameter]
+    public bool IsLoading { get; set; } = false;
+
     [Parameter]
     public List<CollapseItem> Data { get; set; } = [];
 

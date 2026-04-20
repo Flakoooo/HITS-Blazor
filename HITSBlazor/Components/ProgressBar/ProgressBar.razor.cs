@@ -5,6 +5,9 @@ namespace HITSBlazor.Components.ProgressBar
     public partial class ProgressBar : IDisposable
     {
         [Parameter]
+        public bool IsLoading { get; set; } = false;
+
+        [Parameter]
         public double? Score { get; set; }
 
         [Parameter]

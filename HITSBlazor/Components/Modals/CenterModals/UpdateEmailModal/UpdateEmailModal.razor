@@ -21,8 +21,7 @@
                NeedValidation="_submitted"
                IsDisabled="true"
                @bind-Value="EmailValue" />
-        <Button BtnType="ButtonType.Button" 
-                IsLoading="_isLoading" 
+        <Button InProgress="_isLoading"
                 Variant="ButtonVariant.Primary"
                 Text="Изменить email"
                 LoadingText="Изменение"
@@ -34,8 +33,7 @@
                Placeholder="Введите ваш новый email"
                NeedValidation="_submitted"
                @bind-Value="EmailValue" />
-        <Button BtnType="ButtonType.Button"
-                IsLoading="_isLoading"
+        <Button InProgress="_isLoading"
                 Variant="ButtonVariant.Primary"
                 Text="Отправить"
                 LoadingText="Отправка"

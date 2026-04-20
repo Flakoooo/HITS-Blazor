@@ -52,7 +52,7 @@
                          SelectedUserChanged="UnSelectUser" />
         </div>
         <Button Variant="ButtonVariant.Primary"
-                IsLoading="_submitting"
+                InProgress="_submitting"
                 Text="@(CompanyId.HasValue ? "Сохранить изменения" : "Добавить")"
                 LoadingText="@(CompanyId.HasValue ? "Сохранение" : "Добавление")"
                 OnButtonClick="SendCompany" />

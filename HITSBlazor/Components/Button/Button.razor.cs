@@ -8,7 +8,13 @@ namespace HITSBlazor.Components.Button
         public ButtonType BtnType { get; set; } = ButtonType.Button;
 
         [Parameter]
-        public bool? IsLoading { get; set; } = false;
+        public bool IsLoading { get; set; } = false;
+
+        [Parameter]
+        public string LoadingWidth { get; set; } = "w-100";
+
+        [Parameter]
+        public bool InProgress { get; set; } = false;
 
         [Parameter]
         public EventCallback OnButtonClick { get; set; }

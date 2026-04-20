@@ -53,13 +53,13 @@ else
                                     {
                                         <Button Variant="ButtonVariant.Secondary" 
                                                 Text="Ваша команда уже участвует в идее или проекте" 
-                                                IsLoading="true" />
+                                                InProgress="true" />
                                     }
                                     else if (!_cachedRequests.TryGetValue(team.Id, out var request) || request.Status is not TeamRequestStatus.New)
                                     {
                                         <Button Text="@GetStatusButtonText(request?.Status)"
                                                 Variant="GetStatusButtonVariant(request?.Status)"
-                                                IsLoading="request?.Status is TeamRequestStatus.Annulled or TeamRequestStatus.Canceled"
+                                                InProgress="request?.Status is TeamRequestStatus.Annulled or TeamRequestStatus.Canceled"
                                                 OnButtonClick="async () => {
                                                     _queuedCollapseMethod = collapse.ExpandedStatus ? null : () => collapse.Toggle();
                                                     await collapse.Toggle();

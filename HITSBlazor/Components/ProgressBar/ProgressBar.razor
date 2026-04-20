@@ -3,16 +3,23 @@
 @using HITSBlazor.Components.Typography
 @using HITSBlazor.Utils.Models
 
-<Typography FontSize="6" TextColor="TextColor.Primary">
-    @Text: @(Score.HasValue ? Score.Value : "вычисление")@($"{new string('.', _dotCount)}")
-</Typography>
-@if (!Score.HasValue)
+@if (IsLoading)
 {
     <Placeholder />
 }
 else
 {
-    <div class="progress w-100 mt-2">
-        <div class="progress-bar progress-bar-animated" style="@_progressStyle"></div>
-    </div>
+    <Typography FontSize="6" TextColor="TextColor.Primary">
+        @Text: @(Score.HasValue? Score.Value: "вычисление")@($"{new string('.', _dotCount)}")
+    </Typography>
+    @if (!Score.HasValue)
+    {
+        <Placeholder />
+    }
+    else
+    {
+        <div class="progress w-100 mt-2">
+            <div class="progress-bar progress-bar-animated" style="@_progressStyle"></div>
+        </div>
+    }
 }

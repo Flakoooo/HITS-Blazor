@@ -48,7 +48,7 @@
                           Placeholder="Выбрано"
                           @bind-SelectedValues="SelectedRoles" />
         <Button Variant="ButtonVariant.Primary"
-                IsLoading="_submitting"
+                InProgress="_submitting"
                 Text="@(UsersGroupId.HasValue ? "Сохранить изменения" : "Добавить")"
                 LoadingText="@(UsersGroupId.HasValue ? "Сохранение" : "Добавление")"
                 OnButtonClick="SendUsersGroup" />

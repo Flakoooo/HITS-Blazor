@@ -22,7 +22,7 @@
            CustomValidation="ValidFinishDate"
            @bind-Value="MarketFinishDate" />
     <Button Variant="ButtonVariant.Primary"
-            IsLoading="_submitting"
+            InProgress="_submitting"
             Text="@(Market is not null ? "Сохранить изменения" : "Добавить")"
             LoadingText="@(Market is not null ? "Сохранение" : "Добавление")"
             OnButtonClick="SendMarket" />

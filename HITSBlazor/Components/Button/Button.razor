@@ -1,22 +1,30 @@
 ﻿@namespace HITSBlazor.Components.Button
+@using HITSBlazor.Components.Placeholders.Placeholder
 @using HITSBlazor.Components.Typography
 
-<button type="@BtnType.ToString().ToLower()" 
-        @onclick="@ButtonClick" 
-        disabled="@IsLoading"
-        class="@GetClass()"
-        style="@Style">
-    @if (!string.IsNullOrWhiteSpace(IconStyle))
-    {
-        <i class="bi @IconStyle @IconSize"></i>
-    }
-    @if (IsLoading.HasValue && IsLoading.Value && !string.IsNullOrWhiteSpace(LoadingText))
-    {
-        <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-        <Typography>@LoadingText...</Typography>
-    }
-    else if (!string.IsNullOrWhiteSpace(Text))
-    {
-        <Typography>@Text</Typography>
-    }
-</button>
+@if (IsLoading)
+{
+    <Placeholder Height="PlaceholderHeight.Smaller" Width="@LoadingWidth" />
+}
+else
+{
+    <button type="@BtnType.ToString().ToLower()"
+            @onclick="@ButtonClick"
+            disabled="@InProgress"
+            class="@GetClass()"
+            style="@Style">
+        @if (!string.IsNullOrWhiteSpace(IconStyle))
+        {
+            <i class="bi @IconStyle @IconSize"></i>
+        }
+        @if (InProgress && !string.IsNullOrWhiteSpace(LoadingText))
+        {
+            <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+            <Typography>@LoadingText...</Typography>
+        }
+        else if (!string.IsNullOrWhiteSpace(Text))
+        {
+            <Typography>@Text</Typography>
+        }
+    </button>
+}

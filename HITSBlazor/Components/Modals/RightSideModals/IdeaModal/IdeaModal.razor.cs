@@ -34,7 +34,7 @@ namespace HITSBlazor.Components.Modals.RightSideModals.IdeaModal
         [Parameter]
         public Guid IdeaId { get; set; }
 
-        private bool isLoading = true;
+        private bool _isLoading = true;
         private bool _submitted = false;
         private bool isRatingSaving = false;
         private bool isRatingSaved = false;
@@ -128,7 +128,7 @@ namespace HITSBlazor.Components.Modals.RightSideModals.IdeaModal
 
         protected override async Task OnInitializedAsync()
         {
-            isLoading = true;
+            _isLoading = true;
 
             CurrentUser = AuthService.CurrentUser; 
 
@@ -173,7 +173,7 @@ namespace HITSBlazor.Components.Modals.RightSideModals.IdeaModal
                 CurrentIdea.IsChecked = true;
             }
 
-            isLoading = false;
+            _isLoading = false;
         }
 
         private void UpdateRatingScore()
@@ -299,6 +299,12 @@ namespace HITSBlazor.Components.Modals.RightSideModals.IdeaModal
                 if (await IdeasService.DeleteCommentInIdeaAsync(comment))
                     IdeaComments.Remove(comment);
             }
+        }
+
+        private void ShowUserProfile(Guid? userId)
+        {
+            if (userId.HasValue)
+                ModalService.ShowProfileModal(userId.Value);
         }
 
         private async Task NavigateToCreateIdea()

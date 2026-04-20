@@ -5,6 +5,9 @@ namespace HITSBlazor.Components.Inputs.Select
     public partial class Select
     {
         [Parameter]
+        public bool IsLoading { get; set; } = false;
+
+        [Parameter]
         public string Label { get; set; } = string.Empty;
 
         [Parameter]

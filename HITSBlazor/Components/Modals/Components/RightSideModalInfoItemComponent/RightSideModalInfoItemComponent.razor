@@ -1,40 +1,52 @@
 ﻿@namespace HITSBlazor.Components.Modals.Components.RightSideModalInfoItemComponent
+@using HITSBlazor.Components.Placeholders.Placeholder
 @using HITSBlazor.Components.Typography
 
 <div class="w-100">
-    <Typography FontSize="6" TextColor="HITSBlazor.Components.Typography.TextColor.Secondary" CustomClass="border-bottom d-block">
-        @Label
-        @if (IsInline)
-        {
-            <Typography FontSize="6" TextColor="TextColor">
-                @($" {Text}")
-            </Typography>
-        }
-    </Typography>
-    @if (!IsInline)
+    @if (IsLoading)
     {
-        <div class="right-side-modal-info-item pt-2">
-            @if (!string.IsNullOrWhiteSpace(Icon))
-            {
-                <i class="bi @Icon text-secondary fs-3 opacity-25"></i>
-            }
-            @if (IsLinkable)
-            {
-                <Typography FontSize="6" TextColor="TextColor" OnClick="LinkClick">
-                    @Text
-                </Typography>
-            }
-            else
+        <Placeholder Width="w-25" />
+        <Placeholder />
+    }
+    else
+    {
+        <Typography FontSize="6" TextColor="HITSBlazor.Components.Typography.TextColor.Secondary" CustomClass="border-bottom d-block">
+            @Label
+            @if (IsInline)
             {
                 <Typography FontSize="6" TextColor="TextColor">
-                    @Text
+                    @($" {Text}")
                 </Typography>
             }
-        </div>
+        </Typography>
+        @if (!IsInline)
+        {
+            <div class="right-side-modal-info-item pt-2">
+                @if (!string.IsNullOrWhiteSpace(Icon))
+                {
+                    <i class="bi @Icon text-secondary fs-3 opacity-25"></i>
+                }
+                @if (IsLinkable)
+                {
+                    <Typography FontSize="6" TextColor="TextColor" OnClick="LinkClick">
+                        @Text
+                    </Typography>
+                }
+                else
+                {
+                    <Typography FontSize="6" TextColor="TextColor">
+                        @Text
+                    </Typography>
+                }
+            </div>
+        }
     }
 </div>
 
 @code {
+    [Parameter]
+    public bool IsLoading { get; set; } = false;
+
     [Parameter]
     public string Label { get; set; } = string.Empty;
 

@@ -1,16 +1,18 @@
-﻿namespace HITSBlazor.Utils.EnumStyles
+﻿using HITSBlazor.Components.Typography;
+
+namespace HITSBlazor.Utils.EnumStyles
 {
     public static class IdeaRatingStyle
     {
-        public static string GetStyle(this double rating) => rating switch
+        public static TextColor GetStyle(this double rating) => rating switch
         {
-            < 3.0 => "text-danger",
-            >= 3.0 and < 4.0 => "text-warning",
-            >= 4.0 => "text-success",
-            _ => string.Empty
+            < 3.0 => TextColor.Danger,
+            >= 3.0 and < 4.0 => TextColor.Warning,
+            >= 4.0 => TextColor.Success,
+            _ => TextColor.Secondary
         };
 
-        public static string GetStyle(this double? rating)
-            => rating is null ? string.Empty : rating.Value.GetStyle();
+        public static TextColor GetStyle(this double? rating)
+            => rating is null ? TextColor.Secondary : rating.Value.GetStyle();
     }
 }
