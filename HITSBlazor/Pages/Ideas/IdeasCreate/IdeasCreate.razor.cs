@@ -202,9 +202,6 @@ namespace HITSBlazor.Pages.Ideas.IdeasCreate
         //TODO: реализовать слегка подробное отображение ошибки валидации в уведомлении
         private async Task CreateIdea(IdeaStatusType ideaStatusType)
         {
-            Console.WriteLine(IdeasCreateModel.MinTeamSize);
-            return;
-
             if (ideaStatusType == IdeaStatusType.OnConfirmation)
             {
                 bool isInvalid = false;
