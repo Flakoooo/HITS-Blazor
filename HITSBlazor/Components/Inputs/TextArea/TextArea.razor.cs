@@ -5,6 +5,9 @@ namespace HITSBlazor.Components.Inputs.TextArea
     public partial class TextArea
     {
         [Parameter]
+        public bool IsLoading { get; set; } = false;
+
+        [Parameter]
         public string? Label { get; set; }
 
         [Parameter]

@@ -9,13 +9,17 @@ namespace HITSBlazor.Components.Placeholders.Placeholder
         [Style("")]
         None,
 
-        [Description("filter-button")]
+        [Description("smaller")]
         [Style("height: 40px;")]
         Smaller,
 
         [Description("small")]
         [Style("height: 50px;")]
         Small,
+
+        [Description("regular")]
+        [Style("height: 70px;")]
+        Regular,
 
         [Description("medium")]
         [Style("height: 100px;")]

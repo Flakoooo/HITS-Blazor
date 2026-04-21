@@ -2,20 +2,23 @@
 @using HITSBlazor.Components.Placeholders.Placeholder
 @using HITSBlazor.Components.Typography
 
-@if (IsLoading)
-{
-    @if (string.IsNullOrWhiteSpace(Label))
+<div class="w-100">
+    @if (IsLoading)
     {
-        <Placeholder Width="w-25" />
+        @if (!string.IsNullOrWhiteSpace(Label))
+        {
+            <Placeholder Width="w-25" />
+        }
+        <Placeholder Height="PlaceholderHeight.Smaller" />
     }
-    <Placeholder Height="PlaceholderHeight.Smaller" />
-}
-else
-{
-    <div class="w-100">
-        <label class="form-label text-primary">
-            @Label*
-        </label>
+    else
+    {
+        @if (!string.IsNullOrWhiteSpace(Label))
+        {
+            <label class="form-label text-primary">
+                @Label*
+            </label>
+        }
         <select value="@Value" @onchange="OnOptionChanged" class="form-select @(_showError ? "is-invalid" : string.Empty)">
             <option disabled value="">Выберите значение</option>
             @foreach (var option in Options)
@@ -27,5 +30,5 @@ else
         {
             <Typography CustomClass="invalid-feedback">@ErrorMessage</Typography>
         }
-    </div>
-}
+    }
+</div>

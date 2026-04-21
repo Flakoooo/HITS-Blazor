@@ -1,41 +1,53 @@
 ﻿@namespace HITSBlazor.Components.Inputs.Input
 @using HITSBlazor.Components.Hint
+@using HITSBlazor.Components.Placeholders.Placeholder
 @using HITSBlazor.Components.Typography
 
 <div class="w-@Width">
-    @if (!string.IsNullOrWhiteSpace(Label))
+    @if (IsLoading)
     {
-        <label class="form-label text-primary d-flex gap-1 align-items-center">
-            @Label
-            @if (!string.IsNullOrWhiteSpace(HintText))
-            {
-                <Hint Text="@HintText" />
-            }
-        </label>
+        @if (!string.IsNullOrWhiteSpace(Label))
+        {
+            <Placeholder Width="w-25" />
+        }
+        <Placeholder Height="PlaceholderHeight.Smaller" />
     }
-    <div class="input-group">
-        @if (!string.IsNullOrWhiteSpace(IconStyle))
+    else
+    {
+        @if (!string.IsNullOrWhiteSpace(Label))
         {
-            <Typography FontSize="6" CustomClass="input-group-text">
-                @if (!IconStyle.Contains("bi"))
+            <label class="form-label text-primary d-flex gap-1 align-items-center">
+                @Label
+                @if (!string.IsNullOrWhiteSpace(HintText))
                 {
-                    @IconStyle
+                    <Hint Text="@HintText" />
                 }
-                else
-                {
-                    <i class="bi @IconStyle"></i>
-                }
-            </Typography>
+            </label>
         }
-        <input type="@InputType.ToString().ToLower()"
-               value="@Value"
-               placeholder="@Placeholder"
-               @oninput="@OnInputChanged"
-               class="form-control rounded-end @CustomClass @(_showError ? "is-invalid" : string.Empty)"
-               @attributes="GetInputAttributes()" />
-        @if (_showError && !string.IsNullOrWhiteSpace(ErrorMessage))
-        {
-            <Typography CustomClass="invalid-feedback">@ErrorMessage</Typography>
-        }
-    </div>
+        <div class="input-group">
+            @if (!string.IsNullOrWhiteSpace(IconStyle))
+            {
+                <Typography FontSize="6" CustomClass="input-group-text">
+                    @if (!IconStyle.Contains("bi"))
+                    {
+                        @IconStyle
+                    }
+                    else
+                    {
+                        <i class="bi @IconStyle"></i>
+                    }
+                </Typography>
+            }
+            <input type="@InputType.ToString().ToLower()"
+                   value="@Value"
+                   placeholder="@Placeholder"
+                   @oninput="@OnInputChanged"
+                   class="form-control rounded-end @CustomClass @(_showError ? "is-invalid" : string.Empty)"
+                   @attributes="GetInputAttributes()" />
+            @if (_showError && !string.IsNullOrWhiteSpace(ErrorMessage))
+            {
+                <Typography CustomClass="invalid-feedback">@ErrorMessage</Typography>
+            }
+        </div>
+    }
 </div>

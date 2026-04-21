@@ -21,50 +21,71 @@
 
 <div class="new-idea page-content-with-header">
     <div class="p-3 bg-white w-100 h-100 idea-form">
-        <Typography FontSize="2" TextColor="TextColor.Primary">
-            @(string.IsNullOrWhiteSpace(IdeaId) ? "Создание" : "Редактирование") идеи
-        </Typography>
+        @if (_isLoading)
+        {
+            <Placeholder Width="w-25" />
+        }
+        else
+        {
+            <Typography FontSize="2" TextColor="TextColor.Primary">
+                @(string.IsNullOrWhiteSpace(IdeaId) ? "Создание" : "Редактирование") идеи
+            </Typography>
+        }
         <div class="w-75 d-flex flex-column gap-3">
             <div class="d-flex flex-column gap-3">
-                <Input Label="Название идеи*"
-                       HintText="@_hints[nameof(IdeasCreateModel.Name)]"
+                <Input IsLoading="_isLoading"
+                       Label="Название идеи*"
+                       HintText="@GetHintText(nameof(IdeasCreateModel.Name))"
                        NeedValidation="_submitted"
                        Placeholder="Введите название идеи"
                        @bind-Value="@IdeasCreateModel.Name" />
-                <TextArea Label="Проблема*"
-                          HintText="@_hints[nameof(IdeasCreateModel.Problem)]"
+                <TextArea IsLoading="_isLoading"
+                          Label="Проблема*"
+                          HintText="@GetHintText(nameof(IdeasCreateModel.Problem))"
                           NeedValidation="_submitted"
                           Placeholder="Опишите проблему, которую решает ваша идея"
                           @bind-Value="@IdeasCreateModel.Problem" />
-                <TextArea Label="Предлагаемое решение*"
-                          HintText="@_hints[nameof(IdeasCreateModel.Solution)]"
+                <TextArea IsLoading="_isLoading"
+                          Label="Предлагаемое решение*"
+                          HintText="@GetHintText(nameof(IdeasCreateModel.Solution))"
                           NeedValidation="_submitted"
                           Placeholder="Опишите, что вы предлагаете для решения проблемы"
                           @bind-Value="@IdeasCreateModel.Solution" />
-                <TextArea Label="Ожидаемый результат*"
-                          HintText="@_hints[nameof(IdeasCreateModel.Result)]"
+                <TextArea IsLoading="_isLoading"
+                          Label="Ожидаемый результат*"
+                          HintText="@GetHintText(nameof(IdeasCreateModel.Result))"
                           NeedValidation="_submitted"
                           Placeholder="Опишите ожидаемый результат"
                           @bind-Value="@IdeasCreateModel.Result" />
-                <TextArea Label="Описание необходимых ресурсов для реализации*"
-                          HintText="@_hints[nameof(IdeasCreateModel.Description)]"
+                <TextArea IsLoading="_isLoading"
+                          Label="Описание необходимых ресурсов для реализации*"
+                          HintText="@GetHintText(nameof(IdeasCreateModel.Description))"
                           NeedValidation="_submitted"
                           Placeholder="Укажите список требуемых для выполнения проекта ресурсов"
                           @bind-Value="@IdeasCreateModel.Description" />
                 <div>
-                    <div class="d-flex gap-1 align-items-center">
-                        <Typography FontSize="6" TextColor="TextColor.Primary">
-                            Желаемое количество участников в команде*
-                        </Typography>
-                        <Hint Text="@_hints["TeamSize"]" />
-                    </div>
+                    @if (_isLoading)
+                    {
+                        <Placeholder Width="w-25" />
+                    }
+                    else
+                    {
+                        <div class="d-flex gap-1 align-items-center">
+                            <Typography FontSize="6" TextColor="TextColor.Primary">
+                                Желаемое количество участников в команде*
+                            </Typography>
+                            <Hint Text="@GetHintText("TeamSize")" />
+                        </div>
+                    }
                     <div class="mt-2 d-flex gap-3">
-                        <Number MinValue="2" 
+                        <Number IsLoading="_isLoading"
+                                MinValue="2" 
                                 MaxValue="30" 
                                 NeedValidation="_submitted"
                                 Placeholder="Минимальное количество: 2" 
                                 @bind-Value="IdeasCreateModel.MinTeamSize" />
-                        <Number MinValue="2"
+                        <Number IsLoading="_isLoading"
+                                MinValue="2"
                                 MaxValue="30"
                                 NeedValidation="_submitted"
                                 Placeholder="Максимальное количество: 30"
@@ -75,10 +96,7 @@
             <div>
                 @if (_isLoading)
                 {
-                    @for (int p = 0; p < 4; ++p)
-                    {
-                        <Placeholder Height="PlaceholderHeight.Small" />
-                    }
+                    <Placeholder Width="w-25" />
                 }
                 else
                 {
@@ -86,86 +104,83 @@
                         <Typography FontSize="6" TextColor="TextColor.Primary">
                             Стек технологий
                         </Typography>
-                        <Hint Text="@_hints["Skills"]" />
-                    </div>
-                    <div class="mt-2 w-100 stack-categories">
-                        <SkillDropdown Placeholder="@(EnumViewModel<SkillType>.GetTranslation(SkillType.Language))"
-                                       AllSkills="LanguageSkills"
-                                       @bind-SelectedSkills="@SelectedLanguageSkills"
-                                       ValueMustCreated="(value) => CreateNewSkill(value, SkillType.Language)" />
-                        <SkillDropdown Placeholder="@(EnumViewModel<SkillType>.GetTranslation(SkillType.Framework))"
-                                       AllSkills="FrameworkSkills"
-                                       @bind-SelectedSkills="@SelectedFrameworkSkills"
-                                       ValueMustCreated="(value) => CreateNewSkill(value, SkillType.Framework)" />
-                        <SkillDropdown Placeholder="@(EnumViewModel<SkillType>.GetTranslation(SkillType.Database))"
-                                       AllSkills="DatabaseSkills"
-                                       @bind-SelectedSkills="@SelectedDatabaseSkills"
-                                       ValueMustCreated="(value) => CreateNewSkill(value, SkillType.Database)" />
-                        <SkillDropdown Placeholder="@(EnumViewModel<SkillType>.GetTranslation(SkillType.Devops))"
-                                       AllSkills="DevopsSkills"
-                                       @bind-SelectedSkills="@SelectedDevopsSkills"
-                                       ValueMustCreated="(value) => CreateNewSkill(value, SkillType.Devops)" />
+                        <Hint Text="@GetHintText("Skills")" />
                     </div>
                 }
-            </div>
-            @if (_isLoading)
-            {
-                <div class="w-100">
-                    <Placeholder Width="w-25" />
-                    <Placeholder Height="PlaceholderHeight.Small"/>
+                <div class="mt-2 w-100 stack-categories">
+                    <SkillDropdown IsLoading="_isLoading"
+                                   Placeholder="@(EnumViewModel<SkillType>.GetTranslation(SkillType.Language))"
+                                   AllSkills="LanguageSkills"
+                                   @bind-SelectedSkills="@SelectedLanguageSkills"
+                                   ValueMustCreated="(value) => CreateNewSkill(value, SkillType.Language)" />
+                    <SkillDropdown IsLoading="_isLoading"
+                                   Placeholder="@(EnumViewModel<SkillType>.GetTranslation(SkillType.Framework))"
+                                   AllSkills="FrameworkSkills"
+                                   @bind-SelectedSkills="@SelectedFrameworkSkills"
+                                   ValueMustCreated="(value) => CreateNewSkill(value, SkillType.Framework)" />
+                    <SkillDropdown IsLoading="_isLoading"
+                                   Placeholder="@(EnumViewModel<SkillType>.GetTranslation(SkillType.Database))"
+                                   AllSkills="DatabaseSkills"
+                                   @bind-SelectedSkills="@SelectedDatabaseSkills"
+                                   ValueMustCreated="(value) => CreateNewSkill(value, SkillType.Database)" />
+                    <SkillDropdown IsLoading="_isLoading"
+                                   Placeholder="@(EnumViewModel<SkillType>.GetTranslation(SkillType.Devops))"
+                                   AllSkills="DevopsSkills"
+                                   @bind-SelectedSkills="@SelectedDevopsSkills"
+                                   ValueMustCreated="(value) => CreateNewSkill(value, SkillType.Devops)" />
                 </div>
-            }
-            else
+            </div>
+            <RadioDropdown T="Company"
+                           IsLoading="_isLoading"
+                           Label="Заказчик"
+                           HintText="Выберите заказчика (компанию), к которой Вы принадлежите или от лица которой создаётся идея"
+                           Placeholder="Выберите заказчика"
+                           @bind-Value="@SelectedCompany"
+                           AllValues="Companies" />
+            @if (SelectedCompany is not null)
             {
-                <RadioDropdown T="Company"
-                               Label="Заказчик"
-                               HintText="Выберите заказчика (компанию), к которой Вы принадлежите или от лица которой создаётся идея"
-                               Placeholder="Выберите заказчика"
-                               @bind-Value="@SelectedCompany"
-                               AllValues="Companies" />
-                @if (SelectedCompany is not null)
-                {
-                    <RadioDropdown T="User"
-                                   Label="Контактное лицо"
-                                   Placeholder="Выберите контактное лицо"
-                                   @bind-Value="@SelectedContactPerson"
-                                   AllValues="SelectedCompany.Members" />
-                }
+                <RadioDropdown T="User"
+                               IsLoading="_isLoading"
+                               Label="Контактное лицо"
+                               Placeholder="Выберите контактное лицо"
+                               @bind-Value="@SelectedContactPerson"
+                               AllValues="SelectedCompany.Members" />
             }
             <div class="row">
                 <div class="col">
-                    <Select Label="Пригодность"
+                    <Select IsLoading="_isLoading"
+                            Label="Пригодность"
                             @bind-Value="@SuitabilityScore"
                             NeedValidation="_submitted"
                             Options="IdeasRatingCategories.SuitabilityOptions" />
                 </div>
                 <div class="col">
-                    <Select Label="Бюджет" 
+                    <Select IsLoading="_isLoading"
+                            Label="Бюджет" 
                             @bind-Value="@BudgetScore" 
                             NeedValidation="_submitted"
                             Options="IdeasRatingCategories.BudgetOptions" />
                 </div>
             </div>
             <div class="col">
-                <ProgressBar Text="Предварительная оценка" 
+                <ProgressBar IsLoading="_isLoading"
+                             Text="Предварительная оценка" 
                              Score="_preAssessmentScore" 
                              CategoryCounts="5" />
             </div>
             <div class="idea-form-submit-buttons">
                 @if (string.IsNullOrWhiteSpace(IdeaId))
                 {
-                    <Button BtnType="ButtonType.Button" 
-                            Variant="ButtonVariant.Primary"
+                    <Button IsLoading="_isLoading" Variant="ButtonVariant.Primary"
                             Text="Сохранить черновик"
                             OnButtonClick="@(() => CreateIdea(IdeaStatusType.New))" />
-                    <Button BtnType="ButtonType.Button"
-                            Variant="ButtonVariant.Success"
+                    <Button IsLoading="_isLoading" Variant="ButtonVariant.Success"
                             Text="Отправить на согласование"
                             OnButtonClick="@(() => CreateIdea(IdeaStatusType.OnApproval))" />
                 }
                 else
                 {
-                    <Button BtnType="ButtonType.Button"
+                    <Button IsLoading="_isLoading" 
                             Variant="ButtonVariant.Primary"
                             Text="Сохранить изменения"
                             OnButtonClick="UpdateIdea" />

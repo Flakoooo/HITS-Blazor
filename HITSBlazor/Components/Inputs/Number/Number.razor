@@ -1,18 +1,27 @@
 ﻿@namespace HITSBlazor.Components.Inputs.Number
+@using HITSBlazor.Components.Placeholders.Placeholder
 @using HITSBlazor.Components.Typography
 
 <div class="w-100">
-    <div class="input-group">
-        <input type="number"
-               min="@MinValue"
-               max="@MaxValue"
-               value="@Value"
-               placeholder="@Placeholder"
-               @oninput="@OnInputChanged"
-               class="form-control rounded-end @(_showError ? "is-invalid" : string.Empty)" />
-        @if (_showError)
-        {
-            <Typography CustomClass="invalid-feedback">@ErrorMessage</Typography>
-        }
-    </div>
+    @if (IsLoading)
+    {
+        <Placeholder Height="PlaceholderHeight.Smaller" />
+    }
+    else
+    {
+        <div class="input-group">
+            <input type="number"
+                   min="@MinValue"
+                   max="@MaxValue"
+                   placeholder="@Placeholder"
+                   @bind:get="Value"
+                   @bind:set="OnInputChanged"
+                   @bind:event="oninput"
+                   class="form-control rounded-end @(_showError ? "is-invalid" : string.Empty)" />
+            @if (_showError)
+            {
+                <Typography CustomClass="invalid-feedback">@ErrorMessage</Typography>
+            }
+        </div>
+    }
 </div>

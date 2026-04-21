@@ -8,6 +8,9 @@ namespace HITSBlazor.Components.Inputs.Input
     public partial class Input : IDisposable
     {
         [Parameter]
+        public bool IsLoading { get; set; } = false;
+
+        [Parameter]
         public int Width { get; set; } = 100;
 
         [Parameter]

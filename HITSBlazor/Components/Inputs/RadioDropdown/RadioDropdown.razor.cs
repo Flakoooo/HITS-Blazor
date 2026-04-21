@@ -10,6 +10,9 @@ namespace HITSBlazor.Components.Inputs.RadioDropdown
         private IJSRuntime JSRuntime { get; set; } = null!;
 
         [Parameter]
+        public bool IsLoading { get; set; } = false;
+
+        [Parameter]
         public string? Label { get; set; }
 
         [Parameter] 

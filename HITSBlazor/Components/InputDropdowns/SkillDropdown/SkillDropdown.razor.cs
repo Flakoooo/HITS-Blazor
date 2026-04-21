@@ -6,6 +6,9 @@ namespace HITSBlazor.Components.InputDropdowns.SkillDropdown
     public partial class SkillDropdown
     {
         [Parameter]
+        public bool IsLoading { get; set; } = false;
+
+        [Parameter]
         public List<Skill> AllSkills { get; set; } = null!;
 
         [Parameter]

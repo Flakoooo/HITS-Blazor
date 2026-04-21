@@ -204,7 +204,7 @@ namespace HITSBlazor.Components.Modals.RightSideModals.IdeaModal
             {
                 _submitted = true;
             }
-            else if (await IdeasService.SendRatingAsync(_expertRating, true))
+            else if (await IdeasService.SendRatingAsync(_expertRating, true, IdeaRatings))
             {
                 isRatingConfirmed = true;
             }

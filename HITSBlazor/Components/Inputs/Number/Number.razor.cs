@@ -5,6 +5,9 @@ namespace HITSBlazor.Components.Inputs.Number
     public partial class Number
     {
         [Parameter]
+        public bool IsLoading { get; set; } = false;
+
+        [Parameter]
         public int? MinValue { get; set; }
 
         [Parameter]
@@ -33,16 +36,19 @@ namespace HITSBlazor.Components.Inputs.Number
                 Value = null;
         }
 
-        protected override async Task OnParametersSetAsync()
+        protected override void OnParametersSet()
         {
             _showError = NeedValidation && (Value > 30 || Value < 2);
             ErrorMessage = $"Значение должно быть от {MinValue} до {MaxValue}";
             StateHasChanged();
         }
 
-        private async Task OnInputChanged(ChangeEventArgs e)
+        private async Task OnInputChanged(int? value)
         {
-            if (ValueChanged.HasDelegate && int.TryParse(e.Value?.ToString(), out int value))
+            if (value < MinValue) value = MinValue.Value;
+            else if (value > MaxValue) value = MaxValue.Value;
+
+            if (ValueChanged.HasDelegate)
                 await ValueChanged.InvokeAsync(value);
         }
     }

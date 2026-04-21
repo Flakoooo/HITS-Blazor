@@ -10,12 +10,13 @@
 
 <div class="w-25">
     <CheckboxDropdown T="Skill"
+                      IsLoading="IsLoading"
                       AllValues="AllSkills"
                       Placeholder="@Placeholder"
                       @bind-SelectedValues="SelectedSkills"
                       CreateValueAllowed="true"
                       ValueMustCreated="(value) => CreateNewSkill(value)" />
-    @if (SelectedSkills.Any())
+    @if (!IsLoading && SelectedSkills.Any())
     {
         <div class="mt-2">
             <div class="d-flex flex-wrap gap-1">
