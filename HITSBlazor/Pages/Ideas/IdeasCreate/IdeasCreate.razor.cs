@@ -199,33 +199,34 @@ namespace HITSBlazor.Pages.Ideas.IdeasCreate
             StateHasChanged();
         }
 
-        //TODO: реализовать слегка подробное отображение ошибки валидации в уведомлении
+        private bool CheckValidValues()
+        {
+            if (string.IsNullOrWhiteSpace(IdeasCreateModel.Name)) return false;
+            if (string.IsNullOrWhiteSpace(IdeasCreateModel.Problem)) return false;
+            if (string.IsNullOrWhiteSpace(IdeasCreateModel.Description)) return false;
+            if (string.IsNullOrWhiteSpace(IdeasCreateModel.Solution)) return false;
+            if (string.IsNullOrWhiteSpace(IdeasCreateModel.Result)) return false;
+
+            if (!IdeasCreateModel.MaxTeamSize.HasValue || IdeasCreateModel.MaxTeamSize.Value is > 30 or < 2) return false;
+
+            if (!IdeasCreateModel.MinTeamSize.HasValue || IdeasCreateModel.MinTeamSize.Value is > 30 or < 2) return false;
+
+            if (SelectedCompany is null) return false;
+            if (SelectedContactPerson is null) return false;
+
+            if (IdeasCreateModel.Suitability is > 5 or < 1) return false;
+            if (IdeasCreateModel.Budget is > 5 or < 1) return false;
+
+            return true;
+        }
+
         private async Task CreateIdea(IdeaStatusType ideaStatusType)
         {
-            if (ideaStatusType == IdeaStatusType.OnConfirmation)
+            if (ideaStatusType is IdeaStatusType.OnApproval && !CheckValidValues())
             {
-                bool isInvalid = false;
-                if (string.IsNullOrWhiteSpace(IdeasCreateModel.Name)) isInvalid = true;
-                if (string.IsNullOrWhiteSpace(IdeasCreateModel.Problem)) isInvalid = true;
-                if (string.IsNullOrWhiteSpace(IdeasCreateModel.Description)) isInvalid = true;
-                if (string.IsNullOrWhiteSpace(IdeasCreateModel.Solution)) isInvalid = true;
-                if (string.IsNullOrWhiteSpace(IdeasCreateModel.Result)) isInvalid = true;
-
-                if (IdeasCreateModel.MaxTeamSize.HasValue && IdeasCreateModel.MaxTeamSize.Value is > 30 or < 2) isInvalid = true;
-                if (IdeasCreateModel.MinTeamSize.HasValue && IdeasCreateModel.MinTeamSize.Value is > 30 or < 2) isInvalid = true;
-
-                if (SelectedCompany is null) isInvalid = true;
-                if (SelectedContactPerson is null) isInvalid = true;
-
-                if (IdeasCreateModel.Suitability is > 5 or < 1) isInvalid = true;
-                if (IdeasCreateModel.Budget is > 5 or < 1) isInvalid = true;
-
-                if (isInvalid)
-                {
-                    GlobalNotificationService.ShowError("Заполните все необходимые поля");
-                    _submitted = true;
-                    return;
-                }
+                GlobalNotificationService.ShowError("Заполните все необходимые поля");
+                _submitted = true;
+                return;
             }
 
             IdeasCreateModel.Status = ideaStatusType;
@@ -233,7 +234,6 @@ namespace HITSBlazor.Pages.Ideas.IdeasCreate
             IdeasCreateModel.ContactPerson = SelectedContactPerson!.FullName;
 
             var result = await IdeasService.CreateNewIdeaAsync(IdeasCreateModel);
-            _submitted = true;
 
             if (result is null) return;
 
@@ -247,6 +247,7 @@ namespace HITSBlazor.Pages.Ideas.IdeasCreate
                 ]
             );
             await Navigation.NavigateToAsync("ideas/list");
+            _submitted = true;
         }
 
         private async Task UpdateIdea()

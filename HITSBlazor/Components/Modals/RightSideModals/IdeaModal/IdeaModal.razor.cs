@@ -235,10 +235,10 @@ namespace HITSBlazor.Components.Modals.RightSideModals.IdeaModal
             if (CurrentUser?.Role is RoleType.Admin) 
                 return true;
 
-            if (CurrentIdea?.Status is IdeaStatusType.New or IdeaStatusType.OnEditing 
-                && CurrentUser?.Role is RoleType.Initiator 
-                && CurrentUser?.Id == CurrentIdea?.Initiator.Id
-            ) return true;
+            if (CurrentIdea?.Status is IdeaStatusType.New or IdeaStatusType.OnEditing)
+            {
+                if (CurrentUser?.Role is RoleType.Initiator && CurrentUser?.Id == CurrentIdea?.Initiator.Id) return true;
+            }
 
             return false;
         }
@@ -248,9 +248,10 @@ namespace HITSBlazor.Components.Modals.RightSideModals.IdeaModal
             if (CurrentUser?.Role is RoleType.Admin) 
                 return true;
 
-            if (CurrentIdea?.Status is IdeaStatusType.OnApproval 
-                && CurrentUser?.Id == CurrentIdea.ProjectOffice?.Id
-            ) return true;
+            if (CurrentIdea?.Status is IdeaStatusType.OnApproval)
+            {
+                if (CurrentUser?.Id == CurrentIdea.ProjectOffice?.Id) return true;
+            }
 
             return false;
         }

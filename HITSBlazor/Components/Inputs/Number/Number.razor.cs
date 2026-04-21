@@ -38,7 +38,8 @@ namespace HITSBlazor.Components.Inputs.Number
 
         protected override void OnParametersSet()
         {
-            _showError = NeedValidation && (Value > 30 || Value < 2);
+            _showError = NeedValidation && (!Value.HasValue || Value.Value > MaxValue || Value.Value < MinValue);
+
             ErrorMessage = $"Значение должно быть от {MinValue} до {MaxValue}";
             StateHasChanged();
         }
