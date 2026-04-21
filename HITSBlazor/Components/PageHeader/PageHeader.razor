@@ -8,87 +8,30 @@
 @using HITSBlazor.Services.Auth
 @using HITSBlazor.Services.Modal
 @using HITSBlazor.Utils.Models
-@inject IAuthService AuthService
-@inject ModalService ModalService
 
-<div class="bg-white border-bottom w-100" 
-     style="position: sticky; top: 0; right: 0; bottom: auto; left: 0; z-index: 6; height: min-content;">
-    <div class="py-2 px-3 bg-white w-100" 
-         style="display: flex; flex-direction: row; flex-wrap: nowrap; align-items: center; justify-content: space-between;">
+<div class="bg-white border-bottom w-100 position-sticky" 
+     style="top: 0; right: 0; bottom: auto; left: 0; z-index: 6; height: min-content;">
+    <div class="py-2 px-3 bg-white w-100 d-flex flex-row flex-nowrap align-items-center justify-content-between">
         <div class="d-flex gap-2 align-items-center">
             <div class="rounded-circle overflow-hidden" 
                  style="height: 58px; min-height: 58px; max-height: 58px; width: 58px; min-width: 58px; max-width: 58px;">
                 <img class="text-secondary" width="58" height="58" src="/images//defProfile.png" />
             </div>
             <div class="d-flex gap-1 flex-column">
-                <div @onclick="ShowUserProfile" class="fw-semibold data-link" style="width: fit-content;">
-                    <Typography FontSize="6">@CurrentUser?.FullName</Typography>
-                </div>
-                <!-- TODO: Заменить на Button -->
-                <button type="button" 
-                        @onclick="ShowRoleModal"
-                        class="btn d-flex btn-outline-success btn-sm rounded-4 py-1 fit-" style="width: fit-content;">
-                    <i class="bi bi-circle-fill fs-6"></i>
-                    @(EnumViewModel<RoleType>.GetTranslation(CurrentRole))
-                </button>
+                <Typography FontSize="6" OnClick="() => ShowUserProfile()" CustomClass="fw-semibold">
+                    @CurrentUser?.FullName
+                </Typography>
+                <Button ButtonClass="btn-outline-success btn-sm rounded-4 py-1"
+                        IconStyle="bi-circle-fill"
+                        IconSize="fs-6"
+                        Style="width: fit-content;"
+                        Text="@(EnumViewModel<RoleType>.GetTranslation(CurrentRole))"
+                        OnButtonClick="() => ShowRoleModal()" />
             </div>
         </div>
-        <div class="d-flex gap-2">
-            <!-- TODO: При нажатии вызывать ссылку на тг, но на кого??? -->
-            <button type="button" class="btn d-flex btn-primary">
-                <i class="bi bi-telegram fs-5"></i>
-            </button>
-            <!-- TODO: При нажатии вызывать боковую панель уведомлений -->
-            <button type="button" class="btn d-flex btn-primary position-relative">
-                <i class="bi bi-bell-fill fs-5"></i>
-            </button>
-        </div>
+        <Button Variant="ButtonVariant.Primary"
+                ButtonClass="position-relative"
+                IconStyle="bi-bell-fill"
+                OnButtonClick="() => ShowNotificationModal()" />
     </div>
 </div>
-
-@code {
-    private User? CurrentUser { get; set; } = null;
-    private RoleType? CurrentRole { get; set; } = null;
-
-    protected override async Task OnInitializedAsync()
-    {
-        try
-        {
-            AuthService.OnAuthStateChanged += AuthStateChanged;
-            AuthService.OnActiveRoleChanged += RoleStateChanged;
-            CurrentUser = AuthService.CurrentUser;
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Ошибка инициализации MainLayout: {ex.Message}");
-        }
-    }
-
-    private void AuthStateChanged()
-    {
-        CurrentUser = AuthService.CurrentUser;
-        StateHasChanged();
-    }
-
-    private void RoleStateChanged(RoleType? role)
-    {
-        CurrentRole = role;
-        StateHasChanged();
-    }
-
-    private void ShowUserProfile()
-    {
-        var userId = CurrentUser?.Id;
-        if (userId is null) return;
-
-        ModalService.ShowProfileModal(userId.Value);
-    }
-
-    private void ShowRoleModal() => ModalService.ShowActiveRoleModal();
-
-    public void Dispose()
-    {
-        AuthService.OnAuthStateChanged -= AuthStateChanged;
-        AuthService.OnActiveRoleChanged -= RoleStateChanged;
-    }
-}

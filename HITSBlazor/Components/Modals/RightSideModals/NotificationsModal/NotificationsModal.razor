@@ -1,0 +1,69 @@
+﻿@namespace HITSBlazor.Components.Modals.RightSideModals.NotificationsModal
+@using HITSBlazor.Components.Button
+@using HITSBlazor.Components.NavigationTabs
+@using HITSBlazor.Components.Typography
+@using HITSBlazor.Services.Modal
+
+<div @onclick:stopPropagation="true"
+     class="notification-window-modal p-3 bg-white overflow-y-scroll">
+    <div class="w-100 d-flex justify-content-between">
+        <Button Variant="ButtonVariant.Primary" 
+                ButtonClass="col-2"
+                IconStyle="bi-backspace-fill"
+                Text="Назад"
+                OnButtonClick="() => ModalService.Close(ModalType.RightSide)"/>
+        <Typography FontSize="3" TextColor="TextColor.Primary" CustomClass="text-center">
+            Уведомления
+        </Typography>
+        <div class="col-2"></div>
+    </div>
+    <NavigationTabs T="NotificationCategory" 
+                    NavType="NavigationTabType.Underline" 
+                    NavClass="w-100 d-flex justify-content-center"
+                    NavLinkClass="fw-normal"
+                    Tabs="Enum.GetValues<NotificationCategory>()"
+                    ActiveTab="_activeCategory"
+                    ActiveTabChanged="(value) => ChangeCategory(value)" />
+    @if (_activeCategory is NotificationCategory.All)
+    {
+        <div class="w-100 d-flex flex-column gap-3">
+            @{
+                var uncheckedNotifications = _notifications.Where(n => !n.IsReaded).ToList();
+                <div class="d-flex justify-content-between align-items-center gap-3 w-100">
+                    <Typography FontSize="5" TextColor="TextColor.Primary">
+                        Непрочитано (@uncheckedNotifications.Count)
+                    </Typography>
+                </div>
+                @if (uncheckedNotifications.Count == 0)
+                {
+                    <div class="w-100 text-center">
+                        <Typography FontSize="6" TextColor="TextColor.Secondary">
+                            У вас нет непрочитанных уведомлений
+                        </Typography>
+                    </div>
+                }
+            }
+            <hr class="my-0 hr hr-blurry" />
+            <div class="w-100 d-flex flex-column">
+                @{
+                    var checkedNotifications = _notifications.Where(n => n.IsReaded).ToList();
+                    <Typography FontSize="5" TextColor="TextColor.Primary" CustomClass="text-wrap">
+                        Прочитано (@checkedNotifications.Count)
+                    </Typography>
+                    @if (checkedNotifications.Count == 0)
+                    {
+                        <Typography FontSize="6" TextColor="TextColor.Secondary" CustomClass="w-100 text-center">
+                            У вас нет непрочитанных уведомлений
+                        </Typography>
+                    }
+                }
+            </div>
+        </div>
+    }
+    else if (_activeCategory is NotificationCategory.Favorite)
+    {
+        <Typography FontSize="6" TextColor="TextColor.Secondary" CustomClass="w-100 text-center">
+            Добавляйте в избранное важные уведомления
+        </Typography>
+    }
+</div>
