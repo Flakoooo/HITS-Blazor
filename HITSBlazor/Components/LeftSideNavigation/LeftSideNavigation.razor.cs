@@ -83,9 +83,8 @@ namespace HITSBlazor.Components.LeftSideNavigation
         private string GetItemButtonClass(int itemId)
         {
             var baseClass = "nav-link d-flex w-100";
-            var isActive = activeSubItem.ParentId == itemId;
 
-            if (isActive)
+            if (activeSubItem.ParentId == itemId)
                 return $"{baseClass} bg-primary text-white";
 
             return isHovered ? $"{baseClass} text-white" : $"{baseClass} text-black";
@@ -102,7 +101,7 @@ namespace HITSBlazor.Components.LeftSideNavigation
         private async Task SelectMenuItem(int itemId)
         {
             var item = _menuItems.FirstOrDefault(n => n.Id == itemId);
-            if (item == null || string.IsNullOrEmpty(item.BaseUrl)) return;
+            if (item is null || string.IsNullOrEmpty(item.BaseUrl)) return;
 
             if (item.SubItems.Count != 0)
             {
@@ -120,12 +119,14 @@ namespace HITSBlazor.Components.LeftSideNavigation
             var parentItem = _menuItems.FirstOrDefault(n => n.Id == parentId);
             var subItem = parentItem?.SubItems.FirstOrDefault(n => n.Id == subItemId);
 
-            if (parentItem == null || subItem == null) return;
+            if (parentItem is null || subItem is null) return;
 
             await NavigationService.NavigateToAsync($"{parentItem.BaseUrl}{subItem.Url}");
         }
 
         private void ShowRoleModal() => ModalService.ShowActiveRoleModal();
+
+        private async Task Logout() => await AuthService.LogoutAsync();
 
         public void Dispose()
         {

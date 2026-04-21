@@ -1,0 +1,8 @@
+﻿.left-side-bar-link {
+    border-radius: 6px;
+    transition: background-color .15s ease-out
+}
+
+    .left-side-bar-link:hover {
+        background-color: rgba(0,0,0,.424)
+    }

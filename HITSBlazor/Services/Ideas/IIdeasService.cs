@@ -32,7 +32,7 @@ namespace HITSBlazor.Services.Ideas
 
         //Ratings
         Task<List<Rating>> GetIdeaRatingsAsync(Guid ideaId);
-        Task<bool> SendRatingAsync(RatingRequest request, bool isConfirmed = false);
+        Task<bool> SendRatingAsync(RatingRequest request, bool isConfirmed = false, List<Rating>? ideasRatings = null);
 
         //Comments
         Task<List<Comment>> GetIdeasCommentsAsync(Guid ideaId);

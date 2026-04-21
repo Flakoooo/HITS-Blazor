@@ -81,7 +81,6 @@ namespace HITSBlazor.Services.Ideas
             return newIdea;
         }
 
-        //TODO: как то в UI отслеживать изменение, походу передавать туда Id идеи и true
         public async Task<bool> UpdateCheckedIdeaAsync(Guid ideaId)
         {
             if (!MockIdeas.CheckIdea(ideaId)) return false;
@@ -110,7 +109,6 @@ namespace HITSBlazor.Services.Ideas
             return true;
         }
 
-        //TODO: как то обновлять в UI статус идеи
         public async Task<bool> UpdateIdeaStatusAsync(Guid ideaId, IdeaStatusType ideaStatus)
         {
             var updatedIdea = MockIdeas.UpdateIdeaStatus(ideaId, ideaStatus);
@@ -148,14 +146,35 @@ namespace HITSBlazor.Services.Ideas
         public async Task<List<Rating>> GetIdeaRatingsAsync(Guid ideaId)
             => MockRatings.GetIdeaRatingById(ideaId);
 
-        public async Task<bool> SendRatingAsync(RatingRequest request, bool isConfirmed)
+        public async Task<bool> SendRatingAsync(RatingRequest request, bool isConfirmed, List<Rating>? ideasRatings)
         {
+            if (isConfirmed && ideasRatings is null)
+            {
+                string errorText = "При подстверждении рейтинга необхдимо также указать значение \"ideasRatings\"";
+                throw new ArgumentNullException(errorText);
+            }
+
+
             if (isConfirmed)
             {
                 if (!MockRatings.UpdateOrConfirmRating(request, isConfirmed))
                 {
                     _globalNotificationService.ShowError("Не удалось подтвердить рейтинг");
                     return false;
+                }
+
+                var rating = ideasRatings!.FirstOrDefault(r => r.Id == request.Id);
+                if (rating is not null)
+                {
+                    rating.MarketValue = request.MarketValue;
+                    rating.Originality = request.Originality;
+                    rating.TechnicalRealizability = request.TechnicalRealizability;
+                    rating.Suitability = request.Suitability;
+                    rating.Budget = request.Budget;
+                    rating.IsConfirmed = true;
+
+                    if (ideasRatings!.Count == ideasRatings!.Count(r => r.IsConfirmed))
+                        OnIdeasStatusHasChanged?.Invoke(rating.IdeaId, IdeaStatusType.Confirmed);
                 }
 
                 _globalNotificationService.ShowSuccess("Рейтинг успешно подтвержден");

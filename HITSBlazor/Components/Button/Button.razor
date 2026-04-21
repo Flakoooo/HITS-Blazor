@@ -20,11 +20,15 @@ else
         @if (InProgress && !string.IsNullOrWhiteSpace(LoadingText))
         {
             <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-            <Typography>@LoadingText...</Typography>
+            <Typography FontSize="TextSize" TextColor="TextColor" CustomClass="@TextCustomClass">
+                @LoadingText...
+            </Typography>
         }
         else if (!string.IsNullOrWhiteSpace(Text))
         {
-            <Typography>@Text</Typography>
+            <Typography FontSize="TextSize" TextColor="TextColor" CustomClass="@TextCustomClass">
+                @Text
+            </Typography>
         }
     </button>
 }

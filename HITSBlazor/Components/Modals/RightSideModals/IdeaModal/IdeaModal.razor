@@ -23,7 +23,6 @@
     <div class="idea-modal-side w-75">
         <RightSideModalHeader IsLoading="_isLoading" HeaderText="@CurrentIdea?.Name" />
         <RightSideModaCollapselInfo IsLoading="_isLoading" Data="ideaData" />
-        <!-- TODO: сделать валидацию полей рейтинга -->
         @if (CheckIdeaRatingAccess() && !isRatingConfirmed)
         {
             <div class="idea-modal-rating bg-white rounded-3 p-3 d-grid w-100">
@@ -163,7 +162,7 @@
                         </div>                        
                     }
                 </div>
-                <!-- TODO: система комментариев не сделана -->
+                <!-- TODO: система комментариев не сделана? ну это уже с API надо делать -->
                 <div class="p-3">
                     <div class="d-flex gap-3 align-items-start">
                         <div class="w-100">
@@ -174,8 +173,7 @@
                                 <input type="text" placeholder="Добавить комментарий" class="form-control rounded-end" />
                             </div>
                         </div>
-                        <Button BtnType="ButtonType.Button" 
-                                Variant="ButtonVariant.Primary"
+                        <Button Variant="ButtonVariant.Primary"
                                 Text="Отправить" />
                     </div>
                 </div>

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using HITSBlazor.Components.Typography;
+using Microsoft.AspNetCore.Components;
 
 namespace HITSBlazor.Components.Button
 {
@@ -24,6 +25,15 @@ namespace HITSBlazor.Components.Button
 
         [Parameter]
         public string LoadingText { get; set; } = string.Empty;
+
+        [Parameter]
+        public int? TextSize { get; set; }
+
+        [Parameter]
+        public TextColor? TextColor { get; set; }
+
+        [Parameter]
+        public string TextCustomClass { get; set; } = string.Empty;
 
         [Parameter]
         public string IconStyle { get; set; } = string.Empty;

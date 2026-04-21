@@ -1,4 +1,5 @@
 ﻿@namespace HITSBlazor.Components.LeftSideNavigation
+@using HITSBlazor.Components.Button
 @using HITSBlazor.Components.Collapse
 @using HITSBlazor.Components.Placeholders.Placeholder
 @using HITSBlazor.Components.Typography
@@ -27,8 +28,7 @@
                 {
                     var item = _menuItems[i];
 
-                    <div class="@(isHovered ? "nav-item w-100" : "nav-item")"
-                         style="@(isHovered ? "border-radius: 6px; transition: background-color .15s ease-out;" : string.Empty)">
+                    <div class="@(isHovered ? "nav-item w-100 left-side-bar-link" : "nav-item")">
                         <Collapse StartCollapsed="!item.IsExpanded">
                             <MainContent Context="collapse">
                                 <button type="button"
@@ -36,8 +36,8 @@
                                             await SelectMenuItem(item.Id); 
                                             await collapse.Toggle(); 
                                         }"
-                                        class="@GetItemButtonClass(item.Id)"
-                                        style="height: 40px; min-height: 40px; max-height: 40px; flex-direction: row; flex-wrap: nowrap; align-items: center; justify-content: flex-start; gap: 4px;">
+                                        class="flex-nowrap flex-row align-items-center justify-content-start gap-1 @GetItemButtonClass(item.Id)"
+                                        style="height: 40px; min-height: 40px; max-height: 40px;">
                                     <i class="bi @item.Icon fs-5"></i>
                                     @if (isHovered)
                                     {
@@ -57,8 +57,8 @@
                                             <!--TODO: Переделать на гиперссылку, чтобы открывать в других окнах-->
                                             <button type="button"
                                                     @onclick="() => SelectSubItem(item.Id, subItem.Id)"
-                                                    class="@GetSubItemClass(item.Id, subItem.Id)"
-                                                    style="height: 40px; min-height: 40px; max-height: 40px; flex-direction: row; flex-wrap: nowrap; align-items: center; justify-content: flex-start; gap: 4px;">
+                                                    class="flex-nowrap flex-row align-items-center justify-content-start gap-1 @GetSubItemClass(item.Id, subItem.Id)"
+                                                    style="height: 40px; min-height: 40px; max-height: 40px;">
                                                 <i class="bi @subItem.Icon"></i>
                                                 @if (isHovered)
                                                 {
@@ -73,28 +73,20 @@
                     </div>
                 }
             </ul>
-
             <div class="d-flex flex-column gap-2">
-                <button type="button"
-                        @onclick="ShowRoleModal"
-                        class="btn d-flex btn-light w-100 text-success"
-                        style="height: 40px; min-height: 40px; max-height: 40px;">
-                    <i class="bi bi-circle-fill fs-6"></i>
-                    @if (isHovered)
-                    {
-                        <span>@(EnumViewModel<RoleType>.GetTranslation(CurrentRole))</span>
-                    }
-                </button>
-                <button @onclick="@(async () => await AuthService.LogoutAsync())"
-                        type="button"
-                        class="btn d-flex btn-light w-100"
-                        style="height: 40px; min-height: 40px; max-height: 40px;">
-                    <i class="bi bi-box-arrow-left fs-5"></i>
-                    @if (isHovered)
-                    {
-                        <span>Выйти</span>
-                    }
-                </button>
+                <Button Variant="ButtonVariant.Light"
+                        ButtonClass="w-100 text-success"
+                        Style="height: 40px; min-height: 40px; max-height: 40px;"
+                        IconStyle="bi-circle-fill"
+                        IconSize="fs-6"
+                        Text="@(isHovered ? EnumViewModel<RoleType>.GetTranslation(CurrentRole) : string.Empty)"
+                        OnButtonClick="() => ShowRoleModal()" />
+                <Button Variant="ButtonVariant.Light" 
+                        ButtonClass="w-100" 
+                        Style="height: 40px; min-height: 40px; max-height: 40px;"
+                        IconStyle="bi-box-arrow-left"
+                        Text="@(isHovered ? "Выйти" : string.Empty)"
+                        OnButtonClick="() => Logout()" />
             </div>
         </div>
     }

@@ -14,7 +14,7 @@ using Microsoft.AspNetCore.Components;
 
 namespace HITSBlazor.Components.Modals.RightSideModals.IdeaModal
 {
-    public partial class IdeaModal
+    public partial class IdeaModal : IDisposable
     {
         [Inject]
         private IAuthService AuthService { get; set; } = null!;
@@ -117,18 +117,13 @@ namespace HITSBlazor.Components.Modals.RightSideModals.IdeaModal
             }
         }
 
-        private bool IsValidOptions => _expertRating is not null &&
-                _expertRating.MarketValue.HasValue &&
-                _expertRating.Originality.HasValue &&
-                _expertRating.TechnicalRealizability.HasValue &&
-                _expertRating.Suitability.HasValue &&
-                _expertRating.Budget.HasValue;
-
         private double? _expertRatingValue;
 
         protected override async Task OnInitializedAsync()
         {
             _isLoading = true;
+
+            IdeasService.OnIdeasStatusHasChanged += ChangeIdeaStatusByEvent;
 
             CurrentUser = AuthService.CurrentUser; 
 
@@ -167,21 +162,21 @@ namespace HITSBlazor.Components.Modals.RightSideModals.IdeaModal
                 }
             }
 
-            if (CurrentIdea is not null)
-            {
+            if (CurrentIdea is not null && !CurrentIdea.IsChecked)
                 await IdeasService.UpdateCheckedIdeaAsync(CurrentIdea.Id);
-                CurrentIdea.IsChecked = true;
-            }
 
             _isLoading = false;
         }
 
         private void UpdateRatingScore()
         {
-            if (!IsValidOptions) return;
+            if (_expertRating is null ||
+                !_expertRating.MarketValue.HasValue ||
+                !_expertRating.Originality.HasValue ||
+                !_expertRating.TechnicalRealizability.HasValue ||
+                !_expertRating.Suitability.HasValue ||
+                !_expertRating.Budget.HasValue) return;
 
-#pragma warning disable CS8629 // Nullable value type may be null.
-#pragma warning disable CS8602 // Dereference of a possibly null reference.
             _expertRatingValue = Formulas.CalculcateRating(
                 [
                     _expertRating.MarketValue.Value, 
@@ -191,8 +186,6 @@ namespace HITSBlazor.Components.Modals.RightSideModals.IdeaModal
                     _expertRating.Budget.Value
                 ]
             );
-#pragma warning restore CS8602 // Dereference of a possibly null reference.
-#pragma warning restore CS8629 // Nullable value type may be null.
 
             StateHasChanged();
         }
@@ -202,19 +195,19 @@ namespace HITSBlazor.Components.Modals.RightSideModals.IdeaModal
             isRatingConfirming = true;
             _submitted = false;
 
-#pragma warning disable CS8604 // Possible null reference argument.
-            if (!IsValidOptions)
+            if (_expertRating is null || 
+                !_expertRating.MarketValue.HasValue ||
+                !_expertRating.Originality.HasValue ||
+                !_expertRating.TechnicalRealizability.HasValue ||
+                !_expertRating.Suitability.HasValue ||
+                !_expertRating.Budget.HasValue)
             {
                 _submitted = true;
             }
             else if (await IdeasService.SendRatingAsync(_expertRating, true))
             {
                 isRatingConfirmed = true;
-                IdeaRatings.FirstOrDefault(r => r.Id == _expertRating.Id)?.IsConfirmed = true;
-                if (IdeaRatings.Count == IdeaRatings.Count(r => r.IsConfirmed))
-                    CurrentIdea?.Status = IdeaStatusType.Confirmed;
             }
-#pragma warning restore CS8604 // Possible null reference argument.
 
             isRatingConfirming = false;
         }
@@ -239,24 +232,25 @@ namespace HITSBlazor.Components.Modals.RightSideModals.IdeaModal
 
         private bool CheckInitiatorAccess()
         {
-            if (CurrentUser?.Role == RoleType.Admin) return true;
+            if (CurrentUser?.Role is RoleType.Admin) 
+                return true;
 
-            if (CurrentIdea?.Status is IdeaStatusType.New or IdeaStatusType.OnEditing)
-            {
-                if (CurrentUser?.Role == RoleType.Initiator && CurrentUser?.Id == CurrentIdea?.Initiator.Id) return true;
-            }
+            if (CurrentIdea?.Status is IdeaStatusType.New or IdeaStatusType.OnEditing 
+                && CurrentUser?.Role is RoleType.Initiator 
+                && CurrentUser?.Id == CurrentIdea?.Initiator.Id
+            ) return true;
 
             return false;
         }
 
         private bool CheckProjectOfficeAccess()
         {
-            if (CurrentUser?.Role == RoleType.Admin) return true;
+            if (CurrentUser?.Role is RoleType.Admin) 
+                return true;
 
-            if (CurrentIdea?.Status == IdeaStatusType.OnApproval)
-            {
-                if (CurrentUser?.Id == CurrentIdea.ProjectOffice?.Id) return true;
-            }
+            if (CurrentIdea?.Status is IdeaStatusType.OnApproval 
+                && CurrentUser?.Id == CurrentIdea.ProjectOffice?.Id
+            ) return true;
 
             return false;
         }
@@ -311,6 +305,16 @@ namespace HITSBlazor.Components.Modals.RightSideModals.IdeaModal
         {
             await ModalService.CloseAll(ModalType.RightSide);
             await NavigationService.NavigateToAsync($"/ideas/create/{CurrentIdea?.Id}");
+        }
+
+        private void ChangeIdeaStatusByEvent(Guid ideaId, IdeaStatusType ideaStatus)
+        {
+            if (ideaId == IdeaId) CurrentIdea?.Status = ideaStatus;
+        }
+
+        public void Dispose()
+        {
+            IdeasService.OnIdeasStatusHasChanged -= ChangeIdeaStatusByEvent;
         }
     }
 }
