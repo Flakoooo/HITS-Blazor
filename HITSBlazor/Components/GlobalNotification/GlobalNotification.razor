@@ -1,5 +1,8 @@
 ﻿@namespace HITSBlazor.Components.GlobalNotification
+@using HITSBlazor.Components.Button
+@using HITSBlazor.Components.Typography
 @using HITSBlazor.Services
+@using HITSBlazor.Utils.Models
 @implements IDisposable
 
 @if (_notifications.Count > 0)
@@ -7,24 +10,39 @@
     <div class="notification-container">
         @foreach (var notification in _notifications)
         {
-            <div class="alert @notification.AlertClass alert-dismissible show fade @notification.AlertAnimation"
-                 style="--notification-index: @notification.Index;"
-                 role="alert">
-                <div class="notification-content">
-                    @notification.Message
+            @if (notification.Type is NotificationType.Info)
+            {
+                <div class="card text-primary @notification.AlertAnimation">
+                    <div class="card-header d-flex flex-row justify-content-between">
+                        <Typography FontSize="6">
+                            @notification.Title
+                        </Typography>
+                        <Button ButtonClass="btn-close" OnButtonClick="async () => await HideNotification(notification.Id)" />
+                    </div>
+                    <div class="card-body">
+                        @notification.Message
+                    </div>
                 </div>
-                <button type="button" class="btn-close" @onclick="() => HideNotification(notification.Id)"></button>
-            </div>
+            }
+            else
+            {
+                <div class="alert @(EnumViewModel<NotificationType>.GetStyle(notification.Type)) alert-dismissible show fade @notification.AlertAnimation"
+                     style="--notification-index: @notification.Index;"
+                     role="alert">
+                    <div class="notification-content">@notification.Message</div>
+                    <Button ButtonClass="btn-close" OnButtonClick="async () => await HideNotification(notification.Id)" />
+                </div>
+            }
         }
     </div>
 }
 
 @code {
-    private List<GlobalNotificationItem> _notifications = [];
-    private bool _isDisposed;
-
     [Inject]
     private GlobalNotificationService NotificationService { get; set; } = null!;
+
+    private List<GlobalNotificationItem> _notifications = [];
+    private bool _isDisposed;
 
     protected override void OnInitialized()
     {
@@ -33,11 +51,11 @@
         NotificationService.OnClearNotification += ClearAll;
     }
 
-    private void ShowError(string errorMessage) => ShowNotification(errorMessage, true);
+    private async void ShowError(string errorMessage) => await ShowNotification(errorMessage, NotificationType.Error);
 
-    private void ShowSuccess(string successMessage) => ShowNotification(successMessage, false);
+    private async void ShowSuccess(string successMessage) => await ShowNotification(successMessage, NotificationType.Success);
 
-    private async void ShowNotification(string message, bool error)
+    private async Task ShowNotification(string message, NotificationType type, string? title = null)
     {
         var existNtf = _notifications.FirstOrDefault(n => n.Message == message);
         if (existNtf is not null)
@@ -54,12 +72,12 @@
                 _notifications.Insert(0, existNtf);
                 StateHasChanged();
                 await Task.Delay(300);
-                existNtf.AlertAnimation = "";
+                existNtf.AlertAnimation = string.Empty;
                 StateHasChanged();
                 UpdateNotificationIndices();
                 StateHasChanged();
             }
-            StartAutoRemoveTimer(existNtf);
+            await StartAutoRemoveTimer(existNtf);
 
             return;
         }
@@ -67,29 +85,31 @@
         var notification = new GlobalNotificationItem
         {
             Id = Guid.NewGuid(),
+            Title = string.IsNullOrWhiteSpace(title) ? EnumViewModel<NotificationType>.GetTranslation(type) : title,
             Message = message,
-            IsError = error,
+            Type = type,
             Index = _notifications.Count
         };
+
         _notifications.Insert(0, notification);
         StateHasChanged();
         await Task.Delay(300);
-        _notifications.ElementAt(0).AlertAnimation = "";
+        notification.AlertAnimation = string.Empty;
         StateHasChanged();
         UpdateNotificationIndices();
         StateHasChanged();
 
-        StartAutoRemoveTimer(notification);
+        await StartAutoRemoveTimer(notification);
     }
 
-    private void StartAutoRemoveTimer(GlobalNotificationItem notification)
+    private async Task StartAutoRemoveTimer(GlobalNotificationItem notification)
     {
         notification.AutoRemoveCts?.Cancel();
         notification.AutoRemoveCts?.Dispose();
 
         notification.AutoRemoveCts = new CancellationTokenSource();
 
-        _ = AutoRemoveNotificationAsync(notification.Id, notification.AutoRemoveCts.Token);
+        await AutoRemoveNotificationAsync(notification.Id, notification.AutoRemoveCts.Token);
     }
 
     private async Task AutoRemoveNotificationAsync(Guid notificationId, CancellationToken cancellationToken)
@@ -132,14 +152,14 @@
         ntf.Dispose();
     }
 
-    private async void HideNotification(Guid id)
+    private async Task HideNotification(Guid id)
     {
         await HideNotificationWithAnimation(id);
     }
 
     private void UpdateNotificationIndices()
     {
-        for (int i = 0; i < _notifications.Count; i++)
+        for (int i = 0; i < _notifications.Count; ++i)
             _notifications[i].Index = i;
     }
 
