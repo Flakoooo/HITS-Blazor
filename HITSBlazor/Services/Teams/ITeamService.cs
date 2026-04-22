@@ -1,4 +1,5 @@
-﻿using HITSBlazor.Models.Markets.Entities;
+﻿using HITSBlazor.Models.Common.Responses;
+using HITSBlazor.Models.Markets.Entities;
 using HITSBlazor.Models.Teams.Entities;
 using HITSBlazor.Models.Teams.Enums;
 
@@ -9,7 +10,15 @@ namespace HITSBlazor.Services.Teams
         event Func<Task>? OnRequestsStatusCreated;
         event Action<Guid, TeamRequestStatus>? OnRequestsStatusUpdated;
 
-        Task<List<Team>> GetTeamsAsync(TeamsFilter filter);
+        Task<ListDataResponse<Team>> GetTeamsAsync(
+            int page,
+            string? searchText = null,
+            bool? privacy = null,
+            bool? hasActiveProject = null,
+            HashSet<Guid>? searchSkillIds = null,
+            string? orderBy = null,
+            bool? byDescending = null
+        );
         Task<List<Team>> GetTeamsByOwnerOrLeaderId(Guid userId);
         Task<Team?> GetTeamByIdAsync(Guid teamId);
         Task<bool> DeleteTeamAsync(Team team);

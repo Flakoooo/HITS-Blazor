@@ -1,8 +1,8 @@
 ﻿using HITSBlazor.Components.ActionMenus.BaseActionMenu;
+using HITSBlazor.Components.Button;
 using HITSBlazor.Components.Tables.TableHeader;
-using HITSBlazor.Models.Ideas.Entities;
 using HITSBlazor.Models.Teams.Entities;
-using HITSBlazor.Pages.Ideas.IdeasList;
+using HITSBlazor.Models.Users.Enums;
 using HITSBlazor.Services;
 using HITSBlazor.Services.Auth;
 using HITSBlazor.Services.Modal;
@@ -10,7 +10,6 @@ using HITSBlazor.Services.Teams;
 using HITSBlazor.Utils.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
-using Microsoft.JSInterop;
 
 namespace HITSBlazor.Pages.Teams.TeamsList
 {
@@ -31,9 +30,6 @@ namespace HITSBlazor.Pages.Teams.TeamsList
         [Inject]
         private ModalService ModalService { get; set; } = null!;
 
-        [Inject]
-        private IJSRuntime JSRuntime { get; set; } = null!;
-
         [Parameter]
         public string TeamId { get; set; } = string.Empty;
 
@@ -47,14 +43,8 @@ namespace HITSBlazor.Pages.Teams.TeamsList
         ];
 
         private bool _isLoading = true;
-        private bool _isLoadingMore = false;
 
-        private ElementReference _tableContainer;
-        private DotNetObjectReference<TeamsList>? _dotNetHelper;
-        private IJSObjectReference? _jsModule;
-        private bool _isInitialized = false;
-
-        private List<Team> _teams = [];
+        private readonly List<Team> _teams = [];
 
         private string? _searchText = null;
         private string? _orderTeamBy = null;
@@ -91,6 +81,8 @@ namespace HITSBlazor.Pages.Teams.TeamsList
             await LoadTeamsAsync();
 
             _isLoading = false;
+
+            MarkAsInitialized();
         }
 
         protected override void OnParametersSet()
@@ -99,40 +91,54 @@ namespace HITSBlazor.Pages.Teams.TeamsList
                 ModalService.ShowTeamModal(teamId);
         }
 
-        protected override async Task OnAfterRenderAsync(bool firstRender)
+        protected override int GetCurrentItemsCount() => _teams.Count;
+
+        protected override async Task OnLoadMoreItemsAsync()
         {
-            if (firstRender && _isInitialized)
-            {
-                _dotNetHelper = DotNetObjectReference.Create(this);
-                try
-                {
-                    _jsModule = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "./js/infiniteScroll.js");
-                    await _jsModule.InvokeVoidAsync("initializeInfiniteScroll", _tableContainer, _dotNetHelper);
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Ошибка инициализации дозагрузки данных: {ex.Message}");
-                }
-            }
+            await LoadTeamsAsync(append: true);
         }
 
-        private async Task LoadTeamsAsync()
+        private async Task LoadTeamsAsync(bool append = false)
         {
-            var filter = new TeamsFilter(
-                SearchText: _searchText,
-                Privacy: IsClosed?.Value,
-                HasActiveProject: HasActiveProjectState?.Value,
-                SearchSkillIds: SelectedSkillIds,
-                OrderBy: _orderTeamBy,
-                ByDescending: _sortTeamState
+            if (!append)
+            {
+                _currentPage = 1;
+                _teams.Clear();
+            }
+
+            StateHasChanged();
+
+            var listResponse = await TeamService.GetTeamsAsync(
+                _currentPage,
+                searchText: _searchText,
+                privacy: IsClosed?.Value,
+                hasActiveProject: HasActiveProjectState?.Value,
+                searchSkillIds: SelectedSkillIds,
+                orderBy: _orderTeamBy,
+                byDescending: _sortTeamState
             );
-            _teams = await TeamService.GetTeamsAsync(filter);
+
+            if (listResponse.List.Count > 0)
+            {
+                if (append)
+                    _teams.AddRange(listResponse.List);
+                else
+                {
+                    _teams.Clear();
+                    _teams.AddRange(listResponse.List);
+                }
+                _totalCount = listResponse.Count;
+
+                IncrementPage();
+            }
+
             StateHasChanged();
         }
 
         private async Task SearchTeam(string value)
         {
             _searchText = value;
+            ResetPagination();
             await LoadTeamsAsync();
         }
 
@@ -140,12 +146,18 @@ namespace HITSBlazor.Pages.Teams.TeamsList
         {
             _orderTeamBy = value;
             _sortTeamState = state;
+            ResetPagination();
             await LoadTeamsAsync();
         }
 
-        private void ShowTeam(Guid teamId) => ModalService.ShowTeamModal(teamId);
+        private async Task ShowTeam(Guid teamId)
+        {
+            if (AuthService.CurrentUser?.Role is RoleType.Admin)
+                await NavigationService.NavigateToAsync($"/teams/list/{teamId}");
+            else
+                ModalService.ShowIdeaModal(teamId);
+        }
 
-        //TODO: сброс фильтров не влияет на иконки фильтров в хэдэре таблицы
         private async Task ResetFilters()
         {
             _sortTeamState = null;
@@ -155,28 +167,39 @@ namespace HITSBlazor.Pages.Teams.TeamsList
             SeacrhSkillText = string.Empty;
             SelectedSkillIds = [];
 
+            _teamTableHeader.ForEach(h => h.IsOrdered = null);
+
+            ResetPagination();
+
             await LoadTeamsAsync();
         }
 
         private async Task OnTeamAction(TableActionContext context)
         {
-            if (context.Action == MenuAction.View)
+            if (context.Item is Guid teamId)
             {
-                if (context.Item is Guid guid)
-                    ShowTeam(guid);
+                if (context.Action is MenuAction.View) 
+                    await ShowTeam(teamId);
+                else if (context.Action is MenuAction.Edit)
+                    await NavigationService.NavigateToAsync($"/teams/create/{teamId}");
             }
-            else if (context.Action == MenuAction.Edit)
+            else if (context.Action is MenuAction.Delete)
             {
-                if (context.Item is Guid guid)
-                    await NavigationService.NavigateToAsync($"/teams/create/{guid}");
-            }
-            else if (context.Action == MenuAction.Delete)
-            {
-                if (context.Item is not Team team || !await TeamService.DeleteTeamAsync(team))
+                if (context.Item is not Team team)
                     return;
 
-                _teams.Remove(team);
+                ModalService.ShowConfirmModal(
+                    $"Вы действительно хотите удалить {team.Name}?",
+                    () => TeamService.DeleteTeamAsync(team),
+                    confirmButtonVariant: ButtonVariant.Danger,
+                    confirmButtonText: "Удалить"
+                );
             }
+        }
+
+        protected override async ValueTask DisposeAsyncCore()
+        {
+            await ValueTask.CompletedTask;
         }
     }
 }

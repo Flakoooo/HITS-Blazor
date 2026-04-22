@@ -1,4 +1,5 @@
 ﻿using HITSBlazor.Models.Common.Entities;
+using HITSBlazor.Models.Common.Responses;
 using HITSBlazor.Models.Ideas.Entities;
 using HITSBlazor.Models.Teams.Entities;
 using HITSBlazor.Models.Teams.Enums;
@@ -130,7 +131,55 @@ namespace HITSBlazor.Utils.Mocks.Teams
         public static Team? GetTeamById(Guid id) 
             => _teams.FirstOrDefault(t => t.Id == id);
 
-        public static List<Team> GetAllTeams() => _teams;
+        public static ListDataResponse<Team> GetAllTeamsByQueryParams(
+            int page,
+            int pageSize = 20,
+            string? searchText = null,
+            bool? privacy = null,
+            bool? hasActiveProject = null,
+            HashSet<Guid>? searchSkillIds = null,
+            string? orderBy = null,
+            bool? byDescending = null
+        )
+        {
+            var query = _teams.AsEnumerable();
+
+            if (!string.IsNullOrWhiteSpace(searchText))
+                query = query.Where(t => t.Name.Contains(searchText, StringComparison.CurrentCultureIgnoreCase));
+
+            if (privacy.HasValue)
+                query = query.Where(t => t.Closed == privacy);
+
+            if (hasActiveProject.HasValue)
+                query = query.Where(t => t.HasActiveProject == hasActiveProject);
+
+            if (searchSkillIds?.Count > 0)
+                query = query.Where(t => t.Skills.Any(s => searchSkillIds.Contains(s.Id)));
+
+            if (!string.IsNullOrWhiteSpace(orderBy) && byDescending.HasValue)
+            {
+                query = (orderBy, byDescending.Value) switch
+                {
+                    (nameof(Team.Closed), true) => query.OrderByDescending(t => t.Closed),
+                    (nameof(Team.Closed), false) => query.OrderBy(t => t.Closed),
+                    (nameof(Team.Name), true) => query.OrderByDescending(t => t.Name),
+                    (nameof(Team.Name), false) => query.OrderBy(t => t.Name),
+                    (nameof(Team.HasActiveProject), true) => query.OrderByDescending(t => t.HasActiveProject),
+                    (nameof(Team.HasActiveProject), false) => query.OrderBy(t => t.HasActiveProject),
+                    (nameof(Team.MembersCount), true) => query.OrderByDescending(t => t.MembersCount),
+                    (nameof(Team.MembersCount), false) => query.OrderBy(t => t.MembersCount),
+                    (nameof(Team.CreatedAt), true) => query.OrderByDescending(t => t.CreatedAt),
+                    (nameof(Team.CreatedAt), false) => query.OrderBy(t => t.CreatedAt),
+                    _ => query
+                };
+            }
+
+            int count = query.Count();
+
+            query = query.Skip((page - 1) * pageSize).Take(pageSize);
+
+            return new ListDataResponse<Team> { Count = count, List = query.ToList() };
+        }
 
         public static List<Team> GetTeamsByOwnerIdOrLeaderId(Guid userId) 
             => [.. _teams.Where(t => t.Owner.UserId == userId || t.Leader?.UserId == userId)];

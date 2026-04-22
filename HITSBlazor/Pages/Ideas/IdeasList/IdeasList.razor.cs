@@ -197,12 +197,12 @@ namespace HITSBlazor.Pages.Ideas.IdeasList
         {
             if (context.Item is Guid guid)
             {
-                if (context.Action == MenuAction.View)
+                if (context.Action is MenuAction.View)
                     await ShowIdea(guid);
-                else if (context.Action == MenuAction.Edit)
+                else if (context.Action is MenuAction.Edit)
                     await NavigationService.NavigateToAsync($"/ideas/create/{guid}");
             }
-            else if (context.Action == MenuAction.Delete)
+            else if (context.Action is MenuAction.Delete)
             {
                 if (context.Item is not Idea idea) return;
 

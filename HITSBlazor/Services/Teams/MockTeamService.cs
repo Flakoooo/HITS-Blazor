@@ -1,4 +1,5 @@
-﻿using HITSBlazor.Models.Markets.Entities;
+﻿using HITSBlazor.Models.Common.Responses;
+using HITSBlazor.Models.Markets.Entities;
 using HITSBlazor.Models.Teams.Entities;
 using HITSBlazor.Models.Teams.Enums;
 using HITSBlazor.Utils.Mocks.Teams;
@@ -10,59 +11,27 @@ namespace HITSBlazor.Services.Teams
         private readonly GlobalNotificationService _globalNotificationService = globalNotificationService;
 
         public event Func<Task>? OnRequestsStatusCreated;
-        public event Action<Guid, TeamRequestStatus>? OnRequestsStatusUpdated;        
+        public event Action<Guid, TeamRequestStatus>? OnRequestsStatusUpdated;     
 
-        private List<Team> _cachedTeams = [];
-        private DateTime _lastRefreshTime;
-        private readonly TimeSpan _cacheLifetime = TimeSpan.FromMinutes(5);
-
-        private async Task RefreshCacheAsync()
+        public async Task<ListDataResponse<Team>> GetTeamsAsync(
+            int page,
+            string? searchText,
+            bool? privacy,
+            bool? hasActiveProject,
+            HashSet<Guid>? searchSkillIds,
+            string? orderBy,
+            bool? byDescending
+        )
         {
-            _cachedTeams = MockTeams.GetAllTeams();
-            _lastRefreshTime = DateTime.UtcNow;
-        }
-
-        public async Task<List<Team>> GetTeamsAsync(TeamsFilter filter)
-        {
-            if (_cachedTeams.Count == 0 || DateTime.UtcNow - _lastRefreshTime > _cacheLifetime)
-                await RefreshCacheAsync();
-
-            var query = _cachedTeams.AsEnumerable();
-
-            if (!string.IsNullOrWhiteSpace(filter.SearchText))
-                query = query.Where(t => t.Name.Contains(filter.SearchText, StringComparison.CurrentCultureIgnoreCase));
-
-            if (filter.Privacy.HasValue)
-                query = query.Where(t => t.Closed == filter.Privacy);
-            
-            if (filter.Survey.HasValue)
-                query = query.Where(t => t.StatusQuest == filter.Survey);
-            
-            if (filter.HasActiveProject.HasValue)
-                query = query.Where(t => t.HasActiveProject == filter.HasActiveProject);
-            
-            if (filter.SearchSkillIds?.Count > 0)
-                query = query.Where(t => t.Skills.Any(s => filter.SearchSkillIds.Contains(s.Id)));
-
-            if (!string.IsNullOrWhiteSpace(filter.OrderBy) && filter.ByDescending.HasValue)
-            {
-                query = (filter.OrderBy, filter.ByDescending.Value) switch
-                {
-                    (nameof(Team.Closed), true) => query.OrderByDescending(t => t.Closed),
-                    (nameof(Team.Closed), false) => query.OrderBy(t => t.Closed),
-                    (nameof(Team.Name), true) => query.OrderByDescending(t => t.Name),
-                    (nameof(Team.Name), false) => query.OrderBy(t => t.Name),
-                    (nameof(Team.HasActiveProject), true) => query.OrderByDescending(t => t.HasActiveProject),
-                    (nameof(Team.HasActiveProject), false) => query.OrderBy(t => t.HasActiveProject),
-                    (nameof(Team.MembersCount), true) => query.OrderByDescending(t => t.MembersCount),
-                    (nameof(Team.MembersCount), false) => query.OrderBy(t => t.MembersCount),
-                    (nameof(Team.CreatedAt), true) => query.OrderByDescending(t => t.CreatedAt),
-                    (nameof(Team.CreatedAt), false) => query.OrderBy(t => t.CreatedAt),
-                    _ => query
-                };
-            }
-
-            return [.. query];
+            return MockTeams.GetAllTeamsByQueryParams(
+                page, 
+                searchText: searchText, 
+                privacy: privacy,
+                hasActiveProject: hasActiveProject,
+                searchSkillIds: searchSkillIds,
+                orderBy:orderBy,
+                byDescending: byDescending
+            );
         }
 
         public async Task<List<Team>> GetTeamsByOwnerOrLeaderId(Guid userId)
@@ -71,6 +40,7 @@ namespace HITSBlazor.Services.Teams
         public async Task<Team?> GetTeamByIdAsync(Guid teamId) 
             => MockTeams.GetTeamById(teamId);
 
+        //TODO: сделать удаление команды в UI (через событие)
         public async Task<bool> DeleteTeamAsync(Team team)
         {
             if (!MockTeams.DeleteTeam(team))
@@ -79,7 +49,6 @@ namespace HITSBlazor.Services.Teams
                 return false;
             }
 
-            _cachedTeams.Remove(team);
             return true;
         }
 

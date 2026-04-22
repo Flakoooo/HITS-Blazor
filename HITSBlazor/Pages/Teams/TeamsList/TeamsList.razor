@@ -19,19 +19,17 @@
 @using HITSBlazor.Components.Typography
 @using HITSBlazor.Models.Users.Enums
 @using HITSBlazor.Utils.Models
+@inherits ListPageDataLoader
 
-<div class="bg-white teams-list h-auto overflow-y-scroll">
+<div class="bg-white teams-list h-auto overflow-y-scroll" @ref="_tableContainer">
     <div class="w-100 p-3">
         <ListPageHeader IsLoading="_isLoading"
-                        HeaderText="@($"Список команд: {_teams.Count}")" 
+                        HeaderText="@($"Список команд: {_totalCount}")" 
                         ShowCreateButton="AuthService.CurrentUser?.Role is RoleType.TeamOwner or RoleType.Admin"
                         CreateButtonText="Создать команду" 
                         OnButtonClick="@(() => NavigationService.NavigateToAsync("teams/create"))" />
         <InputSearch Width="50" IsLoading="_isLoading" ValueChanged="@((value) => SearchTeam(value))" />
-        <TableComponent>
-
-        </TableComponent>
-        <ListPageTable IsLoading="_isLoading" HeaderItems="_teamTableHeader" TableActionMenuIsEnable="true" OrderMethod="SortTeam">
+        <TableComponent IsLoading="_isLoading" HeaderItems="_teamTableHeader" TableActionMenuIsEnable="true" OrderMethod="SortTeam">
             <TableContent>
                 @foreach (var team in _teams)
                 {
@@ -69,25 +67,34 @@
                              Label="Приватность"
                              AllValues="_isClosedFilterValues"
                              @bind-Value="IsClosed"
-                             OnFilterChanged="LoadTeamsAsync" />
+                             OnFilterChanged="() => LoadTeamsAsync()" />
                 <RadioFilter T="ValueViewModel<bool?>"
                              IsLoading="_isLoading"
                              Label="Статус"
                              AllValues="_hasActiveProjectFilterValues"
                              @bind-Value="HasActiveProjectState"
-                             OnFilterChanged="@LoadTeamsAsync" />
+                             OnFilterChanged="() => LoadTeamsAsync()" />
                 <RadioFilter T="ValueViewModel<bool?>"
                              IsLoading="_isLoading"
                              Label="Компетенции"
                              AllValues="_skillProjectFilterValues"
                              @bind-Value="SkillsState"
-                             OnFilterChanged="@LoadTeamsAsync" />
+                             OnFilterChanged="() => LoadTeamsAsync()" />
                 <SkillFilter @bind-SeacrhSkillText="SeacrhSkillText" 
                              @bind-SelectedSkillIds="SelectedSkillIds" 
                              IsLoading="_isLoading"
-                             OnFilterChanged="LoadTeamsAsync" />
+                             OnFilterChanged="() => LoadTeamsAsync()" />
                 <ResetFilterButton IsLoading="_isLoading" ResetMethod="ResetFilters" />
             </FilterContent>
-        </ListPageTable>
+        </TableComponent>
+        <!-- TODO: заменить на что то другое -->
+        @if (_isLoadingMore)
+        {
+            <div class="text-center py-3">
+                <div class="spinner-border spinner-border-sm text-primary" role="status">
+                    <span class="visually-hidden">Загрузка...</span>
+                </div>
+            </div>
+        }
     </div>
 </div>
