@@ -1,6 +1,7 @@
 ﻿@namespace HITSBlazor.Components.Tables.TableComponent
 @using HITSBlazor.Components.ActionMenus.BaseActionMenu
 @using HITSBlazor.Components.Filters.FilterContainer
+@using HITSBlazor.Components.Placeholders.Placeholder
 @using HITSBlazor.Components.Statuses.BoolStatus
 @using HITSBlazor.Components.Statuses.EnumStatus
 @using HITSBlazor.Components.Tables.TableActionMenu
@@ -19,12 +20,42 @@
         <table class="table table-hover mb-0">
             @if (HeaderItems.Count > 0)
             {
-                <TableHeader TableActionMenuIsEnable="TableActionMenuIsEnable" 
+                <TableHeader IsLoading="IsLoading"
+                             TableActionMenuIsEnable="TableActionMenuIsEnable" 
                              Items="HeaderItems"
                              OrderChanged="(value) => ExecuteOrder(value.Item1, value.Item2)" />
             }
             <tbody>
-                @TableContent
+                @if (IsLoading)
+                {
+                    @for (int i = 0; i < 5; ++i)
+                    {
+                        <tr>
+                            @if (HeaderItems.Count > 0)
+                            {
+                                @foreach (var header in HeaderItems)
+                                {
+                                    <td>
+                                        <Placeholder Height="PlaceholderHeight.Smaller" />
+                                    </td>
+                                }
+                            }
+                            else
+                            {
+                                @for (int j = 0; j < 6; ++j)
+                                {
+                                    <td>
+                                        <Placeholder Height="PlaceholderHeight.Smaller" />
+                                    </td>
+                                }
+                            }
+                        </tr>
+                    }
+                }
+                else
+                {
+                    @TableContent
+                }
             </tbody>
         </table>
     </div>

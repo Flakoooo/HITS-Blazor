@@ -18,7 +18,7 @@ namespace HITSBlazor.Pages.Ideas.IdeasList
     [Authorize]
     [Route("/ideas/list")]
     [Route("/ideas/list/{IdeaId}")]
-    public partial class IdeasList : IAsyncDisposable
+    public partial class IdeasList
     {
         [Inject]
         private IAuthService AuthService { get; set; } = null!;
@@ -32,9 +32,6 @@ namespace HITSBlazor.Pages.Ideas.IdeasList
         [Inject]
         private ModalService ModalService { get; set; } = null!;
 
-        [Inject] 
-        private IJSRuntime JSRuntime { get; set; } = null!;
-
         [Inject]
         private GlobalNotificationService NotificationService { get; set; } = null!;
 
@@ -42,19 +39,11 @@ namespace HITSBlazor.Pages.Ideas.IdeasList
         public string IdeaId { get; set; } = string.Empty;
 
         private bool _isLoading = true;
-        private bool _isLoadingMore = false;
-
-        private ElementReference _tableContainer;
-        private DotNetObjectReference<IdeasList>? _dotNetHelper;
-        private IJSObjectReference? _jsModule;
-        private bool _isInitialized = false;
 
         private string _searchText = string.Empty;
 
         private readonly List<Idea> _ideas = [];
-        private HashSet<Idea> _selectedIdeas = [];
-        private int _currentPage = 1;
-        private int _totalCount = 0;
+        private readonly HashSet<Idea> _selectedIdeas = [];
 
         private readonly List<EnumViewModel<IdeaStatusType>> _filterIdeaStatus
             = [.. Enum.GetValues<IdeaStatusType>().Select(s => new EnumViewModel<IdeaStatusType>(s))];
@@ -76,58 +65,29 @@ namespace HITSBlazor.Pages.Ideas.IdeasList
             await LoadIdeasAsync();
 
             _isLoading = false;
-            _isInitialized = true;
+
+            MarkAsInitialized();
         }
 
-        protected override async Task OnParametersSetAsync()
+        protected override void OnParametersSet()
         {
             if (!string.IsNullOrWhiteSpace(IdeaId) && Guid.TryParse(IdeaId, out Guid ideaId))
                 ModalService.ShowIdeaModal(ideaId);
         }
 
-        protected override async Task OnAfterRenderAsync(bool firstRender)
+        protected override int GetCurrentItemsCount() => _ideas.Count;
+
+        protected override async Task OnLoadMoreItemsAsync()
         {
-            if (firstRender && _isInitialized)
-            {
-                _dotNetHelper = DotNetObjectReference.Create(this);
-                try
-                {
-                    _jsModule = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "./js/infiniteScroll.js");
-                    await _jsModule.InvokeVoidAsync("initializeInfiniteScroll", _tableContainer, _dotNetHelper);
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Ошибка инициализации дозагрузки данных: {ex.Message}");
-                }
-            }
-        }
-
-        [JSInvokable]
-        public async Task LoadMoreItems()
-        {
-            if (_isLoadingMore || _isLoading) return;
-
-            if (_ideas.Count >= _totalCount)
-            {
-                if (_jsModule is not null)
-                    await _jsModule.InvokeVoidAsync("stopInfiniteScroll");
-
-                return;
-            }
-
             await LoadIdeasAsync(append: true);
         }
 
-        private async Task LoadIdeasAsync(bool append = false, int page = 1)
+        private async Task LoadIdeasAsync(bool append = false)
         {
             if (!append)
             {
-                _currentPage = page;
+                _currentPage = 1;
                 _ideas.Clear();
-            }
-            else
-            {
-                _isLoadingMore = true;
             }
 
             StateHasChanged();
@@ -148,10 +108,9 @@ namespace HITSBlazor.Pages.Ideas.IdeasList
                     _ideas.AddRange(listResponse.List);
                 }
                 _totalCount = listResponse.Count;
-                ++_currentPage;
-            }
 
-            _isLoadingMore = false;
+                IncrementPage();
+            }
 
             StateHasChanged();
         }
@@ -186,18 +145,15 @@ namespace HITSBlazor.Pages.Ideas.IdeasList
 
         private async Task SearchIdea(string value)
         {
-            Console.WriteLine($"новое {value}");
             _searchText = value;
-            _currentPage = 1;
-            _totalCount = 0;
+            ResetPagination();
             await LoadIdeasAsync();
         }
 
         private async Task ResetFilters()
         {
             SelectedStatuses.Clear();
-            _currentPage = 1;
-            _totalCount = 0;
+            ResetPagination();
             await LoadIdeasAsync();
         }
 
@@ -293,7 +249,7 @@ namespace HITSBlazor.Pages.Ideas.IdeasList
             _ideas.FirstOrDefault(i => i.Id == ideaId)?.Status = ideaStatus;
         }
 
-        public async ValueTask DisposeAsync()
+        protected override async ValueTask DisposeAsyncCore()
         {
             AuthService.OnActiveRoleChanged -= UserRoleHasChanged;
             IdeasService.OnIdeaHasDeleted -= IdeaHasDeleted;
@@ -301,10 +257,7 @@ namespace HITSBlazor.Pages.Ideas.IdeasList
             IdeasService.OnIdeasStatusHasChanged -= ChangeIdeasStatus;
             ModalService.OnRightSideModalsUpdated -= IdeaModalHasClosed;
 
-            _dotNetHelper?.Dispose();
-
-            if (_jsModule != null)
-                await _jsModule.DisposeAsync();
+            await ValueTask.CompletedTask;
         }
     }
 }

@@ -4,6 +4,7 @@
 @using HITSBlazor.Components.Filters.RadioFilter
 @using HITSBlazor.Components.Filters.ResetFilterButton
 @using HITSBlazor.Components.Filters.SkillFilter
+@using HITSBlazor.Components.InputSearch
 @using HITSBlazor.Components.Inputs.Input
 @using HITSBlazor.Components.ListPageComponents.ListPageHeader
 @using HITSBlazor.Components.ListPageComponents.ListPageSearch
@@ -13,94 +14,80 @@
 @using HITSBlazor.Components.Statuses.BoolStatus
 @using HITSBlazor.Components.Tables.TableActionMenu
 @using HITSBlazor.Components.Tables.TableBodyRow
+@using HITSBlazor.Components.Tables.TableComponent
 @using HITSBlazor.Components.Tables.TableHeader
 @using HITSBlazor.Components.Typography
 @using HITSBlazor.Models.Users.Enums
 @using HITSBlazor.Utils.Models
 
-<div class="bg-white teams-list page-content-with-header">
-    @if (_isLoading)
-    {
-        <TablePlaceholder />
-    }
-    else
-    {
-        <div class="w-100 bg-white p-3">
-            <ListPageHeader IsLoading="_isLoading"
-                            HeaderText="@($"Список команд: {_teams.Count}")" 
-                            ShowCreateButton="AuthService.CurrentUser?.Role is RoleType.TeamOwner or RoleType.Admin"
-                            CreateButtonText="Создать команду" 
-                            OnButtonClick="@(() => NavigationService.NavigateToAsync("teams/create"))" />
-            <ListPageSearch IsLoading="_isLoading" ValueChanged="@((value) => SearchTeam(value))" />
-            <ListPageTable IsLoading="_isLoading" HeaderItems="_teamTableHeader" TableActionMenuIsEnable="true" OrderMethod="SortTeam">
-                <TableContent>
-                    <tbody>
-                        @foreach (var team in _teams)
-                        {
-                            <tr>
-                                <TableBodyRow IsCentered="true">
-                                    <BoolStatus Value="team.Closed" StatusType="BoolStatusType.TeamClosed"  />
-                                </TableBodyRow>
-                                <TableBodyRow>
-                                    <div class="data-link" @onclick="@(() => ShowTeam(team.Id))">
-                                        @team.Name
-                                    </div>
-                                </TableBodyRow>
-                                <TableBodyRow IsCentered="true">
-                                    <BoolStatus Value="team.HasActiveProject" StatusType="BoolStatusType.TeamActiveProject"  />
-                                </TableBodyRow>
-                                <TableBodyRow IsCentered="true">
-                                    @team.MembersCount
-                                </TableBodyRow>
-                                <TableBodyRow IsCentered="true">
-                                    @team.CreatedAt.ToString("dd.MM.yyyy")
-                                </TableBodyRow>
-                                <TableActionMenu ItemId="@team.Id"
-                                                    OnAction="OnTeamAction"
-                                                    ActionIds="@(new Dictionary<MenuAction, object> { 
-                                                    [MenuAction.View] = team.Id,
-                                                    [MenuAction.Edit] = team.Id,
-                                                    [MenuAction.Delete] = team
-                                                    })" />
-                            </tr>
-                        }
-                    </tbody>
-                </TableContent>
-                <FilterContent>
-                    <RadioFilter T="ValueViewModel<bool?>"
-                                 IsLoading="_isLoading"
-                                 Label="Приватность"
-                                 AllValues="_isClosedFilterValues"
-                                 @bind-Value="IsClosed"
-                                 OnFilterChanged="LoadTeamsAsync" />
+<div class="bg-white teams-list h-auto overflow-y-scroll">
+    <div class="w-100 p-3">
+        <ListPageHeader IsLoading="_isLoading"
+                        HeaderText="@($"Список команд: {_teams.Count}")" 
+                        ShowCreateButton="AuthService.CurrentUser?.Role is RoleType.TeamOwner or RoleType.Admin"
+                        CreateButtonText="Создать команду" 
+                        OnButtonClick="@(() => NavigationService.NavigateToAsync("teams/create"))" />
+        <InputSearch Width="50" IsLoading="_isLoading" ValueChanged="@((value) => SearchTeam(value))" />
+        <TableComponent>
 
-                    <RadioFilter T="ValueViewModel<bool?>"
-                                 IsLoading="_isLoading"
-                                 Label="Опросы"
-                                 AllValues="_isSurveyFilterValues"
-                                 @bind-Value="SurveyState"
-                                 OnFilterChanged="LoadTeamsAsync" />
-
-                    <RadioFilter T="ValueViewModel<bool?>"
-                                 IsLoading="_isLoading"
-                                 Label="Статус"
-                                 AllValues="_hasActiveProjectFilterValues"
-                                 @bind-Value="HasActiveProjectState"
-                                 OnFilterChanged="@LoadTeamsAsync" />
-
-                    <RadioFilter T="ValueViewModel<bool?>"
-                                 IsLoading="_isLoading"
-                                 Label="Компетенции"
-                                 AllValues="_skillProjectFilterValues"
-                                 @bind-Value="SkillsState"
-                                 OnFilterChanged="@LoadTeamsAsync" />
-                    <SkillFilter @bind-SeacrhSkillText="SeacrhSkillText" 
-                                 @bind-SelectedSkillIds="SelectedSkillIds" 
-                                 IsLoading="_isLoading"
-                                 OnFilterChanged="LoadTeamsAsync" />
-                    <ResetFilterButton IsLoading="_isLoading" ResetMethod="ResetFilters" />
-                </FilterContent>
-            </ListPageTable>
-        </div>
-    }
+        </TableComponent>
+        <ListPageTable IsLoading="_isLoading" HeaderItems="_teamTableHeader" TableActionMenuIsEnable="true" OrderMethod="SortTeam">
+            <TableContent>
+                @foreach (var team in _teams)
+                {
+                    <tr>
+                        <TableBodyRow IsCentered="true">
+                            <BoolStatus Value="team.Closed" StatusType="BoolStatusType.TeamClosed"  />
+                        </TableBodyRow>
+                        <TableBodyRow>
+                            <div class="data-link" @onclick="@(() => ShowTeam(team.Id))">
+                                @team.Name
+                            </div>
+                        </TableBodyRow>
+                        <TableBodyRow IsCentered="true">
+                            <BoolStatus Value="team.HasActiveProject" StatusType="BoolStatusType.TeamActiveProject"  />
+                        </TableBodyRow>
+                        <TableBodyRow IsCentered="true">
+                            @team.MembersCount
+                        </TableBodyRow>
+                        <TableBodyRow IsCentered="true">
+                            @team.CreatedAt.ToString("dd.MM.yyyy")
+                        </TableBodyRow>
+                        <TableActionMenu ItemId="@team.Id"
+                                            OnAction="OnTeamAction"
+                                            ActionIds="@(new Dictionary<MenuAction, object> { 
+                                            [MenuAction.View] = team.Id,
+                                            [MenuAction.Edit] = team.Id,
+                                            [MenuAction.Delete] = team
+                                            })" />
+                    </tr>
+                }
+            </TableContent>
+            <FilterContent>
+                <RadioFilter T="ValueViewModel<bool?>"
+                             IsLoading="_isLoading"
+                             Label="Приватность"
+                             AllValues="_isClosedFilterValues"
+                             @bind-Value="IsClosed"
+                             OnFilterChanged="LoadTeamsAsync" />
+                <RadioFilter T="ValueViewModel<bool?>"
+                             IsLoading="_isLoading"
+                             Label="Статус"
+                             AllValues="_hasActiveProjectFilterValues"
+                             @bind-Value="HasActiveProjectState"
+                             OnFilterChanged="@LoadTeamsAsync" />
+                <RadioFilter T="ValueViewModel<bool?>"
+                             IsLoading="_isLoading"
+                             Label="Компетенции"
+                             AllValues="_skillProjectFilterValues"
+                             @bind-Value="SkillsState"
+                             OnFilterChanged="@LoadTeamsAsync" />
+                <SkillFilter @bind-SeacrhSkillText="SeacrhSkillText" 
+                             @bind-SelectedSkillIds="SelectedSkillIds" 
+                             IsLoading="_isLoading"
+                             OnFilterChanged="LoadTeamsAsync" />
+                <ResetFilterButton IsLoading="_isLoading" ResetMethod="ResetFilters" />
+            </FilterContent>
+        </ListPageTable>
+    </div>
 </div>

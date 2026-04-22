@@ -1,5 +1,4 @@
 ﻿.teams-list {
-    overflow-y: scroll;
     display: flex;
     flex-direction: column;
     flex-wrap: nowrap;

@@ -5,6 +5,9 @@ namespace HITSBlazor.Components.Tables.TableHeader
     public partial class TableHeader
     {
         [Parameter]
+        public bool IsLoading { get; set; } = false;
+
+        [Parameter]
         public List<TableHeaderItem> Items { get; set; } = [];
 
         [Parameter]

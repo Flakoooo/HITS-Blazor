@@ -29,7 +29,7 @@ namespace HITSBlazor.Utils.Mocks.Ideas
         public static Guid ArmatureId { get; } = Guid.NewGuid();
 
         private static readonly Random _random = new();
-        private static readonly List<Idea> _ideas = CreateIdeas();
+        private static readonly List<Idea> _ideas = [.. CreateIdeas(), .. CreateIdeas(), .. CreateIdeas()];
 
         private static List<Idea> CreateIdeas()
         {
@@ -298,15 +298,17 @@ namespace HITSBlazor.Utils.Mocks.Ideas
             HashSet<IdeaStatusType>? statusTypes = null
         )
         {
-            var query = _ideas.Skip((page - 1) * pageSize).Take(pageSize);
-
-            int count = query.Count();
+            var query = _ideas.AsEnumerable();
 
             if (statusTypes?.Count > 0)
                 query = query.Where(i => statusTypes.Contains(i.Status));
 
             if (!string.IsNullOrWhiteSpace(searchText))
                 query = query.Where(i => i.Name.Contains(searchText, StringComparison.CurrentCultureIgnoreCase));
+
+            int count = query.Count();
+
+            query = query.Skip((page - 1) * pageSize).Take(pageSize);
 
             return new ListDataResponse<Idea> { Count = count, List = query.ToList() };
         }
@@ -319,15 +321,17 @@ namespace HITSBlazor.Utils.Mocks.Ideas
             HashSet<IdeaStatusType>? statusTypes = null
         )
         {
-            var query = _ideas.Where(i => i.Initiator.Id == initiatorId).Skip((page - 1) * pageSize).Take(pageSize);
-
-            int count = query.Count();
+            var query = _ideas.Where(i => i.Initiator.Id == initiatorId);
 
             if (statusTypes?.Count > 0)
                 query = query.Where(i => statusTypes.Contains(i.Status));
 
             if (!string.IsNullOrWhiteSpace(searchText))
                 query = query.Where(i => i.Name.Contains(searchText, StringComparison.CurrentCultureIgnoreCase));
+
+            int count = query.Count();
+
+            query = query.Skip((page - 1) * pageSize).Take(pageSize);
 
             return new ListDataResponse<Idea> { Count = count, List = query.ToList() };
         }

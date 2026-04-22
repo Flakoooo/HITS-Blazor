@@ -24,6 +24,7 @@
 @using HITSBlazor.Utils
 @using HITSBlazor.Utils.EnumStyles
 @using HITSBlazor.Utils.Models
+@inherits ListPageDataLoader
 
 <div class="bg-white h-auto overflow-y-scroll" @ref="_tableContainer">
     <div class="w-100 p-3">
@@ -33,7 +34,8 @@
                         CreateButtonText="Создать идею" 
                         OnButtonClick="@(() => NavigationService.NavigateToAsync("ideas/create"))" />
         <div class="py-2 d-flex justify-content-between">
-            <Input Width="50" 
+            <Input IsLoading="_isLoading"
+                   Width="50" 
                    IconStyle="bi-search" 
                    Placeholder="Поиск" 
                    Value="@_searchText" 
@@ -41,7 +43,9 @@
                    DebounceDelay="500" />
             @if (AuthService.CurrentUser?.Role is RoleType.ProjectOffice or RoleType.Admin)
             {
-                <Button Text="Отправить на биржу" 
+                <Button IsLoading="_isLoading"
+                        LoadingWidth="w-25"
+                        Text="Отправить на биржу" 
                         Variant="ButtonVariant.Primary" 
                         OnButtonClick="() => ShowSendIdeaOnMarket()" />
             }

@@ -1,6 +1,8 @@
 ﻿using HITSBlazor.Components.ActionMenus.BaseActionMenu;
 using HITSBlazor.Components.Tables.TableHeader;
+using HITSBlazor.Models.Ideas.Entities;
 using HITSBlazor.Models.Teams.Entities;
+using HITSBlazor.Pages.Ideas.IdeasList;
 using HITSBlazor.Services;
 using HITSBlazor.Services.Auth;
 using HITSBlazor.Services.Modal;
@@ -8,6 +10,7 @@ using HITSBlazor.Services.Teams;
 using HITSBlazor.Utils.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
 
 namespace HITSBlazor.Pages.Teams.TeamsList
 {
@@ -28,8 +31,11 @@ namespace HITSBlazor.Pages.Teams.TeamsList
         [Inject]
         private ModalService ModalService { get; set; } = null!;
 
+        [Inject]
+        private IJSRuntime JSRuntime { get; set; } = null!;
+
         [Parameter]
-        public Guid? TeamId { get; set; }
+        public string TeamId { get; set; } = string.Empty;
 
         private static readonly List<TableHeaderItem> _teamTableHeader =
         [
@@ -41,6 +47,12 @@ namespace HITSBlazor.Pages.Teams.TeamsList
         ];
 
         private bool _isLoading = true;
+        private bool _isLoadingMore = false;
+
+        private ElementReference _tableContainer;
+        private DotNetObjectReference<TeamsList>? _dotNetHelper;
+        private IJSObjectReference? _jsModule;
+        private bool _isInitialized = false;
 
         private List<Team> _teams = [];
 
@@ -54,13 +66,6 @@ namespace HITSBlazor.Pages.Teams.TeamsList
             new(false, "Открытая команда")
         ];
         private ValueViewModel<bool?>? IsClosed { get; set; }
-
-        private readonly List<ValueViewModel<bool?>> _isSurveyFilterValues =
-        [
-            new(true, "Опрос пройден"),
-            new(false, "Опрос не пройден")
-        ];
-        private ValueViewModel<bool?>? SurveyState { get; set; }
 
         private readonly List<ValueViewModel<bool?>> _hasActiveProjectFilterValues =
         [
@@ -88,10 +93,27 @@ namespace HITSBlazor.Pages.Teams.TeamsList
             _isLoading = false;
         }
 
-        protected override async Task OnParametersSetAsync()
+        protected override void OnParametersSet()
         {
-            if (TeamId is not null)
-                ShowTeam((Guid)TeamId);
+            if (!string.IsNullOrWhiteSpace(TeamId) && Guid.TryParse(TeamId, out Guid teamId))
+                ModalService.ShowTeamModal(teamId);
+        }
+
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            if (firstRender && _isInitialized)
+            {
+                _dotNetHelper = DotNetObjectReference.Create(this);
+                try
+                {
+                    _jsModule = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "./js/infiniteScroll.js");
+                    await _jsModule.InvokeVoidAsync("initializeInfiniteScroll", _tableContainer, _dotNetHelper);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Ошибка инициализации дозагрузки данных: {ex.Message}");
+                }
+            }
         }
 
         private async Task LoadTeamsAsync()
@@ -99,7 +121,6 @@ namespace HITSBlazor.Pages.Teams.TeamsList
             var filter = new TeamsFilter(
                 SearchText: _searchText,
                 Privacy: IsClosed?.Value,
-                Survey: SurveyState?.Value,
                 HasActiveProject: HasActiveProjectState?.Value,
                 SearchSkillIds: SelectedSkillIds,
                 OrderBy: _orderTeamBy,
@@ -129,7 +150,6 @@ namespace HITSBlazor.Pages.Teams.TeamsList
         {
             _sortTeamState = null;
             IsClosed = null;
-            SurveyState = null;
             HasActiveProjectState = null;
             SkillsState = null;
             SeacrhSkillText = string.Empty;

@@ -1,23 +1,43 @@
 ﻿@namespace HITSBlazor.Components.Tables.TableHeader
+@using HITSBlazor.Components.Placeholders.Placeholder
 
 <thead>
-    <tr class="table-lables">
-        @foreach (var item in Items)
-        {
-            <th class="py-3 col fw-semibold text-secondary @item.ColumnClass">
-                <div class="@GetItemClass(item.InCentered) d-flex">
-                    @item.Text
-                    @if (!string.IsNullOrWhiteSpace(item.OrderBy))
-                    {
-                        <i @onclick="@(() => SetOrderState(item))" class="table-lables-row-icon ms-1 bi @GetSortIcon(item) text-secondary"></i>
-                    }
-                </div>
-            </th>
-        }
-        @if (TableActionMenuIsEnable)
-        {
-            <th></th>
-            <th></th>
-        }
-    </tr>
+    @if (IsLoading)
+    {
+        <tr>
+            @foreach (var header in Items)
+            {
+                <th>
+                    <Placeholder />
+                </th>
+            }
+            @if (TableActionMenuIsEnable)
+            {
+                <th></th>
+                <th></th>
+            }
+        </tr>
+    }
+    else
+    {
+        <tr class="table-lables">
+            @foreach (var item in Items)
+            {
+                <th class="py-3 col fw-semibold text-secondary @item.ColumnClass">
+                    <div class="@GetItemClass(item.InCentered) d-flex">
+                        @item.Text
+                        @if (!string.IsNullOrWhiteSpace(item.OrderBy))
+                        {
+                            <i @onclick="@(() => SetOrderState(item))" class="table-lables-row-icon ms-1 bi @GetSortIcon(item) text-secondary"></i>
+                        }
+                    </div>
+                </th>
+            }
+            @if (TableActionMenuIsEnable)
+            {
+                <th></th>
+                <th></th>
+            }
+        </tr>
+    }
 </thead>
