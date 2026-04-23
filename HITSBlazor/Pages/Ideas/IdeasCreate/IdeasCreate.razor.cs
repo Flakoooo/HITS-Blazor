@@ -164,33 +164,6 @@ namespace HITSBlazor.Pages.Ideas.IdeasCreate
             _isLoading = false;
         }
 
-        private async Task CreateNewSkill(string name, SkillType skillType)
-        {
-            var newSkill = await SkillService.CreateNewSkillAsync(name, skillType, false);
-            if (newSkill is null) return;
-
-            if (skillType is SkillType.Language)
-            {
-                LanguageSkills.Add(newSkill);
-                SelectedLanguageSkills.Add(newSkill);
-            }
-            else if (skillType is SkillType.Framework)
-            {
-                FrameworkSkills.Add(newSkill);
-                SelectedFrameworkSkills.Add(newSkill);
-            }
-            else if (skillType is SkillType.Database)
-            {
-                DatabaseSkills.Add(newSkill);
-                SelectedDatabaseSkills.Add(newSkill);
-            }
-            else if (skillType is SkillType.Devops)
-            {
-                DevopsSkills.Add(newSkill);
-                SelectedDevopsSkills.Add(newSkill);
-            }
-        }
-
         private void UpdatePreAssessmentScore()
         {
             _preAssessmentScore = (int.TryParse(SuitabilityScore, out int s) && int.TryParse(BudgetScore, out int b))
@@ -229,9 +202,12 @@ namespace HITSBlazor.Pages.Ideas.IdeasCreate
                 return;
             }
 
+            if (string.IsNullOrWhiteSpace(IdeasCreateModel.Name))
+                IdeasCreateModel.Name = "Новая идея";
+
             IdeasCreateModel.Status = ideaStatusType;
-            IdeasCreateModel.Customer = SelectedCompany!.Name;
-            IdeasCreateModel.ContactPerson = SelectedContactPerson!.FullName;
+            IdeasCreateModel.Customer = SelectedCompany?.Name ?? "Отсутствует";
+            IdeasCreateModel.ContactPerson = SelectedContactPerson?.FullName ?? "Отсутствует";
 
             var result = await IdeasService.CreateNewIdeaAsync(IdeasCreateModel);
 

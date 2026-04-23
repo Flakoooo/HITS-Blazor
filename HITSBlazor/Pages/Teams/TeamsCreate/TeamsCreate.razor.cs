@@ -1,9 +1,12 @@
 ﻿using ApexCharts;
+using HITSBlazor.Components.Modals.CenterModals.AddTeamMembersModal;
 using HITSBlazor.Components.Skills;
 using HITSBlazor.Models.Common.Entities;
 using HITSBlazor.Models.Common.Enums;
+using HITSBlazor.Models.Teams.Requests;
 using HITSBlazor.Models.Users.Entities;
 using HITSBlazor.Services.Auth;
+using HITSBlazor.Services.Modal;
 using HITSBlazor.Services.Skills;
 using HITSBlazor.Services.Teams;
 using HITSBlazor.Services.UserSkills;
@@ -29,17 +32,22 @@ namespace HITSBlazor.Pages.Teams.TeamsCreate
         [Inject]
         private IUserSkillService UserSkillService { get; set; } = null!;
 
+        [Inject]
+        private ModalService ModalService { get; set; } = null!;
+
         [Parameter]
         public string TeamId { get; set; } = string.Empty;
 
-        private TeamsCreateModel TeamsCreateModel { get; set; } = new();
-
         private bool _isLoading = true;
-        private string _value = string.Empty;
 
+        private string TeamName { get; set; } = string.Empty;
+        private string TeamDescription { get; set; } = string.Empty;
+        private bool? _teamIsClosed;
+        private User? SelectedOwner { get; set; }
+        private User? SelectedLeader { get; set; }
+        private HashSet<User> SelectedMember { get; set; } = [];
         private List<User> TeamMembers { get; set; } = [];
-
-        private HashSet<Skill> TeamSkills { get; set; } = [];
+        private List<User> MembersForInviting { get; set; } = [];
 
         private List<Skill> LanguageSkills { get; set; } = [];
         private List<Skill> FrameworkSkills { get; set; } = [];
@@ -51,6 +59,14 @@ namespace HITSBlazor.Pages.Teams.TeamsCreate
         private HashSet<Skill> SelectedDatabaseSkills { get; set; } = [];
         private HashSet<Skill> SelectedDevopsSkills { get; set; } = [];
 
+        private bool WantedSkillsAny => SelectedLanguageSkills.Count > 0 
+                                     || SelectedFrameworkSkills.Count > 0 
+                                     || SelectedDatabaseSkills.Count > 0 
+                                     || SelectedDevopsSkills.Count > 0;
+
+        private readonly Dictionary<SkillType, ApexChartOptions<Skill>> _skillRadarOptions = [];
+        private HashSet<Skill> TeamSkills { get; set; } = [];
+
         protected override async Task OnInitializedAsync()
         {
             _isLoading = true;
@@ -60,56 +76,54 @@ namespace HITSBlazor.Pages.Teams.TeamsCreate
             DatabaseSkills = await SkillService.GetSkillsAsync(skillTypes: [SkillType.Database]);
             DevopsSkills = await SkillService.GetSkillsAsync(skillTypes: [SkillType.Devops]);
 
+            foreach (var skillType in Enum.GetValues<SkillType>())
+                _skillRadarOptions.Add(skillType, GetRadarChartOptions());
+
             if (Guid.TryParse(TeamId, out Guid guid))
             {
                 var team = await TeamsService.GetTeamByIdAsync(guid);
                 if (team is not null)
                 {
-                    TeamsCreateModel = new()
+                    TeamName = team.Name;
+                    TeamDescription = team.Description;
+                    _teamIsClosed = team.Closed;
+                    SelectedOwner = new User
                     {
-                        Name = team.Name,
-                        Description = team.Description,
-                        Closed = team.Closed,
+                        Id = team.Owner.UserId,
+                        Email = team.Owner.Email,
+                        FirstName = team.Owner.FirstName,
+                        LastName = team.Owner.LastName
                     };
+                    SelectedLeader = team.Leader is not null ? new User
+                    {
+                        Id = team.Leader.UserId,
+                        Email = team.Leader.Email,
+                        FirstName = team.Leader.FirstName,
+                        LastName = team.Leader.LastName
+                    } : null;
 
                     _isLoading = false;
                 }
             }
             else
             {
-                var currentUser = AuthService.CurrentUser;
-                if (currentUser is not null)
-                    TeamsCreateModel.Owner = currentUser;
+                if (AuthService.CurrentUser is not null)
+                {
+                    SelectedOwner = AuthService.CurrentUser;
+                    TeamMembers.Add(AuthService.CurrentUser);
+                }
 
                 _isLoading = false;
             }
         }
 
-        private async Task CreateNewSkill(string name, SkillType skillType)
-        {
-            var newSkill = await SkillService.CreateNewSkillAsync(name, skillType, false);
-            if (newSkill is null) return;
+        private static string GetTeamClosedStyle(bool? isClosed) => isClosed.HasValue && isClosed.Value
+                ? "team-type-active border-primary border-opacity-75"
+                : string.Empty;
 
-            if (skillType is SkillType.Language)
-            {
-                LanguageSkills.Add(newSkill);
-                SelectedLanguageSkills.Add(newSkill);
-            }
-            else if (skillType is SkillType.Framework)
-            {
-                FrameworkSkills.Add(newSkill);
-                SelectedFrameworkSkills.Add(newSkill);
-            }
-            else if (skillType is SkillType.Database)
-            {
-                DatabaseSkills.Add(newSkill);
-                SelectedDatabaseSkills.Add(newSkill);
-            }
-            else if (skillType is SkillType.Devops)
-            {
-                DevopsSkills.Add(newSkill);
-                SelectedDevopsSkills.Add(newSkill);
-            }
+        private void ShowInviteUsersModal()
+        {
+            ModalService.Show<AddTeamMembersModal>(ModalType.Center);
         }
 
         private async Task UpdateTeamSkills()

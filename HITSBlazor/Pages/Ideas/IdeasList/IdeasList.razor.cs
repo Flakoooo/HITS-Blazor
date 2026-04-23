@@ -107,10 +107,10 @@ namespace HITSBlazor.Pages.Ideas.IdeasList
                     _ideas.Clear();
                     _ideas.AddRange(listResponse.List);
                 }
-                _totalCount = listResponse.Count;
 
                 IncrementPage();
             }
+            _totalCount = listResponse.Count;
 
             StateHasChanged();
         }

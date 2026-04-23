@@ -97,6 +97,13 @@ namespace HITSBlazor.Components.Modals.CenterModals.EndedSprintModal
             return tabs;
         }
 
+        private static string GetInfoCategoryName(EndedSprintModalInfoCategory category) => category switch
+        {
+            EndedSprintModalInfoCategory.Scores => "Оценки",
+            EndedSprintModalInfoCategory.Info => "Информация",
+            _ => category.ToString()
+        };
+
         private async System.Threading.Tasks.Task ChangeCategory(EndedSprintModalStatCategory category)
         {
             _activeStatCategory = category;

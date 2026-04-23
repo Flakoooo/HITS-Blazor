@@ -14,6 +14,7 @@ using HITSBlazor.Services.IdeaMarkets;
 using HITSBlazor.Services.Markets;
 using HITSBlazor.Services.Modal;
 using HITSBlazor.Services.Teams;
+using HITSBlazor.Utils.EnumUIConverters;
 using HITSBlazor.Utils.Models;
 using Microsoft.AspNetCore.Components;
 
@@ -136,7 +137,7 @@ namespace HITSBlazor.Components.Modals.RightSideModals.IdeaMarketModal
             initiatorInfoItem.Text = _currentIdeaMarket.Initiator.FullName;
             initiatorInfoItem.LinkMethod = () => ModalService.ShowProfileModal(_currentIdeaMarket.Initiator.Id);
 
-            _infoItems[2].Text = EnumViewModel<IdeaMarketStatusType>.GetTranslation(_currentIdeaMarket.Status);
+            _infoItems[2].Text = EnumUIConverter.GetInfo(_currentIdeaMarket.Status).DisplayText;
 
             _currentMarket = await MarketService.GetMarketByIdAsync(_currentIdeaMarket.MarketId);
             _infoItems[3].Text = _currentMarket?.StartDate.ToString("dd.MM.yyyy") ?? "-";
@@ -151,6 +152,14 @@ namespace HITSBlazor.Components.Modals.RightSideModals.IdeaMarketModal
             new() { Title = "Ожидаемый результат",                          Data = _currentIdeaMarket?.Result         },
             new() { Title = "Описание необходимых ресурсов для реализации", Data = _currentIdeaMarket?.Description    }
         ];
+
+        private static string GetCategoryInfo(IdeaMarketTableCategory category) => category switch
+        {
+            IdeaMarketTableCategory.AcceptedTeam => "Принятая команда",
+            IdeaMarketTableCategory.Requests => "Заявки",
+            IdeaMarketTableCategory.InvitedTeams => "Приглашенные команды",
+            _ => category.ToString()
+        };
 
         private string GetTableCategoryClass(IdeaMarketTableCategory category)
             => _activeTableCategory == category ? "active text-primary" : "text-secondary";

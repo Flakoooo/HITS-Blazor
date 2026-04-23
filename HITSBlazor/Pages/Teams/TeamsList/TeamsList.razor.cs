@@ -127,10 +127,10 @@ namespace HITSBlazor.Pages.Teams.TeamsList
                     _teams.Clear();
                     _teams.AddRange(listResponse.List);
                 }
-                _totalCount = listResponse.Count;
 
                 IncrementPage();
             }
+            _totalCount = listResponse.Count;
 
             StateHasChanged();
         }
@@ -185,8 +185,7 @@ namespace HITSBlazor.Pages.Teams.TeamsList
             }
             else if (context.Action is MenuAction.Delete)
             {
-                if (context.Item is not Team team)
-                    return;
+                if (context.Item is not Team team) return;
 
                 ModalService.ShowConfirmModal(
                     $"Вы действительно хотите удалить {team.Name}?",

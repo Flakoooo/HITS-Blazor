@@ -29,13 +29,19 @@ namespace HITSBlazor.Components.Modals.Components.RightSideModalInfo
 
         private RightSideModalCategory _activeInfoCategory = RightSideModalCategory.Info;
 
+        private static string GetCategoryText(RightSideModalCategory category) => category switch
+        {
+            RightSideModalCategory.Info => "Информация",
+            RightSideModalCategory.Skills => "Компетенции",
+            _ => category.ToString()
+        };
+
+
         private string GetInfoCategoryClass(RightSideModalCategory category)
                 => _activeInfoCategory == category ? "btn-primary" : "btn-secondary";
 
-        private string GetSideClass(bool isSplitted)
-        {
-            return isSplitted ? "rounded-3 bg-white" : string.Empty;
-        }
+        private static string GetSideClass(bool isSplitted) 
+            => isSplitted ? "rounded-3 bg-white" : string.Empty;
 
         private static ApexChartOptions<Skill> GetRadarChartOptions() => new()
         {

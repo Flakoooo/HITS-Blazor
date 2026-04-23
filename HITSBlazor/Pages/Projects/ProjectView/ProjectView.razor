@@ -19,6 +19,7 @@
 @using HITSBlazor.Models.Common.Entities
 @using HITSBlazor.Models.Projects.Enums
 @using HITSBlazor.Models.Users.Enums
+@using HITSBlazor.Utils.EnumUIConverters
 @using HITSBlazor.Utils.Models
 
 <div class="bg-white h-auto">
@@ -231,7 +232,7 @@
                                         <div class="d-flex gap-2">
                                             <i class="bi bi-flag-fill fs-6" style="color: @color;"></i>
                                             <Typography FontSize="6">
-                                                @(EnumViewModel<HITSBlazor.Models.Projects.Enums.TaskStatus>.GetTranslation(taskCategory))
+                                                @EnumUIConverter.GetInfo(taskCategory).DisplayText
                                             </Typography>
                                         </div>
                                         <div class="d-flex align-items-center gap-2">

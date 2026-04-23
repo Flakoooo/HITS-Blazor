@@ -1,5 +1,6 @@
 ﻿@namespace HITSBlazor.Components.Tables.TableActionMenu
 @using HITSBlazor.Components.ActionMenus.BaseActionMenu
+@using HITSBlazor.Utils.EnumUIConverters
 @using HITSBlazor.Utils.Models
 @inherits BaseActionMenuComponent
 
@@ -16,9 +17,10 @@
             <ul class="list-group list-group-flush">
                 @foreach (var action in ActionIds)
                 {
+                    var uiResult = EnumUIConverter.GetInfo(action.Key);
                     <li @onclick="@(() => HandleActionClick(action.Key, action.Value))"
-                        class="list-group-item list-group-item-action px-2 py-1 @(EnumViewModel<MenuAction>.GetStyle(action.Key))">
-                        @(EnumViewModel<MenuAction>.GetTranslation(action.Key))
+                        class="list-group-item list-group-item-action px-2 py-1 @uiResult.DisplayStyle">
+                        @uiResult.DisplayText
                     </li>
                 }
             </ul>

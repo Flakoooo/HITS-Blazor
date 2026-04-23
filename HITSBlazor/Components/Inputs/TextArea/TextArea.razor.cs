@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using HITSBlazor.Utils.Validation;
+using Microsoft.AspNetCore.Components;
 
 namespace HITSBlazor.Components.Inputs.TextArea
 {
@@ -26,6 +27,9 @@ namespace HITSBlazor.Components.Inputs.TextArea
         public bool NeedValidation { get; set; } = false;
 
         [Parameter]
+        public Func<string, ValidationEvaluation>? CustomValidation { get; set; }
+
+        [Parameter]
         public string? ErrorMessage { get; set; } = "Поле не заполнено";
 
         [Parameter]
@@ -38,7 +42,21 @@ namespace HITSBlazor.Components.Inputs.TextArea
 
         protected override void OnParametersSet()
         {
-            _showError = NeedValidation && string.IsNullOrWhiteSpace(Value);
+            if (NeedValidation)
+            {
+                if (CustomValidation is not null)
+                {
+                    var result = CustomValidation(Value);
+                    ErrorMessage = result.Message;
+                    _showError = !result.IsValid;
+                }
+                else
+                {
+                    _showError = string.IsNullOrWhiteSpace(Value);
+                }
+            }
+            else _showError = false;
+
             StateHasChanged();
         }
 

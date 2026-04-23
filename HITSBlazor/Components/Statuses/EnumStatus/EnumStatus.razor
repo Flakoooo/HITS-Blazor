@@ -1,9 +1,13 @@
 ﻿@namespace HITSBlazor.Components.Statuses.EnumStatus
+@using HITSBlazor.Utils.EnumUIConverters
 @using HITSBlazor.Utils.Models
 
-<div class="px-2 py-1 rounded-4 @CustomClass @(EnumViewModel<Enum>.GetStyle(Statustype))">
-    @(EnumViewModel<Enum>.GetTranslation(Statustype))
-</div>
+@{
+    var uiResult = EnumUIConverter.GetInfo(Statustype);
+    <div class="px-2 py-1 rounded-4 @CustomClass @uiResult.DisplayStyle">
+        @uiResult.DisplayText
+    </div>
+}
 
 @code {
     [Parameter]

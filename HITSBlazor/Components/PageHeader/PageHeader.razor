@@ -7,6 +7,7 @@
 @using HITSBlazor.Services
 @using HITSBlazor.Services.Auth
 @using HITSBlazor.Services.Modal
+@using HITSBlazor.Utils.EnumUIConverters
 @using HITSBlazor.Utils.Models
 
 <div class="bg-white border-bottom w-100 position-sticky" 
@@ -25,7 +26,7 @@
                         IconStyle="bi-circle-fill"
                         IconSize="fs-6"
                         Style="width: fit-content;"
-                        Text="@(EnumViewModel<RoleType>.GetTranslation(CurrentRole))"
+                        Text="@EnumUIConverter.GetInfo(CurrentRole).DisplayText"
                         OnButtonClick="() => ShowRoleModal()" />
             </div>
         </div>

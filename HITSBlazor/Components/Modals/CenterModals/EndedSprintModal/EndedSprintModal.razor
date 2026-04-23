@@ -128,22 +128,22 @@
                                     <div class="d-flex gap-1">
                                         @{
                                             (ButtonVariant Variant1, ButtonVariant Variant2) variants
-                                            = _activeInfoCategory is EndedSprintModalInfoCategory.Scores
-                                            ? (ButtonVariant.Primary, ButtonVariant.Secondary)
-                                            : (ButtonVariant.Secondary, ButtonVariant.Primary);
+                                                = _activeInfoCategory is EndedSprintModalInfoCategory.Scores
+                                                ? (ButtonVariant.Primary, ButtonVariant.Secondary)
+                                                : (ButtonVariant.Secondary, ButtonVariant.Primary);
                                             <Button Variant="variants.Variant1" 
-                                                    Text="@(EnumViewModel<EndedSprintModalInfoCategory>.GetTranslation(EndedSprintModalInfoCategory.Scores))" 
+                                                    Text="@GetInfoCategoryName(EndedSprintModalInfoCategory.Scores)"
                                                     ButtonClass="w-100" 
                                                     OnButtonClick="() => _activeInfoCategory = EndedSprintModalInfoCategory.Scores" />
                                             <Button Variant="variants.Variant2" 
-                                                    Text="@(EnumViewModel<EndedSprintModalInfoCategory>.GetTranslation(EndedSprintModalInfoCategory.Info))" 
+                                                    Text="@GetInfoCategoryName(EndedSprintModalInfoCategory.Info)"
                                                     ButtonClass="w-100"
                                                     OnButtonClick="() => _activeInfoCategory = EndedSprintModalInfoCategory.Info" />
                                         }
                                     </div>
                                     <div>
                                         <div class="text-center p-2 bg-primary rounded-top text-white fs-5 border border-bottom-0">
-                                            @(EnumViewModel<EndedSprintModalInfoCategory>.GetTranslation(_activeInfoCategory))
+                                            @GetInfoCategoryName(_activeInfoCategory)
                                         </div>
                                         @if (_activeInfoCategory is EndedSprintModalInfoCategory.Scores)
                                         {

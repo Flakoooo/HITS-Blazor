@@ -9,6 +9,7 @@
 @using HITSBlazor.Services
 @using HITSBlazor.Services.Modal
 @using HITSBlazor.Services.Skills
+@using HITSBlazor.Utils.EnumUIConverters
 @using HITSBlazor.Utils.Models
 
 <div @onclick:stopPropagation="true" class="skill-modal p-3 rounded-3">
@@ -46,10 +47,10 @@
 
     private List<KeyValuePair<int, string>> _skillTypeOptions = 
     [
-        new((int)SkillType.Language, EnumViewModel<SkillType>.GetTranslation(SkillType.Language)),
-        new((int)SkillType.Framework, EnumViewModel<SkillType>.GetTranslation(SkillType.Framework)),
-        new((int)SkillType.Database, EnumViewModel<SkillType>.GetTranslation(SkillType.Database)),
-        new((int)SkillType.Devops, EnumViewModel<SkillType>.GetTranslation(SkillType.Devops))
+        new((int)SkillType.Language, EnumUIConverter.GetInfo(SkillType.Language).DisplayText),
+        new((int)SkillType.Framework, EnumUIConverter.GetInfo(SkillType.Framework).DisplayText),
+        new((int)SkillType.Database, EnumUIConverter.GetInfo(SkillType.Database).DisplayText),
+        new((int)SkillType.Devops, EnumUIConverter.GetInfo(SkillType.Devops).DisplayText)
     ];
 
     private string SkillName { get; set; } = string.Empty;

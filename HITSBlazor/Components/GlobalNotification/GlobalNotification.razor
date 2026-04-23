@@ -2,6 +2,7 @@
 @using HITSBlazor.Components.Button
 @using HITSBlazor.Components.Typography
 @using HITSBlazor.Services
+@using HITSBlazor.Utils.EnumUIConverters
 @using HITSBlazor.Utils.Models
 @implements IDisposable
 
@@ -26,7 +27,7 @@
             }
             else
             {
-                <div class="alert @(EnumViewModel<NotificationType>.GetStyle(notification.Type)) alert-dismissible show fade @notification.AlertAnimation"
+                <div class="alert @EnumUIConverter.GetInfo(notification.Type).DisplayStyle alert-dismissible show fade @notification.AlertAnimation"
                      style="--notification-index: @notification.Index;"
                      role="alert">
                     <div class="notification-content">@notification.Message</div>
@@ -85,7 +86,7 @@
         var notification = new GlobalNotificationItem
         {
             Id = Guid.NewGuid(),
-            Title = string.IsNullOrWhiteSpace(title) ? EnumViewModel<NotificationType>.GetTranslation(type) : title,
+            Title = string.IsNullOrWhiteSpace(title) ? EnumUIConverter.GetInfo(type).DisplayText : title,
             Message = message,
             Type = type,
             Index = _notifications.Count

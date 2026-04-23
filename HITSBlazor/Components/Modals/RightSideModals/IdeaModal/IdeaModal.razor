@@ -17,6 +17,7 @@
 @using HITSBlazor.Services.Ideas
 @using HITSBlazor.Services.Modal
 @using HITSBlazor.Utils.EnumStyles
+@using HITSBlazor.Utils.EnumUIConverters
 @using HITSBlazor.Utils.Models
 
 <div class="right-side-modal p-3 overflow-y-scroll" @onclick:stopPropagation="true">
@@ -191,7 +192,7 @@
                 @(
                     CurrentIdea?.Status == IdeaStatusType.OnConfirmation
                         ? $"Утвердили {IdeaRatings.Where(r => r.IsConfirmed).Count()}/{IdeaRatings.Count()}"
-                        : EnumViewModel<IdeaStatusType>.GetTranslation(CurrentIdea?.Status)
+                        : EnumUIConverter.GetInfo(CurrentIdea?.Status).DisplayText
                 ) 
             </Typography>
         }

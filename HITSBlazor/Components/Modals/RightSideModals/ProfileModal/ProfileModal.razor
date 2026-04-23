@@ -9,6 +9,7 @@
 @using HITSBlazor.Components.Modals.Components.ModalHeader
 @using HITSBlazor.Components.NavigationTabs
 @using HITSBlazor.Components.Placeholders.Placeholder
+@using HITSBlazor.Components.StackCategories
 @using HITSBlazor.Components.Statuses.BoolStatus
 @using HITSBlazor.Components.Statuses.EnumStatus
 @using HITSBlazor.Components.Tables.TableActionMenu
@@ -24,6 +25,7 @@
 @using HITSBlazor.Models.Users.Enums
 @using HITSBlazor.Services.Modal
 @using HITSBlazor.Utils.EnumStyles
+@using HITSBlazor.Utils.EnumUIConverters
 @using HITSBlazor.Utils.Models
 
 <div class="right-side-modal flex-column p-3 overflow-y-scroll" @onclick:stopPropagation="true">
@@ -41,7 +43,7 @@
                     {
                         <div class="w-auto">
                             <div class="text-center rounded-pill px-2 py-1 @(_isCurrentUser && role == AuthService.CurrentUser?.Role ? "bg-primary text-light" : "bg-light border p-2")">
-                                @(EnumViewModel<RoleType>.GetTranslation(role))
+                                @EnumUIConverter.GetInfo(role).DisplayText
                             </div>
                         </div>
                     }
@@ -143,41 +145,46 @@
                                 var databaseCount = Profile.Skills.Count(s => s.Type == SkillType.Database);
                                 var devopsCount = Profile.Skills.Count(s => s.Type == SkillType.Devops);
                 
+                                @* TODO: вынести в отдельный компонент *@
                                 <div class="d-flex flex-wrap gap-3">
                                     @if (languageCount > 0)
                                     {
-                                        <div class="d-flex align-items-center gap-2 px-3 py-2 rounded-3 @(EnumViewModel<SkillType>.GetStyle(SkillType.Language))">
+                                        var uiResult = EnumUIConverter.GetInfo(SkillType.Language);
+                                        <div class="d-flex align-items-center gap-2 px-3 py-2 rounded-3 @uiResult.DisplayStyle">
                                             <Typography FontSize="6" TextColor="TextColor.Inherit">
-                                                @(EnumViewModel<SkillType>.GetTranslation(SkillType.Language))
+                                                @uiResult.DisplayText
                                             </Typography>
-                                            <span class="fw-bold">@languageCount</span>
+                                            <Typography CustomClass="fw-bold">@languageCount</Typography>
                                         </div>
                                     }
                                     @if (frameworkCount > 0)
                                     {
-                                        <div class="d-flex align-items-center gap-2 px-3 py-2 rounded-3 @(EnumViewModel<SkillType>.GetStyle(SkillType.Framework))">
+                                        var uiResult = EnumUIConverter.GetInfo(SkillType.Framework);
+                                        <div class="d-flex align-items-center gap-2 px-3 py-2 rounded-3 @uiResult.DisplayStyle">
                                             <Typography FontSize="6" TextColor="TextColor.Inherit">
-                                                @(EnumViewModel<SkillType>.GetTranslation(SkillType.Framework))
+                                                @uiResult.DisplayText
                                             </Typography>
-                                            <span class="fw-bold">@frameworkCount</span>
+                                            <Typography CustomClass="fw-bold">@frameworkCount</Typography>
                                         </div>
                                     }
                                     @if (databaseCount > 0)
                                     {
-                                        <div class="d-flex align-items-center gap-2 px-3 py-2 rounded-3 @(EnumViewModel<SkillType>.GetStyle(SkillType.Database))">
+                                        var uiResult = EnumUIConverter.GetInfo(SkillType.Database);
+                                        <div class="d-flex align-items-center gap-2 px-3 py-2 rounded-3 @uiResult.DisplayStyle">
                                             <Typography FontSize="6" TextColor="TextColor.Inherit">
-                                                @(EnumViewModel<SkillType>.GetTranslation(SkillType.Database))
+                                                @uiResult.DisplayText
                                             </Typography>
-                                            <span class="fw-bold">@databaseCount</span>
+                                            <Typography CustomClass="fw-bold">@databaseCount</Typography>
                                         </div>
                                     }
                                     @if (devopsCount > 0)
                                     {
-                                        <div class="d-flex align-items-center gap-2 px-3 py-2 rounded-3 @(EnumViewModel<SkillType>.GetStyle(SkillType.Devops))">
+                                        var uiResult = EnumUIConverter.GetInfo(SkillType.Devops);
+                                        <div class="d-flex align-items-center gap-2 px-3 py-2 rounded-3 @uiResult.DisplayStyle">
                                             <Typography FontSize="6" TextColor="TextColor.Inherit">
-                                                @(EnumViewModel<SkillType>.GetTranslation(SkillType.Devops))
+                                                @uiResult.DisplayText
                                             </Typography>
-                                            <span class="fw-bold">@devopsCount</span>
+                                            <Typography CustomClass="fw-bold">@devopsCount</Typography>
                                         </div>
                                     }
                                 </div>
@@ -298,24 +305,15 @@
                             }
                             else
                             {
-                                <div class="mt-2 w-100 stack-categories">
-                                    <SkillDropdown Placeholder="@(EnumViewModel<SkillType>.GetTranslation(SkillType.Language))"
-                                                   AllSkills="LanguageSkills"
-                                                   @bind-SelectedSkills="@SelectedLanguageSkills"
-                                                   ValueMustCreated="(value) => CreateNewSkill(value, SkillType.Language)" />
-                                    <SkillDropdown Placeholder="@(EnumViewModel<SkillType>.GetTranslation(SkillType.Framework))"
-                                                   AllSkills="FrameworkSkills"
-                                                   @bind-SelectedSkills="@SelectedFrameworkSkills"
-                                                   ValueMustCreated="(value) => CreateNewSkill(value, SkillType.Framework)" />
-                                    <SkillDropdown Placeholder="@(EnumViewModel<SkillType>.GetTranslation(SkillType.Database))"
-                                                   AllSkills="DatabaseSkills"
-                                                   @bind-SelectedSkills="@SelectedDatabaseSkills"
-                                                   ValueMustCreated="(value) => CreateNewSkill(value, SkillType.Database)" />
-                                    <SkillDropdown Placeholder="@(EnumViewModel<SkillType>.GetTranslation(SkillType.Devops))"
-                                                   AllSkills="DevopsSkills"
-                                                   @bind-SelectedSkills="@SelectedDevopsSkills"
-                                                   ValueMustCreated="(value) => CreateNewSkill(value, SkillType.Devops)" />
-                                </div>
+                                <StackCategories IsLoading="_isLoading"
+                                                 @bind-LanguageSkills="LanguageSkills"
+                                                 @bind-SelectedLanguageSkills="SelectedLanguageSkills"
+                                                 @bind-FrameworkSkills="FrameworkSkills"
+                                                 @bind-SelectedFrameworkSkills="SelectedFrameworkSkills"
+                                                 @bind-DatabaseSkills="DatabaseSkills"
+                                                 @bind-SelectedDatabaseSkills="SelectedDatabaseSkills"
+                                                 @bind-DevopsSkills="DevopsSkills"
+                                                 @bind-SelectedDevopsSkills="SelectedDevopsSkills" />
                             }
                         }
                         else

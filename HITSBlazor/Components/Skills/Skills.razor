@@ -2,11 +2,12 @@
 @using HITSBlazor.Components.Typography
 @using HITSBlazor.Models.Common.Entities
 @using HITSBlazor.Models.Common.Enums
+@using HITSBlazor.Utils.EnumUIConverters
 @using HITSBlazor.Utils.Models
 
 @foreach (var skill in SkillList)
 {
-    <div class="px-2 py-1 rounded d-flex gap-1 @(EnumViewModel<SkillType>.GetStyle(skill.Type))">
+    <div class="px-2 py-1 rounded d-flex gap-1 @EnumUIConverter.GetInfo(skill.Type).DisplayStyle">
         <Typography FontSize="6">
             @skill.Name
         </Typography>

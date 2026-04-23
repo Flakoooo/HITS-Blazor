@@ -29,7 +29,7 @@
                         CreateButtonText="Создать команду" 
                         OnButtonClick="@(() => NavigationService.NavigateToAsync("teams/create"))" />
         <InputSearch Width="50" IsLoading="_isLoading" ValueChanged="@((value) => SearchTeam(value))" />
-        <TableComponent IsLoading="_isLoading" HeaderItems="_teamTableHeader" TableActionMenuIsEnable="true" OrderMethod="SortTeam">
+        <TableComponent IsLoading="_isLoading" IsDataLoading="_isLoadingMore" HeaderItems="_teamTableHeader" TableActionMenuIsEnable="true" OrderMethod="SortTeam">
             <TableContent>
                 @foreach (var team in _teams)
                 {
@@ -87,14 +87,5 @@
                 <ResetFilterButton IsLoading="_isLoading" ResetMethod="ResetFilters" />
             </FilterContent>
         </TableComponent>
-        <!-- TODO: заменить на что то другое -->
-        @if (_isLoadingMore)
-        {
-            <div class="text-center py-3">
-                <div class="spinner-border spinner-border-sm text-primary" role="status">
-                    <span class="visually-hidden">Загрузка...</span>
-                </div>
-            </div>
-        }
     </div>
 </div>

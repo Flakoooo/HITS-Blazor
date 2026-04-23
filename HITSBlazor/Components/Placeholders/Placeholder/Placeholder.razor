@@ -20,7 +20,14 @@
 
     protected override async Task OnInitializedAsync()
     {
-        heightClass = EnumViewModel<PlaceholderHeight>.GetTranslation(Height);
-        heightStyle = EnumViewModel<PlaceholderHeight>.GetStyle(Height);
+        (heightClass, heightStyle) = Height switch
+        {
+            PlaceholderHeight.Smaller => ("smaller", "height: 40px;"),
+            PlaceholderHeight.Small => ("small", "height: 50px;"),
+            PlaceholderHeight.Regular => ("regular", "height: 70px;"),
+            PlaceholderHeight.Medium => ("medium", "height: 100px;"),
+            PlaceholderHeight.Second => ("second", "height: 2000px;"),
+            PlaceholderHeight.None or _ => (string.Empty, string.Empty)
+        };
     }
 }

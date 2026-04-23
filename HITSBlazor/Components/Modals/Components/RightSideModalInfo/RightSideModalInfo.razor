@@ -10,17 +10,17 @@
 <div class="right-side-modal-info w-25 @GetSideClass(!IsSplitted)">
     <div class="p-2 rounded-top d-flex gap-2 rounded-3 bg-white">
         <Button ButtonClass="@($"w-50 {GetInfoCategoryClass(RightSideModalCategory.Info)}")" 
-                Text="@(EnumViewModel<RightSideModalCategory>.GetTranslation(RightSideModalCategory.Info))"
+                Text="@GetCategoryText(RightSideModalCategory.Info)"
                 OnButtonClick="() => _activeInfoCategory = RightSideModalCategory.Info" />
         <Button ButtonClass="@($"w-50 {GetInfoCategoryClass(RightSideModalCategory.Skills)}")" 
-                Text="@(EnumViewModel<RightSideModalCategory>.GetTranslation(RightSideModalCategory.Skills))" 
+                Text="@GetCategoryText(RightSideModalCategory.Skills)" 
                 OnButtonClick="() => _activeInfoCategory = RightSideModalCategory.Skills" />
     </div>
     <div class="@GetSideClass(IsSplitted)">
         @if (IsSplitted)
         {
             <div class="right-side-modal-info-header w-100 bg-primary rounded-top fs-5 text-white p-2">
-                @(EnumViewModel<RightSideModalCategory>.GetTranslation(_activeInfoCategory))
+                @GetCategoryText(_activeInfoCategory)
             </div>            
         }
         <div class="right-side-modal-info-items w-100 pb-3 px-3 @(IsSplitted ? "pt-3" : string.Empty)">

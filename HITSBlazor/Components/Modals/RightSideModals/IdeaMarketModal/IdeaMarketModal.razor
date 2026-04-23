@@ -34,7 +34,7 @@
                     {
                         <div @onclick="() => ChangeCategory(category)" style="cursor: pointer;"
                              class="nav-link fw-normal pb-1 @GetTableCategoryClass(category)">
-                            @(EnumViewModel<IdeaMarketTableCategory>.GetTranslation(category))
+                            @GetCategoryInfo(category)
                         </div>
                     }
                 </ul>

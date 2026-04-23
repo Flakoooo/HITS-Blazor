@@ -138,10 +138,13 @@
                                             {
                                                 <tr>
                                                     <TableBodyRow>
-                                                        <div class="data-link @(member.Id == _currentTeam.Owner.Id ? "text-warning" : string.Empty)">
-                                                            @member.Email
-                                                            @(member.Id == _currentTeam.Owner.Id ? " (Владелец)" : string.Empty)
-                                                        </div>
+                                                        @{
+                                                            var displayInfo = GetRoleDisplayInfo(member.Id);
+                                                            <div class="data-link @(displayInfo.TextColor.HasValue ? $"text-{displayInfo.TextColor.Value.ToString().ToLower()}" : string.Empty)">
+                                                                @member.Email
+                                                                @(member.Id == _currentTeam.Owner.Id ? " (Владелец)" : string.Empty)
+                                                            </div>
+                                                        }
                                                     </TableBodyRow>
                                                     <TableBodyRow>
                                                         @member.FirstName
@@ -278,6 +281,7 @@
             <div class="rounded-3 bg-white p-3 d-flex flex-wrap gap-3">
                 <Button Variant="ButtonVariant.Light" Text="Редактировать" />
                 <Button Variant="ButtonVariant.Danger" Text="Удалить команду" />
+                @* TODO: октрывать модальное окно, которое в создании команды *@
                 <Button Variant="ButtonVariant.Primary" Text="Пригласить пользователя" />
             </div>
         </div>

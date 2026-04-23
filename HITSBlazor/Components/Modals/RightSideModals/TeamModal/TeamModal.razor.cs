@@ -5,6 +5,7 @@ using HITSBlazor.Components.Modals.Components.RightSideModalInfo;
 using HITSBlazor.Components.Modals.RightSideModals.IdeaMarketModal;
 using HITSBlazor.Components.Modals.RightSideModals.IdeaModal;
 using HITSBlazor.Components.Tables.TableHeader;
+using HITSBlazor.Components.Typography;
 using HITSBlazor.Models.Common.Entities;
 using HITSBlazor.Models.Ideas.Entities;
 using HITSBlazor.Models.Teams.Entities;
@@ -152,6 +153,28 @@ namespace HITSBlazor.Components.Modals.RightSideModals.TeamModal
         private List<CollapseItem> GetTeamData() => [
             new() { Title = "Описание команды", Data = _currentTeam?.Description },
         ];
+
+        private (TextColor? TextColor, string DisplayText) GetRoleDisplayInfo(Guid memberId)
+        {
+            if (_currentTeam is null) return (null, string.Empty);
+
+            if (memberId == _currentTeam.Owner.Id)
+            {
+                string displayText = "(Владелец)";
+                if (memberId == _currentTeam.Leader?.Id)
+                    displayText = "(Владелец и Тим-лид)";
+
+                return (TextColor.Warning, displayText);
+            }
+            else if (memberId == _currentTeam.Leader?.Id)
+            {
+                return (TextColor.Primary, "(Тим-лид)");
+            }
+            else
+            {
+                return (null, string.Empty);
+            }
+        }
 
         private async Task ChangeCategory(TeamTableCategory category)
         {

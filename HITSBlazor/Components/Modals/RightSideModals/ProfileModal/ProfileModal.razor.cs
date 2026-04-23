@@ -110,7 +110,7 @@ namespace HITSBlazor.Components.Modals.RightSideModals.ProfileModal
             _isLoading = false;
         }
 
-        private async Task ChangeCategory(ProfileModalCategory category)
+        private static async Task ChangeCategory(ProfileModalCategory category)
         {
             _activeCategory = category;
         }
@@ -122,33 +122,6 @@ namespace HITSBlazor.Components.Modals.RightSideModals.ProfileModal
             Telephone = original.Telephone,
             StudyGroup = original.StudyGroup
         };
-
-        private async Task CreateNewSkill(string name, SkillType skillType)
-        {
-            var newSkill = await SkillService.CreateNewSkillAsync(name, skillType, false);
-            if (newSkill is null) return;
-
-            if (skillType is SkillType.Language)
-            {
-                LanguageSkills.Add(newSkill);
-                SelectedLanguageSkills.Add(newSkill);
-            }
-            else if (skillType is SkillType.Framework)
-            {
-                FrameworkSkills.Add(newSkill);
-                SelectedFrameworkSkills.Add(newSkill);
-            }
-            else if (skillType is SkillType.Database)
-            {
-                DatabaseSkills.Add(newSkill);
-                SelectedDatabaseSkills.Add(newSkill);
-            }
-            else if (skillType is SkillType.Devops)
-            {
-                DevopsSkills.Add(newSkill);
-                SelectedDevopsSkills.Add(newSkill);
-            }
-        }
 
         private void UpdateCurrentProfile()
         {

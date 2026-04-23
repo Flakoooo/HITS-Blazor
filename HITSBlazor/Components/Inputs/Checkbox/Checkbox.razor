@@ -8,7 +8,7 @@
            @onclick="() => SelectCheckbox()" />
     @if (!string.IsNullOrWhiteSpace(DisplayText))
     {
-        <Typography CustomClass="form-check-label ms-2">
+        <Typography CustomClass="@($"form-check-label ms-2 {DisplayTextCustomClass}")">
             @DisplayText
         </Typography>
     }
@@ -23,6 +23,9 @@
 
     [Parameter]
     public string DisplayText { get; set; } = string.Empty;
+
+    [Parameter]
+    public string DisplayTextCustomClass { get; set; } = string.Empty;
 
     private async Task SelectCheckbox()
     {

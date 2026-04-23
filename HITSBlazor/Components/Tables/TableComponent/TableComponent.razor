@@ -58,6 +58,14 @@
                 }
             </tbody>
         </table>
+        @if (IsDataLoading)
+        {
+            <div class="text-center py-3">
+                <div class="spinner-border spinner-border-sm text-primary" role="status">
+                    <span class="visually-hidden">Загрузка...</span>
+                </div>
+            </div>
+        }
     </div>
     @if (FilterContent is not null)
     {
@@ -70,6 +78,9 @@
 @code {
     [Parameter]
     public bool IsLoading { get; set; } = false;
+
+    [Parameter]
+    public bool IsDataLoading { get; set; } = false;
 
     [Parameter]
     public List<TableHeaderItem> HeaderItems { get; set; } = [];

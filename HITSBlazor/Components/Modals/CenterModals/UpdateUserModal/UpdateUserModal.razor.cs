@@ -36,12 +36,10 @@ namespace HITSBlazor.Components.Modals.CenterModals.UpdateUserModal
             UpdateUserRequest.Roles = [.. UserForUpdate.Roles];
         }
 
-        private async Task OnRoleTypeChanged(RoleType role, bool isChecked)
+        private async Task OnRoleTypeChanged(RoleType role)
         {
-            if (isChecked)
+            if (!UserForUpdate.Roles.Remove(role))
                 UserForUpdate.Roles.Add(role);
-            else
-                UserForUpdate.Roles.Remove(role);
         }
 
         //TODO: ПОДУМАТЬ НАД ВАЛИДАЦИЕЙ!!!!

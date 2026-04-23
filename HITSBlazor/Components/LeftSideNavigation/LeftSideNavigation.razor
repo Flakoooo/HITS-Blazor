@@ -4,6 +4,7 @@
 @using HITSBlazor.Components.Placeholders.Placeholder
 @using HITSBlazor.Components.Typography
 @using HITSBlazor.Models.Users.Enums
+@using HITSBlazor.Utils.EnumUIConverters
 @using HITSBlazor.Utils.Models
 
 <div class="bg-white border-end"
@@ -79,7 +80,7 @@
                         Style="height: 40px; min-height: 40px; max-height: 40px;"
                         IconStyle="bi-circle-fill"
                         IconSize="fs-6"
-                        Text="@(isHovered ? EnumViewModel<RoleType>.GetTranslation(CurrentRole) : string.Empty)"
+                        Text="@(isHovered ? EnumUIConverter.GetInfo(CurrentRole).DisplayText : string.Empty)"
                         OnButtonClick="() => ShowRoleModal()" />
                 <Button Variant="ButtonVariant.Light" 
                         ButtonClass="w-100" 

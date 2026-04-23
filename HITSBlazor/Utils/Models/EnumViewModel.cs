@@ -1,6 +1,4 @@
-﻿using HITSBlazor.Utils.Attributes;
-using System.ComponentModel;
-using System.Reflection;
+﻿using HITSBlazor.Utils.EnumUIConverters;
 
 namespace HITSBlazor.Utils.Models
 {
@@ -8,27 +6,13 @@ namespace HITSBlazor.Utils.Models
     {
         public T Value { get; private set; } = value;
 
-        public static string GetTranslation(Enum? value)
-        {
-            if (value is null) return nameof(value);
+        public EnumUIResult GetInfo() => EnumUIConverter.GetInfo(Value);
 
-            var field = value.GetType().GetField(value.ToString());
-            var attribute = field?.GetCustomAttribute<DescriptionAttribute>();
+        public string GetTranslation() => GetInfo().DisplayText;
 
-            return attribute?.Description ?? value.ToString();
-        }
+        public string GetStyle() => GetInfo().DisplayStyle;
 
-        public static string GetStyle(Enum? value)
-        {
-            if (value is null) return nameof(value);
-
-            var field = value.GetType().GetField(value.ToString());
-            var attribute = field?.GetCustomAttribute<StyleAttribute>();
-
-            return attribute?.Style ?? value.ToString();
-        }
-
-        public override string GetDisplayInfo() => GetTranslation(Value);
+        public override string GetDisplayInfo() => GetTranslation();
 
         public override object GetId() => Value;
     }

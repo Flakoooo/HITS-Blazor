@@ -1,5 +1,6 @@
 ﻿@using HITSBlazor.Components.Button
 @using HITSBlazor.Components.Collapse
+@using HITSBlazor.Components.Inputs.Checkbox
 @using HITSBlazor.Components.Inputs.Input
 @using HITSBlazor.Components.Modals.Components.CenterModalHeader
 @using HITSBlazor.Components.Typography
@@ -9,6 +10,7 @@
 @using HITSBlazor.Services
 @using HITSBlazor.Services.Modal
 @using HITSBlazor.Services.Users
+@using HITSBlazor.Utils.EnumUIConverters
 @using HITSBlazor.Utils.Models
 @using HITSBlazor.Utils.Validation
 
@@ -56,17 +58,10 @@
                 <div class="list-group">
                     @foreach (var role in Enum.GetValues<RoleType>())
                     {
-                        <div class="d-flex">
-                            <div class="d-flex">
-                                <input type="checkbox"
-                                       checked="@UpdateUserRequest.Roles.Contains(role)"
-                                       @onchange="@(e => OnRoleTypeChanged(role, (bool)e.Value!))"
-                                       class="form-check-input drop-down-item" />
-                                <Typography CustomClass="form-check-label ms-2 drop-down-item">
-                                    @(EnumViewModel<RoleType>.GetTranslation(role))
-                                </Typography>
-                            </div>
-                        </div>
+                        <Checkbox Checked="@UpdateUserRequest.Roles.Contains(role)"
+                                  OnClick="() => OnRoleTypeChanged(role)"
+                                  DisplayText="@EnumUIConverter.GetInfo(role).DisplayText"
+                                  DisplayTextCustomClass="drop-down-item" />
                     }
                 </div>
             </ExpandedContent>

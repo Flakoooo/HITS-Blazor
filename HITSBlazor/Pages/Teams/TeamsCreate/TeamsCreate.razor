@@ -5,6 +5,7 @@
 @using HITSBlazor.Components.Inputs.Input
 @using HITSBlazor.Components.Inputs.RadioDropdown
 @using HITSBlazor.Components.Inputs.TextArea
+@using HITSBlazor.Components.StackCategories
 @using HITSBlazor.Components.Typography
 @using HITSBlazor.Models.Common.Entities
 @using HITSBlazor.Models.Common.Enums
@@ -16,23 +17,26 @@
 <div class="bg-white page-content-with-header">
     <div class="team-form w-100 h-100 bg-white p-3 overflow-auto">
         <div class="team-form-content w-75">
-            <Typography FontSize="2">
-                Создание команды
+            <Typography FontSize="2" TextColor="TextColor.Primary">
+                @(string.IsNullOrWhiteSpace(TeamId) ? "Создание" : "Редактирование") команды
             </Typography>
-            <Input Label="Название команды*" 
+            <Input IsLoading="_isLoading"
+                   Label="Название команды*" 
                    Placeholder="Введите название команды" 
                    NeedValidation="true" 
-                   @bind-Value="_value" />
-            <TextArea Label="Описание команды*" 
+                   @bind-Value="TeamName" />
+            <TextArea IsLoading="_isLoading"
+                      Label="Описание команды*" 
                       Placeholder="Введите описание команды" 
                       NeedValidation="true" 
-                      @bind-Value="_value" />
+                      @bind-Value="TeamDescription" />
             <div class="w-100">
                 <Typography FontSize="2" TextColor="TextColor.Primary">
                     Тип команды*
                 </Typography>
                 <div class="my-2 d-flex gap-3">
-                    <div class="team-type w-50 p-2 rounded-3 border border-2 @(!TeamsCreateModel.Closed ? "team-type-active border-primary border-opacity-75" : string.Empty)">
+                    <div class="team-type w-50 p-2 rounded-3 border border-2 @GetTeamClosedStyle(!_teamIsClosed)" 
+                         @onclick="() => _teamIsClosed = false">
                         <div class="team-type-icon rounded-circle bg-success bg-opacity-25">
                             <i class="fs-2 text-success bi bi-folder2-open"></i>
                         </div>
@@ -45,7 +49,8 @@
                             </Typography>
                         </div>
                     </div>
-                    <div class="team-type w-50 p-2 rounded-3 border border-2 @(TeamsCreateModel.Closed ? "team-type-active border-primary border-opacity-75" : string.Empty)">
+                    <div class="team-type w-50 p-2 rounded-3 border border-2 @GetTeamClosedStyle(_teamIsClosed)" 
+                         @onclick="() => _teamIsClosed = true">
                         <div class="team-type-icon rounded-circle bg-danger bg-opacity-25">
                             <i class="fs-2 text-danger bi bi-shield-lock"></i>
                         </div>
@@ -60,128 +65,130 @@
                     </div>
                 </div>
             </div>
-            <div class="w-100 d-flex flex-column gap-3">
-                <Typography FontSize="6" TextColor="TextColor.Primary">
-                    Желаемые компетенции*
-                </Typography>
-                <div class="mt-2 w-100 stack-categories">
-                    <SkillDropdown Placeholder="@(EnumViewModel<SkillType>.GetTranslation(SkillType.Language))"
-                                   AllSkills="LanguageSkills"
-                                   @bind-SelectedSkills="@SelectedLanguageSkills"
-                                   ValueMustCreated="(value) => CreateNewSkill(value, SkillType.Language)" />
-                    <SkillDropdown Placeholder="@(EnumViewModel<SkillType>.GetTranslation(SkillType.Framework))"
-                                   AllSkills="FrameworkSkills"
-                                   @bind-SelectedSkills="@SelectedFrameworkSkills"
-                                   ValueMustCreated="(value) => CreateNewSkill(value, SkillType.Framework)" />
-                    <SkillDropdown Placeholder="@(EnumViewModel<SkillType>.GetTranslation(SkillType.Database))"
-                                   AllSkills="DatabaseSkills"
-                                   @bind-SelectedSkills="@SelectedDatabaseSkills"
-                                   ValueMustCreated="(value) => CreateNewSkill(value, SkillType.Database)" />
-                    <SkillDropdown Placeholder="@(EnumViewModel<SkillType>.GetTranslation(SkillType.Devops))"
-                                   AllSkills="DevopsSkills"
-                                   @bind-SelectedSkills="@SelectedDevopsSkills"
-                                   ValueMustCreated="(value) => CreateNewSkill(value, SkillType.Devops)" />
-                </div>
-            </div>
-            <div class="team w-100">             
-                <RadioDropdown T="User" 
-                               Label="Владелец команды*" 
-                               Placeholder="Выберите владельца"
-                               IsDisabled="true" 
-                               @bind-Value="TeamsCreateModel.Owner"
-                               AllValues="TeamMembers"/>
-                <RadioDropdown T="User"
-                               Label="Тим-лидер команды"
-                               Placeholder="Выберите тим-лидера"
-                               @bind-Value="TeamsCreateModel.Leader"
-                               AllValues="TeamMembers" />
-                <div class="w-100 d-flex flex-column">
-                    <CheckboxDropdown T="User"
-                                      Label="Участники команды*"
-                                      Placeholder="Выберите участников"
-                                      @bind-SelectedValues="TeamsCreateModel.Members"
-                                      AllValues="TeamMembers" />
-                    @if (TeamsCreateModel.Members.Count > 0)
-                    {
-                        <div class="team-members mt-2">
-                            @foreach (var member in TeamsCreateModel.Members)
-                            {
-                                <div class="team-member p-1 rounded-3 bg-opacity-25 bg-danger">
-                                    <Typography FontSize="6">
-                                        @member.FullName
-                                    </Typography>
-                                    <i class="bi bi-x-lg" style="cursor: pointer;"></i>
-                                </div>
-                            }
-                        </div>
-                    }
-                </div>
-                <div class="d-flex flex-column">
-                    <div class="d-flex gap-2 text-primary" style="cursor: pointer;">
-                        <div class="data-link">Пригласить пользователей</div>
-                        <i class="bi bi-person-plus"></i>
-                    </div>
-                    @if (TeamsCreateModel.Members.Count > 0)
-                    {
-                        <div class="team-members mt-2">
-                            @foreach (var member in TeamsCreateModel.Members)
-                            {
-                                <div class="team-member p-1 rounded-3 bg-opacity-25 bg-primary">
-                                    <Typography FontSize="6">
-                                        @member.FullName
-                                    </Typography>
-                                    <i class="bi bi-x-lg" style="cursor: pointer;"></i>
-                                </div>
-                            }
-                        </div>
-                    }
-                </div>
-            </div>
-            @if (TeamSkills.Count > 0 || TeamsCreateModel.WantedSkills.Count > 0)
+            <StackCategories IsLoading="_isLoading"
+                             Label="Желаемые компетенции*"
+                             @bind-LanguageSkills="LanguageSkills"
+                             @bind-SelectedLanguageSkills="SelectedLanguageSkills"
+                             @bind-FrameworkSkills="FrameworkSkills"
+                             @bind-SelectedFrameworkSkills="SelectedFrameworkSkills"
+                             @bind-DatabaseSkills="DatabaseSkills"
+                             @bind-SelectedDatabaseSkills="SelectedDatabaseSkills"
+                             @bind-DevopsSkills="DevopsSkills"
+                             @bind-SelectedDevopsSkills="SelectedDevopsSkills" />
+            @if (string.IsNullOrWhiteSpace(TeamId))
             {
-                <div class="radar-charts">
-                    @foreach (var type in Enum.GetValues<SkillType>())
-                    {
-                        var teamSkills = TeamSkills.Where(s => s.Type == type).ToList();
-                        var teamWantedSkills = TeamsCreateModel.WantedSkills.Where(s => s.Type == type).ToList();
-                        var intersectSkills = teamWantedSkills.IntersectBy(teamSkills.Select(s => s.Id), ws => ws.Id).ToList();
-
-                        var allSkills = teamSkills
-                        .UnionBy(teamWantedSkills, s => s.Id)
-                        .OrderBy(s => s.Name)
-                        .ToList();
-
-                        if (allSkills?.Count > 0)
+                @* TODO: выбор владельца думаю оставить при редактировании, чтобы можно было передавать команды *@
+                @* TODO: также думаю сделать так, чтобы изначально лидером был владелец, смысл оставлять пустой поле тимлида? *@
+                <div class="team w-100">
+                    <RadioDropdown T="User"
+                                   IsLoading="_isLoading"
+                                   Label="Владелец команды*"
+                                   Placeholder="Выберите владельца"
+                                   IsDisabled="true"
+                                   @bind-Value="SelectedOwner"
+                                   AllValues="TeamMembers" />
+                    <RadioDropdown T="User"
+                                   IsLoading="_isLoading"
+                                   Label="Тим-лидер команды"
+                                   Placeholder="Выберите тим-лидера"
+                                   @bind-Value="SelectedLeader"
+                                   AllValues="TeamMembers" />
+                    <div class="w-100 d-flex flex-column">
+                        <CheckboxDropdown T="User"
+                                          IsLoading="_isLoading"
+                                          Label="Участники команды*"
+                                          Placeholder="Выберите участников"
+                                          @bind-SelectedValues="SelectedMember"
+                                          AllValues="TeamMembers" />
+                        @if (SelectedMember.Count > 0)
                         {
-                            <ApexChart TItem="Skill"
-                                       Options="@GetRadarChartOptions()"
-                                       Width="250"
-                                       Height="275">
-                                <ApexPointSeries TItem="Skill"
-                                                 Items="allSkills"
-                                                 Name="Желаемые компетенции"
-                                                 SeriesType="SeriesType.Radar"
-                                                 XValue="@(s => s.Name)"
-                                                 YValue="@(s => teamWantedSkills.Contains(s) ? 1 : 0)"
-                                                 Color="@type.GetWantedColor()" />
-                                <ApexPointSeries TItem="Skill"
-                                                 Items="allSkills"
-                                                 Name="Фактические компетенции"
-                                                 SeriesType="SeriesType.Radar"
-                                                 XValue="@(s => s.Name)"
-                                                 YValue="@(s => teamSkills.Contains(s) ? 1 : 0)"
-                                                 Color="@type.GetColor()" />
-                                <ApexPointSeries TItem="Skill"
-                                                 Items="allSkills"
-                                                 Name="Пересечение"
-                                                 SeriesType="SeriesType.Radar"
-                                                 XValue="@(s => s.Name)"
-                                                 YValue="@(s => intersectSkills.Contains(s) ? 1 : 0)"
-                                                 Color="#bfbfbf" />
-                            </ApexChart>
+                            <div class="team-members mt-2">
+                                @foreach (var member in SelectedMember.OrderBy(m => m.Id == SelectedLeader?.Id))
+                                {
+                                    <div class="team-member p-1 rounded-3 bg-opacity-25 @(member.Id == SelectedLeader?.Id ? "bg-danger" : "bg-primary")">
+                                        <Typography FontSize="6">
+                                            @member.FullName
+                                        </Typography>
+                                        <i class="bi bi-x-lg" style="cursor: pointer;" @onclick="() => TeamMembers.Remove(member)"></i>
+                                    </div>
+                                }
+                            </div>
                         }
-                    }
+                    </div>
+                    <div class="d-flex flex-column">
+                        <div class="d-flex gap-2 text-primary" style="cursor: pointer;" @onclick="ShowInviteUsersModal">
+                            <div class="data-link">Пригласить пользователей</div>
+                            <i class="bi bi-person-plus"></i>
+                        </div>
+                        @if (MembersForInviting.Count > 0)
+                        {
+                            <div class="team-members mt-2">
+                                @foreach (var member in MembersForInviting)
+                                {
+                                    <div class="team-member p-1 rounded-3 bg-opacity-25 bg-primary">
+                                        <Typography FontSize="6">
+                                            @member.FullName
+                                        </Typography>
+                                        <i class="bi bi-x-lg" style="cursor: pointer;" @onclick="() => MembersForInviting.Remove(member)"></i>
+                                    </div>
+                                }
+                            </div>
+                        }
+                    </div>
                 </div>
+                @if (TeamSkills.Count > 0 || WantedSkillsAny)
+                {
+                    <div class="radar-charts">
+                        @foreach (var type in Enum.GetValues<SkillType>())
+                        {
+                            var teamSkills = TeamSkills.Where(s => s.Type == type).ToList();
+                            var teamWantedSkills = type switch
+                            {
+                                SkillType.Language => SelectedLanguageSkills.ToList(),
+                                SkillType.Framework => SelectedFrameworkSkills.ToList(),
+                                SkillType.Database => SelectedDatabaseSkills.ToList(),
+                                SkillType.Devops => SelectedDevopsSkills.ToList(),
+                                _ => []
+                            };
+                            var intersectSkills = teamWantedSkills.IntersectBy(teamSkills.Select(s => s.Id), ws => ws.Id).ToList();
+
+                            var allSkills = teamSkills
+                            .UnionBy(teamWantedSkills, s => s.Id)
+                            .OrderBy(s => s.Name)
+                            .ToList();
+
+                            if (allSkills?.Count > 0)
+                            {
+                                <ApexChart TItem="Skill"
+                                           Options="@GetRadarChartOptions()"
+                                           Width="250"
+                                           Height="275">
+                                    <ApexPointSeries TItem="Skill"
+                                                     Items="allSkills"
+                                                     Name="Желаемые компетенции"
+                                                     SeriesType="SeriesType.Radar"
+                                                     XValue="@(s => s.Name)"
+                                                     YValue="@(s => teamWantedSkills.Contains(s) ? 1 : 0)"
+                                                     Color="@type.GetWantedColor()" />
+                                    <ApexPointSeries TItem="Skill"
+                                                     Items="allSkills"
+                                                     Name="Фактические компетенции"
+                                                     SeriesType="SeriesType.Radar"
+                                                     XValue="@(s => s.Name)"
+                                                     YValue="@(s => teamSkills.Contains(s) ? 1 : 0)"
+                                                     Color="@type.GetColor()" />
+                                    <ApexPointSeries TItem="Skill"
+                                                     Items="allSkills"
+                                                     Name="Пересечение"
+                                                     SeriesType="SeriesType.Radar"
+                                                     XValue="@(s => s.Name)"
+                                                     YValue="@(s => intersectSkills.Contains(s) ? 1 : 0)"
+                                                     Color="#bfbfbf" />
+                                </ApexChart>
+                            }
+                        }
+                    </div>
+                }
             }
             @if (string.IsNullOrWhiteSpace(TeamId))
             {

@@ -115,12 +115,10 @@ namespace HITSBlazor.Pages.Admin.InviteUsers
             }
         }
 
-        private async Task OnRoleTypeChanged(RoleType role, bool isChecked)
+        private async Task OnRoleTypeChanged(RoleType role)
         {
-            if (isChecked)
+            if (!SelectedRoles.Remove(role))
                 SelectedRoles.Add(role);
-            else
-                SelectedRoles.Remove(role);
         }
 
         private async Task SendInvitations()

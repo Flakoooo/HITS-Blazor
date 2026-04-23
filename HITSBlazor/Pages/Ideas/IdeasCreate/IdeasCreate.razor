@@ -9,6 +9,7 @@
 @using HITSBlazor.Components.Inputs.TextArea
 @using HITSBlazor.Components.Placeholders.Placeholder
 @using HITSBlazor.Components.ProgressBar
+@using HITSBlazor.Components.StackCategories
 @using HITSBlazor.Components.Typography
 @using HITSBlazor.Models.Common.Entities
 @using HITSBlazor.Models.Common.Enums
@@ -93,43 +94,17 @@
                     </div>
                 </div>
             </div>
-            <div>
-                @if (_isLoading)
-                {
-                    <Placeholder Width="w-25" />
-                }
-                else
-                {
-                    <div class="d-flex gap-1 align-items-center">
-                        <Typography FontSize="6" TextColor="TextColor.Primary">
-                            Стек технологий
-                        </Typography>
-                        <Hint Text="@GetHintText("Skills")" />
-                    </div>
-                }
-                <div class="mt-2 w-100 stack-categories">
-                    <SkillDropdown IsLoading="_isLoading"
-                                   Placeholder="@(EnumViewModel<SkillType>.GetTranslation(SkillType.Language))"
-                                   AllSkills="LanguageSkills"
-                                   @bind-SelectedSkills="@SelectedLanguageSkills"
-                                   ValueMustCreated="(value) => CreateNewSkill(value, SkillType.Language)" />
-                    <SkillDropdown IsLoading="_isLoading"
-                                   Placeholder="@(EnumViewModel<SkillType>.GetTranslation(SkillType.Framework))"
-                                   AllSkills="FrameworkSkills"
-                                   @bind-SelectedSkills="@SelectedFrameworkSkills"
-                                   ValueMustCreated="(value) => CreateNewSkill(value, SkillType.Framework)" />
-                    <SkillDropdown IsLoading="_isLoading"
-                                   Placeholder="@(EnumViewModel<SkillType>.GetTranslation(SkillType.Database))"
-                                   AllSkills="DatabaseSkills"
-                                   @bind-SelectedSkills="@SelectedDatabaseSkills"
-                                   ValueMustCreated="(value) => CreateNewSkill(value, SkillType.Database)" />
-                    <SkillDropdown IsLoading="_isLoading"
-                                   Placeholder="@(EnumViewModel<SkillType>.GetTranslation(SkillType.Devops))"
-                                   AllSkills="DevopsSkills"
-                                   @bind-SelectedSkills="@SelectedDevopsSkills"
-                                   ValueMustCreated="(value) => CreateNewSkill(value, SkillType.Devops)" />
-                </div>
-            </div>
+            <StackCategories IsLoading="_isLoading"
+                             Label="Стек технологий"
+                             HintText="@GetHintText("Skills")"
+                             @bind-LanguageSkills="LanguageSkills"
+                             @bind-SelectedLanguageSkills="SelectedLanguageSkills"
+                             @bind-FrameworkSkills="FrameworkSkills"
+                             @bind-SelectedFrameworkSkills="SelectedFrameworkSkills"
+                             @bind-DatabaseSkills="DatabaseSkills"
+                             @bind-SelectedDatabaseSkills="SelectedDatabaseSkills"
+                             @bind-DevopsSkills="DevopsSkills"
+                             @bind-SelectedDevopsSkills="SelectedDevopsSkills" />
             <RadioDropdown T="Company"
                            IsLoading="_isLoading"
                            Label="Заказчик"
