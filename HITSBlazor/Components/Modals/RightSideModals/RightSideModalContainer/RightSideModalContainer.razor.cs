@@ -10,6 +10,7 @@ namespace HITSBlazor.Components.Modals.RightSideModals.RightSideModalContainer
 
         protected override void OnInitialized()
         {
+            ModalService.OnAllModalsUpdated += StateHasChanged;
             ModalService.OnRightSideModalsUpdated += StateHasChanged;
         }
 
@@ -19,8 +20,18 @@ namespace HITSBlazor.Components.Modals.RightSideModals.RightSideModalContainer
                 await ModalService.Close(ModalType.RightSide);
         }
 
+        private int GetZIndexValue()
+        {
+            var type = ModalService.AllModals.Peek().Type;
+            var index = ModalService.AllModals.Count * (type is ModalType.RightSide ? 600 : 500);
+            if (type is ModalType.Center) index -= 500;
+
+            return index;
+        }
+
         public void Dispose()
         {
+            ModalService.OnAllModalsUpdated -= StateHasChanged;
             ModalService.OnRightSideModalsUpdated -= StateHasChanged;
         }
     }

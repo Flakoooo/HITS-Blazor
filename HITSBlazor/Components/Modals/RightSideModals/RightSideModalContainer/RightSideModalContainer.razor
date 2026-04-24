@@ -1,11 +1,12 @@
 ﻿@namespace HITSBlazor.Components.Modals.RightSideModals.RightSideModalContainer
+@using HITSBlazor.Services.Modal
 
 @if (ModalService.SideModals.Count != 0)
 {
     var modal = ModalService.SideModals.Peek();
     <div @onclick="() => CloseModalIfAllowed(modal.BlockCloseModal)"
          class="modal-layout modal-layout-@modal.State.ToString().ToLower()-active"
-         style="z-index: 500;">
+         style="z-index: @GetZIndexValue();">
         <DynamicComponent Type="@modal.ComponentType"
                           Parameters="@modal.Parameters" />
     </div>

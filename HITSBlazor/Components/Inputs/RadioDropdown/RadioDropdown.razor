@@ -4,7 +4,7 @@
 @using HITSBlazor.Utils.Models
 @typeparam T where T : ViewModelBase
 
-<div class="w-100" tabindex="-1">
+<div class="w-100 gap-1" tabindex="-1">
     @if (IsLoading)
     {
         @if (!string.IsNullOrWhiteSpace(Label))
@@ -42,7 +42,7 @@
                 </div>
             </div>
 
-            @if (!_isOpen)
+            @if (!IsDisabled && !_isOpen)
             {
                 <i class="input-dropdown-icon bi bi-chevron-down" @onclick="ToggleDropdown"></i>
             }

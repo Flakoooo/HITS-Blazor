@@ -10,6 +10,7 @@ namespace HITSBlazor.Components.Modals.CenterModals.CenterModalContainer
 
         protected override void OnInitialized()
         {
+            ModalService.OnAllModalsUpdated += StateHasChanged;
             ModalService.OnCenterModalsUpdated += StateHasChanged;
         }
 
@@ -19,8 +20,17 @@ namespace HITSBlazor.Components.Modals.CenterModals.CenterModalContainer
                 await ModalService.Close(ModalType.Center);
         }
 
+        private int GetZIndexValue(int count)
+        {
+            if (count == ModalService.CenterModals.Count)
+                return count * (ModalService.AllModals.Peek().Type is ModalType.Center ? 600 : 500);
+
+            return count * 500;
+        }
+
         public void Dispose()
         {
+            ModalService.OnAllModalsUpdated -= StateHasChanged;
             ModalService.OnCenterModalsUpdated -= StateHasChanged;
         }
     }

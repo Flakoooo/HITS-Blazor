@@ -1,6 +1,7 @@
 ﻿using HITSBlazor.Components.ActionMenus.BaseActionMenu;
 using HITSBlazor.Components.GlobalNotification;
 using HITSBlazor.Components.Modals.CenterModals.EndedSprintModal;
+using HITSBlazor.Components.Modals.RightSideModals.ProfileModal;
 using HITSBlazor.Models.Common.Enums;
 using HITSBlazor.Models.Ideas.Enums;
 using HITSBlazor.Models.Markets.Enums;
@@ -19,6 +20,7 @@ namespace HITSBlazor.Utils.EnumUIConverters
             IdeaStatusType s => GetIdeasStatusInfo(s),
             IdeaMarketStatusType s => GetMarketIdeaStatusInfo(s),
             HITSTaskStatus s => GetTastStatusInfo(s),
+            ProfileModalCategory c => GetProfileCategoryInfo(c),
             EndedSprintModalStatCategory c => GetSprintModalStatCategoryInfo(c),
             MenuAction a => GetActionMenuInfo(a),
             NotificationType n => GetNotificationTypeInfo(n),
@@ -32,6 +34,7 @@ namespace HITSBlazor.Utils.EnumUIConverters
             IdeaStatusType s => GetIdeasStatusInfo(s),
             IdeaMarketStatusType s => GetMarketIdeaStatusInfo(s),
             HITSTaskStatus s => GetTastStatusInfo(s),
+            ProfileModalCategory c => GetProfileCategoryInfo(c),
             EndedSprintModalStatCategory c => GetSprintModalStatCategoryInfo(c),
             MenuAction a => GetActionMenuInfo(a),
             NotificationType n => GetNotificationTypeInfo(n),

@@ -2,6 +2,7 @@
 using HITSBlazor.Models.Markets.Entities;
 using HITSBlazor.Models.Teams.Entities;
 using HITSBlazor.Models.Teams.Enums;
+using HITSBlazor.Models.Users.Entities;
 using HITSBlazor.Utils.Mocks.Teams;
 
 namespace HITSBlazor.Services.Teams
@@ -10,8 +11,11 @@ namespace HITSBlazor.Services.Teams
     {
         private readonly GlobalNotificationService _globalNotificationService = globalNotificationService;
 
+        public event Action<ICollection<User>>? OnInviteMembersCollected;
         public event Func<Task>? OnRequestsStatusCreated;
         public event Action<Guid, TeamRequestStatus>? OnRequestsStatusUpdated;     
+
+        public void InvokeInvitationEvent(ICollection<User> users) => OnInviteMembersCollected?.Invoke(users);
 
         public async Task<ListDataResponse<Team>> GetTeamsAsync(
             int page,

@@ -141,8 +141,7 @@
                                                         @{
                                                             var displayInfo = GetRoleDisplayInfo(member.Id);
                                                             <div class="data-link @(displayInfo.TextColor.HasValue ? $"text-{displayInfo.TextColor.Value.ToString().ToLower()}" : string.Empty)">
-                                                                @member.Email
-                                                                @(member.Id == _currentTeam.Owner.Id ? " (Владелец)" : string.Empty)
+                                                                @member.Email @displayInfo.DisplayText
                                                             </div>
                                                         }
                                                     </TableBodyRow>

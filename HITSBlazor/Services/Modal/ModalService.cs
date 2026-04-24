@@ -10,13 +10,16 @@ using Microsoft.AspNetCore.Components;
 
 namespace HITSBlazor.Services.Modal
 {
+    //TODO: наверно события можно вынести в одно
     public class ModalService
     {
         public event Action? OnCenterModalsUpdated;
         public event Action? OnRightSideModalsUpdated;
+        public event Action? OnAllModalsUpdated;
 
         public List<ModalData> CenterModals { get; private set; } = [];
         public Stack<ModalData> SideModals { get; private set; } = [];
+        public Stack<ModalData> AllModals { get; private set; } = [];
 
         public void Show<TComponent>(
             ModalType type,
@@ -45,6 +48,9 @@ namespace HITSBlazor.Services.Modal
                 CustomClass = customClass
             };
 
+            AllModals.Push(modalData);
+            OnAllModalsUpdated?.Invoke();
+
             switch (type)
             {
                 case ModalType.Center:
@@ -67,8 +73,7 @@ namespace HITSBlazor.Services.Modal
             switch (type)
             {
                 case ModalType.Center:
-                    if (CenterModals.Count == 0)
-                        return;
+                    if (CenterModals.Count == 0) return;
 
                     CenterModals.Last().State = ModalState.Leave;
                     OnCenterModalsUpdated?.Invoke();
@@ -79,8 +84,7 @@ namespace HITSBlazor.Services.Modal
                     break;
 
                 case ModalType.RightSide:
-                    if (SideModals.Count == 0)
-                        return;
+                    if (SideModals.Count == 0) return;
 
                     SideModals.Peek().State = ModalState.Leave;
                     OnRightSideModalsUpdated?.Invoke();
@@ -93,6 +97,9 @@ namespace HITSBlazor.Services.Modal
                 default: 
                     break;
             }
+
+            AllModals.Pop();
+            OnAllModalsUpdated?.Invoke();
         }
 
         public async System.Threading.Tasks.Task CloseAll(ModalType type)
@@ -113,7 +120,7 @@ namespace HITSBlazor.Services.Modal
 
                 case ModalType.RightSide:
                     foreach (var modal in SideModals)
-                        SideModals.Peek().State |= ModalState.Leave;
+                        SideModals.Peek().State = ModalState.Leave;
 
                     OnRightSideModalsUpdated?.Invoke();
 
@@ -126,6 +133,9 @@ namespace HITSBlazor.Services.Modal
                 default:
                     break;
             }
+
+            AllModals.Clear();
+            OnAllModalsUpdated?.Invoke();
         }
 
         public void ShowActiveRoleModal() => Show<SelectActiveRoleModal>(

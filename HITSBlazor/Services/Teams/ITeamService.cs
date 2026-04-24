@@ -2,13 +2,17 @@
 using HITSBlazor.Models.Markets.Entities;
 using HITSBlazor.Models.Teams.Entities;
 using HITSBlazor.Models.Teams.Enums;
+using HITSBlazor.Models.Users.Entities;
 
 namespace HITSBlazor.Services.Teams
 {
     public interface ITeamService
     {
+        event Action<ICollection<User>>? OnInviteMembersCollected;
         event Func<Task>? OnRequestsStatusCreated;
         event Action<Guid, TeamRequestStatus>? OnRequestsStatusUpdated;
+
+        void InvokeInvitationEvent(ICollection<User> users);
 
         Task<ListDataResponse<Team>> GetTeamsAsync(
             int page,

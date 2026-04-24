@@ -1,19 +1,30 @@
 ﻿@namespace HITSBlazor.Components.Modals.Components.CenterModalHeader
 @using HITSBlazor.Components.Button
+@using HITSBlazor.Components.Placeholders.Placeholder
 @using HITSBlazor.Components.Typography
 @using HITSBlazor.Services.Modal
 
 <div class="center-modal-header w-100">
-    <Typography FontSize="FontSize" TextColor="TextColor.Primary" CustomClass="text-center">
-        @HeaderText
-    </Typography>
-    <Button ButtonClass="btn-close"
-            OnButtonClick="CloseModal" />
+    @if (IsLoading)
+    {
+        <Placeholder Width="w-25" />
+    }
+    else
+    {
+        <Typography FontSize="FontSize" TextColor="TextColor.Primary" CustomClass="text-center">
+            @HeaderText
+        </Typography>
+        <Button ButtonClass="btn-close"
+                OnButtonClick="CloseModal" />
+    }
 </div>
 
 @code {
     [Inject]
     public ModalService ModalService { get; set; } = null!;
+
+    [Parameter]
+    public bool IsLoading { get; set; } = false;
 
     [Parameter]
     public string HeaderText { get; set; } = string.Empty;
