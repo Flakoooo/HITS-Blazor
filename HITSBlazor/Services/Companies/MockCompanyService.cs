@@ -1,6 +1,6 @@
 ﻿using HITSBlazor.Models.Common.Entities;
+using HITSBlazor.Models.Common.Responses;
 using HITSBlazor.Models.Users.Entities;
-using HITSBlazor.Models.Users.Enums;
 using HITSBlazor.Services.Auth;
 using HITSBlazor.Utils.Mocks.Common;
 
@@ -14,37 +14,18 @@ namespace HITSBlazor.Services.Companies
         private readonly IAuthService _authService = authService;
         private readonly GlobalNotificationService _globalNotificationService = globalNotificationService;
 
-        public event Func<Task>? OnCompaniesStateChanged;
-        public event Action? OnCompaniesStateUpdated;
+        public event Action<Company>? OnCompanyHasCreated;
+        public event Action<Company>? OnCompanyHasUpdated;
+        public event Action<Company>? OnCompanyHasDeleted;
 
-        private List<Company> _cachedCompanies = [];
-        private DateTime _lastRefreshTime;
-        private readonly TimeSpan _cacheLifetime = TimeSpan.FromMinutes(5);
-
-        private async Task RefreshCacheAsync()
+        public async Task<ListDataResponse<Company>> GetCompaniesAsync(
+            int page, string? searchText
+        )
         {
-            _cachedCompanies = MockCompanies.GetAllCompanies();
-            _lastRefreshTime = DateTime.UtcNow;
-        }
-
-        public async Task<List<Company>> GetCompaniesAsync(string? searchText, RoleType? role = null)
-        {
-            if (_cachedCompanies.Count == 0 || DateTime.UtcNow - _lastRefreshTime > _cacheLifetime)
-                await RefreshCacheAsync();
-
-            var query = _cachedCompanies.AsEnumerable();
-
-            if (role.HasValue && role is not RoleType.Admin)
-            {
-                var companies = query.Where(c => c.Owner.Id == _authService.CurrentUser?.Id);
-                if (companies.Any()) query = companies;
-                else query = query.Where(c => c.Name.Equals("ВШЦТ"));
-            }
-
-            if (!string.IsNullOrWhiteSpace(searchText))
-                query = query.Where(c => c.Name.Contains(searchText, StringComparison.CurrentCultureIgnoreCase));
-
-            return [.. query];
+            return MockCompanies.GetAllCompaniesByQueryParams(
+                page, 
+                searchText: searchText
+            );
         }
 
         public async Task<Company?> GetCompanyByIdAsync(Guid companyId)
@@ -56,12 +37,10 @@ namespace HITSBlazor.Services.Companies
             return company;
         }
 
+        //TODO: надо это как то изменить
         public async Task<Company?> GetCompanyByNameAsync(string name)
         {
-            if (_cachedCompanies.Count == 0 || DateTime.UtcNow - _lastRefreshTime > _cacheLifetime)
-                await RefreshCacheAsync();
-
-            return _cachedCompanies.FirstOrDefault(c => c.Name.Equals(name, StringComparison.CurrentCultureIgnoreCase));
+            return MockCompanies.GetCompanyByName(name);
         }
 
         public async Task<bool> CreateCompanyAsync(string name, User owner, List<User> members)
@@ -74,8 +53,7 @@ namespace HITSBlazor.Services.Companies
             }
 
             _globalNotificationService.ShowSuccess("Компания успешно создана");
-            _cachedCompanies.Clear();
-            OnCompaniesStateChanged?.Invoke();
+            OnCompanyHasCreated?.Invoke(company);
             return true;
         }
 
@@ -88,16 +66,8 @@ namespace HITSBlazor.Services.Companies
                 return false;
             }
 
-            var companyForUpdate = _cachedCompanies.FirstOrDefault(u => u.Id == companyId);
-            if (companyForUpdate is not null)
-            {
-                companyForUpdate.Name = name;
-                companyForUpdate.Owner = owner;
-                companyForUpdate.Members = [.. members];
-            }
-
             _globalNotificationService.ShowSuccess("Компания успешно обновлена");
-            OnCompaniesStateUpdated?.Invoke();
+            OnCompanyHasUpdated?.Invoke(company);
             return true;
         }
 
@@ -109,7 +79,8 @@ namespace HITSBlazor.Services.Companies
                 return false;
             }
 
-            _cachedCompanies.Remove(company);
+            OnCompanyHasDeleted?.Invoke(company);
+
             return true;
         }
     }

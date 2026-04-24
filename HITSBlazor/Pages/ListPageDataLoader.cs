@@ -27,6 +27,8 @@ namespace HITSBlazor.Pages
             _dotNetHelper = DotNetObjectReference.Create((ComponentBase)this);
             try
             {
+                await AdditionalAfterRenderMethod();
+
                 _jsModule = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "./js/infiniteScroll.js");
                 await _jsModule.InvokeVoidAsync("initializeInfiniteScroll", _tableContainer, _dotNetHelper);
             }
@@ -68,6 +70,11 @@ namespace HITSBlazor.Pages
         protected virtual ValueTask DisposeAsyncCore() => ValueTask.CompletedTask;
 
         /// <summary>
+        /// Метод для дополнительной регистрации JS
+        /// </summary>
+        protected virtual async Task AdditionalAfterRenderMethod() { return; }
+
+        /// <summary>
         /// Метод, завершающий инициализацию
         /// </summary>
         protected void MarkAsInitialized()
@@ -99,7 +106,9 @@ namespace HITSBlazor.Pages
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             if (firstRender && _isInitialized)
+            {
                 await InitializeInfiniteScrollAsync();
+            }
         }
 
         /// <summary>

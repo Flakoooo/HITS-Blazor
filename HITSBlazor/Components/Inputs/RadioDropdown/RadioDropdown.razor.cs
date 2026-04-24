@@ -1,14 +1,12 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using HITSBlazor.Models.Common.Responses;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
 
 namespace HITSBlazor.Components.Inputs.RadioDropdown
 {
-    public partial class RadioDropdown<T> : IAsyncDisposable
+    public partial class RadioDropdown<T>
     {
-        [Inject]
-        private IJSRuntime JSRuntime { get; set; } = null!;
-
         [Parameter]
         public bool IsLoading { get; set; } = false;
 
@@ -33,8 +31,10 @@ namespace HITSBlazor.Components.Inputs.RadioDropdown
         [Parameter]
         public bool IsDisabled { get; set; } = false;
 
+        [Parameter]
+        public Func<int, string?, Task<ListDataResponse<T>>>? DataLoaderMethod { get; set; }
+
         private ElementReference _inputRef;
-        private DotNetObjectReference<RadioDropdown<T>>? _dotNetHelper;
 
         private bool _isOpen = false;
 
@@ -42,19 +42,34 @@ namespace HITSBlazor.Components.Inputs.RadioDropdown
         private readonly string _radioGroupName = typeof(T).Name;
         private string _searchText = string.Empty;
 
-        protected override async Task OnAfterRenderAsync(bool firstRender)
+        protected override async Task OnInitializedAsync()
         {
-            if (firstRender)
-            {
-                _dotNetHelper = DotNetObjectReference.Create(this);
-                await JSRuntime.InvokeVoidAsync("listDropdown.registerClickOutside", _inputRef, _dotNetHelper);
-                _values = [.. AllValues];
-            }
+            await LoadDataAsync();
+            MarkAsInitialized();
         }
+
+        protected override async Task AdditionalAfterRenderMethod()
+        {
+            try
+            {
+                await JSRuntime.InvokeVoidAsync("listDropdown.registerClickOutside", _inputRef, _dotNetHelper);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Ошибка регистрации clickOutside: {ex.Message}");
+            }
+
+            _values = [.. AllValues];
+        }
+
 
         private async Task OpenDropdown()
         {
-            if (!_isOpen) _isOpen = true;
+            if (!_isOpen)
+            {
+                _isOpen = true;
+                await InvokeAsync(StateHasChanged);
+            }
         }
 
         private void ToggleDropdown() => _isOpen = !_isOpen;
@@ -97,13 +112,59 @@ namespace HITSBlazor.Components.Inputs.RadioDropdown
             return Value.Equals(value);
         }
 
-        public async ValueTask DisposeAsync()
+        protected override async ValueTask DisposeAsyncCore()
         {
-            if (_dotNetHelper != null)
+            try
             {
-                await JSRuntime.InvokeVoidAsync("listDropdown.unregisterClickOutside", _inputRef);
-                _dotNetHelper.Dispose();
+                if (_dotNetHelper != null)
+                    await JSRuntime.InvokeVoidAsync("listDropdown.unregisterClickOutside", _inputRef);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Ошибка при очистке RadioDropdown: {ex.Message}");
+            }
+
+            await ValueTask.CompletedTask;
+        }
+
+        private async Task LoadDataAsync(bool append = false)
+        {
+            if (DataLoaderMethod is not null)
+            {
+                if (!append)
+                {
+                    ResetPagination();
+                    AllValues.Clear();
+                }
+
+                StateHasChanged();
+
+                var listResponse = await DataLoaderMethod.Invoke(_currentPage, _searchText);
+
+                _totalCount = listResponse.Count;
+                if (listResponse.List.Count > 0)
+                {
+                    if (append)
+                        AllValues.AddRange(listResponse.List);
+                    else
+                    {
+                        AllValues.Clear();
+                        AllValues.AddRange(listResponse.List);
+                    }
+                    _values = [.. AllValues];
+
+                    IncrementPage();
+                }
+
+                StateHasChanged();
             }
         }
+
+        protected override async Task OnLoadMoreItemsAsync()
+        {
+            await LoadDataAsync(append: true);
+        }
+
+        protected override int GetCurrentItemsCount() => _values.Count;
     }
 }

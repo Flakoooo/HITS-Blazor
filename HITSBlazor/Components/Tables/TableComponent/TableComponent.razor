@@ -17,55 +17,57 @@
 
 <div class="w-100 d-flex">
     <div class="w-100">
-        <table class="table table-hover mb-0">
-            @if (HeaderItems.Count > 0)
-            {
-                <TableHeader IsLoading="IsLoading"
-                             TableActionMenuIsEnable="TableActionMenuIsEnable" 
-                             Items="HeaderItems"
-                             OrderChanged="(value) => ExecuteOrder(value.Item1, value.Item2)" />
-            }
-            <tbody>
-                @if (IsLoading)
+        <div class="table-responsive" style="max-height: 75vh; overflow-y: auto;" @ref="_tableScrollContainer">
+            <table class="table table-hover mb-0">
+                @if (HeaderItems.Count > 0)
                 {
-                    @for (int i = 0; i < 5; ++i)
+                    <TableHeader IsLoading="IsLoading"
+                                 TableActionMenuIsEnable="TableActionMenuIsEnable"
+                                 Items="HeaderItems"
+                                 OrderChanged="(value) => ExecuteOrder(value.Item1, value.Item2)" />
+                }
+                <tbody>
+                    @if (IsLoading)
                     {
-                        <tr>
-                            @if (HeaderItems.Count > 0)
-                            {
-                                @foreach (var header in HeaderItems)
+                        @for (int i = 0; i < 5; ++i)
+                        {
+                            <tr>
+                                @if (HeaderItems.Count > 0)
                                 {
-                                    <td>
-                                        <Placeholder Height="PlaceholderHeight.Smaller" />
-                                    </td>
+                                    @foreach (var header in HeaderItems)
+                                    {
+                                        <td>
+                                            <Placeholder Height="PlaceholderHeight.Smaller" />
+                                        </td>
+                                    }
                                 }
-                            }
-                            else
-                            {
-                                @for (int j = 0; j < 6; ++j)
+                                else
                                 {
-                                    <td>
-                                        <Placeholder Height="PlaceholderHeight.Smaller" />
-                                    </td>
+                                    @for (int j = 0; j < 6; ++j)
+                                    {
+                                        <td>
+                                            <Placeholder Height="PlaceholderHeight.Smaller" />
+                                        </td>
+                                    }
                                 }
-                            }
-                        </tr>
+                            </tr>
+                        }
                     }
-                }
-                else
-                {
-                    @TableContent
-                }
-            </tbody>
-        </table>
-        @if (IsDataLoading)
-        {
-            <div class="text-center py-3">
-                <div class="spinner-border spinner-border-sm text-primary" role="status">
-                    <span class="visually-hidden">Загрузка...</span>
+                    else
+                    {
+                        @TableContent
+                    }
+                </tbody>
+            </table>
+            @if (IsDataLoading)
+            {
+                <div class="text-center py-3">
+                    <div class="spinner-border spinner-border-sm text-primary" role="status">
+                        <span class="visually-hidden">Загрузка...</span>
+                    </div>
                 </div>
-            </div>
-        }
+            }
+        </div>
     </div>
     @if (FilterContent is not null)
     {
@@ -96,6 +98,10 @@
 
     [Parameter]
     public RenderFragment? FilterContent { get; set; }
+
+    public ElementReference ScrollContainer => _tableScrollContainer;
+
+    private ElementReference _tableScrollContainer;
 
     private async Task ExecuteOrder(string? value1, bool? value2)
     {

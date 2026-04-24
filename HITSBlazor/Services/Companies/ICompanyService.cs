@@ -1,4 +1,5 @@
 ﻿using HITSBlazor.Models.Common.Entities;
+using HITSBlazor.Models.Common.Responses;
 using HITSBlazor.Models.Users.Entities;
 using HITSBlazor.Models.Users.Enums;
 
@@ -6,10 +7,13 @@ namespace HITSBlazor.Services.Companies
 {
     public interface ICompanyService
     {
-        event Func<Task>? OnCompaniesStateChanged;
-        event Action? OnCompaniesStateUpdated;
+        event Action<Company>? OnCompanyHasCreated;
+        event Action<Company>? OnCompanyHasUpdated;
+        event Action<Company>? OnCompanyHasDeleted;
 
-        Task<List<Company>> GetCompaniesAsync(string? searchText = null, RoleType? role = null);
+        Task<ListDataResponse<Company>> GetCompaniesAsync(
+            int page, string? searchText = null
+        );
         Task<Company?> GetCompanyByIdAsync(Guid companyId);
         Task<Company?> GetCompanyByNameAsync(string name);
         Task<bool> CreateCompanyAsync(string name, User owner, List<User> members);

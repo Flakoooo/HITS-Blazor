@@ -1,6 +1,7 @@
 ﻿using HITSBlazor.Components.ActionMenus.BaseActionMenu;
 using HITSBlazor.Components.Button;
 using HITSBlazor.Components.Modals.RightSideModals.SendIdeaOnMarketModal;
+using HITSBlazor.Components.Tables.TableComponent;
 using HITSBlazor.Models.Ideas.Entities;
 using HITSBlazor.Models.Ideas.Enums;
 using HITSBlazor.Models.Users.Enums;
@@ -11,7 +12,6 @@ using HITSBlazor.Services.Modal;
 using HITSBlazor.Utils.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
-using Microsoft.JSInterop;
 
 namespace HITSBlazor.Pages.Ideas.IdeasList
 {
@@ -45,6 +45,8 @@ namespace HITSBlazor.Pages.Ideas.IdeasList
         private readonly List<Idea> _ideas = [];
         private readonly HashSet<Idea> _selectedIdeas = [];
 
+        private TableComponent? _tableComponent;
+
         private readonly List<EnumViewModel<IdeaStatusType>> _filterIdeaStatus
             = [.. Enum.GetValues<IdeaStatusType>().Select(s => new EnumViewModel<IdeaStatusType>(s))];
 
@@ -75,6 +77,12 @@ namespace HITSBlazor.Pages.Ideas.IdeasList
                 ModalService.ShowIdeaModal(ideaId);
         }
 
+        protected override async Task AdditionalAfterRenderMethod()
+        {
+            if (_tableComponent != null)
+                _tableContainer = _tableComponent.ScrollContainer;
+        }
+
         protected override int GetCurrentItemsCount() => _ideas.Count;
 
         protected override async Task OnLoadMoreItemsAsync()
@@ -86,7 +94,7 @@ namespace HITSBlazor.Pages.Ideas.IdeasList
         {
             if (!append)
             {
-                _currentPage = 1;
+                ResetPagination();
                 _ideas.Clear();
             }
 
@@ -98,6 +106,7 @@ namespace HITSBlazor.Pages.Ideas.IdeasList
                 statusTypes: [.. SelectedStatuses.Select(s => s.Value)]
             );
 
+            _totalCount = listResponse.Count;
             if (listResponse.List.Count > 0)
             {
                 if (append)
@@ -110,7 +119,6 @@ namespace HITSBlazor.Pages.Ideas.IdeasList
 
                 IncrementPage();
             }
-            _totalCount = listResponse.Count;
 
             StateHasChanged();
         }

@@ -1,8 +1,10 @@
 ﻿@namespace HITSBlazor.Components.Inputs.RadioDropdown
 @using HITSBlazor.Components.Hint
 @using HITSBlazor.Components.Placeholders.Placeholder
+@using HITSBlazor.Pages
 @using HITSBlazor.Utils.Models
 @typeparam T where T : ViewModelBase
+@inherits ListPageDataLoader
 
 <div class="w-100 gap-1" tabindex="-1">
     @if (IsLoading)
@@ -47,31 +49,40 @@
                 <i class="input-dropdown-icon bi bi-chevron-down" @onclick="ToggleDropdown"></i>
             }
 
-            @if (_isOpen && _values.Any())
-            {
-                <div class="list-group w-100 dropdown-list"
-                     style="top: 42px; right: auto; z-index: 6; max-height: 173px; overflow-y: scroll; position: absolute; bottom: auto; left: auto;"
-                     @onclick:stopPropagation>
+            <div @ref="_tableContainer" class="list-group w-100 dropdown-list"
+                 style="top: 42px; right: auto; z-index: 6; max-height: 173px; overflow-y: scroll; position: absolute; bottom: auto; left: auto; @(_isOpen && _values.Any() ? string.Empty : "display: none;")"
+                 @onclick:stopPropagation>
 
-                    @foreach (var value in _values)
-                    {
-                        <div @onclick="@(() => OnElementChange(value))"
-                             class="d-flex list-group-item list-group-item-action"
-                             style="padding: 8px 12px; cursor: pointer; flex-direction: row; flex-wrap: nowrap; align-items: center; justify-content: flex-start;"
-                             tabindex="-1">
-                            <div class="d-flex">
-                                <input type="radio"
-                                       @onchange="@(() => OnElementChange(value))"
-                                       checked="@IsItemSelected(value)"
-                                       @onclick:stopPropagation
-                                       name="@_radioGroupName"
-                                       class="form-check-input" />
-                                <span class="form-check-label ms-2">@value.GetDisplayInfo()</span>
+                @foreach (var value in _values)
+                {
+                    <div @onclick="@(() => OnElementChange(value))"
+                         class="d-flex list-group-item list-group-item-action"
+                         style="padding: 8px 12px; cursor: pointer; flex-direction: row; flex-wrap: nowrap; align-items: center; justify-content: flex-start;"
+                         tabindex="-1">
+                        <div class="d-flex">
+                            <input type="radio"
+                                   @onchange="@(() => OnElementChange(value))"
+                                   checked="@IsItemSelected(value)"
+                                   @onclick:stopPropagation
+                                   name="@_radioGroupName"
+                                   class="form-check-input" />
+                            <span class="form-check-label ms-2">@value.GetDisplayInfo()</span>
+                        </div>
+                    </div>
+                }
+                @if (_isLoadingMore)
+                {
+                    <div class="d-flex list-group-item list-group-item-action"
+                         style="padding: 8px 12px; cursor: pointer; flex-direction: row; flex-wrap: nowrap; align-items: center; justify-content: flex-start;"
+                         tabindex="-1">
+                        <div class="text-center py-3">
+                            <div class="spinner-border spinner-border-sm text-primary" role="status">
+                                <span class="visually-hidden">Загрузка...</span>
                             </div>
                         </div>
-                    }
-                </div>
-            }
+                    </div>
+                }
+            </div>
         </div>
     }
 </div>

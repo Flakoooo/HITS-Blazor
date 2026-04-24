@@ -1,47 +1,46 @@
 ﻿@namespace HITSBlazor.Pages.Admin.AllCompanies
 @using HITSBlazor.Components.ActionMenus.BaseActionMenu
 @using HITSBlazor.Components.Button
+@using HITSBlazor.Components.InputSearch
 @using HITSBlazor.Components.ListPageComponents.ListPageHeader
 @using HITSBlazor.Components.ListPageComponents.ListPageSearch
 @using HITSBlazor.Components.ListPageComponents.ListPageTable
 @using HITSBlazor.Components.Placeholders.TablePlaceholder
 @using HITSBlazor.Components.Tables.TableActionMenu
 @using HITSBlazor.Components.Tables.TableBodyRow
+@using HITSBlazor.Components.Tables.TableComponent
 @using HITSBlazor.Components.Tables.TableHeader
 @using HITSBlazor.Components.Typography
+@inherits ListPageDataLoader
 
-<div class="page-content-with-header bg-white overflow-y-scroll">
-    <div class="w-100 bg-white p-3">
+<div class="h-auto bg-white overflow-y-scroll" @ref="_tableContainer">
+    <div class="w-100 p-3">
         <ListPageHeader IsLoading="_isLoading"
-                        HeaderText="@($"Список компаний: {_companies.Count}")"
+                        HeaderText="@($"Список компаний: {_totalCount}")"
                         ShowCreateButton="true"
                         CreateButtonText="Создать компанию" 
                         OnButtonClick="@(() => ShowCompanyModal())" />
-        <ListPageSearch IsLoading="_isLoading" ValueChanged="@((value) => SeacrhCompany(value))" />
-        <ListPageTable IsLoading="_isLoading" TableActionMenuIsEnable="true" HeaderItems="TableHeaderItems">
+        <InputSearch Width="50" IsLoading="_isLoading" ValueChanged="@((value) => SeacrhCompany(value))" />
+        <TableComponent IsLoading="_isLoading" IsDataLoading="_isLoadingMore" HeaderItems="TableHeaderItems" TableActionMenuIsEnable="true">
             <TableContent>
-                <tbody>
-                    @foreach (var company in _companies)
-                    {
-                        <tr>
-                            <TableBodyRow>
-                                <div class="text-primary data-link" @onclick="() => ShowCompanyModal(company.Id)">
-                                    @company.Name
-                                </div>
-                            </TableBodyRow>
-                            <TableBodyRow>
-                                @company.Owner.FullName
-                            </TableBodyRow>
-                            <TableActionMenu ItemId="company.Id"
-                                             OnAction="OnCompanyAction"
-                                             ActionIds="@(new Dictionary<MenuAction, object> { 
-                                                 [MenuAction.Edit] = company.Id,
-                                                 [MenuAction.Delete] = company
-                                             })"/>
-                        </tr>
-                    }
-                </tbody>
+                @foreach (var company in _companies)
+                {
+                    <tr>
+                        <TableBodyRow>
+                            <div class="text-primary data-link" @onclick="() => ShowCompanyModal(company.Id)">
+                                @company.Name
+                            </div>
+                        </TableBodyRow>
+                        <TableBodyRow>@company.Owner.FullName</TableBodyRow>
+                        <TableActionMenu ItemId="company.Id"
+                                            OnAction="OnCompanyAction"
+                                            ActionIds="@(new Dictionary<MenuAction, object> { 
+                                                [MenuAction.Edit] = company.Id,
+                                                [MenuAction.Delete] = company
+                                            })"/>
+                    </tr>
+                }
             </TableContent>
-        </ListPageTable>
+        </TableComponent>
     </div>
 </div>

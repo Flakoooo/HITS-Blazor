@@ -29,7 +29,16 @@ namespace HITSBlazor.Utils.Mocks.Ideas
         public static Guid ArmatureId { get; } = Guid.NewGuid();
 
         private static readonly Random _random = new();
-        private static readonly List<Idea> _ideas = CreateIdeas();
+        private static readonly List<Idea> _ideas = CreateIdeasBig();
+
+        private static List<Idea> CreateIdeasBig()
+        {
+            var companies = new List<Idea>();
+            for (int i = 0; i < 15; ++i)
+                companies = [.. companies, .. CreateIdeas()];
+
+            return companies;
+        }
 
         private static List<Idea> CreateIdeas()
         {

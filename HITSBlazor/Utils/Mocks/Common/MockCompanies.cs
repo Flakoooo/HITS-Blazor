@@ -1,5 +1,8 @@
 ﻿using HITSBlazor.Models.Common.Entities;
+using HITSBlazor.Models.Common.Responses;
+using HITSBlazor.Models.Ideas.Entities;
 using HITSBlazor.Models.Users.Entities;
+using HITSBlazor.Models.Users.Enums;
 using HITSBlazor.Utils.Mocks.Users;
 
 namespace HITSBlazor.Utils.Mocks.Common
@@ -10,7 +13,16 @@ namespace HITSBlazor.Utils.Mocks.Common
         public static Guid GazpromId { get; } = Guid.NewGuid();
         public static Guid RosneftId { get; } = Guid.NewGuid();
 
-        private static readonly List<Company> _companies = CreateCompanies();
+        private static readonly List<Company> _companies = CreateCompaniesBig();
+
+        private static List<Company> CreateCompaniesBig()
+        {
+            var companies = new List<Company>();
+            for (int i = 0; i < 15; ++i)
+                companies = [.. companies, .. CreateCompanies()];
+
+            return companies;
+        }
 
         private static List<Company> CreateCompanies()
         {
@@ -25,10 +37,29 @@ namespace HITSBlazor.Utils.Mocks.Common
             ];
         }
 
-        public static List<Company> GetAllCompanies() => [.. _companies];
+        public static ListDataResponse<Company> GetAllCompaniesByQueryParams(
+            int page, 
+            int pageSize = 20,
+            string? searchText = null
+        )
+        {
+            var query = _companies.AsEnumerable();
+
+            if (!string.IsNullOrWhiteSpace(searchText))
+                query = query.Where(c => c.Name.Contains(searchText, StringComparison.CurrentCultureIgnoreCase));
+
+            int count = query.Count();
+
+            query = query.Skip((page - 1) * pageSize).Take(pageSize);
+
+            return new ListDataResponse<Company> { Count = count, List = query.ToList() };
+        }
 
         public static Company? GetCompanyById(Guid id)
             => _companies.FirstOrDefault(c => c.Id == id);
+
+        public static Company? GetCompanyByName(string name)
+            => _companies.FirstOrDefault(c => c.Name.Contains(name, StringComparison.CurrentCultureIgnoreCase));
 
         public static Company? CreateCompany(string name, Guid ownerId, List<Guid> membersIds)
         {

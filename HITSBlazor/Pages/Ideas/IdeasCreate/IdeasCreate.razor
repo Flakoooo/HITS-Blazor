@@ -94,16 +94,11 @@
                     </div>
                 </div>
             </div>
-            <StackCategories IsLoading="_isLoading"
-                             Label="Стек технологий"
+            <StackCategories Label="Стек технологий"
                              HintText="@GetHintText("Skills")"
-                             @bind-LanguageSkills="LanguageSkills"
                              @bind-SelectedLanguageSkills="SelectedLanguageSkills"
-                             @bind-FrameworkSkills="FrameworkSkills"
                              @bind-SelectedFrameworkSkills="SelectedFrameworkSkills"
-                             @bind-DatabaseSkills="DatabaseSkills"
                              @bind-SelectedDatabaseSkills="SelectedDatabaseSkills"
-                             @bind-DevopsSkills="DevopsSkills"
                              @bind-SelectedDevopsSkills="SelectedDevopsSkills" />
             <RadioDropdown T="Company"
                            IsLoading="_isLoading"
@@ -111,7 +106,7 @@
                            HintText="Выберите заказчика (компанию), к которой Вы принадлежите или от лица которой создаётся идея"
                            Placeholder="Выберите заказчика"
                            @bind-Value="@SelectedCompany"
-                           AllValues="Companies" />
+                           DataLoaderMethod="async (page, searchText) => await CompanyService.GetCompaniesAsync(page, searchText)" />
             @if (SelectedCompany is not null)
             {
                 <RadioDropdown T="User"

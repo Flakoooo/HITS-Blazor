@@ -26,7 +26,7 @@
 @using HITSBlazor.Utils.Models
 @inherits ListPageDataLoader
 
-<div class="bg-white h-auto overflow-y-scroll" @ref="_tableContainer">
+<div class="bg-white h-auto">
     <div class="w-100 p-3">
         <ListPageHeader IsLoading="_isLoading"
                         HeaderText="@($"Список идей: {_totalCount}")"
@@ -51,7 +51,7 @@
             }
         </div>
         <!-- TODO: если идей нет, то сообщить пользователю, что идеи не найдены, но это как ИДЕЯ -->
-        <TableComponent IsLoading="_isLoading" IsDataLoading="_isLoadingMore" TableActionMenuIsEnable="true">
+        <TableComponent IsLoading="_isLoading" IsDataLoading="_isLoadingMore" TableActionMenuIsEnable="true" @ref="_tableComponent">
             <TableContent>
                 @foreach (var idea in _ideas)
                 {

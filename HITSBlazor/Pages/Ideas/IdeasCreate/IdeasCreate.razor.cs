@@ -65,17 +65,10 @@ namespace HITSBlazor.Pages.Ideas.IdeasCreate
         private bool _isLoading = true;
         private bool _submitted = false;
 
-        private List<Skill> LanguageSkills { get; set; } = [];
-        private List<Skill> FrameworkSkills { get; set; } = [];
-        private List<Skill> DatabaseSkills { get; set; } = [];
-        private List<Skill> DevopsSkills { get; set; } = [];
-
         private HashSet<Skill> SelectedLanguageSkills { get; set; } = [];
         private HashSet<Skill> SelectedFrameworkSkills { get; set; } = [];
         private HashSet<Skill> SelectedDatabaseSkills { get; set; } = [];
         private HashSet<Skill> SelectedDevopsSkills { get; set; } = [];
-
-        private List<Company> Companies { get; set; } = [];
 
         private Company? SelectedCompany { get; set; } = null;
         private User? SelectedContactPerson { get; set; } = null;
@@ -115,13 +108,6 @@ namespace HITSBlazor.Pages.Ideas.IdeasCreate
         protected override async Task OnInitializedAsync()
         {
             _isLoading = true;
-
-            LanguageSkills = await SkillService.GetSkillsAsync(skillTypes: [SkillType.Language]);
-            FrameworkSkills = await SkillService.GetSkillsAsync(skillTypes: [SkillType.Framework]);
-            DatabaseSkills = await SkillService.GetSkillsAsync(skillTypes: [SkillType.Database]);
-            DevopsSkills = await SkillService.GetSkillsAsync(skillTypes: [SkillType.Devops]);
-
-            Companies = await CompanyService.GetCompaniesAsync(role: AuthService.CurrentUser?.Role);
 
             if (Guid.TryParse(IdeaId, out Guid guid))
             {

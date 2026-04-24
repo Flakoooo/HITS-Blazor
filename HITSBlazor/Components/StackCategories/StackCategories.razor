@@ -10,10 +10,10 @@
 @using HITSBlazor.Utils.Models
 
 
-@if (!string.IsNullOrWhiteSpace(Label))
-{
-    <div class="w-100 d-flex flex-column">
-        @if (IsLoading)
+<div class="w-100 d-flex flex-column">
+    @if (!string.IsNullOrWhiteSpace(Label))
+    {
+        @if (_isLoading)
         {
             <Placeholder Width="w-25" />
         }
@@ -21,7 +21,7 @@
         {
             <div class="d-flex gap-1 align-items-center">
                 <Typography FontSize="6" TextColor="TextColor.Primary">
-                    Стек технологий
+                    @Label
                 </Typography>
                 @if (!string.IsNullOrWhiteSpace(HintText))
                 {
@@ -29,89 +29,40 @@
                 }
             </div>
         }
-        <div class="mt-2 w-100 stack-categories">
-            <SkillDropdown IsLoading="IsLoading"
-                           Placeholder="@EnumUIConverter.GetInfo(SkillType.Language).DisplayText"
-                           AllSkills="LanguageSkills"
-                           @bind-SelectedSkills="@SelectedLanguageSkills"
-                           ValueMustCreated="(value) => CreateNewSkill(value, SkillType.Language)" />
-            <SkillDropdown IsLoading="IsLoading"
-                           Placeholder="@EnumUIConverter.GetInfo(SkillType.Framework).DisplayText"
-                           AllSkills="FrameworkSkills"
-                           @bind-SelectedSkills="@SelectedFrameworkSkills"
-                           ValueMustCreated="(value) => CreateNewSkill(value, SkillType.Framework)" />
-            <SkillDropdown IsLoading="IsLoading"
-                           Placeholder="@EnumUIConverter.GetInfo(SkillType.Database).DisplayText"
-                           AllSkills="DatabaseSkills"
-                           @bind-SelectedSkills="@SelectedDatabaseSkills"
-                           ValueMustCreated="(value) => CreateNewSkill(value, SkillType.Database)" />
-            <SkillDropdown IsLoading="IsLoading"
-                           Placeholder="@EnumUIConverter.GetInfo(SkillType.Devops).DisplayText"
-                           AllSkills="DevopsSkills"
-                           @bind-SelectedSkills="@SelectedDevopsSkills"
-                           ValueMustCreated="(value) => CreateNewSkill(value, SkillType.Devops)" />
-        </div>
-    </div>
-}
-else
-{
+    }
     <div class="mt-2 w-100 stack-categories">
-        <SkillDropdown IsLoading="IsLoading"
+        <SkillDropdown IsLoading="_isLoading"
                        Placeholder="@EnumUIConverter.GetInfo(SkillType.Language).DisplayText"
-                       AllSkills="LanguageSkills"
+                       AllSkills="_languageSkills"
                        @bind-SelectedSkills="@SelectedLanguageSkills"
                        ValueMustCreated="(value) => CreateNewSkill(value, SkillType.Language)" />
-        <SkillDropdown IsLoading="IsLoading"
+        <SkillDropdown IsLoading="_isLoading"
                        Placeholder="@EnumUIConverter.GetInfo(SkillType.Framework).DisplayText"
-                       AllSkills="FrameworkSkills"
+                       AllSkills="_frameworkSkills"
                        @bind-SelectedSkills="@SelectedFrameworkSkills"
                        ValueMustCreated="(value) => CreateNewSkill(value, SkillType.Framework)" />
-        <SkillDropdown IsLoading="IsLoading"
+        <SkillDropdown IsLoading="_isLoading"
                        Placeholder="@EnumUIConverter.GetInfo(SkillType.Database).DisplayText"
-                       AllSkills="DatabaseSkills"
+                       AllSkills="_databaseSkills"
                        @bind-SelectedSkills="@SelectedDatabaseSkills"
                        ValueMustCreated="(value) => CreateNewSkill(value, SkillType.Database)" />
-        <SkillDropdown IsLoading="IsLoading"
+        <SkillDropdown IsLoading="_isLoading"
                        Placeholder="@EnumUIConverter.GetInfo(SkillType.Devops).DisplayText"
-                       AllSkills="DevopsSkills"
+                       AllSkills="_devopsSkills"
                        @bind-SelectedSkills="@SelectedDevopsSkills"
                        ValueMustCreated="(value) => CreateNewSkill(value, SkillType.Devops)" />
     </div>
-}
+</div>
 
 @code {
     [Inject]
     private ISkillService SkillService { get; set; } = null!;
 
     [Parameter]
-    public bool IsLoading { get; set; } = false;
-
-    [Parameter]
     public string Label { get; set; } = string.Empty;
 
     [Parameter]
     public string HintText { get; set; } = string.Empty;
-
-    [Parameter]
-    public List<Skill> LanguageSkills { get; set; } = [];
-
-    [Parameter]
-    public EventCallback<List<Skill>> LanguageSkillsChanged { get; set; }
-
-    [Parameter]
-    public List<Skill> FrameworkSkills { get; set; } = [];
-
-    [Parameter]
-    public EventCallback<List<Skill>> FrameworkSkillsChanged { get; set; }
-
-    [Parameter]
-    public List<Skill> DatabaseSkills { get; set; } = [];
-
-    [Parameter]
-    public EventCallback<List<Skill>> DatabaseSkillsChanged { get; set; }
-
-    [Parameter]
-    public List<Skill> DevopsSkills { get; set; } = [];
 
     [Parameter]
     public EventCallback<List<Skill>> DevopsSkillsChanged { get; set; }
@@ -140,6 +91,28 @@ else
     [Parameter]
     public EventCallback<HashSet<Skill>> SelectedDevopsSkillsChanged { get; set; }
 
+    private bool _isLoading = true;
+
+    private List<Skill> _languageSkills = [];
+
+    private List<Skill> _frameworkSkills = [];
+
+    private List<Skill> _databaseSkills = [];
+
+    private List<Skill> _devopsSkills = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        _isLoading = true;
+
+        _languageSkills = await SkillService.GetSkillsAsync(skillTypes: [SkillType.Language]);
+        _frameworkSkills = await SkillService.GetSkillsAsync(skillTypes: [SkillType.Framework]);
+        _databaseSkills = await SkillService.GetSkillsAsync(skillTypes: [SkillType.Database]);
+        _devopsSkills = await SkillService.GetSkillsAsync(skillTypes: [SkillType.Devops]);
+
+        _isLoading = false;
+    }
+
     private async Task CreateNewSkill(string name, SkillType skillType)
     {
         var newSkill = await SkillService.CreateNewSkillAsync(name, skillType, false);
@@ -147,30 +120,26 @@ else
 
         if (skillType is SkillType.Language)
         {
-            LanguageSkills.Add(newSkill);
+            _languageSkills.Add(newSkill);
             SelectedLanguageSkills.Add(newSkill);
-            await LanguageSkillsChanged.InvokeAsync(LanguageSkills);
             await SelectedLanguageSkillsChanged.InvokeAsync(SelectedLanguageSkills);
         }
         else if (skillType is SkillType.Framework)
         {
-            FrameworkSkills.Add(newSkill);
+            _frameworkSkills.Add(newSkill);
             SelectedFrameworkSkills.Add(newSkill);
-            await FrameworkSkillsChanged.InvokeAsync(FrameworkSkills);
             await SelectedFrameworkSkillsChanged.InvokeAsync(SelectedFrameworkSkills);
         }
         else if (skillType is SkillType.Database)
         {
-            DatabaseSkills.Add(newSkill);
+            _databaseSkills.Add(newSkill);
             SelectedDatabaseSkills.Add(newSkill);
-            await DatabaseSkillsChanged.InvokeAsync(DatabaseSkills);
             await SelectedDatabaseSkillsChanged.InvokeAsync(SelectedDatabaseSkills);
         }
         else if (skillType is SkillType.Devops)
         {
-            DevopsSkills.Add(newSkill);
+            _devopsSkills.Add(newSkill);
             SelectedDevopsSkills.Add(newSkill);
-            await DevopsSkillsChanged.InvokeAsync(DevopsSkills);
             await SelectedDevopsSkillsChanged.InvokeAsync(SelectedDevopsSkills);
         }
     }

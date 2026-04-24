@@ -102,7 +102,7 @@ namespace HITSBlazor.Pages.Teams.TeamsList
         {
             if (!append)
             {
-                _currentPage = 1;
+                ResetPagination();
                 _teams.Clear();
             }
 
@@ -118,6 +118,7 @@ namespace HITSBlazor.Pages.Teams.TeamsList
                 byDescending: _sortTeamState
             );
 
+            _totalCount = listResponse.Count;
             if (listResponse.List.Count > 0)
             {
                 if (append)
@@ -130,7 +131,6 @@ namespace HITSBlazor.Pages.Teams.TeamsList
 
                 IncrementPage();
             }
-            _totalCount = listResponse.Count;
 
             StateHasChanged();
         }
