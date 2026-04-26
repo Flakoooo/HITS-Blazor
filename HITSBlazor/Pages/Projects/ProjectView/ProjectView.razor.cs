@@ -2,22 +2,17 @@
 using HITSBlazor.Components.Modals.CenterModals.EndedSprintModal;
 using HITSBlazor.Components.Modals.CenterModals.FinishSprintModal;
 using HITSBlazor.Components.Modals.CenterModals.SprintModal;
-using HITSBlazor.Components.Modals.CenterModals.TaskModal;
 using HITSBlazor.Components.Modals.Components.RightSideModaCollapselInfo;
-using HITSBlazor.Components.Modals.RightSideModals.TeamModal;
 using HITSBlazor.Components.Tables.TableHeader;
 using HITSBlazor.Models.Common.Entities;
-using HITSBlazor.Models.Ideas.Entities;
 using HITSBlazor.Models.Projects.Entities;
 using HITSBlazor.Models.Projects.Enums;
 using HITSBlazor.Models.Users.Entities;
-using HITSBlazor.Pages.Markets.MarketIdeas;
-using HITSBlazor.Services;
 using HITSBlazor.Services.Auth;
 using HITSBlazor.Services.Modal;
+using HITSBlazor.Services.Tags;
 using HITSBlazor.Utils.Mocks.Common;
 using HITSBlazor.Utils.Mocks.Projects;
-using HITSBlazor.Utils.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
 
@@ -29,6 +24,9 @@ namespace HITSBlazor.Pages.Projects.ProjectView
     {
         [Inject]
         private IAuthService AuthService { get; set; } = null!;
+
+        [Inject]
+        private ITagService TagService { get; set; } = null!;
 
         [Inject]
         private ModalService ModalService { get; set; } = null!;
@@ -46,8 +44,6 @@ namespace HITSBlazor.Pages.Projects.ProjectView
         private ProjectViewCategory _activeCategory = ProjectViewCategory.Info;
 
         private List<CollapseItem> _projectInfoData = [];
-
-        private List<Tag> _filterTags = [];
         private HashSet<Tag> SelectedTagNames { get; set; } = [];
 
         private string _seacrhMemberText = string.Empty;
@@ -96,8 +92,6 @@ namespace HITSBlazor.Pages.Projects.ProjectView
                 _projectInfoData = GetProjectData();
 
                 await LoadTasksAsync();
-                //лучше наверно заменить на один запрос, который получает все теги проекта
-                _filterTags = MockTags.GetTags();
 
                 _projectSprints = MockSprints.GetSprintsByProjectId(guid);
 

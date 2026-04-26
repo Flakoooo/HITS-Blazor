@@ -1,9 +1,8 @@
 ﻿using HITSBlazor.Models.Common.Entities;
 using HITSBlazor.Models.Common.Enums;
+using HITSBlazor.Models.Common.Responses;
 using HITSBlazor.Services.Auth;
 using HITSBlazor.Utils.Mocks.Common;
-using System.ComponentModel.Design;
-using System.Xml.Linq;
 
 namespace HITSBlazor.Services.Skills
 {
@@ -15,55 +14,27 @@ namespace HITSBlazor.Services.Skills
         private readonly IAuthService _authService = authService;
         private readonly GlobalNotificationService _globalNotificationService = globalNotificationService;
 
-        public event Func<Task>? OnSkillsStateChanged;
-        public event Action? OnSkillsStateUpdated;
+        public event Action<Skill>? OnSkillHasCreated;
+        public event Action<Skill>? OnSkillHasUpdated;
+        public event Action<Skill>? OnSkillHasDeleted;
 
-        private List<Skill> _cachedSkills = [];
-        private DateTime _lastRefreshTime;
-        private readonly TimeSpan _cacheLifetime = TimeSpan.FromMinutes(5);
-
-        private async Task RefreshCacheAsync()
-        {
-            _cachedSkills = MockSkills.GetAllSkills();
-            _lastRefreshTime = DateTime.UtcNow;
-        }
-
-        public async Task<List<Skill>> GetSkillsAsync(
+        public async Task<ListDataResponse<Skill>> GetSkillsAsync(
+            int page,
             string? searchText,
             bool? confirmed,
-            HashSet<SkillType>? skillTypes
-        )
-        {
-            if (_cachedSkills.Count == 0 || DateTime.UtcNow - _lastRefreshTime > _cacheLifetime)
-                await RefreshCacheAsync();
-
-            var query = _cachedSkills.AsEnumerable();
-
-            if (skillTypes?.Count > 0)
-                query = query.Where(s => skillTypes.Contains(s.Type));
-
-            if (confirmed.HasValue)
-                query = query.Where(s => s.Confirmed == confirmed.Value);
-
-            if (!string.IsNullOrWhiteSpace(searchText))
-                query = query.Where(s => s.Name.Contains(searchText, StringComparison.CurrentCultureIgnoreCase));
-
-            return [.. query];
-        }
+            IEnumerable<SkillType>? skillTypes
+        ) => MockSkills.GetAllSkills(
+            page, searchText: searchText, confirmed: confirmed, skillTypes: skillTypes?.ToHashSet()
+        );
 
         public async Task<Skill?> CreateNewSkillAsync(string name, SkillType type, bool isConfirmed)
         {
-            if (_authService.CurrentUser is null)
-                return null;
+            if (_authService.CurrentUser is null) return null;
 
             var newSkill = MockSkills.CreateSkill(name, type, isConfirmed, _authService.CurrentUser.Id);
             if (newSkill is not null)
-            {
-                if (!_cachedSkills.Contains(newSkill))
-                    _cachedSkills.Add(newSkill);
-            }
+                OnSkillHasCreated?.Invoke(newSkill);
 
-            OnSkillsStateChanged?.Invoke();
             return newSkill;
         }
 
@@ -73,20 +44,13 @@ namespace HITSBlazor.Services.Skills
                 return false;
 
             var result = MockSkills.ConfirmSkill(skillId, _authService.CurrentUser.Id);
-            if (!result)
+            if (result is null)
             {
                 _globalNotificationService.ShowError("Не удалось утвердить компетенцию");
                 return false;
             }
 
-            var skillForUpdate = _cachedSkills.FirstOrDefault(u => u.Id == skillId);
-            if (skillForUpdate is not null)
-            {
-                skillForUpdate.Confirmed = true;
-                skillForUpdate.UpdaterId = _authService.CurrentUser.Id;
-            }
-
-            OnSkillsStateUpdated?.Invoke();
+            OnSkillHasUpdated?.Invoke(result);
             _globalNotificationService.ShowSuccess("Компетенция успешно утверждена");
             return true;
         }
@@ -103,15 +67,7 @@ namespace HITSBlazor.Services.Skills
                 return false;
             }
 
-            var skillForUpdate = _cachedSkills.FirstOrDefault(u => u.Id == skillId);
-            if (skillForUpdate is not null)
-            {
-                skillForUpdate.Name = name;
-                skillForUpdate.Type = type;
-                skillForUpdate.UpdaterId = _authService.CurrentUser.Id;
-            }
-
-            OnSkillsStateUpdated?.Invoke();
+            OnSkillHasUpdated?.Invoke(updatedSkill);
             _globalNotificationService.ShowSuccess("Компетенция успешно изменена");
             return true;
         }
@@ -124,8 +80,7 @@ namespace HITSBlazor.Services.Skills
                 return;
             }
 
-            _cachedSkills.Remove(skill);
-            OnSkillsStateChanged?.Invoke();
+            OnSkillHasDeleted?.Invoke(skill);
             _globalNotificationService.ShowSuccess("Компетенция успешно удалена");
             return;
         }

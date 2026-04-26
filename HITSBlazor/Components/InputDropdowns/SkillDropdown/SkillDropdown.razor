@@ -11,11 +11,12 @@
 <div class="w-25">
     <CheckboxDropdown T="Skill"
                       IsLoading="IsLoading"
-                      AllValues="AllSkills"
                       Placeholder="@Placeholder"
                       @bind-SelectedValues="SelectedSkills"
                       CreateValueAllowed="true"
-                      ValueMustCreated="(value) => CreateNewSkill(value)" />
+                      ValueMustCreated="(value) => CreateNewSkill(value)"
+                      DataLoaderMethod="async (page, searchText) => await SkillService.GetSkillsAsync(page, searchText)"
+                      DebounceDelay="500" />
     @if (!IsLoading && SelectedSkills.Any())
     {
         <div class="mt-2">

@@ -22,7 +22,7 @@
 <div class="h-auto bg-white">
     <div class="w-100 p-3">
         <ListPageHeader IsLoading="_isLoading"
-                        HeaderText="@($"Группы пользователей: {_usersGroups.Count}")"
+                        HeaderText="@($"Группы пользователей: {_totalCount}")"
                         ShowCreateButton="true"
                         CreateButtonText="Создать группу" 
                         OnButtonClick="@(() => ShowUsersGroupModal())"/>

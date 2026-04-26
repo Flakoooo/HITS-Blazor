@@ -3,16 +3,36 @@
 @using HITSBlazor.Components.Inputs.Input
 @using HITSBlazor.Components.Placeholders.Placeholder
 @using HITSBlazor.Components.Typography
+@using HITSBlazor.Pages
 @using HITSBlazor.Utils.Models
 @typeparam T where T : ViewModelBase
+@inherits ListPageDataLoader
 
 <div class="w-100">
-    @if (IsLoading)
+    @if (!string.IsNullOrWhiteSpace(Label))
     {
-        @if (!string.IsNullOrWhiteSpace(Label))
+        @if (IsOnLoadingNow)
         {
             <Placeholder Width="w-25" />
         }
+        else
+        {
+            <Typography FontSize="6" CustomClass="fw-semibold">
+                @Label
+            </Typography>
+        }
+    }
+    @if (SearchTextChanged.HasDelegate)
+    {
+        <Input IsLoading="IsOnLoadingNow" 
+               Placeholder="Найти" 
+               CustomClass="my-1" 
+               Value="@SearchText" 
+               ValueChanged="@((value) => SearchData(value))" 
+               DebounceDelay="DebounceDelay" />
+    }
+    @if (IsOnLoadingNow)
+    {
         @for (int i = 0; i < 6; ++i)
         {
             <Placeholder />
@@ -20,21 +40,11 @@
     }
     else
     {
-        @if (!string.IsNullOrWhiteSpace(Label))
-        {
-            <Typography FontSize="6" CustomClass="fw-semibold">
-                @Label
-            </Typography>
-        }
-        @if (SearchTextChanged.HasDelegate)
-        {
-            <Input Placeholder="Найти" CustomClass="my-1" Value="@SearchText" ValueChanged="@((value) => SearchData(value))" />
-        }
         <div class="filter-choices">
             @foreach (var value in _values)
             {
                 <div class="filter-choice px-2 py-1 rounded-1" @onclick="() => SelectValue(value)">
-                    <Checkbox Checked="@SelectedValues.Contains(value)" 
+                    <Checkbox Checked="@SelectedValues.Contains(value)"
                               DisplayText="@value.GetDisplayInfo()" />
                 </div>
             }

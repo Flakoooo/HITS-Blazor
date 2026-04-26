@@ -52,11 +52,6 @@ namespace HITSBlazor.Pages.Teams.TeamsCreate
         private List<User> MembersForInviting { get; set; } = [];
         private HashSet<Skill> MembersForInvitingSkills { get; set; } = [];
 
-        private List<Skill> LanguageSkills { get; set; } = [];
-        private List<Skill> FrameworkSkills { get; set; } = [];
-        private List<Skill> DatabaseSkills { get; set; } = [];
-        private List<Skill> DevopsSkills { get; set; } = [];
-
         private HashSet<Skill> SelectedLanguageSkills { get; set; } = [];
         private HashSet<Skill> SelectedFrameworkSkills { get; set; } = [];
         private HashSet<Skill> SelectedDatabaseSkills { get; set; } = [];
@@ -82,11 +77,6 @@ namespace HITSBlazor.Pages.Teams.TeamsCreate
             _isLoading = true;
 
             TeamsService.OnInviteMembersCollected += SetTeamInvitationMembers;
-
-            LanguageSkills = await SkillService.GetSkillsAsync(skillTypes: [SkillType.Language]);
-            FrameworkSkills = await SkillService.GetSkillsAsync(skillTypes: [SkillType.Framework]);
-            DatabaseSkills = await SkillService.GetSkillsAsync(skillTypes: [SkillType.Database]);
-            DevopsSkills = await SkillService.GetSkillsAsync(skillTypes: [SkillType.Devops]);
 
             foreach (var skillType in Enum.GetValues<SkillType>())
                 _skillRadarOptions.Add(skillType, GetRadarChartOptions());

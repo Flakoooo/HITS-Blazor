@@ -4,6 +4,7 @@
     {
         TeamClosed,
         TeamActiveProject,
+        SkillConfirm,
         TagConfirm
     }
 }

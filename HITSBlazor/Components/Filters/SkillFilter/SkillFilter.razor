@@ -1,17 +1,34 @@
 ﻿@namespace HITSBlazor.Components.Filters.SkillFilter
+@using HITSBlazor.Components.Inputs.Checkbox
 @using HITSBlazor.Components.Inputs.Input
 @using HITSBlazor.Components.Placeholders.Placeholder
 @using HITSBlazor.Components.Typography
 @using HITSBlazor.Models.Common.Entities
+@using HITSBlazor.Pages
 @using HITSBlazor.Services.Auth
 @using HITSBlazor.Services.Skills
 @using HITSBlazor.Services.UserSkills
+@inherits ListPageDataLoader
 
 <div class="w-100">
-    @if (IsLoading)
+    @if (IsOnLoadingNow)
     {
         <Placeholder Width="w-25" />
-        <Placeholder Height="PlaceholderHeight.Smaller" />
+    }
+    else
+    {
+        <Typography FontSize="6" CustomClass="fw-semibold">
+            Стек технологий
+        </Typography>
+    }
+    <Input IsLoading="IsOnLoadingNow"
+           Placeholder="Найти"
+           CustomClass="my-1"
+           Value="@SeacrhSkillText"
+           ValueChanged="@((value) => SearchSkill(value))"
+           DebounceDelay="500" />
+    @if (IsOnLoadingNow)
+    {
         @for (int i = 0; i < 6; ++i)
         {
             <Placeholder />
@@ -19,25 +36,13 @@
     }
     else
     {
-        <Typography FontSize="6" CustomClass="fw-semibold">
-            Стек технологий
-        </Typography>
-        <Input Placeholder="Найти" CustomClass="my-1" Value="@SeacrhSkillText" ValueChanged="@((value) => SearchSkill(value))" />
-        <div class="filter-choices">
+        <div class="filter-choices" @ref="_tableContainer">
             @foreach (var skill in _skills)
             {
                 <div class="filter-choice px-2 py-1 rounded-1">
-                    <div class="d-flex">
-                        <input type="checkbox"
-                               checked="@SelectedSkillIds.Contains(skill.Id)"
-                               @onchange="@(e => SelectedSkillsChanged(skill.Id, (bool)e.Value!))"
-                               name="Стек технологий"
-                               value="@skill.Name"
-                               class="form-check-input" />
-                        <Typography CustomClass="form-check-label ms-2">
-                            @skill.Name
-                        </Typography>
-                    </div>
+                    <Checkbox Checked="SelectedSkillIds.Contains(skill.Id)"
+                              DisplayText="@skill.Name"
+                              OnClick="() => SelectedSkillsChanged(skill.Id)" />
                     @if (_userSkillIds.Contains(skill.Id))
                     {
                         <i class="bi bi-star-fill text-warning"></i>
@@ -47,71 +52,3 @@
         </div>
     }
 </div>
-
-@code {
-    [Inject]
-    private IAuthService AuthService { get; set; } = null!;
-
-    [Inject]
-    private ISkillService SkillService { get; set; } = null!;
-
-    [Inject]
-    private IUserSkillService UserSkillService { get; set; } = null!;
-
-    [Parameter]
-    public bool IsLoading { get; set; } = false;
-
-    [Parameter]
-    public string SeacrhSkillText { get; set; } = string.Empty;
-
-    [Parameter]
-    public EventCallback<string> SeacrhSkillTextChanged { get; set; }
-
-    [Parameter]
-    public HashSet<Guid> SelectedSkillIds { get; set; } = [];
-
-    [Parameter]
-    public EventCallback<HashSet<Guid>> SelectedSkillIdsChanged { get; set; }
-
-    [Parameter]
-    public EventCallback OnFilterChanged { get; set; }
-
-    private List<Skill> _skills = [];
-    private HashSet<Guid> _userSkillIds = [];
-
-    protected override async Task OnInitializedAsync()
-    {
-        if (AuthService.CurrentUser is not null)
-            _userSkillIds = [.. (await UserSkillService.GetUserSkillsAsync(AuthService.CurrentUser.Id)).Select(s => s.Id)];
-    }
-
-    protected override async Task OnParametersSetAsync()
-    {
-        await LoadSkillsAsync();
-    }
-
-    private async Task LoadSkillsAsync()
-    {
-        _skills = await SkillService.GetSkillsAsync(searchText: SeacrhSkillText);
-
-        _skills = [.. _skills
-            .OrderByDescending(s => _userSkillIds.Contains(s.Id))
-            .ThenBy(s => s.Name)];
-        StateHasChanged();
-    }
-
-    private async Task SearchSkill(string value)
-    {
-        SeacrhSkillText = value;
-        await SeacrhSkillTextChanged.InvokeAsync(value);
-    }
-
-    private async Task SelectedSkillsChanged(Guid skillId, bool isChecked)
-    {
-        if (isChecked) SelectedSkillIds.Add(skillId);
-        else SelectedSkillIds.Remove(skillId);
-
-        await SelectedSkillIdsChanged.InvokeAsync(SelectedSkillIds);
-        await OnFilterChanged.InvokeAsync();
-    }
-}

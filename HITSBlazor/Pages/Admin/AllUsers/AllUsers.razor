@@ -23,7 +23,7 @@
 
 <div class="h-auto bg-white">
     <div class="w-100 p-3">
-        <ListPageHeader IsLoading="_isLoading" HeaderText="@($"Список пользователей: {_users.Count}")" />
+        <ListPageHeader IsLoading="_isLoading" HeaderText="@($"Список пользователей: {_totalCount}")" />
         <InputSearch IsLoading="_isLoading" Width="50" ValueChanged="@((value) => SearchUser(value))" DebounceDelay="500" />
         <TableComponent IsLoading="_isLoading" TableActionMenuIsEnable="true" HeaderItems="_userTableHeader" OrderMethod="SortUser" @ref="_tableComponent">
             <TableContent>

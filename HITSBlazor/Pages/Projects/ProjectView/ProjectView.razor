@@ -4,6 +4,7 @@
 @using HITSBlazor.Components.Filters.CheckboxFilter
 @using HITSBlazor.Components.Filters.ResetFilterButton
 @using HITSBlazor.Components.Hint
+@using HITSBlazor.Components.InputSearch
 @using HITSBlazor.Components.ListPageComponents.ListPageHeader
 @using HITSBlazor.Components.ListPageComponents.ListPageSearch
 @using HITSBlazor.Components.ListPageComponents.ListPageTable
@@ -13,6 +14,7 @@
 @using HITSBlazor.Components.Statuses.EnumStatus
 @using HITSBlazor.Components.Tables.TableActionMenu
 @using HITSBlazor.Components.Tables.TableBodyRow
+@using HITSBlazor.Components.Tables.TableComponent
 @using HITSBlazor.Components.Tables.TableHeader
 @using HITSBlazor.Components.TaskComponent
 @using HITSBlazor.Components.Typography
@@ -114,19 +116,22 @@
                             </div>
                             <div class="d-flex flex-column gap-2 mt-2">
 
-                                <Button Text="Перейти в идею" 
+                                <Button IsLoading="_isLoading"
+                                        Text="Перейти в идею" 
                                         Variant="ButtonVariant.Primary"
                                         OnButtonClick="() => ModalService.ShowIdeaModal(_currentProject.IdeaId)" />
                                 @if (_currentProject.Status is ProjectStatus.Done)
                                 {
-                                    <Button Text="Информация о проекте" 
+                                    <Button IsLoading="_isLoading"
+                                            Text="Информация о проекте" 
                                             Variant="ButtonVariant.Primary"
                                             OnButtonClick="@(() => Console.WriteLine("Какое то модальное окно"))" />
                                 }
                                 //TODO: тут вызывается модальное окно завершения спринта, но я думаю надо сделать лучше
                                 else
                                 {
-                                    <Button Text="Завершить проект" 
+                                    <Button IsLoading="_isLoading"
+                                            Text="Завершить проект" 
                                             Variant="ButtonVariant.Primary"
                                             OnButtonClick="@(() => Console.WriteLine("Какое то модальное окно"))" />
                                 }
@@ -148,15 +153,20 @@
                         }
                     </div>
                     <div class="d-flex flex-column gap-3 w-25">
-                        <Button Variant="ButtonVariant.Primary" ButtonClass="p-2"Text="Создать задачу" OnButtonClick="() => ShowTaskModal()" />
+                        <Button IsLoading="_isLoading" 
+                                Variant="ButtonVariant.Primary" 
+                                ButtonClass="p-2"
+                                Text="Создать задачу" 
+                                OnButtonClick="() => ShowTaskModal()" />
                         <div class="filter w-25 bg-white p-2 border-start w-100">
                             <CheckboxFilter T="Tag" 
                                             IsLoading="_isLoading"
                                             Label="Теги" 
                                             @bind-SearchText="SearchTagFilterText"
-                                            AllValues="_filterTags"
                                             @bind-SelectedValues="SelectedTagNames"
-                                            FilterChanged="LoadTasksAsync"/>
+                                            FilterChanged="LoadTasksAsync"
+                                            DataLoaderMethod="async (page, searchText) => await TagService.GetTagsAsync(page, searchText)"
+                                            DebounceDelay="500" />
                             <ResetFilterButton IsLoading="_isLoading" />
                         </div>
                     </div>
@@ -171,32 +181,30 @@
                                         ShowCreateButton="AuthService.CurrentUser?.Role is RoleType.TeamLeader or RoleType.Initiator or RoleType.Admin"
                                         CreateButtonText="Создать спринт" 
                                         OnButtonClick="() => ShowSprintModal()"/>
-                        <ListPageSearch IsLoading="_isLoading" ValueChanged="@((value) => SeacrhSprint(value))" />
-                        <ListPageTable IsLoading="_isLoading" HeaderItems="_sprintsTableHeader">
+                        <InputSearch Width="50" IsLoading="_isLoading" ValueChanged="@((value) => SeacrhSprint(value))" />
+                        <TableComponent IsLoading="_isLoading" HeaderItems="_sprintsTableHeader">
                             <TableContent>
-                                <tbody>
-                                    @foreach (var sprint in _projectSprints)
-                                    {
-                                        <tr>
-                                            <TableBodyRow>
-                                                <div class="data-link" @onclick="() => ShowSprintModal(sprint)">
-                                                    @sprint.Name
-                                                </div>
-                                            </TableBodyRow>
-                                            <TableBodyRow IsCentered="true">
-                                                <EnumStatus Statustype="sprint.Status" />
-                                            </TableBodyRow>
-                                            <TableBodyRow IsCentered="true">
-                                                @sprint.StartDate.ToString("dd.MM.yyyy")
-                                            </TableBodyRow>
-                                            <TableBodyRow IsCentered="true">
-                                                @sprint.FinishDate.ToString("dd.MM.yyyy")
-                                            </TableBodyRow>
-                                        </tr>
-                                    }
-                                </tbody>
+                                @foreach (var sprint in _projectSprints)
+                                {
+                                    <tr>
+                                        <TableBodyRow>
+                                            <div class="data-link" @onclick="() => ShowSprintModal(sprint)">
+                                                @sprint.Name
+                                            </div>
+                                        </TableBodyRow>
+                                        <TableBodyRow IsCentered="true">
+                                            <EnumStatus Statustype="sprint.Status" />
+                                        </TableBodyRow>
+                                        <TableBodyRow IsCentered="true">
+                                            @sprint.StartDate.ToString("dd.MM.yyyy")
+                                        </TableBodyRow>
+                                        <TableBodyRow IsCentered="true">
+                                            @sprint.FinishDate.ToString("dd.MM.yyyy")
+                                        </TableBodyRow>
+                                    </tr>
+                                }
                             </TableContent>
-                        </ListPageTable>
+                        </TableComponent>
                     </div>
                 </div>
             }

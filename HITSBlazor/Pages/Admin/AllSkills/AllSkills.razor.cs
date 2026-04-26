@@ -1,13 +1,12 @@
-﻿using ApexCharts;
-using HITSBlazor.Components.ActionMenus.BaseActionMenu;
+﻿using HITSBlazor.Components.ActionMenus.BaseActionMenu;
 using HITSBlazor.Components.Button;
 using HITSBlazor.Components.Modals.CenterModals.SkillModal;
+using HITSBlazor.Components.Tables.TableComponent;
 using HITSBlazor.Components.Tables.TableHeader;
 using HITSBlazor.Models.Common.Entities;
 using HITSBlazor.Models.Common.Enums;
 using HITSBlazor.Services.Modal;
 using HITSBlazor.Services.Skills;
-using HITSBlazor.Services.Tags;
 using HITSBlazor.Utils.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
@@ -16,7 +15,7 @@ namespace HITSBlazor.Pages.Admin.AllSkills
 {
     [Authorize]
     [Route("admin/skills")]
-    public partial class AllSkills : IDisposable
+    public partial class AllSkills
     {
         [Inject]
         private ISkillService SkillService { get; set; } = null!;
@@ -25,6 +24,8 @@ namespace HITSBlazor.Pages.Admin.AllSkills
         private ModalService ModalService { get; set; } = null!;
 
         private bool _isLoading = true;
+
+        private TableComponent? _tableComponent;
 
         private string _searchText = string.Empty;
 
@@ -36,7 +37,7 @@ namespace HITSBlazor.Pages.Admin.AllSkills
 
         private ValueViewModel<bool?>? IsConfirmed { get; set; }
 
-        private List<Skill> _skills = [];
+        private readonly List<Skill> _skills = [];
 
         private readonly List<TableHeaderItem> _skillsTableHeader =
         [
@@ -54,37 +55,57 @@ namespace HITSBlazor.Pages.Admin.AllSkills
         {
             _isLoading = true;
 
-            _skills = await SkillService.GetSkillsAsync();
-            SkillService.OnSkillsStateChanged += LoadSkillsAsync;
-            SkillService.OnSkillsStateUpdated += StateHasChanged;
+            SkillService.OnSkillHasCreated += SkillHasCreated;
+            SkillService.OnSkillHasUpdated += SkillHasUpdated;
+            SkillService.OnSkillHasDeleted += SkillHasDeleted;
 
             _isLoading = false;
+
+            MarkAsInitialized();
         }
 
-        private async Task LoadSkillsAsync()
+        protected override async Task AdditionalAfterRenderMethod()
         {
-            _skills = await SkillService.GetSkillsAsync(
+            if (_tableComponent != null)
+                _tableContainer = _tableComponent.ScrollContainer;
+        }
+
+        protected override int GetCurrentItemsCount() => _skills.Count;
+
+        protected override async Task OnLoadMoreItemsAsync()
+        {
+            await LoadSkillsAsync(append: true);
+        }
+
+        private async Task LoadSkillsAsync(bool append = false) => await LoadDataAsync(
+            _skills,
+            () => SkillService.GetSkillsAsync(
+                _currentPage,
                 searchText: _searchText,
                 confirmed: IsConfirmed?.Value,
-                skillTypes: [.. SelectedSkillTypes.Select(s => s.Value)]
-            );
-            StateHasChanged();
+                skillTypes: SelectedSkillTypes.Select(s => s.Value)
+            ),
+            append: append
+        );
+
+        private async Task FiltersHasChanged()
+        {
+            ResetPagination();
+            await LoadSkillsAsync();
         }
 
         private async Task SeacrhSkill(string value)
         {
             _searchText = value;
-            await LoadSkillsAsync();
+            await FiltersHasChanged();
         }
 
         private static Dictionary<MenuAction, object> GetTableActions(Skill skill)
         {
             var actions = new Dictionary<MenuAction, object>();
 
-            if (skill.Confirmed)
-                actions.Add(MenuAction.Edit, skill);
-            else
-                actions.Add(MenuAction.Confirm, skill.Id);
+            if (skill.Confirmed) actions.Add(MenuAction.Edit, skill);
+            else actions.Add(MenuAction.Confirm, skill.Id);
 
             actions.Add(MenuAction.Delete, skill);
 
@@ -95,39 +116,27 @@ namespace HITSBlazor.Pages.Admin.AllSkills
         {
             SelectedSkillTypes.Clear();
             IsConfirmed = null;
-            await LoadSkillsAsync();
+            await FiltersHasChanged();
         }
 
-        private void ShowSkillModal(Skill? skill = null)
-        {
-            if (skill is not null)
-            {
-                ModalService.Show<SkillModal>(
-                    ModalType.Center,
-                    parameters: new Dictionary<string, object> { [nameof(SkillModal.Skill)] = skill }
-                );
-            }
-            else
-            {
-                ModalService.Show<SkillModal>(ModalType.Center);
-            }
-        }
+        private void ShowSkillModal(Skill? skill = null) => ModalService.Show<SkillModal>(
+            ModalType.Center,
+            parameters: skill is not null
+                ? new Dictionary<string, object> { [nameof(SkillModal.Skill)] = skill }
+                : null
+        );
 
         private async Task OnSkillAction(TableActionContext context)
         {
-            if (context.Action == MenuAction.Confirm)
+            if (context.Action is MenuAction.Confirm && context.Item is Guid skillId)
             {
-                if (context.Item is Guid skillId)
-                    await SkillService.ConfirmSkillAsync(skillId);
+                await SkillService.ConfirmSkillAsync(skillId);
             }
-            else if (context.Action == MenuAction.Edit)
+            else if (context.Item is Skill skill)
             {
-                if (context.Item is Skill skill)
+                if (context.Action is MenuAction.Edit) 
                     ShowSkillModal(skill);
-            }
-            else if (context.Action == MenuAction.Delete)
-            {
-                if (context.Item is Skill skill)
+                else if (context.Action is MenuAction.Delete)
                     ModalService.ShowConfirmModal(
                         $"Вы действительно хотите удалить \"{skill.Name}\"?",
                         () => SkillService.DeleteSkillAsync(skill),
@@ -137,10 +146,41 @@ namespace HITSBlazor.Pages.Admin.AllSkills
             }
         }
 
-        public void Dispose()
+        private void SkillHasCreated(Skill newSkill)
         {
-            SkillService.OnSkillsStateChanged -= LoadSkillsAsync;
-            SkillService.OnSkillsStateUpdated -= StateHasChanged;
+            _skills.Add(newSkill);
+            ++_totalCount;
+            StateHasChanged();
+        }
+
+        private void SkillHasUpdated(Skill updatedSkill)
+        {
+            var skill = _skills.FirstOrDefault(s => s.Id == updatedSkill.Id);
+            if (skill is null) return;
+
+            skill.Name = updatedSkill.Name;
+            skill.Confirmed = updatedSkill.Confirmed;
+            skill.UpdaterId = updatedSkill.UpdaterId;
+
+            StateHasChanged();
+        }
+
+        private void SkillHasDeleted(Skill skill)
+        {
+            if (_skills.Remove(skill))
+            {
+                --_totalCount;
+                StateHasChanged();
+            }
+        }
+
+        protected override async ValueTask DisposeAsyncCore()
+        {
+            SkillService.OnSkillHasCreated -= SkillHasCreated;
+            SkillService.OnSkillHasUpdated -= SkillHasUpdated;
+            SkillService.OnSkillHasDeleted -= SkillHasDeleted;
+
+            await ValueTask.CompletedTask;
         }
     }
 }

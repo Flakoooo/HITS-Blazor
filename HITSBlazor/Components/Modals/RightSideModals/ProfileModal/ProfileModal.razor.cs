@@ -9,7 +9,6 @@ using HITSBlazor.Models.Users.Entities;
 using HITSBlazor.Services.Auth;
 using HITSBlazor.Services.Modal;
 using HITSBlazor.Services.Profiles;
-using HITSBlazor.Services.Skills;
 using HITSBlazor.Services.TestResults;
 using HITSBlazor.Services.UserSkills;
 using Microsoft.AspNetCore.Components;
@@ -26,9 +25,6 @@ namespace HITSBlazor.Components.Modals.RightSideModals.ProfileModal
 
         [Inject]
         private IProfileService ProfileService { get; set; } = null!;
-
-        [Inject]
-        private ISkillService SkillService { get; set; } = null!;
 
         [Inject]
         private IUserSkillService UserSkillService { get; set; } = null!;
@@ -54,11 +50,6 @@ namespace HITSBlazor.Components.Modals.RightSideModals.ProfileModal
 
         private Profile? Profile { get; set; }
         private UserDataForm? _userDataForm;
-
-        private List<Skill> LanguageSkills { get; set; } = [];
-        private List<Skill> FrameworkSkills { get; set; } = [];
-        private List<Skill> DatabaseSkills { get; set; } = [];
-        private List<Skill> DevopsSkills { get; set; } = [];
 
         private HashSet<Skill> SelectedLanguageSkills { get; set; } = [];
         private HashSet<Skill> SelectedFrameworkSkills { get; set; } = [];
@@ -89,11 +80,6 @@ namespace HITSBlazor.Components.Modals.RightSideModals.ProfileModal
             if (Profile is null) return;
 
             _userDataForm = ResetUserForm(Profile);
-
-            LanguageSkills = await SkillService.GetSkillsAsync(skillTypes: [SkillType.Language]);
-            FrameworkSkills = await SkillService.GetSkillsAsync(skillTypes: [SkillType.Framework]);
-            DatabaseSkills = await SkillService.GetSkillsAsync(skillTypes: [SkillType.Database]);
-            DevopsSkills = await SkillService.GetSkillsAsync(skillTypes: [SkillType.Devops]);
 
             BelbinTestResult = await TestResultService.GetTestResultAsync(UserId, TestResultService.BelbinTestName);
             TemperTestResult = await TestResultService.GetTestResultAsync(UserId, TestResultService.TemperTestName);

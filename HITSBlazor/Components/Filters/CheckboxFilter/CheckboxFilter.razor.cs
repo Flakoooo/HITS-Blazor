@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using HITSBlazor.Models.Common.Responses;
+using HITSBlazor.Services.Debounce;
+using HITSBlazor.Services.Skills;
+using Microsoft.AspNetCore.Components;
 
 namespace HITSBlazor.Components.Filters.CheckboxFilter
 {
@@ -28,19 +31,69 @@ namespace HITSBlazor.Components.Filters.CheckboxFilter
         [Parameter]
         public EventCallback<string> SearchTextChanged { get; set; }
 
+        [Parameter]
+        public Func<int, string?, Task<ListDataResponse<T>>>? DataLoaderMethod { get; set; }
+
+        [Parameter]
+        public int DebounceDelay { get; set; } = 0;
+
+        private bool IsOnLoadingNow => _isLoading || IsLoading;
+
+        private bool _isLoading;
+
         private List<T> _values = [];
 
-        protected override void OnParametersSet()
+        protected override async Task OnInitializedAsync()
         {
-            if (!SearchTextChanged.HasDelegate)
+            _isLoading = true;
+
+            if (DataLoaderMethod is not null)
             {
-                if (_values.Count == 0) _values = [.. AllValues];
+                await LoadCheckboxDataAsync();
+                MarkAsInitialized();
+            }
+
+            _isLoading = false;
+        }
+
+        protected override async Task OnParametersSetAsync()
+        {
+            if (DataLoaderMethod is not null)
+            {
+                ResetPagination();
+                await LoadCheckboxDataAsync();
             }
             else
             {
-                _values = string.IsNullOrWhiteSpace(SearchText)
-                    ? [.. AllValues]
-                    : [.. AllValues.Where(v => v.MatchesSearch(SearchText))];
+                if (!SearchTextChanged.HasDelegate && _values.Count == 0)
+                {
+                    _values = AllValues.ToList();
+                }
+                else
+                {
+                    _values = string.IsNullOrWhiteSpace(SearchText)
+                        ? AllValues.ToList()
+                        : AllValues.Where(v => v.MatchesSearch(SearchText)).ToList();
+                }
+            }
+        }
+
+        protected override async Task OnLoadMoreItemsAsync()
+            => await LoadCheckboxDataAsync(append: true);
+
+        protected override int GetCurrentItemsCount() => _values.Count;
+
+        private async Task LoadCheckboxDataAsync(bool append = false)
+        {
+            if (DataLoaderMethod is not null)
+            {
+                await LoadDataAsync(
+                    AllValues,
+                    () => DataLoaderMethod.Invoke(_currentPage, SearchText),
+                    append: append
+                );
+
+                _values = AllValues.ToList();
             }
         }
 

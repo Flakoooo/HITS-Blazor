@@ -1,15 +1,16 @@
 ﻿using HITSBlazor.Models.Common.Entities;
+using HITSBlazor.Services.Skills;
 using Microsoft.AspNetCore.Components;
 
 namespace HITSBlazor.Components.InputDropdowns.SkillDropdown
 {
     public partial class SkillDropdown
     {
-        [Parameter]
-        public bool IsLoading { get; set; } = false;
+        [Inject]
+        private ISkillService SkillService { get; set; } = null!;
 
         [Parameter]
-        public List<Skill> AllSkills { get; set; } = null!;
+        public bool IsLoading { get; set; } = false;
 
         [Parameter]
         public string Placeholder { get; set; } = string.Empty;

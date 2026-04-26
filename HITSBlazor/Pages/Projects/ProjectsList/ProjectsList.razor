@@ -2,50 +2,50 @@
 @using HITSBlazor.Components.ActionMenus.BaseActionMenu
 @using HITSBlazor.Components.Filters.RadioFilter
 @using HITSBlazor.Components.Filters.ResetFilterButton
+@using HITSBlazor.Components.InputSearch
 @using HITSBlazor.Components.ListPageComponents.ListPageHeader
 @using HITSBlazor.Components.ListPageComponents.ListPageSearch
 @using HITSBlazor.Components.ListPageComponents.ListPageTable
 @using HITSBlazor.Components.Statuses.EnumStatus
 @using HITSBlazor.Components.Tables.TableActionMenu
 @using HITSBlazor.Components.Tables.TableBodyRow
+@using HITSBlazor.Components.Tables.TableComponent
 @using HITSBlazor.Models.Projects.Enums
 @using HITSBlazor.Utils.Models
+@inherits ListPageDataLoader
 
 <div class="h-auto bg-white overflow-y-scroll">
     <div class="w-100 p-3">
         <ListPageHeader IsLoading="_isLoading"
                         HeaderText="@($"Список проектов: {_projects.Count}")" />
-        <ListPageSearch IsLoading="_isLoading" ValueChanged="@((value) => SearchProject(value))" />
-        <ListPageTable IsLoading="_isLoading" TableActionMenuIsEnable="true" HeaderItems="_projectsTableHeader">
+        <InputSearch Width="50" IsLoading="_isLoading" ValueChanged="@((value) => SearchProject(value))" />
+        <TableComponent IsLoading="_isLoading" TableActionMenuIsEnable="true" HeaderItems="_projectsTableHeader" @ref="_tableComponent">
             <TableContent>
-                <tbody>
-                    @foreach (var project in _projects)
-                    {
-                        <tr>
-                            <TableBodyRow>
-                                <div class="data-link" @onclick="() => NavigateToProject(project.Id)">
-                                    @project.Name
-                                </div>
-                            </TableBodyRow>
-                            <TableBodyRow IsCentered="true">
-                                <EnumStatus Statustype="project.Status" />
-                            </TableBodyRow>
-                            <TableBodyRow IsCentered="true">
-                                @project.StartDate.ToString("dd.MM.yyyy")
-                            </TableBodyRow>
-                            <TableBodyRow IsCentered="true">
-                                <!-- TODO: либо текст синего цвета что реализуется -->
-                                @project.FinishDate.ToString("dd.MM.yyyy")
-                            </TableBodyRow>
-                            <!-- TODO: преейти в проект -->
-                            <TableActionMenu ItemId="@project.Id"
-                                             OnAction="OnProjectAction"
-                                             ActionIds="@(new Dictionary<MenuAction, object> { 
-                                                 [MenuAction.ViewProject] = project.Id
-                                             })" />
-                        </tr>
-                    }
-                </tbody>
+                @foreach (var project in _projects)
+                {
+                    <tr>
+                        <TableBodyRow>
+                            <div class="data-link" @onclick="() => NavigateToProject(project.Id)">
+                                @project.Name
+                            </div>
+                        </TableBodyRow>
+                        <TableBodyRow IsCentered="true">
+                            <EnumStatus Statustype="project.Status" />
+                        </TableBodyRow>
+                        <TableBodyRow IsCentered="true">
+                            @project.StartDate.ToString("dd.MM.yyyy")
+                        </TableBodyRow>
+                        <TableBodyRow IsCentered="true">
+                            <!-- TODO: либо текст синего цвета что реализуется -->
+                            @project.FinishDate.ToString("dd.MM.yyyy")
+                        </TableBodyRow>
+                        <TableActionMenu ItemId="@project.Id"
+                                            OnAction="OnProjectAction"
+                                            ActionIds="@(new Dictionary<MenuAction, object> { 
+                                                [MenuAction.ViewProject] = project.Id
+                                            })" />
+                    </tr>
+                }
             </TableContent>
             <FilterContent>
                 <RadioFilter T="EnumViewModel<ProjectStatus>"
@@ -53,9 +53,9 @@
                              Label="Статус"
                              AllValues="_filterProjectStatus"
                              @bind-Value="SelectedProjectStatus"
-                             OnFilterChanged="LoadProjectsAsync" />
+                             OnFilterChanged="FiltersHasChanged" />
                 <ResetFilterButton IsLoading="_isLoading" ResetMethod="ResetFilters" />
             </FilterContent>
-        </ListPageTable>
+        </TableComponent>
     </div>
 </div>

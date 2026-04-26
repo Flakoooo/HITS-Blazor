@@ -10,7 +10,7 @@ namespace HITSBlazor.Utils.Mocks.Ideas
 
         private static List<IdeaSkills> CreateIdeaSkills()
         {
-            var skillsMocks = MockSkills.GetAllSkills();
+            var skillsMocks = MockSkills.GetAllMockSkills();
 
             return
             [

@@ -1,4 +1,5 @@
-﻿using HITSBlazor.Models.Projects.Entities;
+﻿using HITSBlazor.Models.Common.Responses;
+using HITSBlazor.Models.Projects.Entities;
 using HITSBlazor.Models.Projects.Enums;
 using HITSBlazor.Utils.Mocks.Ideas;
 using HITSBlazor.Utils.Mocks.Teams;
@@ -144,10 +145,30 @@ namespace HITSBlazor.Utils.Mocks.Projects
             ];
         }
 
-        public static List<Project> GetAllProjects() => [.. _projects];
+        public static ListDataResponse<Project> GetAllProjects(
+            int page,
+            int pageSize = 20,
+            string? searchText = null,
+            ProjectStatus? selectedStatus = null
+        )
+        {
+            var query = _projects.AsEnumerable();
+
+            if (selectedStatus.HasValue)
+                query = query.Where(p => p.Status == selectedStatus);
+
+            if (!string.IsNullOrWhiteSpace(searchText))
+                query = query.Where(p => p.Name.Contains(searchText, StringComparison.CurrentCultureIgnoreCase));
+
+            int count = query.Count();
+
+            query = query.Skip((page - 1) * pageSize).Take(pageSize);
+
+            return new ListDataResponse<Project> { Count = count, List = query.ToList() };
+        }
 
         public static List<Project> GetActiveProjects(Guid id)
-            => [.. _projects.Where(p => p.Id == id && p.Status == ProjectStatus.Active)];
+            => _projects.Where(p => p.Status == ProjectStatus.Active && p.Members.Select(m => m.UserId).Contains(id)).ToList();
 
         public static Project? GetProjectById(Guid projectId)
             => _projects.FirstOrDefault(p => p.Id == projectId);

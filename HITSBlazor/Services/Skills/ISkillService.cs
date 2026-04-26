@@ -1,17 +1,20 @@
 ﻿using HITSBlazor.Models.Common.Entities;
 using HITSBlazor.Models.Common.Enums;
+using HITSBlazor.Models.Common.Responses;
 
 namespace HITSBlazor.Services.Skills
 {
     public interface ISkillService
     {
-        event Func<Task>? OnSkillsStateChanged;
-        event Action? OnSkillsStateUpdated;
+        event Action<Skill>? OnSkillHasCreated;
+        event Action<Skill>? OnSkillHasUpdated;
+        event Action<Skill>? OnSkillHasDeleted;
 
-        Task<List<Skill>> GetSkillsAsync(
+        Task<ListDataResponse<Skill>> GetSkillsAsync(
+            int page,
             string? searchText = null,
             bool? confirmed = null,
-            HashSet<SkillType>? skillTypes = null
+            IEnumerable<SkillType>? skillTypes = null
         );
 
         Task<Skill?> CreateNewSkillAsync(string name, SkillType type, bool isConfirmed);

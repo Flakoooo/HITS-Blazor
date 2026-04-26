@@ -1,5 +1,6 @@
 ﻿using HITSBlazor.Models.Common.Entities;
 using HITSBlazor.Models.Common.Enums;
+using HITSBlazor.Models.Common.Responses;
 using System.Xml.Linq;
 
 namespace HITSBlazor.Utils.Mocks.Common
@@ -60,10 +61,36 @@ namespace HITSBlazor.Utils.Mocks.Common
             new Skill { Id = ScikitLearnId,     Name = "Scikit Learn",  Type = SkillType.Framework,     Confirmed = true }
         ];
 
+        public static List<Skill> GetAllMockSkills() => _skills;
+
+        public static ListDataResponse<Skill> GetAllSkills(
+            int page,
+            int pageSize = 20,
+            string? searchText = null,
+            bool? confirmed = null,
+            HashSet<SkillType>? skillTypes = null
+        )
+        {
+            var query = _skills.AsEnumerable();
+
+            if (skillTypes?.Count > 0)
+                query = query.Where(s => skillTypes.Contains(s.Type));
+
+            if (confirmed.HasValue)
+                query = query.Where(s => s.Confirmed == confirmed.Value);
+
+            if (!string.IsNullOrWhiteSpace(searchText))
+                query = query.Where(s => s.Name.Contains(searchText, StringComparison.CurrentCultureIgnoreCase));
+
+            int count = query.Count();
+
+            query = query.Skip((page - 1) * pageSize).Take(pageSize);
+
+            return new ListDataResponse<Skill> { Count = count, List = query.ToList() };
+        }
+
         public static Skill? GetSkillById(Guid id)
             => _skills.FirstOrDefault(s => s.Id == id);
-
-        public static List<Skill> GetAllSkills() => [.. _skills];
 
         public static Skill CreateSkill(string name, SkillType type, bool isConfirmed, Guid creatorId)
         {
@@ -83,15 +110,15 @@ namespace HITSBlazor.Utils.Mocks.Common
             return newSkill;
         }
 
-        public static bool ConfirmSkill(Guid skillId, Guid updatorId)
+        public static Skill? ConfirmSkill(Guid skillId, Guid updatorId)
         {
             var skillForUpdate = _skills.FirstOrDefault(s => s.Id == skillId);
-            if (skillForUpdate is null) return false;
+            if (skillForUpdate is null) return null;
 
             skillForUpdate.Confirmed = true;
             skillForUpdate.UpdaterId = updatorId;
 
-            return true;
+            return skillForUpdate;
         }
 
         public static Skill? UpdateSkill(Guid skillId, string name, SkillType type, Guid updatorId)

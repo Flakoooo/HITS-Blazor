@@ -1,10 +1,10 @@
 ﻿using HITSBlazor.Components.ActionMenus.BaseActionMenu;
-using HITSBlazor.Components.Button;
+using HITSBlazor.Components.Tables.TableComponent;
 using HITSBlazor.Components.Tables.TableHeader;
 using HITSBlazor.Models.Projects.Entities;
 using HITSBlazor.Models.Projects.Enums;
 using HITSBlazor.Services;
-using HITSBlazor.Utils.Mocks.Projects;
+using HITSBlazor.Services.Projects;
 using HITSBlazor.Utils.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
@@ -16,13 +16,18 @@ namespace HITSBlazor.Pages.Projects.ProjectsList
     public partial class ProjectsList
     {
         [Inject]
+        private IProjectService ProjectService { get; set; } = null!;
+
+        [Inject]
         private NavigationService NavigationService { get; set; } = null!;
 
         private bool _isLoading = true;
 
+        private TableComponent? _tableComponent;
+
         private string _searchText = string.Empty;
 
-        private List<Project> _projects = [];
+        private readonly List<Project> _projects = [];
 
         private EnumViewModel<ProjectStatus>? SelectedProjectStatus { get; set; }
 
@@ -44,17 +49,40 @@ namespace HITSBlazor.Pages.Projects.ProjectsList
             await LoadProjectsAsync();
 
             _isLoading = false;
+            MarkAsInitialized();
         }
 
-        private async System.Threading.Tasks.Task LoadProjectsAsync()
+        protected override async System.Threading.Tasks.Task AdditionalAfterRenderMethod()
         {
-            _projects = MockProjects.GetAllProjects();
+            if (_tableComponent != null)
+                _tableContainer = _tableComponent.ScrollContainer;
+        }
+
+        protected override int GetCurrentItemsCount() => _projects.Count;
+
+        protected override async System.Threading.Tasks.Task OnLoadMoreItemsAsync()
+        {
+            await LoadProjectsAsync(append: true);
+        }
+
+        private async System.Threading.Tasks.Task LoadProjectsAsync(bool append = false) => await LoadDataAsync(
+            _projects,
+            () => ProjectService.GetProjectsByQueryAsync(
+                _currentPage, searchText: _searchText, selectedStatus: SelectedProjectStatus?.Value
+            ),
+            append: append
+        );
+
+        private async System.Threading.Tasks.Task FiltersHasChanged()
+        {
+            ResetPagination();
+            await LoadProjectsAsync();
         }
 
         private async System.Threading.Tasks.Task SearchProject(string value)
         {
             _searchText = value;
-            await LoadProjectsAsync();
+            await FiltersHasChanged();
         }
 
         private async System.Threading.Tasks.Task NavigateToProject(Guid projectId)
@@ -73,7 +101,7 @@ namespace HITSBlazor.Pages.Projects.ProjectsList
         {
             SelectedProjectStatus = null;
 
-            await LoadProjectsAsync();
+            await FiltersHasChanged();
         }
     }
 }
