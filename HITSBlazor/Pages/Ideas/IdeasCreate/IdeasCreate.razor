@@ -106,7 +106,8 @@
                            HintText="Выберите заказчика (компанию), к которой Вы принадлежите или от лица которой создаётся идея"
                            Placeholder="Выберите заказчика"
                            @bind-Value="@SelectedCompany"
-                           DataLoaderMethod="async (page, searchText) => await CompanyService.GetCompaniesAsync(page, searchText)" />
+                           DataLoaderMethod="async (page, searchText) => await CompanyService.GetCompaniesAsync(page, searchText)"
+                           DebounceDelay="500"/>
             @if (SelectedCompany is not null)
             {
                 <RadioDropdown T="User"

@@ -1,4 +1,5 @@
-﻿using HITSBlazor.Utils.Validation;
+﻿using HITSBlazor.Services.Debounce;
+using HITSBlazor.Utils.Validation;
 using Microsoft.AspNetCore.Components;
 using System.Timers;
 using Timer = System.Timers.Timer;
@@ -55,17 +56,22 @@ namespace HITSBlazor.Components.Inputs.Input
         [Parameter]
         public int DebounceDelay { get; set; } = 0;
 
+        private DebounceHelper? _searchDebounce;
+
         private bool _showError = false;
-        private Timer? _debounceTimer;
         private string _pendingValue = string.Empty;
 
         protected override void OnInitialized()
         {
-            if (DebounceDelay > 0)
+            if (ValueChanged.HasDelegate && DebounceDelay > 0)
             {
-                _debounceTimer = new Timer(DebounceDelay);
-                _debounceTimer.Elapsed += OnDebounceTimerElapsed;
-                _debounceTimer.AutoReset = false;
+                _searchDebounce = new DebounceHelper(DebounceDelay, async () =>
+                {
+                    await InvokeAsync(async () =>
+                    {
+                        await ValueChanged.InvokeAsync(_pendingValue);
+                    });
+                });
             }
         }
 
@@ -110,41 +116,23 @@ namespace HITSBlazor.Components.Inputs.Input
         {
             var newValue = e.Value?.ToString() ?? string.Empty;
 
-            if (DebounceDelay > 0 && ValueChanged.HasDelegate)
-            {
-                _pendingValue = newValue;
-
-                _debounceTimer?.Stop();
-
-                _debounceTimer?.Start();
-            }
-            else
-            {
-                if (ValueChanged.HasDelegate)
-                    await ValueChanged.InvokeAsync(newValue);
-            }
-        }
-
-        private async void OnDebounceTimerElapsed(object? sender, ElapsedEventArgs e)
-        {
             if (ValueChanged.HasDelegate)
             {
-                await InvokeAsync(async () =>
+                if (DebounceDelay > 0)
                 {
-                    await ValueChanged.InvokeAsync(_pendingValue);
-                });
+                    _pendingValue = newValue;
+                    _searchDebounce?.Trigger();
+                }
+                else
+                {
+                    await ValueChanged.InvokeAsync(newValue);
+                }
             }
         }
 
         public void Dispose()
         {
-            if (_debounceTimer != null)
-            {
-                _debounceTimer.Stop();
-                _debounceTimer.Elapsed -= OnDebounceTimerElapsed;
-                _debounceTimer.Dispose();
-                _debounceTimer = null;
-            }
+            _searchDebounce?.Dispose();
         }
     }
 }

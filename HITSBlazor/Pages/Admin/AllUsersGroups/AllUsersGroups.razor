@@ -30,30 +30,28 @@
         <InputSearch IsLoading="_isLoading" ValueChanged="@((value) => SearchUsersGroup(value))" DebounceDelay="500" />
         <TableComponent IsLoading="_isLoading" TableActionMenuIsEnable="true" HeaderItems="UsersGroupsTableHeader" @ref="_tableComponent">
             <TableContent>
-                <tbody>
-                    @foreach (var usersGroup in _usersGroups)
-                    {
-                        <tr>
-                            <TableBodyRow>
-                                <div class="text-primary data-link" @onclick="() => ShowUsersGroupModal(usersGroup.Id)">
-                                    @usersGroup.Name
-                                </div>
-                            </TableBodyRow>
-                            <TableBodyRow>
-                                @foreach (var role in usersGroup.Roles)
-                                {
-                                    <EnumStatus Statustype="role" />
-                                }
-                            </TableBodyRow>
-                            <TableActionMenu ItemId="usersGroup.Id"
-                                                OnAction="OnUsersGroupAction"
-                                                ActionIds="@(new Dictionary<MenuAction, object> { 
-                                                    [MenuAction.Edit] = usersGroup.Id,
-                                                    [MenuAction.Delete] = usersGroup
-                                                })"/>
-                        </tr>
-                    }
-                </tbody>
+                @foreach (var usersGroup in _usersGroups)
+                {
+                    <tr>
+                        <TableBodyRow>
+                            <div class="text-primary data-link" @onclick="() => ShowUsersGroupModal(usersGroup.Id)">
+                                @usersGroup.Name
+                            </div>
+                        </TableBodyRow>
+                        <TableBodyRow>
+                            @foreach (var role in usersGroup.Roles)
+                            {
+                                <EnumStatus Statustype="role" />
+                            }
+                        </TableBodyRow>
+                        <TableActionMenu ItemId="usersGroup.Id"
+                                            OnAction="OnUsersGroupAction"
+                                            ActionIds="@(new Dictionary<MenuAction, object> { 
+                                                [MenuAction.Edit] = usersGroup.Id,
+                                                [MenuAction.Delete] = usersGroup
+                                            })"/>
+                    </tr>
+                }
             </TableContent>
             <FilterContent>
                 <CheckboxFilter T="EnumViewModel<RoleType>" 

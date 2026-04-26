@@ -1,4 +1,5 @@
 ﻿using HITSBlazor.Models.Common.Responses;
+using HITSBlazor.Services.Debounce;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
@@ -34,7 +35,11 @@ namespace HITSBlazor.Components.Inputs.RadioDropdown
         [Parameter]
         public Func<int, string?, Task<ListDataResponse<T>>>? DataLoaderMethod { get; set; }
 
+        [Parameter]
+        public int DebounceDelay { get; set; } = 0;
+
         private ElementReference _inputRef;
+        private DebounceHelper? _searchDebounce;
 
         private bool _isOpen = false;
 
@@ -44,6 +49,18 @@ namespace HITSBlazor.Components.Inputs.RadioDropdown
 
         protected override async Task OnInitializedAsync()
         {
+            if (DataLoaderMethod is not null && DebounceDelay > 0)
+            {
+                _searchDebounce = new DebounceHelper(DebounceDelay, async () =>
+                {
+                    await InvokeAsync(async () =>
+                    {
+                        ResetPagination();
+                        await LoadRadioDataAsync();
+                        StateHasChanged();
+                    });
+                });
+            }
             await LoadRadioDataAsync();
             MarkAsInitialized();
         }
@@ -64,7 +81,8 @@ namespace HITSBlazor.Components.Inputs.RadioDropdown
                 Console.WriteLine($"Ошибка регистрации clickOutside: {ex.Message}");
             }
 
-            _values = [.. AllValues];
+            if (_values.Count == 0 && AllValues.Count > 0)
+                _values = AllValues.ToList();
         }
 
 
@@ -90,17 +108,16 @@ namespace HITSBlazor.Components.Inputs.RadioDropdown
         {
             _searchText = (e.Value?.ToString() ?? string.Empty).Trim();
 
-            if (DataLoaderMethod is not null)
+            if (DataLoaderMethod is not null && DebounceDelay > 0)
             {
-                ResetPagination();
-                await LoadRadioDataAsync();
+                _searchDebounce?.Trigger();
             }
             else
             {
                 if (string.IsNullOrWhiteSpace(_searchText))
-                    _values = [.. AllValues];
+                    _values = AllValues.ToList();
                 else
-                    _values = [.. AllValues.Where(v => v.MatchesSearch(_searchText))];
+                    _values = AllValues.Where(v => v.MatchesSearch(_searchText)).ToList();
 
                 await InvokeAsync(StateHasChanged);
             }
@@ -127,6 +144,7 @@ namespace HITSBlazor.Components.Inputs.RadioDropdown
 
         protected override async ValueTask DisposeAsyncCore()
         {
+            _searchDebounce?.Dispose();
             try
             {
                 if (_dotNetHelper != null)

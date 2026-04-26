@@ -27,42 +27,40 @@
         <InputSearch IsLoading="_isLoading" Width="50" ValueChanged="@((value) => SearchUser(value))" DebounceDelay="500" />
         <TableComponent IsLoading="_isLoading" TableActionMenuIsEnable="true" HeaderItems="_userTableHeader" OrderMethod="SortUser" @ref="_tableComponent">
             <TableContent>
-                <tbody>
-                    @foreach (var user in _users)
-                    {
-                        <tr>
-                            <TableBodyRow>
-                                <div class="text-primary data-link" @onclick="@(() => ShowUserProfile(user.Id))">
-                                    @user.Email
-                                </div>
-                            </TableBodyRow>
-                            <TableBodyRow>
-                                @user.FirstName
-                            </TableBodyRow>
-                            <TableBodyRow>
-                                @user.LastName
-                            </TableBodyRow>
-                            <TableBodyRow>
-                                @user.Telephone
-                            </TableBodyRow>
-                            <TableBodyRow>
-                                @user.StudyGroup
-                            </TableBodyRow>
-                            <TableBodyRow IsCentered="true">
-                                @(user.CreatedAt.HasValue ? user.CreatedAt.Value.ToString("dd.MM.yyyy") : "Н/Д")
-                            </TableBodyRow>
-                            <TableBodyRow>
-                                @foreach (var role in user.Roles)
-                                {
-                                    <EnumStatus Statustype="role" />
-                                }
-                            </TableBodyRow>
-                            <TableActionMenu ItemId="@user.Id"
-                                             OnAction="OnUserAction"
-                                             ActionIds="GetActions(user)" />
-                        </tr>
-                    }
-                </tbody>
+                @foreach (var user in _users)
+                {
+                    <tr>
+                        <TableBodyRow>
+                            <div class="text-primary data-link" @onclick="@(() => ShowUserProfile(user.Id))">
+                                @user.Email
+                            </div>
+                        </TableBodyRow>
+                        <TableBodyRow>
+                            @user.FirstName
+                        </TableBodyRow>
+                        <TableBodyRow>
+                            @user.LastName
+                        </TableBodyRow>
+                        <TableBodyRow IsCentered="true">
+                            @user.Telephone
+                        </TableBodyRow>
+                        <TableBodyRow IsCentered="true">
+                            @user.StudyGroup
+                        </TableBodyRow>
+                        <TableBodyRow IsCentered="true">
+                            @(user.CreatedAt.HasValue ? user.CreatedAt.Value.ToString("dd.MM.yyyy") : "Н/Д")
+                        </TableBodyRow>
+                        <TableBodyRow>
+                            @foreach (var role in user.Roles)
+                            {
+                                <EnumStatus Statustype="role" />
+                            }
+                        </TableBodyRow>
+                        <TableActionMenu ItemId="@user.Id"
+                                         OnAction="OnUserAction"
+                                         ActionIds="GetActions(user)" />
+                    </tr>
+                }
             </TableContent>
             <FilterContent>
                 <CheckboxFilter T="EnumViewModel<RoleType>"

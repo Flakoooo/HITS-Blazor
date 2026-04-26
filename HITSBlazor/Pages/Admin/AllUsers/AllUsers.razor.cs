@@ -47,12 +47,12 @@ namespace HITSBlazor.Pages.Admin.AllUsers
 
         private static readonly List<TableHeaderItem> _userTableHeader =
         [
-            new() { Text = "Почта"                                                                  },
-            new() { Text = "Имя"                                                                    },
-            new() { Text = "Фамилия"                                                                },
-            new() { Text = "Номер телефона"                                                         },
-            new() { Text = "Учебная группа"                                                         },
-            new() { Text = "Дата регистрации", InCentered = true, OrderBy = nameof(User.CreatedAt)  },
+            new() { Text = "Почта",            ColumnClass="col-2"                                  },
+            new() { Text = "Имя",              ColumnClass="col-2"                                  },
+            new() { Text = "Фамилия",          ColumnClass="col-2"                                  },
+            new() { Text = "Номер телефона",   ColumnClass="col-1", InCentered = true               },
+            new() { Text = "Учебная группа",   ColumnClass="col-1", InCentered = true               },
+            new() { Text = "Дата регистрации", ColumnClass="col-1", InCentered = true, OrderBy = nameof(User.CreatedAt)  },
             new() { Text = "Роли",             ColumnClass="col-5"                                  }
         ];
 
