@@ -6,6 +6,7 @@ using HITSBlazor.Services.Users;
 using HITSBlazor.Services.UsersGroups;
 using HITSBlazor.Utils.Models;
 using Microsoft.AspNetCore.Components;
+using System.Data;
 
 namespace HITSBlazor.Components.Modals.CenterModals.UsersGroupModal
 {
@@ -31,8 +32,7 @@ namespace HITSBlazor.Components.Modals.CenterModals.UsersGroupModal
 
         private string UsersGroupName { get; set; } = string.Empty;
 
-        private List<User> _users = [];
-        private List<User> _groupUsers = [];
+        private HashSet<User> _groupUsers = [];
 
         private List<EnumViewModel<RoleType>> AllRoles { get; set; } = [];
 
@@ -46,15 +46,10 @@ namespace HITSBlazor.Components.Modals.CenterModals.UsersGroupModal
             {
                 var usersGroup = await UsersGroupsService.GetUsersGroupByIdAsync(UsersGroupId.Value);
                 UsersGroupName = usersGroup?.Name ?? string.Empty;
-                _groupUsers = usersGroup?.Members ?? [];
-                _users = [.. (await UserService.GetUsersAsync()).Where(u => !_groupUsers.Contains(u))];
-                if (usersGroup is not null)
-                    foreach (var role in usersGroup.Roles)
-                        SelectedRoles.Add(new(role));
-            }
-            else
-            {
-                _users = await UserService.GetUsersAsync();
+                _groupUsers = usersGroup?.Members.ToHashSet() ?? [];
+
+                foreach (var role in usersGroup?.Roles ?? [])
+                    SelectedRoles.Add(new(role));
             }
 
             foreach (var role in Enum.GetValues<RoleType>())
@@ -63,29 +58,24 @@ namespace HITSBlazor.Components.Modals.CenterModals.UsersGroupModal
             _isLoading = false;
         }
 
-        private void SelectUser(User user)
-        {
-            _groupUsers.Add(user);
-            _users.Remove(user);
-        }
+        private void SelectUser(User user) => _groupUsers.Add(user);
 
-        private void UnSelectUser(User user)
+        private void UnSelectUser(User user) => _groupUsers.Remove(user);
+
+        private bool CheckValidValues()
         {
-            _groupUsers.Remove(user);
-            _users.Add(user);
+            if (string.IsNullOrWhiteSpace(UsersGroupName)) return false;
+            if (_groupUsers.Count == 0) return false;
+            if (SelectedRoles.Count == 0) return false;
+
+            return true;
         }
 
         private async Task SendUsersGroup()
         {
             _submitting = true;
 
-            bool isValid = true;
-
-            if (string.IsNullOrWhiteSpace(UsersGroupName)) isValid = false;
-            if (_groupUsers.Count == 0) isValid = false;
-            if (SelectedRoles.Count == 0) isValid = false;
-
-            if (!isValid)
+            if (!CheckValidValues())
             {
                 NotificationService.ShowError("Заполнены не все поля");
                 _submitting = false;
@@ -99,7 +89,7 @@ namespace HITSBlazor.Components.Modals.CenterModals.UsersGroupModal
                     UsersGroupId.Value,
                     UsersGroupName,
                     _groupUsers,
-                    [.. SelectedRoles.Select(r => r.Value)]
+                    SelectedRoles.Select(r => r.Value)
                 );
             }
             else
@@ -107,7 +97,7 @@ namespace HITSBlazor.Components.Modals.CenterModals.UsersGroupModal
                 result = await UsersGroupsService.CreateUsersGroup(
                     UsersGroupName,
                     _groupUsers,
-                    [.. SelectedRoles.Select(r => r.Value)]
+                    SelectedRoles.Select(r => r.Value)
                 );
             }
 

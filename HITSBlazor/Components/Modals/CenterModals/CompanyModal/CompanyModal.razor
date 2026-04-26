@@ -13,48 +13,33 @@
 @using HITSBlazor.Utils.Validation
 
 <div @onclick:stopPropagation="true" class="company-modal p-3 bg-white rounded-3">
-    @if (_isLoading)
-    {
-        <div class="w-100 d-flex justify-content-center">
-            <Placeholder Width="w-50" />
-        </div>
-        <Placeholder Height="PlaceholderHeight.Small" />
-        <Placeholder Height="PlaceholderHeight.Small" />
-        <div class="d-flex gap-3">
-            <div class="w-50 d-flex flex-column gap-2">
-                <Placeholder />
-                <Placeholder Height="PlaceholderHeight.Medium" />
-            </div>
-            <div class="w-50 d-flex flex-column gap-2">
-                <Placeholder />
-                <Placeholder Height="PlaceholderHeight.Medium" />
-            </div>
-        </div>
-        <Placeholder Height="PlaceholderHeight.Small" />
-    }
-    else
-    {
-        <CenterModalHeader HeaderText="@(CompanyId.HasValue ? "Редактирование компании" : "Создание компании")" />
-        <Input Label="Название компании:"
-               Placeholder="Введите название компании"
-               @bind-Value="CompanyName" />
-        <RadioDropdown T=User
-                       AllValues="_users"
-                       Label="Выберите руководителя компании:"
-                       Placeholder="Руководитель компании"
-                       @bind-Value="SelectedOwner" />
-        <div class="d-flex justify-content-between gap-3">
-            <UsersColumn HeaderText="Пользователи:"
-                         AllUsers="_users"
-                         SelectedUserChanged="SelectUser" />
-            <UsersColumn HeaderText="Представители компании:"
-                         AllUsers="_companyUsers"
-                         SelectedUserChanged="UnSelectUser" />
-        </div>
-        <Button Variant="ButtonVariant.Primary"
-                InProgress="_submitting"
-                Text="@(CompanyId.HasValue ? "Сохранить изменения" : "Добавить")"
-                LoadingText="@(CompanyId.HasValue ? "Сохранение" : "Добавление")"
-                OnButtonClick="SendCompany" />
-    }
+    <CenterModalHeader IsLoading="_isLoading"
+                       HeaderText="@(CompanyId.HasValue ? "Редактирование компании" : "Создание компании")" />
+    <Input IsLoading="_isLoading"
+           Label="Название компании:"
+           Placeholder="Введите название компании"
+           @bind-Value="CompanyName" />
+    <RadioDropdown T=User
+                   IsLoading="_isLoading"
+                   Label="Выберите руководителя компании:"
+                   Placeholder="Руководитель компании"
+                   @bind-Value="SelectedOwner"
+                   DataLoaderMethod="async (page, searchText) => await UserService.GetUsersAsync(page, searchText: searchText)" />
+    <div class="d-flex justify-content-between gap-3">
+        <UsersColumn IsLoading="_isLoading"
+                     HeaderText="Пользователи:"
+                     SelectedUserChanged="SelectUser"
+                     DataLoaderMethod="async (page, searchText) => await UserService.GetUsersAsync(page, searchText: searchText)"
+                     DebounceDelay="500"/>
+        <UsersColumn IsLoading="_isLoading"
+                     HeaderText="Представители компании:"
+                     AllUsers="_companyUsers.ToList()"
+                     SelectedUserChanged="UnSelectUser" />
+    </div>
+    <Button IsLoading="_isLoading"
+            Variant="ButtonVariant.Primary"
+            InProgress="_submitting"
+            Text="@(CompanyId.HasValue ? "Сохранить изменения" : "Добавить")"
+            LoadingText="@(CompanyId.HasValue ? "Сохранение" : "Добавление")"
+            OnButtonClick="SendCompany" />
 </div>

@@ -44,9 +44,14 @@ namespace HITSBlazor.Components.Inputs.RadioDropdown
 
         protected override async Task OnInitializedAsync()
         {
-            await LoadDataAsync();
+            await LoadRadioDataAsync();
             MarkAsInitialized();
         }
+
+        protected override async Task OnLoadMoreItemsAsync()
+            => await LoadRadioDataAsync(append: true);
+
+        protected override int GetCurrentItemsCount() => _values.Count;
 
         protected override async Task AdditionalAfterRenderMethod()
         {
@@ -83,14 +88,22 @@ namespace HITSBlazor.Components.Inputs.RadioDropdown
 
         private async Task OnSearch(ChangeEventArgs e)
         {
-            _searchText = (e.Value?.ToString() ?? "").Trim();
+            _searchText = (e.Value?.ToString() ?? string.Empty).Trim();
 
-            if (string.IsNullOrWhiteSpace(_searchText))
-                _values = [.. AllValues];
+            if (DataLoaderMethod is not null)
+            {
+                ResetPagination();
+                await LoadRadioDataAsync();
+            }
             else
-                _values = [.. AllValues.Where(v => v.MatchesSearch(_searchText))];
+            {
+                if (string.IsNullOrWhiteSpace(_searchText))
+                    _values = [.. AllValues];
+                else
+                    _values = [.. AllValues.Where(v => v.MatchesSearch(_searchText))];
 
-            await InvokeAsync(StateHasChanged);
+                await InvokeAsync(StateHasChanged);
+            }
 
         }
 
@@ -127,44 +140,18 @@ namespace HITSBlazor.Components.Inputs.RadioDropdown
             await ValueTask.CompletedTask;
         }
 
-        private async Task LoadDataAsync(bool append = false)
+        private async Task LoadRadioDataAsync(bool append = false)
         {
             if (DataLoaderMethod is not null)
             {
-                if (!append)
-                {
-                    ResetPagination();
-                    AllValues.Clear();
-                }
+                await LoadDataAsync(
+                    AllValues,
+                    () => DataLoaderMethod.Invoke(_currentPage, _searchText),
+                    append: append
+                );
 
-                StateHasChanged();
-
-                var listResponse = await DataLoaderMethod.Invoke(_currentPage, _searchText);
-
-                _totalCount = listResponse.Count;
-                if (listResponse.List.Count > 0)
-                {
-                    if (append)
-                        AllValues.AddRange(listResponse.List);
-                    else
-                    {
-                        AllValues.Clear();
-                        AllValues.AddRange(listResponse.List);
-                    }
-                    _values = [.. AllValues];
-
-                    IncrementPage();
-                }
-
-                StateHasChanged();
+                _values = AllValues.ToList();
             }
         }
-
-        protected override async Task OnLoadMoreItemsAsync()
-        {
-            await LoadDataAsync(append: true);
-        }
-
-        protected override int GetCurrentItemsCount() => _values.Count;
     }
 }

@@ -1,4 +1,5 @@
-﻿using HITSBlazor.Models.Users.Entities;
+﻿using HITSBlazor.Models.Common.Responses;
+using HITSBlazor.Models.Users.Entities;
 using HITSBlazor.Models.Users.Enums;
 using HITSBlazor.Models.Users.Requests;
 using HITSBlazor.Utils.Mocks.Users;
@@ -9,71 +10,38 @@ namespace HITSBlazor.Services.Users
     {
         private readonly GlobalNotificationService _globalNotificationService = globalNotificationService;
 
-        private List<User> _cachedUsers = [];
-        private DateTime _lastRefreshTime;
-        private readonly TimeSpan _cacheLifetime = TimeSpan.FromMinutes(5);
+        public event Action<User>? OnUserHasUpdated;
+        public event Action<User>? OnUserHasDeleted;
 
-        public event Action? OnUsersStateChanged;
-
-        private async Task RefreshCacheAsync()
-        {
-            _cachedUsers = MockUsers.GetAllUsers();
-            _lastRefreshTime = DateTime.UtcNow;
-        }
-
-        public async Task<List<User>> GetUsersAsync(
+        public async Task<ListDataResponse<User>> GetUsersAsync(
+            int page,
             string? searchText,
             string? orderBy,
             bool? byDescending,
             HashSet<RoleType>? selectedRoles
-        )
-        {
-            if (_cachedUsers.Count == 0 || DateTime.UtcNow - _lastRefreshTime > _cacheLifetime)
-                await RefreshCacheAsync();
+        ) => MockUsers.GetAllUsers(
+            page,
+            searchText: searchText,
+            orderBy: orderBy,
+            byDescending: byDescending,
+            selectedRoles: selectedRoles
+        );
 
-            var query = _cachedUsers.AsEnumerable();
-
-            if (selectedRoles?.Count > 0)
-                query = query.Where(u => u.Roles.Any(selectedRoles.Contains));
-
-            if (!string.IsNullOrWhiteSpace(searchText))
-                query = query.Where(u => u.FullName.Contains(searchText, StringComparison.CurrentCultureIgnoreCase));
-
-            if (!string.IsNullOrWhiteSpace(orderBy) && byDescending.HasValue)
-            {
-                query = (orderBy, byDescending.Value) switch
-                {
-                    (nameof(User.CreatedAt), true) => query.OrderByDescending(u => u.CreatedAt),
-                    (nameof(User.CreatedAt), false) => query.OrderBy(u => u.CreatedAt),
-                    _ => query
-                };
-            }
-
-            return [.. query];
-        }
-
+        //TODO: событие с изменение пользователя
         public async Task<bool> UpdateUser(UpdateUserRequest request)
         {
-            if (!MockUsers.UpdateUser(request))
+            var newUser = MockUsers.UpdateUser(request);
+            if (newUser is null)
             {
                 _globalNotificationService.ShowError("Не удалось обновить пользователя");
                 return false;
             }
 
-            var userForUpdate = _cachedUsers.FirstOrDefault(u => u.Id == request.Id);
-            if (userForUpdate is not null)
-            {
-                userForUpdate.Email = request.Email;
-                userForUpdate.FirstName = request.FirstName;
-                userForUpdate.LastName = request.LastName;
-                userForUpdate.Telephone = request.Telephone;
-                userForUpdate.StudyGroup = request.StudyGroup;
-            }
-
-            OnUsersStateChanged?.Invoke();
+            OnUserHasUpdated?.Invoke(newUser);
             return true;
         }
 
+        //TODO: событие с удалением пользователя
         public async Task<bool> DeleteUserAsync(User user)
         {
             if (!MockUsers.DeleteUser(user))
@@ -82,7 +50,7 @@ namespace HITSBlazor.Services.Users
                 return false;
             }
 
-            _cachedUsers.Remove(user);
+            OnUserHasDeleted?.Invoke(user);
             return true;
         }
     }

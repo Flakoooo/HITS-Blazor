@@ -7,6 +7,7 @@ using HITSBlazor.Models.Ideas.Enums;
 using HITSBlazor.Models.Users.Enums;
 using HITSBlazor.Services;
 using HITSBlazor.Services.Auth;
+using HITSBlazor.Services.Companies;
 using HITSBlazor.Services.Ideas;
 using HITSBlazor.Services.Modal;
 using HITSBlazor.Utils.Models;
@@ -90,38 +91,15 @@ namespace HITSBlazor.Pages.Ideas.IdeasList
             await LoadIdeasAsync(append: true);
         }
 
-        private async Task LoadIdeasAsync(bool append = false)
-        {
-            if (!append)
-            {
-                ResetPagination();
-                _ideas.Clear();
-            }
-
-            StateHasChanged();
-
-            var listResponse = await IdeasService.GetIdeasAsync(
+        private async Task LoadIdeasAsync(bool append = false) => await LoadDataAsync(
+            _ideas,
+            () => IdeasService.GetIdeasAsync(
                 _currentPage,
                 searchText: _searchText,
                 statusTypes: [.. SelectedStatuses.Select(s => s.Value)]
-            );
-
-            _totalCount = listResponse.Count;
-            if (listResponse.List.Count > 0)
-            {
-                if (append)
-                    _ideas.AddRange(listResponse.List);
-                else
-                {
-                    _ideas.Clear();
-                    _ideas.AddRange(listResponse.List);
-                }
-
-                IncrementPage();
-            }
-
-            StateHasChanged();
-        }
+            ),
+            append: append
+        );
 
         private void SetFilterByRole(RoleType? activeRole)
         {
@@ -242,9 +220,11 @@ namespace HITSBlazor.Pages.Ideas.IdeasList
 
         private void IdeaHasDeleted(Idea idea)
         {
-            _ideas.Remove(idea);
-            --_totalCount;
-            StateHasChanged();
+            if (_ideas.Remove(idea))
+            {
+                --_totalCount;
+                StateHasChanged();
+            }
         }
 
         private void ChangeIdeasCheckStatus(Guid ideaId, bool isChecked)

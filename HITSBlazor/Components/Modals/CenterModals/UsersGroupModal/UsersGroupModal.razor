@@ -9,48 +9,31 @@
 @using HITSBlazor.Utils.Models
 
 <div @onclick:stopPropagation="true" class="users-group-modal p-3 bg-white rounded-3">
-    @if (_isLoading)
-    {
-        <div class="w-100 d-flex justify-content-center">
-            <Placeholder Width="w-50" />
-        </div>
-        <Placeholder Height="PlaceholderHeight.Small" />
-        <div class="d-flex gap-3">
-            <div class="w-50 d-flex flex-column gap-2">
-                <Placeholder />
-                <Placeholder Height="PlaceholderHeight.Medium" />
-            </div>
-            <div class="w-50 d-flex flex-column gap-2">
-                <Placeholder />
-                <Placeholder Height="PlaceholderHeight.Medium" />
-            </div>
-        </div>
-        <Placeholder Height="PlaceholderHeight.Small" />
-        <Placeholder Height="PlaceholderHeight.Small" />
-    }
-    else
-    {
-        <CenterModalHeader HeaderText="@(UsersGroupId.HasValue ? "Редактирование группы" : "Создание группы")" />
-        <Input Label="Название группы:"
-               Placeholder="Введите название группы"
-               @bind-Value="UsersGroupName" />
-        <div class="d-flex justify-content-between gap-3">
-            <UsersColumn HeaderText="Пользователи:"
-                         AllUsers="_users"
-                         SelectedUserChanged="SelectUser" />
-            <UsersColumn HeaderText="@($"Пользователи в группе: {_groupUsers.Count}")"
-                         AllUsers="_groupUsers"
-                         SelectedUserChanged="UnSelectUser" />
-        </div>
-        <CheckboxDropdown T="EnumViewModel<RoleType>"
-                          AllValues="AllRoles"
-                          Label="Выберите тип группы:"
-                          Placeholder="Выбрано"
-                          @bind-SelectedValues="SelectedRoles" />
-        <Button Variant="ButtonVariant.Primary"
-                InProgress="_submitting"
-                Text="@(UsersGroupId.HasValue ? "Сохранить изменения" : "Добавить")"
-                LoadingText="@(UsersGroupId.HasValue ? "Сохранение" : "Добавление")"
-                OnButtonClick="SendUsersGroup" />
-    }
+    <CenterModalHeader IsLoading="_isLoading" HeaderText="@(UsersGroupId.HasValue ? "Редактирование группы" : "Создание группы")" />
+    <Input IsLoading="_isLoading"
+           Label="Название группы:"
+           Placeholder="Введите название группы"
+           @bind-Value="UsersGroupName" />
+    <div class="d-flex justify-content-between gap-3">
+        <UsersColumn IsLoading="_isLoading"
+                     HeaderText="Пользователи:"
+                     SelectedUserChanged="SelectUser"
+                     DataLoaderMethod="async (page, searchText) => await UserService.GetUsersAsync(page, searchText: searchText)" />
+        <UsersColumn IsLoading="_isLoading"
+                     HeaderText="@($"Пользователи в группе: {_groupUsers.Count}")"
+                     AllUsers="_groupUsers.ToList()"
+                     SelectedUserChanged="UnSelectUser" />
+    </div>
+    <CheckboxDropdown T="EnumViewModel<RoleType>"
+                      IsLoading="_isLoading"
+                      AllValues="AllRoles"
+                      Label="Выберите тип группы:"
+                      Placeholder="Выбрано"
+                      @bind-SelectedValues="SelectedRoles" />
+    <Button Variant="ButtonVariant.Primary"
+            IsLoading="_isLoading"
+            InProgress="_submitting"
+            Text="@(UsersGroupId.HasValue ? "Сохранить изменения" : "Добавить")"
+            LoadingText="@(UsersGroupId.HasValue ? "Сохранение" : "Добавление")"
+            OnButtonClick="SendUsersGroup" />
 </div>

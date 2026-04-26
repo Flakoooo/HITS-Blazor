@@ -167,7 +167,8 @@ namespace HITSBlazor.Pages.Teams.TeamsList
             SeacrhSkillText = string.Empty;
             SelectedSkillIds = [];
 
-            _teamTableHeader.ForEach(h => h.IsOrdered = null);
+            foreach (var header in _teamTableHeader) 
+                header.IsOrdered = null;
 
             ResetPagination();
 

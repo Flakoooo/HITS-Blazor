@@ -11,14 +11,16 @@
 @using HITSBlazor.Components.Tables.TableComponent
 @using HITSBlazor.Components.Tables.TableHeader
 @using HITSBlazor.Components.Typography
+@using HITSBlazor.Pages
 @using HITSBlazor.Services.Modal
+@inherits ListPageDataLoader
 
 <div @onclick:stopPropagation="true" class="invitation-modal p-3 bg-white rounded">
     <CenterModalHeader IsLoading="_isLoading" HeaderText="Выберите пользователей для приглашения" />
     <div class="invitation-modal-table">
         <div class="w-100">
-            <InputSearch IsLoading="_isLoading" Width="50" Value="@SeacrhText" ValueChanged="(value) => SearchUser(value)" />
-            <TableComponent IsLoading="_isLoading" HeaderItems="_tableHeader" TableActionMenuIsEnable="true">
+            <InputSearch IsLoading="_isLoading" Width="50" Value="@SeacrhText" ValueChanged="(value) => SearchUser(value)" DebounceDelay="500" />
+            <TableComponent IsLoading="_isLoading" HeaderItems="_tableHeader" TableActionMenuIsEnable="true" @ref="_tableComponent">
                 <TableContent>
                     @foreach (var user in _users)
                     {
@@ -37,7 +39,7 @@
                     }
                 </TableContent>
                 <FilterContent>
-                    <SkillFilter OnFilterChanged="LoadUsersAsync"
+                    <SkillFilter OnFilterChanged="FiltersHasUpdated"
                                  @bind-SeacrhSkillText="SearchSkillText"
                                  @bind-SelectedSkillIds="SelectedSkillIds" />
                     <ResetFilterButton ResetMethod="ResetFilters" />

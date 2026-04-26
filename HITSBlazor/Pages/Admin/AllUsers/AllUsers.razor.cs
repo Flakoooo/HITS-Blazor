@@ -1,7 +1,9 @@
 ﻿using HITSBlazor.Components.ActionMenus.BaseActionMenu;
+using HITSBlazor.Components.Button;
 using HITSBlazor.Components.Modals.CenterModals.UpdateUserModal;
+using HITSBlazor.Components.Tables.TableComponent;
 using HITSBlazor.Components.Tables.TableHeader;
-using HITSBlazor.Models.Common.Enums;
+using HITSBlazor.Models.Ideas.Entities;
 using HITSBlazor.Models.Users.Entities;
 using HITSBlazor.Models.Users.Enums;
 using HITSBlazor.Services.Auth;
@@ -15,7 +17,7 @@ namespace HITSBlazor.Pages.Admin.AllUsers
 {
     [Authorize]
     [Route("/admin/users")]
-    public partial class AllUsers : IDisposable
+    public partial class AllUsers
     {
         [Inject]
         private IAuthService AuthService { get; set; } = null!;
@@ -27,6 +29,8 @@ namespace HITSBlazor.Pages.Admin.AllUsers
         private ModalService ModalService { get; set; } = null!;
 
         private bool _isLoading = true;
+
+        private TableComponent? _tableComponent;
 
         private string SeacrhText { get; set; } = string.Empty;
         private string? _orderBy = null;
@@ -55,32 +59,50 @@ namespace HITSBlazor.Pages.Admin.AllUsers
         private readonly List<EnumViewModel<RoleType>> _filterRoleTypes
             = [.. Enum.GetValues<RoleType>().Select(s => new EnumViewModel<RoleType>(s))];
 
-        private List<User> _users = [];
+        private readonly List<User> _users = [];
 
         protected override async Task OnInitializedAsync()
         {
             _isLoading = true;
 
-            UserService.OnUsersStateChanged += StateHasChanged;
+            UserService.OnUserHasUpdated += UserHasUpdated;
+            UserService.OnUserHasDeleted += UserHasDeleted;
+
             await LoadUsersAsync();
 
             _isLoading = false;
+            MarkAsInitialized();
         }
 
-        private async Task LoadUsersAsync()
+        protected override async Task AdditionalAfterRenderMethod()
         {
-            _users = await UserService.GetUsersAsync(
+            if (_tableComponent != null)
+                _tableContainer = _tableComponent.ScrollContainer;
+        }
+
+        protected override int GetCurrentItemsCount() => _users.Count;
+
+        protected override async Task OnLoadMoreItemsAsync()
+        {
+            await LoadUsersAsync(append: true);
+        }
+
+        private async Task LoadUsersAsync(bool append = false) => await LoadDataAsync(
+            _users,
+            () => UserService.GetUsersAsync(
+                _currentPage,
                 searchText: SeacrhText,
                 orderBy: _orderBy,
                 byDescending: _byDescending,
                 selectedRoles: [.. SelectedUserRoles.Select(s => s.Value)]
-            );
-            await InvokeAsync(StateHasChanged);
-        }
+            ),
+            append: append
+        );
 
         private async Task SearchUser(string searchText)
         {
             SeacrhText = searchText;
+            ResetPagination();
             await LoadUsersAsync();
         }
 
@@ -88,6 +110,13 @@ namespace HITSBlazor.Pages.Admin.AllUsers
         {
             _orderBy = value;
             _byDescending = state;
+            ResetPagination();
+            await LoadUsersAsync();
+        }
+
+        private async Task FiltersHasChanged()
+        {
+            ResetPagination();
             await LoadUsersAsync();
         }
 
@@ -95,6 +124,11 @@ namespace HITSBlazor.Pages.Admin.AllUsers
         {
             SelectedUserRoles.Clear();
             InTeam = null;
+
+            foreach (var header in _userTableHeader) 
+                header.IsOrdered = null;
+
+            ResetPagination();
             await LoadUsersAsync();
         }
 
@@ -129,26 +163,57 @@ namespace HITSBlazor.Pages.Admin.AllUsers
                 if (context.Item is Guid guid)
                     ShowUserProfile(guid);
             }
-            else if (context.Action == MenuAction.Edit)
+            else if (context.Item is User user)
             {
-                if (context.Item is User user)
+                if (context.Action == MenuAction.Edit)
+                {
                     ModalService.Show<UpdateUserModal>(
-                        ModalType.Center, 
+                        ModalType.Center,
                         parameters: new Dictionary<string, object> { [nameof(UpdateUserModal.UserForUpdate)] = user }
                     );
-            }
-            else if (context.Action == MenuAction.Delete)
-            {
-                if (context.Item is not User user || !await UserService.DeleteUserAsync(user))
-                    return;
-
-                _users.Remove(user);
+                }
+                else if (context.Action == MenuAction.Delete)
+                {
+                    ModalService.ShowConfirmModal(
+                        $"Вы действительно хотите удалить {user.FullName}?",
+                        () => UserService.DeleteUserAsync(user),
+                        confirmButtonVariant: ButtonVariant.Danger,
+                        confirmButtonText: "Удалить"
+                    );
+                }
             }
         }
 
-        public void Dispose()
+        private void UserHasUpdated(User updatedUser)
         {
-            UserService.OnUsersStateChanged -= StateHasChanged;
+            var user = _users.FirstOrDefault(c => c.Id == updatedUser.Id);
+            if (user is null) return;
+
+            user.Email = updatedUser.Email;
+            user.StudyGroup = updatedUser.StudyGroup;
+            user.FirstName = updatedUser.FirstName;
+            user.LastName = updatedUser.LastName;
+            user.Telephone = updatedUser.Telephone;
+            user.Roles = updatedUser.Roles;
+
+            StateHasChanged();
+        }
+
+        private void UserHasDeleted(User user)
+        {
+            if (_users.Remove(user))
+            {
+                --_totalCount;
+                StateHasChanged();
+            }
+        }
+
+        protected override async ValueTask DisposeAsyncCore()
+        {
+            UserService.OnUserHasUpdated -= UserHasUpdated;
+            UserService.OnUserHasDeleted -= UserHasDeleted;
+
+            await ValueTask.CompletedTask;
         }
     }
 }

@@ -247,16 +247,17 @@ namespace HITSBlazor.Pages.Teams.TeamsCreate
             ModalService.Show<AddTeamMembersModal>(ModalType.Center);
         }
 
-        private void SetTeamInvitationMembers(ICollection<User> users)
+        private async void SetTeamInvitationMembers(ICollection<User> users)
         {
             MembersForInviting = users.ToList();
-
             MembersForInvitingSkills.Clear();
-            MembersForInviting.ForEach(async m =>
-                (await UserSkillService.GetUserSkillsAsync(m.Id)).ForEach(s =>
-                    MembersForInvitingSkills.Add(s)
-                )
-            );
+
+            foreach (var member in MembersForInviting)
+            {
+                var userSkills = await UserSkillService.GetUserSkillsAsync(member.Id);
+                foreach (var skill in userSkills)
+                    MembersForInvitingSkills.Add(skill);
+            }
         }
 
         private static ApexChartOptions<Skill> GetRadarChartOptions() => new()

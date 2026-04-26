@@ -1,4 +1,5 @@
 ﻿using HITSBlazor.Components.ActionMenus.BaseActionMenu;
+using HITSBlazor.Components.Tables.TableComponent;
 using HITSBlazor.Components.Tables.TableHeader;
 using HITSBlazor.Models.Users.Entities;
 using HITSBlazor.Services.Modal;
@@ -21,13 +22,15 @@ namespace HITSBlazor.Components.Modals.CenterModals.AddTeamMembersModal
 
         private bool _isLoading = true;
 
+        private TableComponent? _tableComponent;
+
         private string SeacrhText { get; set; } = string.Empty;
-        private List<User> _users = [];
+        private readonly List<User> _users = [];
 
         private string SearchSkillText { get; set; } = string.Empty;
         private HashSet<Guid> SelectedSkillIds { get; set; } = [];
 
-        private HashSet<User> _selectedUsers = [];
+        private readonly HashSet<User> _selectedUsers = [];
 
         private readonly List<TableHeaderItem> _tableHeader = 
         [
@@ -43,18 +46,42 @@ namespace HITSBlazor.Components.Modals.CenterModals.AddTeamMembersModal
             await LoadUsersAsync();
 
             _isLoading = false;
+            MarkAsInitialized();
         }
 
-        private async Task LoadUsersAsync()
+        protected override async Task OnLoadMoreItemsAsync()
+            => await LoadUsersAsync(append: true);
+
+        protected override async Task AdditionalAfterRenderMethod()
         {
-            _users = await UserService.GetUsersAsync(
-                searchText: SeacrhText
+            if (_tableComponent != null)
+                _tableContainer = _tableComponent.ScrollContainer;
+        }
+
+        protected override int GetCurrentItemsCount() => _users.Count;
+
+        private async Task LoadUsersAsync(bool append = false)
+        {
+            await LoadDataAsync(
+                _users,
+                () => UserService.GetUsersAsync(
+                    _currentPage,
+                    searchText: SeacrhText
+                ),
+                append: append
             );
         }
 
         private async Task SearchUser(string value)
         {
             SeacrhText = value;
+            ResetPagination();
+            await LoadUsersAsync();
+        }
+
+        private async Task FiltersHasUpdated()
+        {
+            ResetPagination();
             await LoadUsersAsync();
         }
 
@@ -62,6 +89,7 @@ namespace HITSBlazor.Components.Modals.CenterModals.AddTeamMembersModal
         {
             SearchSkillText = string.Empty;
             SelectedSkillIds = [];
+            ResetPagination();
             await LoadUsersAsync();
         }
 

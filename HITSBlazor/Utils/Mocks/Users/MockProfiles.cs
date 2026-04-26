@@ -13,7 +13,7 @@ namespace HITSBlazor.Utils.Mocks.Users
         {
             var profiles = new List<Profile>();
 
-            foreach (var user in MockUsers.GetAllUsers())
+            foreach (var user in MockUsers.GetAllMockUsers())
             {
                 var profile = CreateProfile(user.Id);
                 if (profile != null) profiles.Add(profile);

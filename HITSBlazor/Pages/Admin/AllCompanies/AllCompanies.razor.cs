@@ -1,15 +1,13 @@
 ﻿using HITSBlazor.Components.ActionMenus.BaseActionMenu;
 using HITSBlazor.Components.Button;
 using HITSBlazor.Components.Modals.CenterModals.CompanyModal;
+using HITSBlazor.Components.Tables.TableComponent;
 using HITSBlazor.Components.Tables.TableHeader;
 using HITSBlazor.Models.Common.Entities;
-using HITSBlazor.Models.Ideas.Entities;
-using HITSBlazor.Services.Auth;
 using HITSBlazor.Services.Companies;
 using HITSBlazor.Services.Modal;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
-using System;
 
 namespace HITSBlazor.Pages.Admin.AllCompanies
 {
@@ -25,9 +23,11 @@ namespace HITSBlazor.Pages.Admin.AllCompanies
 
         private bool _isLoading = true;
 
+        private TableComponent? _tableComponent;
+
         private string _searchText = string.Empty;
 
-        private List<Company> _companies = [];
+        private readonly List<Company> _companies = [];
 
         private static List<TableHeaderItem> TableHeaderItems => 
         [
@@ -49,6 +49,12 @@ namespace HITSBlazor.Pages.Admin.AllCompanies
             MarkAsInitialized();
         }
 
+        protected override async Task AdditionalAfterRenderMethod()
+        {
+            if (_tableComponent != null)
+                _tableContainer = _tableComponent.ScrollContainer;
+        }
+
         protected override int GetCurrentItemsCount() => _companies.Count;
 
         protected override async Task OnLoadMoreItemsAsync()
@@ -56,39 +62,14 @@ namespace HITSBlazor.Pages.Admin.AllCompanies
             await LoadCompaniesAsync(append: true);
         }
 
-        private async Task LoadCompaniesAsync(bool append = false)
-        {
-            Console.WriteLine("чекаем работу");
-            if (!append)
-            {
-                ResetPagination();
-                _companies.Clear();
-            }
-
-            StateHasChanged();
-
-            var listResponse = await CompanyService.GetCompaniesAsync(
+        private async Task LoadCompaniesAsync(bool append = false) => await LoadDataAsync(
+            _companies,
+            () => CompanyService.GetCompaniesAsync(
                 _currentPage,
                 searchText: _searchText
-            );
-
-            Console.WriteLine($"page {_currentPage}");
-            _totalCount = listResponse.Count;
-            if (listResponse.List.Count > 0)
-            {
-                if (append)
-                    _companies.AddRange(listResponse.List);
-                else
-                {
-                    _companies.Clear();
-                    _companies.AddRange(listResponse.List);
-                }
-
-                IncrementPage();
-            }
-
-            StateHasChanged();
-        }
+            ),
+            append: append
+        );
 
         private async Task SeacrhCompany(string value)
         {
@@ -97,20 +78,12 @@ namespace HITSBlazor.Pages.Admin.AllCompanies
             await LoadCompaniesAsync();
         }
 
-        private void ShowCompanyModal(Guid? guid = null)
-        {
-            if (guid.HasValue)
-            {
-                ModalService.Show<CompanyModal>(
-                    ModalType.Center,
-                    parameters: new Dictionary<string, object> { [nameof(CompanyModal.CompanyId)] = guid }
-                );
-            }
-            else
-            {
-                ModalService.Show<CompanyModal>(ModalType.Center);
-            }
-        }
+        private void ShowCompanyModal(Guid? guid = null) => ModalService.Show<CompanyModal>(
+            ModalType.Center,
+            parameters: guid.HasValue
+                ? new Dictionary<string, object> { [nameof(CompanyModal.CompanyId)] = guid.Value }
+                : null
+        );
 
         private async Task OnCompanyAction(TableActionContext context)
         {
@@ -152,9 +125,11 @@ namespace HITSBlazor.Pages.Admin.AllCompanies
 
         private void CompanyHasDeleted(Company company)
         {
-            _companies.Remove(company);
-            --_totalCount;
-            StateHasChanged();
+            if (_companies.Remove(company))
+            {
+                --_totalCount;
+                StateHasChanged();
+            }
         }
 
         protected override async ValueTask DisposeAsyncCore()

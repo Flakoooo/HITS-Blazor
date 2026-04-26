@@ -1,17 +1,14 @@
 ﻿using HITSBlazor.Models.Common.Entities;
 using HITSBlazor.Models.Common.Responses;
 using HITSBlazor.Models.Users.Entities;
-using HITSBlazor.Services.Auth;
 using HITSBlazor.Utils.Mocks.Common;
 
 namespace HITSBlazor.Services.Companies
 {
     public class MockCompanyService(
-        IAuthService authService, 
         GlobalNotificationService globalNotificationService
     ) : ICompanyService
     {
-        private readonly IAuthService _authService = authService;
         private readonly GlobalNotificationService _globalNotificationService = globalNotificationService;
 
         public event Action<Company>? OnCompanyHasCreated;
@@ -20,13 +17,10 @@ namespace HITSBlazor.Services.Companies
 
         public async Task<ListDataResponse<Company>> GetCompaniesAsync(
             int page, string? searchText
-        )
-        {
-            return MockCompanies.GetAllCompaniesByQueryParams(
-                page, 
-                searchText: searchText
-            );
-        }
+        ) => MockCompanies.GetAllCompaniesByQueryParams(
+            page,
+            searchText: searchText
+        );
 
         public async Task<Company?> GetCompanyByIdAsync(Guid companyId)
         {
@@ -43,9 +37,9 @@ namespace HITSBlazor.Services.Companies
             return MockCompanies.GetCompanyByName(name);
         }
 
-        public async Task<bool> CreateCompanyAsync(string name, User owner, List<User> members)
+        public async Task<bool> CreateCompanyAsync(string name, User owner, HashSet<User> members)
         {
-            var company = MockCompanies.CreateCompany(name, owner.Id, [.. members.Select(u => u.Id)]);
+            var company = MockCompanies.CreateCompany(name, owner.Id, members.Select(u => u.Id).ToList());
             if (company is null)
             {
                 _globalNotificationService.ShowError("Не удалось создать команду");
@@ -57,9 +51,9 @@ namespace HITSBlazor.Services.Companies
             return true;
         }
 
-        public async Task<bool> UpdateCompanyAsync(Guid companyId, string name, User owner, List<User> members)
+        public async Task<bool> UpdateCompanyAsync(Guid companyId, string name, User owner, HashSet<User> members)
         {
-            var company = MockCompanies.UpdateCompany(companyId, name, owner.Id, [.. members.Select(u => u.Id)]);
+            var company = MockCompanies.UpdateCompany(companyId, name, owner.Id, members.Select(u => u.Id).ToList());
             if (company is null)
             {
                 _globalNotificationService.ShowError("Не удалось обновить команду");

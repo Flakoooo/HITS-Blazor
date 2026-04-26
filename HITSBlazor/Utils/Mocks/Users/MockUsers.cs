@@ -1,4 +1,5 @@
-﻿using HITSBlazor.Models.Users.Entities;
+﻿using HITSBlazor.Models.Common.Responses;
+using HITSBlazor.Models.Users.Entities;
 using HITSBlazor.Models.Users.Enums;
 using HITSBlazor.Models.Users.Requests;
 
@@ -304,21 +305,55 @@ namespace HITSBlazor.Utils.Mocks.Users
             }
         ];
 
+        public static List<User> GetAllMockUsers() => _users;
+
+        public static ListDataResponse<User> GetAllUsers(
+            int page,
+            int pageSize = 20,
+            string? searchText = null,
+            string? orderBy = null,
+            bool? byDescending = null,
+            HashSet<RoleType>? selectedRoles = null
+        )
+        {
+            var query = _users.AsEnumerable();
+
+            if (selectedRoles?.Count > 0)
+                query = query.Where(u => u.Roles.Any(selectedRoles.Contains));
+
+            if (!string.IsNullOrWhiteSpace(searchText))
+                query = query.Where(u => u.FullName.Contains(searchText, StringComparison.CurrentCultureIgnoreCase));
+
+            if (!string.IsNullOrWhiteSpace(orderBy) && byDescending.HasValue)
+            {
+                query = (orderBy, byDescending.Value) switch
+                {
+                    (nameof(User.CreatedAt), true) => query.OrderByDescending(u => u.CreatedAt),
+                    (nameof(User.CreatedAt), false) => query.OrderBy(u => u.CreatedAt),
+                    _ => query
+                };
+            }
+
+            int count = query.Count();
+
+            query = query.Skip((page - 1) * pageSize).Take(pageSize);
+
+            return new ListDataResponse<User> { Count = count, List = query.ToList() };
+        }
+
         public static User? GetUserById(Guid id)
             => _users.FirstOrDefault(u => u.Id == id);
 
         public static List<string> GetUserEmails() 
             => [.. _users.Select(u => u.Email)];
 
-        public static List<User> GetAllUsers() => _users;
-
         public static List<User> GetUsersByRole(RoleType role) 
             => [.. _users.Where(u => u.Roles.Contains(role))];
 
-        public static bool UpdateUser(UpdateUserRequest updatedUser)
+        public static User? UpdateUser(UpdateUserRequest updatedUser)
         {
             var user = _users.FirstOrDefault(u => u.Id == updatedUser.Id);
-            if (user is null) return false;
+            if (user is null) return null;
 
             user.Email = updatedUser.Email;
             user.FirstName = updatedUser.FirstName;
@@ -326,7 +361,7 @@ namespace HITSBlazor.Utils.Mocks.Users
             user.Telephone = updatedUser.Telephone;
             user.StudyGroup = updatedUser.StudyGroup;
 
-            return true;
+            return user;
         }
 
         public static bool DeleteUser(User user) => _users.Remove(user);

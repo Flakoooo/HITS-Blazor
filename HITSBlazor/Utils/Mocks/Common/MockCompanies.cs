@@ -1,8 +1,6 @@
 ﻿using HITSBlazor.Models.Common.Entities;
 using HITSBlazor.Models.Common.Responses;
-using HITSBlazor.Models.Ideas.Entities;
 using HITSBlazor.Models.Users.Entities;
-using HITSBlazor.Models.Users.Enums;
 using HITSBlazor.Utils.Mocks.Users;
 
 namespace HITSBlazor.Utils.Mocks.Common
@@ -13,16 +11,7 @@ namespace HITSBlazor.Utils.Mocks.Common
         public static Guid GazpromId { get; } = Guid.NewGuid();
         public static Guid RosneftId { get; } = Guid.NewGuid();
 
-        private static readonly List<Company> _companies = CreateCompaniesBig();
-
-        private static List<Company> CreateCompaniesBig()
-        {
-            var companies = new List<Company>();
-            for (int i = 0; i < 15; ++i)
-                companies = [.. companies, .. CreateCompanies()];
-
-            return companies;
-        }
+        private static readonly List<Company> _companies = CreateCompanies();
 
         private static List<Company> CreateCompanies()
         {

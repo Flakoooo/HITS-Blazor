@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using HITSBlazor.Models.Common.Responses;
+using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 
 namespace HITSBlazor.Pages
@@ -9,6 +10,7 @@ namespace HITSBlazor.Pages
         protected IJSRuntime JSRuntime { get; set; } = null!;
 
         private int _isLoadingMoreFlag = 0;
+        private bool _isFirstLoad = true;
 
         protected bool _isLoadingMore = false;
         protected bool _isInitialized = false;
@@ -36,6 +38,42 @@ namespace HITSBlazor.Pages
             {
                 Console.WriteLine($"Ошибка инициализации дозагрузки данных: {ex.Message}");
             }
+        }
+
+        protected async Task LoadDataAsync<T>(
+            List<T> collection, Func<Task<ListDataResponse<T>>> method, bool append = false
+        )
+        {
+            if (!append)
+            {
+                ResetPagination();
+                collection.Clear();
+            }
+
+            StateHasChanged();
+
+            var listResponse = await method.Invoke();
+
+            _totalCount = listResponse.Count;
+            if (listResponse.List.Count > 0)
+            {
+                if (append)
+                    collection.AddRange(listResponse.List);
+                else
+                {
+                    collection.Clear();
+                    collection.AddRange(listResponse.List);
+                }
+
+                IncrementPage();
+            }
+
+            StateHasChanged();
+
+            if (!append && !_isFirstLoad)
+                await ReinitializeScrollIfNeededAsync();
+
+            _isFirstLoad = false;
         }
 
         private async Task LoadMoreItemsInternalAsync()
@@ -125,6 +163,26 @@ namespace HITSBlazor.Pages
                 catch (Exception ex)
                 {
                     Console.WriteLine($"Ошибка остановки бесконечного скролла: {ex.Message}");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Переинициализирует Infinite Scroll (вызывать после сброса данных: поиск, фильтры)
+        /// </summary>
+        protected async Task ReinitializeScrollIfNeededAsync()
+        {
+            if (!HasMoreItems()) return;
+
+            if (_jsModule != null)
+            {
+                try
+                {
+                    await _jsModule.InvokeVoidAsync("initializeInfiniteScroll", _tableContainer, _dotNetHelper);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Ошибка переинициализации скролла: {ex.Message}");
                 }
             }
         }

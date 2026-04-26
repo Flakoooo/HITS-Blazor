@@ -13,15 +13,15 @@
 @using HITSBlazor.Components.Typography
 @inherits ListPageDataLoader
 
-<div class="h-auto bg-white overflow-y-scroll" @ref="_tableContainer">
+<div class="h-auto bg-white">
     <div class="w-100 p-3">
         <ListPageHeader IsLoading="_isLoading"
                         HeaderText="@($"Список компаний: {_totalCount}")"
                         ShowCreateButton="true"
                         CreateButtonText="Создать компанию" 
                         OnButtonClick="@(() => ShowCompanyModal())" />
-        <InputSearch Width="50" IsLoading="_isLoading" ValueChanged="@((value) => SeacrhCompany(value))" />
-        <TableComponent IsLoading="_isLoading" IsDataLoading="_isLoadingMore" HeaderItems="TableHeaderItems" TableActionMenuIsEnable="true">
+        <InputSearch Width="50" DebounceDelay="500" IsLoading="_isLoading" ValueChanged="@((value) => SeacrhCompany(value))" />
+        <TableComponent IsLoading="_isLoading" IsDataLoading="_isLoadingMore" HeaderItems="TableHeaderItems" TableActionMenuIsEnable="true" @ref="_tableComponent">
             <TableContent>
                 @foreach (var company in _companies)
                 {

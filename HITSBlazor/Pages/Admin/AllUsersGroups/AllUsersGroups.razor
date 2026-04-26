@@ -3,6 +3,7 @@
 @using HITSBlazor.Components.Button
 @using HITSBlazor.Components.Filters.CheckboxFilter
 @using HITSBlazor.Components.Filters.ResetFilterButton
+@using HITSBlazor.Components.InputSearch
 @using HITSBlazor.Components.ListPageComponents.ListPageHeader
 @using HITSBlazor.Components.ListPageComponents.ListPageSearch
 @using HITSBlazor.Components.ListPageComponents.ListPageTable
@@ -10,63 +11,59 @@
 @using HITSBlazor.Components.Statuses.EnumStatus
 @using HITSBlazor.Components.Tables.TableActionMenu
 @using HITSBlazor.Components.Tables.TableBodyRow
+@using HITSBlazor.Components.Tables.TableComponent
 @using HITSBlazor.Components.Tables.TableHeader
 @using HITSBlazor.Components.Typography
 @using HITSBlazor.Models.Users.Enums
 @using HITSBlazor.Utils.EnumStyles
 @using HITSBlazor.Utils.Models
+@inherits ListPageDataLoader
 
-<div class="page-content-with-header bg-white overflow-y-scroll">
-    @if (_isLoading)
-    {
-        <TablePlaceholder />
-    }
-    else
-    {
-        <div class="w-100 bg-white p-3">
-            <ListPageHeader IsLoading="_isLoading"
-                            HeaderText="@($"Группы пользователей: {_usersGroups.Count}")"
-                            ShowCreateButton="true"
-                            CreateButtonText="Создать группу" 
-                            OnButtonClick="@(() => ShowUsersGroupModal())"/>
-            <ListPageSearch IsLoading="_isLoading" ValueChanged="@((value) => SearchUsersGroup(value))" />
-            <ListPageTable IsLoading="_isLoading" TableActionMenuIsEnable="true" HeaderItems="UsersGroupsTableHeader">
-                <TableContent>
-                    <tbody>
-                        @foreach (var usersGroup in _usersGroups)
-                        {
-                            <tr>
-                                <TableBodyRow>
-                                    <div class="text-primary data-link" @onclick="() => ShowUsersGroupModal(usersGroup.Id)">
-                                        @usersGroup.Name
-                                    </div>
-                                </TableBodyRow>
-                                <TableBodyRow>
-                                    @foreach (var role in usersGroup.Roles)
-                                    {
-                                        <EnumStatus Statustype="role" />
-                                    }
-                                </TableBodyRow>
-                                <TableActionMenu ItemId="usersGroup.Id"
-                                                 OnAction="OnUsersGroupAction"
-                                                 ActionIds="@(new Dictionary<MenuAction, object> { 
-                                                     [MenuAction.Edit] = usersGroup.Id,
-                                                     [MenuAction.Delete] = usersGroup
-                                                 })"/>
-                            </tr>
-                        }
-                    </tbody>
-                </TableContent>
-                <FilterContent>
-                    <CheckboxFilter T="EnumViewModel<RoleType>" 
-                                    IsLoading="_isLoading"
-                                    Label="Роли" 
-                                    AllValues="_filterRoleTypes"
-                                    FilterChanged="LoadUsersGroupsAsync"
-                                    @bind-SelectedValues="SelectedRoles" />
-                    <ResetFilterButton IsLoading="_isLoading" ResetMethod="ResetFilters" />
-                </FilterContent>
-            </ListPageTable>
-        </div>
-    }
+<div class="h-auto bg-white">
+    <div class="w-100 p-3">
+        <ListPageHeader IsLoading="_isLoading"
+                        HeaderText="@($"Группы пользователей: {_usersGroups.Count}")"
+                        ShowCreateButton="true"
+                        CreateButtonText="Создать группу" 
+                        OnButtonClick="@(() => ShowUsersGroupModal())"/>
+        <ListPageSearch IsLoading="_isLoading" ValueChanged="@((value) => SearchUsersGroup(value))" />
+        <InputSearch IsLoading="_isLoading" ValueChanged="@((value) => SearchUsersGroup(value))" DebounceDelay="500" />
+        <TableComponent IsLoading="_isLoading" TableActionMenuIsEnable="true" HeaderItems="UsersGroupsTableHeader" @ref="_tableComponent">
+            <TableContent>
+                <tbody>
+                    @foreach (var usersGroup in _usersGroups)
+                    {
+                        <tr>
+                            <TableBodyRow>
+                                <div class="text-primary data-link" @onclick="() => ShowUsersGroupModal(usersGroup.Id)">
+                                    @usersGroup.Name
+                                </div>
+                            </TableBodyRow>
+                            <TableBodyRow>
+                                @foreach (var role in usersGroup.Roles)
+                                {
+                                    <EnumStatus Statustype="role" />
+                                }
+                            </TableBodyRow>
+                            <TableActionMenu ItemId="usersGroup.Id"
+                                                OnAction="OnUsersGroupAction"
+                                                ActionIds="@(new Dictionary<MenuAction, object> { 
+                                                    [MenuAction.Edit] = usersGroup.Id,
+                                                    [MenuAction.Delete] = usersGroup
+                                                })"/>
+                        </tr>
+                    }
+                </tbody>
+            </TableContent>
+            <FilterContent>
+                <CheckboxFilter T="EnumViewModel<RoleType>" 
+                                IsLoading="_isLoading"
+                                Label="Роли" 
+                                AllValues="_filterRoleTypes"
+                                FilterChanged="FiltersHasChanged"
+                                @bind-SelectedValues="SelectedRoles" />
+                <ResetFilterButton IsLoading="_isLoading" ResetMethod="ResetFilters" />
+            </FilterContent>
+        </TableComponent>
+    </div>
 </div>

@@ -31,8 +31,7 @@ namespace HITSBlazor.Components.Modals.CenterModals.CompanyModal
         private string CompanyName { get; set; } = string.Empty;
         private User? SelectedOwner { get; set; }
 
-        private List<User> _users = [];
-        private List<User> _companyUsers = [];
+        private HashSet<User> _companyUsers = [];
 
         protected override async Task OnInitializedAsync()
         {
@@ -43,40 +42,30 @@ namespace HITSBlazor.Components.Modals.CenterModals.CompanyModal
                 var company = await CompanyService.GetCompanyByIdAsync(CompanyId.Value);
                 CompanyName = company?.Name ?? string.Empty;
                 SelectedOwner = company?.Owner;
-                _companyUsers = company?.Members ?? [];
-                _users = [.. (await UserService.GetUsersAsync()).Where(u => !_companyUsers.Contains(u))];
-            }
-            else
-            {
-                _users = await UserService.GetUsersAsync();
+                _companyUsers = company?.Members.ToHashSet() ?? [];
             }
 
             _isLoading = false;
         }
 
-        private void SelectUser(User user)
-        {
-            _companyUsers.Add(user);
-            _users.Remove(user);
-        }
+        private void SelectUser(User user) => _companyUsers.Add(user);
 
-        private void UnSelectUser(User user)
+        private void UnSelectUser(User user) => _companyUsers.Remove(user);
+
+        private bool CheckValidValues()
         {
-            _companyUsers.Remove(user);
-            _users.Add(user);
+            if (string.IsNullOrWhiteSpace(CompanyName)) return false;
+            if (SelectedOwner is null) return false;
+            if (_companyUsers.Count == 0) return false;
+
+            return true;
         }
 
         private async Task SendCompany()
         {
             _submitting = true;
 
-            bool isValid = true;
-
-            if (string.IsNullOrWhiteSpace(CompanyName)) isValid = false;
-            if (SelectedOwner is null) isValid = false;
-            if (_companyUsers.Count == 0) isValid = false;
-
-            if (!isValid)
+            if (!CheckValidValues())
             {
                 NotificationService.ShowError("Заполнены не все поля");
                 _submitting = false;

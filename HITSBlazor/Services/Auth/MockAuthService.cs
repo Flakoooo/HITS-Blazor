@@ -1,4 +1,5 @@
-﻿using HITSBlazor.Models.Users.Entities;
+﻿using HITSBlazor.Models.Quests.Entities;
+using HITSBlazor.Models.Users.Entities;
 using HITSBlazor.Models.Users.Enums;
 using HITSBlazor.Pages.Auth.Login;
 using HITSBlazor.Pages.Auth.NewPassword;
@@ -59,7 +60,7 @@ namespace HITSBlazor.Services.Auth
                 if (!_commonAuthLogic.ValidateLoginModel(request))
                     return false;
 
-                var user = MockUsers.GetAllUsers()
+                var user = MockUsers.GetAllMockUsers()
                     .FirstOrDefault(u => u.Email == request.Email);
 
                 if (user == null)
@@ -105,7 +106,7 @@ namespace HITSBlazor.Services.Auth
                 if (!_commonAuthLogic.ValidateRegisterModel(request))
                     return false;
 
-                if (!MockUsers.GetAllUsers().Select(u => u.Email).Contains(request.Email))
+                if (MockUsers.GetAllMockUsers().Any(u => u.Email == request.Email))
                 {
                     _globalNotificationService.ShowError("Пользователь с таким email уже существует");
                     return false;
@@ -127,7 +128,7 @@ namespace HITSBlazor.Services.Auth
                 if (!_commonAuthLogic.ValidateRecoveryModel(recoveryModel))
                     return null;
 
-                if (!MockUsers.GetAllUsers().Select(u => u.Email).Contains(recoveryModel.Email))
+                if (!MockUsers.GetAllMockUsers().Any(u => u.Email == recoveryModel.Email))
                 {
                     _globalNotificationService.ShowError("Пользователь с таким email не найден");
                     return null;

@@ -1,4 +1,5 @@
 ﻿using HITSBlazor.Models.Common.Entities;
+using HITSBlazor.Models.Common.Responses;
 using HITSBlazor.Models.Users.Entities;
 using HITSBlazor.Models.Users.Enums;
 using HITSBlazor.Utils.Mocks.Users;
@@ -38,7 +39,27 @@ namespace HITSBlazor.Utils.Mocks.Common
             }
         ];
 
-        public static List<UsersGroup> GetAllGroups() => [.. _usersGroups];
+        public static ListDataResponse<UsersGroup> GetAllGroups(
+            int page,
+            int pageSize = 20,
+            string? searchText = null,
+            HashSet<RoleType>? selectedRoles = null
+        )
+        {
+            var query = _usersGroups.AsEnumerable();
+
+            if (selectedRoles?.Count > 0)
+                query = query.Where(ug => ug.Roles.Any(selectedRoles.Contains));
+
+            if (!string.IsNullOrWhiteSpace(searchText))
+                query = query.Where(ug => ug.Name.Contains(searchText, StringComparison.CurrentCultureIgnoreCase));
+
+            int count = query.Count();
+
+            query = query.Skip((page - 1) * pageSize).Take(pageSize);
+
+            return new ListDataResponse<UsersGroup> { Count = count, List = query.ToList() };
+        }
 
         public static UsersGroup? GetGroupById(Guid id)
             => _usersGroups.FirstOrDefault(g => g.Id == id);
