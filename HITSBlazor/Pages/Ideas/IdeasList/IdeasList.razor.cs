@@ -7,7 +7,6 @@ using HITSBlazor.Models.Ideas.Enums;
 using HITSBlazor.Models.Users.Enums;
 using HITSBlazor.Services;
 using HITSBlazor.Services.Auth;
-using HITSBlazor.Services.Companies;
 using HITSBlazor.Services.Ideas;
 using HITSBlazor.Services.Modal;
 using HITSBlazor.Utils.Models;

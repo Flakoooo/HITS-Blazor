@@ -3,7 +3,6 @@ using HITSBlazor.Components.Modals.Components.RightSideModaCollapselInfo;
 using HITSBlazor.Components.Tables.TableHeader;
 using HITSBlazor.Models.Common.Entities;
 using HITSBlazor.Models.Projects.Entities;
-using HITSBlazor.Models.Teams.Entities;
 using HITSBlazor.Services.Tags;
 using HITSBlazor.Utils.Mocks.Projects;
 using Microsoft.AspNetCore.Components;
@@ -24,7 +23,6 @@ namespace HITSBlazor.Components.Modals.CenterModals.EndedSprintModal
         private bool _isLoading = true;
         private string _seacrhText = string.Empty;
 
-        private List<Tag> _tags = [];
         private List<ProjectMember> _members = [];
 
         private HashSet<Tag> SelectedTags { get; set; } = [];
@@ -53,8 +51,7 @@ namespace HITSBlazor.Components.Modals.CenterModals.EndedSprintModal
         {
             _isLoading = true;
 
-            _tags = await TagService.GetTagsAsync();
-            _members = [.. MockProjects.GetProjectById(ProjectId)?.Members ?? []];
+            _members = MockProjects.GetProjectById(ProjectId)?.Members ?? [];
 
             _sprintData = 
             [

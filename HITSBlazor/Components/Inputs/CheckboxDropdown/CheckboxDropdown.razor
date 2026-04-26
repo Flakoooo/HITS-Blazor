@@ -2,9 +2,11 @@
 @using HITSBlazor.Components.Placeholders.Placeholder
 @using HITSBlazor.Components.Typography
 @using HITSBlazor.Models.Common.Enums
+@using HITSBlazor.Pages
 @using HITSBlazor.Utils.EnumStyles
 @using HITSBlazor.Utils.Models
 @typeparam T where T : ViewModelBase
+@inherits ListPageDataLoader
 
 <div class="w-100" tabindex="-1">
     @if (IsLoading)

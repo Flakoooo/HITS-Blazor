@@ -63,16 +63,19 @@
         _isLoading = false;
     }
 
+    private bool CheckValidValues()
+    {
+        if (string.IsNullOrWhiteSpace(TagName)) return false;
+        if (string.IsNullOrWhiteSpace(TagColor)) return false;
+
+        return true;
+    }
+
     private async Task SendTag()
     {
         _submitting = true;
 
-        bool isValid = true;
-
-        if (string.IsNullOrWhiteSpace(TagName)) isValid = false;
-        if (string.IsNullOrWhiteSpace(TagColor)) isValid = false;
-
-        if (!isValid)
+        if (!CheckValidValues())
         {
             NotificationService.ShowError("Заполнены не все поля");
             _submitting = false;

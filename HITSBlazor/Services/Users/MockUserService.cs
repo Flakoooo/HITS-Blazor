@@ -27,7 +27,6 @@ namespace HITSBlazor.Services.Users
             selectedRoles: selectedRoles
         );
 
-        //TODO: событие с изменение пользователя
         public async Task<bool> UpdateUser(UpdateUserRequest request)
         {
             var newUser = MockUsers.UpdateUser(request);
@@ -41,7 +40,6 @@ namespace HITSBlazor.Services.Users
             return true;
         }
 
-        //TODO: событие с удалением пользователя
         public async Task<bool> DeleteUserAsync(User user)
         {
             if (!MockUsers.DeleteUser(user))

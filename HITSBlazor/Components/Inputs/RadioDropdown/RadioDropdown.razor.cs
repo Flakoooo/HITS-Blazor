@@ -85,6 +85,19 @@ namespace HITSBlazor.Components.Inputs.RadioDropdown
                 _values = AllValues.ToList();
         }
 
+        private async Task LoadRadioDataAsync(bool append = false)
+        {
+            if (DataLoaderMethod is not null)
+            {
+                await LoadDataAsync(
+                    AllValues,
+                    () => DataLoaderMethod.Invoke(_currentPage, _searchText),
+                    append: append
+                );
+
+                _values = AllValues.ToList();
+            }
+        }
 
         private async Task OpenDropdown()
         {
@@ -121,7 +134,6 @@ namespace HITSBlazor.Components.Inputs.RadioDropdown
 
                 await InvokeAsync(StateHasChanged);
             }
-
         }
 
         private void OnInputKeyDown(KeyboardEventArgs e)
@@ -156,20 +168,6 @@ namespace HITSBlazor.Components.Inputs.RadioDropdown
             }
 
             await ValueTask.CompletedTask;
-        }
-
-        private async Task LoadRadioDataAsync(bool append = false)
-        {
-            if (DataLoaderMethod is not null)
-            {
-                await LoadDataAsync(
-                    AllValues,
-                    () => DataLoaderMethod.Invoke(_currentPage, _searchText),
-                    append: append
-                );
-
-                _values = AllValues.ToList();
-            }
         }
     }
 }

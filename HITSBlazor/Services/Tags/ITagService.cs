@@ -1,15 +1,16 @@
 ﻿using HITSBlazor.Models.Common.Entities;
+using HITSBlazor.Models.Common.Responses;
 
 namespace HITSBlazor.Services.Tags
 {
     public interface ITagService
     {
-        event Func<Task>? OnTagsStateChanged;
-        event Action? OnTagsStateUpdated;
+        event Action<Tag>? OnTagHasCreated;
+        event Action<Tag>? OnTagHasUpdated;
+        event Action<Tag>? OnTagHasDeleted;
 
-        Task<List<Tag>> GetTagsAsync(
-            string? searchText = null,
-            bool? confirmed = null
+        Task<ListDataResponse<Tag>> GetTagsAsync(
+            int page, string? searchText = null, bool? confirmed = null
         );
 
         Task<Tag?> CreateNewTagAsync(string name, string color, bool isConfirmed);

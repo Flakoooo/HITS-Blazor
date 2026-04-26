@@ -10,10 +10,15 @@
 @using HITSBlazor.Utils.Models
 
 <div @onclick:stopPropagation="true" class="add-task-modal border rounded-3 bg-white px-3 py-2">
-    <CenterModalHeader HeaderText="@(CurrentTask is null ? "Создание задачи" : "Редактирвоание задачи")" FontSize="4" />
-    <Input Label="Название задачи*" Placeholder="Название" @bind-Value="TaskName" />
-    <TextArea Label="Описание задачи*" Placeholder="Описание" @bind-Value="TaskDescription" Style="resize: none; height: 100px;" />
-    <CheckboxDropdown T="Tag" AllValues="_tags" @bind-SelectedValues="SelectedTags" Placeholder="Теги" />
+    <CenterModalHeader IsLoading="_isLoading" HeaderText="@(CurrentTask is null ? "Создание задачи" : "Редактирвоание задачи")" FontSize="4" />
+    <Input IsLoading="_isLoading" Label="Название задачи*" Placeholder="Название" @bind-Value="TaskName" />
+    <TextArea IsLoading="_isLoading" Label="Описание задачи*" Placeholder="Описание" @bind-Value="TaskDescription" Style="resize: none; height: 100px;" />
+    <CheckboxDropdown T="Tag" 
+                      IsLoading="_isLoading" 
+                      @bind-SelectedValues="SelectedTags" 
+                      Placeholder="Теги"
+                      DataLoaderMethod="async (page, searchText) => await TagService.GetTagsAsync(page, searchText)"
+                      DebounceDelay="500"/>
     <div class="d-flex flex-wrap gap-2">
         @foreach (var tag in SelectedTags)
         {
@@ -27,7 +32,11 @@
         <Typography FontSize="6" TextColor="TextColor.Primary">
             Трудоёмкость*
         </Typography>
-        <Number Placeholder="Часы" @bind-Value="Hours" MinValue="0" />
+        <Number IsLoading="_isLoading" Placeholder="Часы" @bind-Value="Hours" MinValue="0" />
     </div>
-    <Button Variant="ButtonVariant.Primary" Text="Создать задачу" ButtonClass="w-100 mb-1" />
+    @* TODOO: добавить метод *@
+    <Button IsLoading="_isLoading" 
+            Variant="ButtonVariant.Primary" 
+            Text="Создать задачу" 
+            ButtonClass="w-100 mb-1" />
 </div>

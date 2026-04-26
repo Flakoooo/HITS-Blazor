@@ -3,6 +3,7 @@
     public enum BoolStatusType
     {
         TeamClosed,
-        TeamActiveProject
+        TeamActiveProject,
+        TagConfirm
     }
 }

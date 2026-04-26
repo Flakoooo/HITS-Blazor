@@ -1,5 +1,5 @@
 ﻿using HITSBlazor.Models.Common.Entities;
-using HITSBlazor.Models.Common.Enums;
+using HITSBlazor.Models.Common.Responses;
 
 namespace HITSBlazor.Utils.Mocks.Common
 {
@@ -35,7 +35,27 @@ namespace HITSBlazor.Utils.Mocks.Common
             new Tag { Id = DesignId,        Name = "Дизайн",        Color = "#8fce00",  Confirmed = true    }
         ];
 
-        public static List<Tag> GetTags() => [.. _tags];
+        public static ListDataResponse<Tag> GetTags(
+            int page,
+            int pageSize = 20,
+            string? searchText = null, 
+            bool? confirmed = null
+        )
+        {
+            var query = _tags.AsEnumerable();
+
+            if (confirmed.HasValue)
+                query = query.Where(t => t.Confirmed == confirmed.Value);
+
+            if (!string.IsNullOrWhiteSpace(searchText))
+                query = query.Where(t => t.Name.Contains(searchText, StringComparison.CurrentCultureIgnoreCase));
+
+            int count = query.Count();
+
+            query = query.Skip((page - 1) * pageSize).Take(pageSize);
+
+            return new ListDataResponse<Tag> { Count = count, List = query.ToList() };
+        }
 
         public static Tag? GetTagById(Guid id)
             => _tags.FirstOrDefault(t => t.Id == id);
@@ -55,15 +75,15 @@ namespace HITSBlazor.Utils.Mocks.Common
             return newTag;
         }
 
-        public static bool ConfirmTag(Guid tagId, Guid updatorId)
+        public static Tag? ConfirmTag(Guid tagId, Guid updatorId)
         {
             var tagForUpdate = _tags.FirstOrDefault(t => t.Id == tagId);
-            if (tagForUpdate is null) return false;
+            if (tagForUpdate is null) return null;
 
             tagForUpdate.Confirmed = true;
             tagForUpdate.UpdaterId = updatorId;
 
-            return true;
+            return tagForUpdate;
         }
 
         public static Tag? UpdateTag(Guid tagId, string name, string color, Guid updatorId)

@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using HITSBlazor.Models.Common.Responses;
+using HITSBlazor.Services.Debounce;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
 
@@ -6,9 +8,6 @@ namespace HITSBlazor.Components.Inputs.CheckboxDropdown
 {
     public partial class CheckboxDropdown<T>
     {
-        [Inject]
-        private IJSRuntime JSRuntime { get; set; } = null!;
-
         [Parameter]
         public bool IsLoading { get; set; } = false;
 
@@ -33,21 +32,69 @@ namespace HITSBlazor.Components.Inputs.CheckboxDropdown
         [Parameter]
         public EventCallback<HashSet<T>> SelectedValuesChanged { get; set; }
 
+        [Parameter]
+        public Func<int, string?, Task<ListDataResponse<T>>>? DataLoaderMethod { get; set; }
+
+        [Parameter]
+        public int DebounceDelay { get; set; } = 0;
+
         private ElementReference _inputRef;
-        private DotNetObjectReference<CheckboxDropdown<T>>? _dotNetHelper;
+        private DebounceHelper? _searchDebounce;
 
         private bool _isOpen = false;
 
         private List<T> _values = [];
         private string _searchText = string.Empty;
 
-        protected override async Task OnAfterRenderAsync(bool firstRender)
+        protected override async Task OnInitializedAsync()
         {
-            if (firstRender)
+            if (DataLoaderMethod is not null && DebounceDelay > 0)
             {
-                _dotNetHelper = DotNetObjectReference.Create(this);
+                _searchDebounce = new DebounceHelper(DebounceDelay, async () =>
+                {
+                    await InvokeAsync(async () =>
+                    {
+                        ResetPagination();
+                        await LoadCheckboxDataAsync();
+                        StateHasChanged();
+                    });
+                });
+            }
+            await LoadCheckboxDataAsync();
+            MarkAsInitialized();
+        }
+
+        protected override async Task OnLoadMoreItemsAsync()
+            => await LoadCheckboxDataAsync(append: true);
+
+        protected override int GetCurrentItemsCount() => _values.Count;
+
+        protected override async Task AdditionalAfterRenderMethod()
+        {
+            try
+            {
                 await JSRuntime.InvokeVoidAsync("listDropdown.registerClickOutside", _inputRef, _dotNetHelper);
-                _values = [.. AllValues];
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Ошибка регистрации clickOutside: {ex.Message}");
+            }
+
+            if (_values.Count == 0 && AllValues.Count > 0)
+                _values = AllValues.ToList();
+        }
+
+        private async Task LoadCheckboxDataAsync(bool append = false)
+        {
+            if (DataLoaderMethod is not null)
+            {
+                await LoadDataAsync(
+                    AllValues,
+                    () => DataLoaderMethod.Invoke(_currentPage, _searchText),
+                    append: append
+                );
+
+                _values = AllValues.ToList();
             }
         }
 
@@ -71,22 +118,26 @@ namespace HITSBlazor.Components.Inputs.CheckboxDropdown
                 && !string.IsNullOrWhiteSpace(_searchText)
                 && AllValues.FirstOrDefault(t => t.GetDisplayInfo().Equals(_searchText)) is null;
 
-        private async Task CreateNewValue()
-        {
-            await ValueMustCreated.InvokeAsync(_searchText);
-        }
+        private async Task CreateNewValue() 
+            => await ValueMustCreated.InvokeAsync(_searchText);
 
         private async Task OnSearch(ChangeEventArgs e)
         {
-            _searchText = (e.Value?.ToString() ?? "").Trim();
+            _searchText = (e.Value?.ToString() ?? string.Empty).Trim();
 
-            if (string.IsNullOrWhiteSpace(_searchText))
-                _values = [.. AllValues];
+            if (DataLoaderMethod is not null && DebounceDelay > 0)
+            {
+                _searchDebounce?.Trigger();
+            }
             else
-                _values = [.. AllValues.Where(v => v.MatchesSearch(_searchText))];
+            {
+                if (string.IsNullOrWhiteSpace(_searchText))
+                    _values = AllValues.ToList();
+                else
+                    _values = AllValues.Where(v => v.MatchesSearch(_searchText)).ToList();
 
-            await InvokeAsync(StateHasChanged);
-
+                await InvokeAsync(StateHasChanged);
+            }
         }
 
         private void OnInputKeyDown(KeyboardEventArgs e)
@@ -102,14 +153,20 @@ namespace HITSBlazor.Components.Inputs.CheckboxDropdown
             await SelectedValuesChanged.InvokeAsync(SelectedValues);
         }
 
-        public async ValueTask DisposeAsync()
+        protected override async ValueTask DisposeAsyncCore()
         {
-            if (_dotNetHelper != null)
+            _searchDebounce?.Dispose();
+            try
             {
-                await JSRuntime.InvokeVoidAsync("listDropdown.unregisterClickOutside", _inputRef);
-                _dotNetHelper.Dispose();
+                if (_dotNetHelper != null)
+                    await JSRuntime.InvokeVoidAsync("listDropdown.unregisterClickOutside", _inputRef);
             }
-        }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Ошибка при очистке RadioDropdown: {ex.Message}");
+            }
 
+            await ValueTask.CompletedTask;
+        }
     }
 }

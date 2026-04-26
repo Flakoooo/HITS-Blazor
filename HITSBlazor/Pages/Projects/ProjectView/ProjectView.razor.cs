@@ -97,7 +97,7 @@ namespace HITSBlazor.Pages.Projects.ProjectView
 
                 await LoadTasksAsync();
                 //лучше наверно заменить на один запрос, который получает все теги проекта
-                _filterTags = [.. MockTags.GetTags()];
+                _filterTags = MockTags.GetTags();
 
                 _projectSprints = MockSprints.GetSprintsByProjectId(guid);
 

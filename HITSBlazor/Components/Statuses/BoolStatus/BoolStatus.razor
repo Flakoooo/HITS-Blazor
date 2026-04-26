@@ -28,6 +28,7 @@
         {
             BoolStatusType.TeamClosed => Value ? ("danger", "Закрыта") : ("success", "Открыта"),
             BoolStatusType.TeamActiveProject => Value ? ("warning", "В работе") : ("primary", "В поисках"),
+            BoolStatusType.TagConfirm => Value ? (string.Empty, "Утвержден") : ("danger", "На рассмотрении"),
             _ => (string.Empty, string.Empty)
         };
 

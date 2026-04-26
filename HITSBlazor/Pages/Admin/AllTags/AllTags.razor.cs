@@ -1,6 +1,7 @@
 ﻿using HITSBlazor.Components.ActionMenus.BaseActionMenu;
 using HITSBlazor.Components.Button;
 using HITSBlazor.Components.Modals.CenterModals.TagModal;
+using HITSBlazor.Components.Tables.TableComponent;
 using HITSBlazor.Components.Tables.TableHeader;
 using HITSBlazor.Models.Common.Entities;
 using HITSBlazor.Services.Modal;
@@ -23,6 +24,8 @@ namespace HITSBlazor.Pages.Admin.AllTags
 
         private bool _isLoading = true;
 
+        private TableComponent? _tableComponent;
+
         private string _searchText = string.Empty;
 
         private readonly List<ValueViewModel<bool?>> _confirmedFilterValues =
@@ -33,7 +36,7 @@ namespace HITSBlazor.Pages.Admin.AllTags
 
         private ValueViewModel<bool?>? IsConfirmed { get; set; }
 
-        private List<Tag> _tags = [];
+        private readonly List<Tag> _tags = [];
 
         private readonly List<TableHeaderItem> _tagsTableHeader =
         [
@@ -46,90 +49,132 @@ namespace HITSBlazor.Pages.Admin.AllTags
         {
             _isLoading = true;
 
+            TagService.OnTagHasCreated += TagHasCreated;
+            TagService.OnTagHasUpdated += TagHasUpdated;
+            TagService.OnTagHasDeleted += TagHasDeleted;
+
             await LoadTagsAsync();
-            TagService.OnTagsStateChanged += LoadTagsAsync;
-            TagService.OnTagsStateUpdated += StateHasChanged;
 
             _isLoading = false;
+            MarkAsInitialized();
         }
-        private async Task LoadTagsAsync()
+
+        protected override async Task AdditionalAfterRenderMethod()
         {
-            _tags = await TagService.GetTagsAsync(
+            if (_tableComponent != null)
+                _tableContainer = _tableComponent.ScrollContainer;
+        }
+
+        protected override int GetCurrentItemsCount() => _tags.Count;
+
+        protected override async Task OnLoadMoreItemsAsync()
+        {
+            await LoadTagsAsync(append: true);
+        }
+
+        private async Task LoadTagsAsync(bool append = false) => await LoadDataAsync(
+            _tags,
+            () => TagService.GetTagsAsync(
+                _currentPage,
                 searchText: _searchText,
                 confirmed: IsConfirmed?.Value
-            );
-            StateHasChanged();
-        }
+            ),
+            append: append
+        );
 
         private async Task SeacrhTag(string value)
         {
             _searchText = value;
-            await LoadTagsAsync();
+            await FiltersHasChanged();
         }
 
         private static Dictionary<MenuAction, object> GetTableActions(Tag tag)
         {
             var actions = new Dictionary<MenuAction, object>();
 
-            if (tag.Confirmed)
-                actions.Add(MenuAction.Edit, tag);
-            else
-                actions.Add(MenuAction.Confirm, tag.Id);
+            if (tag.Confirmed) actions.Add(MenuAction.Edit, tag);
+            else actions.Add(MenuAction.Confirm, tag.Id);
 
             actions.Add(MenuAction.Delete, tag);
 
             return actions;
         }
 
-        private async Task ResetFilters()
+        private async Task FiltersHasChanged()
         {
-            IsConfirmed = null;
+            ResetPagination();
             await LoadTagsAsync();
         }
 
-        private void ShowTagModal(Tag? tag = null)
+        private async Task ResetFilters()
         {
-            if (tag is not null)
-            {
-                ModalService.Show<TagModal>(
-                    ModalType.Center,
-                    parameters: new Dictionary<string, object> { [nameof(TagModal.Tag)] = tag }
-                );
-            }
-            else
-            {
-                ModalService.Show<TagModal>(ModalType.Center);
-            }
+            IsConfirmed = null;
+            await FiltersHasChanged();
         }
+
+        private void ShowTagModal(Tag? tag = null) => ModalService.Show<TagModal>(
+            ModalType.Center,
+            parameters: tag is not null
+                ? new Dictionary<string, object> { [nameof(TagModal.Tag)] = tag }
+                : null
+        );
 
         private async Task OnTagAction(TableActionContext context)
         {
-            if (context.Action == MenuAction.Confirm)
+            if (context.Action == MenuAction.Confirm && context.Item is Guid tagId)
             {
-                if (context.Item is Guid tagId)
-                    await TagService.ConfirmTagAsync(tagId);
+                await TagService.ConfirmTagAsync(tagId);
             }
-            else if (context.Action == MenuAction.Edit)
+            else if (context.Item is Tag tag)
             {
-                if (context.Item is Tag tag)
+                if (context.Action == MenuAction.Edit)
                     ShowTagModal(tag);
-            }
-            else if (context.Action == MenuAction.Delete)
-            {
-                if (context.Item is Tag tag)
+                else if (context.Action == MenuAction.Delete)
                     ModalService.ShowConfirmModal(
                         $"Вы действительно хотите удалить \"{tag.Name}\"?",
                         () => TagService.DeleteTagAsync(tag),
                         confirmButtonVariant: ButtonVariant.Danger,
                         confirmButtonText: "Удалить"
                     );
+
             }
         }
 
-        public void Dispose()
+        private void TagHasCreated(Tag createdTag)
         {
-            TagService.OnTagsStateChanged -= LoadTagsAsync;
-            TagService.OnTagsStateUpdated -= StateHasChanged;
+            _tags.Add(createdTag);
+            ++_totalCount;
+            StateHasChanged();
+        }
+
+        private void TagHasUpdated(Tag updatedTag)
+        {
+            var tag = _tags.FirstOrDefault(t => t.Id == updatedTag.Id);
+            if (tag is null) return;
+
+            tag.Color = updatedTag.Color;
+            tag.Confirmed = updatedTag.Confirmed;
+            tag.UpdaterId = updatedTag.UpdaterId;
+
+            StateHasChanged();
+        }
+
+        private void TagHasDeleted(Tag tag)
+        {
+            if (_tags.Remove(tag))
+            {
+                --_totalCount;
+                StateHasChanged();
+            }
+        }
+
+        protected override async ValueTask DisposeAsyncCore()
+        {
+            TagService.OnTagHasCreated -= TagHasCreated;
+            TagService.OnTagHasUpdated -= TagHasUpdated;
+            TagService.OnTagHasDeleted -= TagHasDeleted;
+
+            await ValueTask.CompletedTask;
         }
     }
 }

@@ -22,7 +22,7 @@
 
 <div @onclick:stopPropagation="true" class="spint-info-modal bg-white rounded p-3">
     <div class="d-flex flex-column gap-2 w-100 h-100">
-        <CenterModalHeader HeaderText="@CurrentSprint.Name" />
+        <CenterModalHeader IsLoading="_isLoading" HeaderText="@CurrentSprint.Name" />
         <div class="spint-info-modal-content w-100">
             <div class="h-100 w-25">
                 <div class="d-flex flex-column gap-3 w-100 h-100">
@@ -31,9 +31,14 @@
                     </div>
                     <div class="d-flex flex-column gap-2 border-bottom pb-3 w-100">
                         <!-- TODO: реализовать поиск заадач по этим фильтрам -->
-                        <Input Placeholder="Поиск" ValueChanged="(value) => SeacrhTask(value)" />
+                        <Input IsLoading="_isLoading" Placeholder="Поиск" ValueChanged="(value) => SeacrhTask(value)" />
                         <div class="d-flex flex-column gap-1">
-                            <CheckboxDropdown T="Tag" AllValues="_tags" Placeholder="Теги" @bind-SelectedValues="SelectedTags" />
+                            <CheckboxDropdown T="Tag" 
+                                              IsLoading="_isLoading"
+                                              Placeholder="Теги" 
+                                              @bind-SelectedValues="SelectedTags"
+                                              DataLoaderMethod="async (page, searchText) => await TagService.GetTagsAsync(page, searchText)"
+                                              DebounceDelay="500" />
                             <div class="d-flex flex-wrap gap-1">
                                 @foreach (var tag in SelectedTags)
                                 {
@@ -43,7 +48,11 @@
                                 }
                             </div>
                         </div>
-                        <RadioDropdown T="ProjectMember" AllValues="_members" Placeholder="Исполнитель" @bind-Value="SelectedMember" />
+                        <RadioDropdown T="ProjectMember" 
+                                       IsLoading="_isLoading" 
+                                       AllValues="_members" 
+                                       Placeholder="Исполнитель" 
+                                       @bind-Value="SelectedMember" />
                     </div>
                     <div class="d-flex flex-column gap-2 w-100 overflow-y-scroll">
                         @foreach (var task in CurrentSprint.Tasks)
@@ -131,11 +140,13 @@
                                                 = _activeInfoCategory is EndedSprintModalInfoCategory.Scores
                                                 ? (ButtonVariant.Primary, ButtonVariant.Secondary)
                                                 : (ButtonVariant.Secondary, ButtonVariant.Primary);
-                                            <Button Variant="variants.Variant1" 
+                                            <Button IsLoading="_isLoading"
+                                                    Variant="variants.Variant1" 
                                                     Text="@GetInfoCategoryName(EndedSprintModalInfoCategory.Scores)"
                                                     ButtonClass="w-100" 
                                                     OnButtonClick="() => _activeInfoCategory = EndedSprintModalInfoCategory.Scores" />
-                                            <Button Variant="variants.Variant2" 
+                                            <Button IsLoading="_isLoading"
+                                                    Variant="variants.Variant2" 
                                                     Text="@GetInfoCategoryName(EndedSprintModalInfoCategory.Info)"
                                                     ButtonClass="w-100"
                                                     OnButtonClick="() => _activeInfoCategory = EndedSprintModalInfoCategory.Info" />
@@ -153,25 +164,29 @@
                                         {
                                             <div class="d-flex flex-column gap-2 bg-white rounded-bottom p-2 border border-top-0">
                                                 <div class="px-2">
-                                                    <RightSideModalInfoItemComponent Icon="bi-clock"
+                                                    <RightSideModalInfoItemComponent IsLoading="_isLoading"
+                                                                                     Icon="bi-clock"
                                                                                      Label="Начало спринта"
                                                                                      TextColor="TextColor.Primary"
                                                                                      Text="@CurrentSprint.StartDate.ToString("dd.MM.yyyy")" />
                                                 </div>
                                                 <div class="px-2">
-                                                    <RightSideModalInfoItemComponent Icon="bi-clock"
+                                                    <RightSideModalInfoItemComponent IsLoading="_isLoading"
+                                                                                     Icon="bi-clock"
                                                                                      Label="Конец спринта"
                                                                                      TextColor="TextColor.Primary"
                                                                                      Text="@CurrentSprint.FinishDate.ToString("dd.MM.yyyy")" />
                                                 </div>
                                                 <div class="px-2">
-                                                    <RightSideModalInfoItemComponent Icon="bi-check2-circle"
+                                                    <RightSideModalInfoItemComponent IsLoading="_isLoading"
+                                                                                     Icon="bi-check2-circle"
                                                                                      Label="Выполнено задач"
                                                                                      TextColor="TextColor.Primary"
                                                                                      Text="@CurrentSprint.Tasks.Where(t => t.Status is not Models.Projects.Enums.TaskStatus.InBackLog).Count().ToString()" />
                                                 </div>
                                                 <div class="px-2">
-                                                    <RightSideModalInfoItemComponent Icon="bi-clock"
+                                                    <RightSideModalInfoItemComponent IsLoading="_isLoading"
+                                                                                     Icon="bi-clock"
                                                                                      Label="Потрачено часов"
                                                                                      TextColor="TextColor.Primary"
                                                                                      Text="@CurrentSprint.Tasks.Sum(t => t.WorkHour).ToString()" />
@@ -188,14 +203,14 @@
                             {
                                 <div class="sprint-info-modal-task-error h-100 w-100">
                                     <img class="sprint-info-modal-task-error-img" src="~/images/develop.png" alt="Выберите задачу" />
-                                    <div class="fs-4 text-secondary">Выберите задачу, кликнув на одну из списка слева</div>
+                                    <div class="fs-4 text-secondary">Выберите задачу, нажава на одну из списка слева</div>
                                 </div>                                
                             }
                             else
                             {
                                 <div class="d-flex gap-3 w-100 overflow-y-scroll">
                                     <div class="w-75">
-                                        <RightSideModaCollapselInfo Data="_taskData" />
+                                        <RightSideModaCollapselInfo IsLoading="_isLoading" Data="_taskData" />
                                         <div class="w-100 bg-white">
                                             <div class="py-2 d-flex justify-content-between">
 
@@ -238,19 +253,22 @@
                                         </div>
                                         <div class="d-flex flex-column gap-2 bg-white rounded-bottom p-2 border border-top-0">
                                             <div class="px-2">
-                                                <RightSideModalInfoItemComponent Icon="bi-person-circle"
+                                                <RightSideModalInfoItemComponent IsLoading="_isLoading"
+                                                                                 Icon="bi-person-circle"
                                                                                  Label="Постановщик"
                                                                                  TextColor="TextColor.Primary"
                                                                                  Text="@_selectedTask.Initiator.FullName" />
                                             </div>
                                             <div class="px-2">
-                                                <RightSideModalInfoItemComponent Icon="bi-person-circle"
+                                                <RightSideModalInfoItemComponent IsLoading="_isLoading"
+                                                                                 Icon="bi-person-circle"
                                                                                  Label="Исполнитель"
                                                                                  TextColor="TextColor.Primary"
                                                                                  Text="@(_selectedTask.Executor?.FullName ?? "-")" />
                                             </div>
                                             <div class="px-2">
-                                                <RightSideModalInfoItemComponent Icon="bi-check2-circle"
+                                                <RightSideModalInfoItemComponent IsLoading="_isLoading"
+                                                                                 Icon="bi-check2-circle"
                                                                                  Label="Трудоемкость"
                                                                                  TextColor="TextColor.Primary"
                                                                                  Text="@_selectedTask.WorkHour.ToString()" />
