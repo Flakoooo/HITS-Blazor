@@ -23,6 +23,7 @@
             <TableContent>
                 @foreach (var project in _projects)
                 {
+                    @* TODOO: обновить таблицы, значения не по центру, как попало *@
                     <tr>
                         <TableBodyRow>
                             <div class="data-link" @onclick="() => NavigateToProject(project.Id)">

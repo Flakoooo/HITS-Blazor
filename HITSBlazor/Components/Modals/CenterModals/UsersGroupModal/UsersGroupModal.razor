@@ -18,7 +18,9 @@
         <UsersColumn IsLoading="_isLoading"
                      HeaderText="Пользователи:"
                      SelectedUserChanged="SelectUser"
-                     DataLoaderMethod="async (page, searchText) => await UserService.GetUsersAsync(page, searchText: searchText)" />
+                     DataLoaderMethod="async (page, searchText) => await UserService.GetUsersAsync(page, searchText: searchText)"
+                     DebounceDelay="500"
+                     DisplayPredicate="(user) => !_groupUsers.Contains(user)" />
         <UsersColumn IsLoading="_isLoading"
                      HeaderText="@($"Пользователи в группе: {_groupUsers.Count}")"
                      AllUsers="_groupUsers.ToList()"

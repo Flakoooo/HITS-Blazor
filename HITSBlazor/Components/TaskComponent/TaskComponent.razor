@@ -2,15 +2,20 @@
 @using HITSBlazor.Components.Button
 @using HITSBlazor.Components.Collapse
 @using HITSBlazor.Components.Hint
+@using HITSBlazor.Components.Modals.CenterModals.ConfirmModal
 @using HITSBlazor.Models.Users.Enums
 @using HITSBlazor.Services.Auth
 @using HITSBlazor.Services.Modal
+@using HITSBlazor.Services.Projects
+
+@using HITSTask = HITSBlazor.Models.Projects.Entities.Task;
+@using HITSTaskStatus = HITSBlazor.Models.Projects.Enums.TaskStatus;
 
 <div class="d-flex gap-2 mb-2 w-100">
     <div class="bg-white overflow-hidden rounded border w-100" style="cursor: pointer;">
         <Collapse>
             <MainContent Context="collapse">
-                <div class="task" @onclick="() => collapse.Toggle()">
+                <div class="task" @onclick="() => ClickTask(() => collapse.Toggle())">
                     <div class="d-flex gap-2 task-left">
                         @{
                             var taskStatusHint = GetHintAndColor(Task.Status);
@@ -60,20 +65,25 @@
     </div>
     @if (DeleteTaskAllowed)
     {
-        <!-- TODO: кнопка УДАЛЯЕТ задачу с ПОДТВЕРЖДЕНИЕМ -->
-        <Button ButtonClass="btn-outline-danger bi bi-x" />
+        <Button ButtonClass="btn-outline-danger bi bi-x" OnButtonClick="ShowConfirmModal" />
     }
 </div>
 
 @code {
     [Inject]
+    private IProjectService ProjectService { get; set; } = null!;
+
+    [Inject]
     private ModalService ModalService { get; set; } = null!;
 
     [Parameter]
-    public required HITSBlazor.Models.Projects.Entities.Task Task { get; set; }
+    public required HITSTask Task { get; set; }
 
     [Parameter]
-    public EventCallback<HITSBlazor.Models.Projects.Entities.Task> TaskChanged { get; set; }
+    public EventCallback<HITSTask> TaskChanged { get; set; }
+
+    [Parameter]
+    public EventCallback OnClickTask { get; set; }
 
     [Parameter]
     public bool DeleteTaskAllowed { get; set; } = false;
@@ -87,16 +97,32 @@
     [Parameter]
     public bool ShowTaskModalAllowed { get; set; } = false;
 
-    private (string Hint, string Color) GetHintAndColor(Models.Projects.Enums.TaskStatus status) => status switch
+    private (string Hint, string Color) GetHintAndColor(HITSTaskStatus status) => status switch
     {
-        Models.Projects.Enums.TaskStatus.InBackLog => ("Приоритетность задачи", "bg-primary"),
-        Models.Projects.Enums.TaskStatus.Done => ("Задача завершена", "bg-secondary"),
+        HITSTaskStatus.InBackLog => ("Приоритетность задачи", "bg-primary"),
+        HITSTaskStatus.Done => ("Задача завершена", "bg-secondary"),
         _ => ("Задача в активном спринте", "bg-warning")
     };
+
+    private async Task ClickTask(Func<Task> toggleMethod)
+    {
+        if (OnClickTask.HasDelegate)
+            await OnClickTask.InvokeAsync();
+        else 
+            await toggleMethod.Invoke();
+
+    }
 
     private void ShowTaskModal()
     {
         if (ShowTaskModalAllowed)
             ModalService.ShowTaskModal(Task);
     }
+
+    private void ShowConfirmModal() => ModalService.ShowConfirmModal(
+        $"Вы действительно хотите удалить \"{Task.Name}\"?",
+        () => ProjectService.DeleteTaskAsync(Task),
+        confirmButtonVariant: ButtonVariant.Danger,
+        confirmButtonText: "Удалить"
+    );
 }

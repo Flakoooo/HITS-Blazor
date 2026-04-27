@@ -1,6 +1,10 @@
 ﻿using HITSBlazor.Models.Common.Entities;
+using HITSBlazor.Models.Common.Responses;
 using HITSBlazor.Models.Projects.Entities;
 using HITSBlazor.Models.Projects.Enums;
+using HITSBlazor.Models.Projects.Requests;
+using HITSBlazor.Models.Quests.Entities;
+using HITSBlazor.Models.Users.Entities;
 using HITSBlazor.Utils.Mocks.Common;
 using HITSBlazor.Utils.Mocks.Users;
 
@@ -343,15 +347,135 @@ namespace HITSBlazor.Utils.Mocks.Projects
             ];
         }
 
-        public static List<Sprint> GetAllSprints() => [.. _sprints];
+        public static List<Sprint> GetAllMockSprints() => _sprints;
 
-        public static List<Sprint> GetSprintsByProjectId(Guid projectId)
-            => [.. _sprints.Where(s => s.ProjectId == projectId)];
+        public static ListDataResponse<Sprint> GetSprintsByProjectId(
+            Guid projectId, int page, int pageSize = 20
+        )
+        {
+            var query = _sprints.Where(s => s.ProjectId == projectId);
+
+            int count = query.Count();
+
+            query = query.Skip((page - 1) * pageSize).Take(pageSize);
+
+            return new ListDataResponse<Sprint> { Count = count, List = query.ToList() };
+        }
+
+        public static Sprint? GetActiveSprintByProjectId(Guid projectId)
+            => _sprints.FirstOrDefault(s => s.Id == projectId);
+
+        public static Sprint? CreateSprint(Guid projectId, CreateSprintRequest request)
+        {
+            var newSprint = new Sprint
+            {
+                Id = Guid.NewGuid(),
+                ProjectId = projectId,
+                Name = request.Name,
+                Goal = request.Goal,
+                StartDate = request.StartDate,
+                FinishDate = request.FinishDate,
+                WorkingHours = request.WorkingHours,
+                Status = SprintStatus.Active,
+                Tasks = request.Tasks.ToList()
+            };
+
+            _sprints.Add(newSprint);
+
+            return newSprint;
+        }
+
+        public static Sprint? UpdateSprint(Guid projectId, UpdateSprintRequest request)
+        {
+            var sprintForUpdate = _sprints.FirstOrDefault(s => s.ProjectId == projectId);
+            if (sprintForUpdate is null) return null;
+
+            sprintForUpdate.Name = request.Name ?? sprintForUpdate.Name;
+            sprintForUpdate.Goal = request.Goal ?? sprintForUpdate.Goal;
+            sprintForUpdate.StartDate = request.StartDate ?? sprintForUpdate.StartDate;
+            sprintForUpdate.FinishDate = request.FinishDate ?? sprintForUpdate.FinishDate;
+            sprintForUpdate.WorkingHours = request.WorkingHours ?? sprintForUpdate.WorkingHours;
+            sprintForUpdate.Tasks = request.Tasks?.ToList() ?? sprintForUpdate.Tasks;
+
+            return sprintForUpdate;
+        }
 
         public static HITSTask? GetTaskById(Guid taskId) =>
             _tasks.FirstOrDefault(t => t.Id == taskId);
 
-        public static List<HITSTask> GetTasksByProjectId(Guid projectId)
-            => [.. _tasks.Where(t => t.ProjectId == projectId)];
+        public static ListDataResponse<HITSTask> GetTasksByProjectId(
+            Guid projectId, 
+            int page, 
+            int pageSize = 40,
+            HashSet<HITSTaskStatus>? selectedStatuses = null
+        )
+        {
+            var query = _tasks.Where(t => t.ProjectId == projectId);
+
+            if (selectedStatuses?.Count > 0)
+                query = query.Where(t => selectedStatuses.Contains(t.Status));
+
+            int count = query.Count();
+
+            query = query.Skip((page - 1) * pageSize).Take(pageSize);
+
+            return new ListDataResponse<HITSTask> { Count = count, List = query.ToList() };
+        }
+
+        public static HITSTask? CreateTask(CreateTaskRequest request)
+        {
+            var newTask = new HITSTask
+            {
+                Id = Guid.NewGuid(),
+                SprintId = request.SprintId,
+                ProjectId = request.ProjectId,
+                Name = request.Name,
+                Description = request.Description,
+                Initiator = request.Initiator,
+                WorkHour = request.WorkHour,
+                StartDate = request.StartDate,
+                Tags = request.Tags.ToList(),
+                Status = request.Status
+            };
+
+            _tasks.Add(newTask);
+            MockTaskMovementLogs.CreateNewTaskLog(newTask, request.Initiator);
+
+            return newTask;
+        }
+
+        public static HITSTask? UpdateTask(Guid taskId, UpdateTaskRequest request)
+        {
+            var taskForUpdate = _tasks.FirstOrDefault(t => t.Id == taskId);
+            if (taskForUpdate is null) return null;
+
+            taskForUpdate.Name = request.Name ?? taskForUpdate.Name;
+            taskForUpdate.Description = request.Description ?? taskForUpdate.Description;
+            taskForUpdate.Tags = request.Tags?.ToList() ?? taskForUpdate.Tags;
+            taskForUpdate.WorkHour = request.WorkHour ?? taskForUpdate.WorkHour;
+
+            return taskForUpdate;
+        }
+
+        public static HITSTask? UpdateTaskStatus(Guid taskId, HITSTaskStatus newStatus, User executor)
+        {
+            var taskForUpdate = _tasks.FirstOrDefault(t => t.Id == taskId);
+            if (taskForUpdate is null) return null;
+
+            taskForUpdate.Status = newStatus;
+            MockTaskMovementLogs.CreateNewTaskLog(taskForUpdate, taskForUpdate.Initiator, executor);
+
+            return taskForUpdate;
+        }
+
+        public static bool DeleteTask(HITSTask task)
+        {
+            var isRemoved = _tasks.Remove(task);
+
+            foreach (var sprint in _sprints)
+                isRemoved = sprint.Tasks.Remove(task);
+
+            return isRemoved;
+        }
     }
 }

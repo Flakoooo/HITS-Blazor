@@ -1,0 +1,48 @@
+﻿@namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewSprintComponent
+@using HITSBlazor.Components.InputSearch
+@using HITSBlazor.Components.ListPageComponents.ListPageHeader
+@using HITSBlazor.Components.Modals.CenterModals.EndedSprintModal
+@using HITSBlazor.Components.Modals.CenterModals.SprintModal
+@using HITSBlazor.Components.Statuses.EnumStatus
+@using HITSBlazor.Components.Tables.TableBodyRow
+@using HITSBlazor.Components.Tables.TableComponent
+@using HITSBlazor.Components.Tables.TableHeader
+@using HITSBlazor.Models.Projects.Entities
+@using HITSBlazor.Models.Projects.Enums
+@using HITSBlazor.Models.Users.Enums
+@using HITSBlazor.Pages
+@using HITSBlazor.Services.Auth
+@using HITSBlazor.Services.Modal
+@inherits ListPageDataLoader
+
+<div class="w-100 p-3">
+    <ListPageHeader IsLoading="IsOnLoading"
+                    HeaderText="@($"Список спринтов: {_totalCount}")"
+                    ShowCreateButton="AuthService.CurrentUser?.Role is RoleType.TeamLeader or RoleType.Initiator or RoleType.Admin"
+                    CreateButtonText="Создать спринт" 
+                    OnButtonClick="() => ShowSprintModal()"/>
+    <InputSearch Width="50" IsLoading="IsOnLoading" ValueChanged="@((value) => SeacrhSprint(value))" />
+    <TableComponent IsLoading="IsOnLoading" HeaderItems="_sprintsTableHeader" @ref="_tableComponent">
+        <TableContent>
+            @foreach (var sprint in _projectSprints)
+            {
+                <tr>
+                    <TableBodyRow>
+                        <div class="data-link" @onclick="() => ShowSprintModal(sprint)">
+                            @sprint.Name
+                        </div>
+                    </TableBodyRow>
+                    <TableBodyRow IsCentered="true">
+                        <EnumStatus Statustype="sprint.Status" />
+                    </TableBodyRow>
+                    <TableBodyRow IsCentered="true">
+                        @sprint.StartDate.ToString("dd.MM.yyyy")
+                    </TableBodyRow>
+                    <TableBodyRow IsCentered="true">
+                        @sprint.FinishDate.ToString("dd.MM.yyyy")
+                    </TableBodyRow>
+                </tr>
+            }
+        </TableContent>
+    </TableComponent>
+</div>

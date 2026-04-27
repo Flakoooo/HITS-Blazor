@@ -30,12 +30,12 @@
                 {
                     <tr>
                         <TableBodyRow IsCentered="true">
-                            <div class="bi bi-circle-fill fs-6 mt-1" style="@($"color: {tag.Color};")">
+                            <div class="bi bi-circle-fill fs-6 mt-1 px-2 py-1" style="@($"color: {tag.Color};")">
                                 <div></div>
                             </div>
                         </TableBodyRow>
                         <TableBodyRow>
-                            <div class="data-link" @onclick="() => ShowTagModal(tag)">
+                            <div class="data-link px-2 py-1" @onclick="() => ShowTagModal(tag)">
                                 @tag.Name
                             </div>
                         </TableBodyRow>

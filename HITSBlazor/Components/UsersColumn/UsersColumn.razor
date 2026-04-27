@@ -19,7 +19,7 @@
         }
         else
         {
-            @foreach (var user in _users)
+            @foreach (var user in _users.Where(u => DisplayPredicate.Invoke(u)))
             {
                 <div class="px-1 rounded border users-column-user" @onclick="() => OnElementSelected(user)">
                     <Typography FontSize="6">@user.FullName</Typography>
@@ -47,6 +47,9 @@
 
     [Parameter]
     public int DebounceDelay { get; set; } = 0;
+
+    [Parameter]
+    public Func<User, bool> DisplayPredicate { get; set; } = (user) => true;
 
     private string _searchText = string.Empty;
     private List<User> _users = [];

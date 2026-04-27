@@ -2,7 +2,6 @@
 using HITSBlazor.Models.Projects.Enums;
 using HITSBlazor.Models.Users.Entities;
 using HITSBlazor.Utils.Mocks.Users;
-using System.Globalization;
 
 using HITSTask = HITSBlazor.Models.Projects.Entities.Task;
 using HITSTaskStatus = HITSBlazor.Models.Projects.Enums.TaskStatus;
@@ -17,7 +16,7 @@ namespace HITSBlazor.Utils.Mocks.Projects
         private static List<TaskMovementLog> CreateLogs()
         {
             var logs = new List<TaskMovementLog>();
-            foreach (var sprint in MockSprints.GetAllSprints())
+            foreach (var sprint in MockSprints.GetAllMockSprints())
             {
                 var project = MockProjects.GetProjectById(sprint.ProjectId);
                 if (project is null) continue;
@@ -138,5 +137,44 @@ namespace HITSBlazor.Utils.Mocks.Projects
 
         public static List<TaskMovementLog> GetTaskMovementLogsByTaskId(Guid taskId)
             => [.. _taskMovementLogs.Where(tml => tml.Task.Id == taskId)];
+
+        public static bool CreateNewTaskLog(HITSTask task, User creator, User? executor = null)
+        {
+            var lastLog = _taskMovementLogs.LastOrDefault(tml => tml.Task.Id == task.Id);
+            TaskMovementLog newLog;
+            if (lastLog is null)
+            {
+                newLog = new TaskMovementLog
+                {
+                    Id = Guid.NewGuid(),
+                    Task = task,
+                    Executor = executor ?? creator,
+                    User = creator,
+                    StartDate = DateTime.UtcNow,
+                    Status = task.Status
+                };
+            }
+            else
+            {
+                var endDate = DateTime.UtcNow;
+
+                lastLog.EndDate = endDate;
+                lastLog.WastedTime = (lastLog.EndDate - lastLog.StartDate).ToString() ?? string.Empty;
+
+                newLog = new TaskMovementLog
+                {
+                    Id = Guid.NewGuid(),
+                    Task = task,
+                    Executor = executor ?? creator,
+                    User = creator,
+                    StartDate = endDate,
+                    Status = task.Status
+                };
+            }
+
+            _taskMovementLogs.Add(newLog);
+
+            return true;
+        }
     }
 }

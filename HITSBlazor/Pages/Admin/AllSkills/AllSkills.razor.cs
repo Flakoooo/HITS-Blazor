@@ -59,6 +59,8 @@ namespace HITSBlazor.Pages.Admin.AllSkills
             SkillService.OnSkillHasUpdated += SkillHasUpdated;
             SkillService.OnSkillHasDeleted += SkillHasDeleted;
 
+            await LoadSkillsAsync();
+
             _isLoading = false;
 
             MarkAsInitialized();

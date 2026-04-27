@@ -395,7 +395,7 @@ namespace HITSBlazor.Services
                     };
                     if (projectAllowedRoles.Contains(userRole))
                     {
-                        var activeProjects = await _projectService.GetAllActiveProjects(_authService.CurrentUser.Id);
+                        var activeProjects = await _projectService.GetAllActiveProjectsAsync(_authService.CurrentUser.Id);
                         int count = nav.SubItems.Count;
                         foreach (var project in activeProjects)
                         {

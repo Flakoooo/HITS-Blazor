@@ -5,8 +5,9 @@ using HITSBlazor.Components.Modals.RightSideModals.ProfileModal;
 using HITSBlazor.Models.Common.Enums;
 using HITSBlazor.Models.Ideas.Enums;
 using HITSBlazor.Models.Markets.Enums;
+using HITSBlazor.Models.Projects.Enums;
 using HITSBlazor.Models.Users.Enums;
-
+using HITSBlazor.Pages.Projects.ProjectView;
 using HITSTaskStatus = HITSBlazor.Models.Projects.Enums.TaskStatus;
 
 namespace HITSBlazor.Utils.EnumUIConverters
@@ -19,8 +20,12 @@ namespace HITSBlazor.Utils.EnumUIConverters
             SkillType t => GetSkillTypeInfo(t),
             IdeaStatusType s => GetIdeasStatusInfo(s),
             IdeaMarketStatusType s => GetMarketIdeaStatusInfo(s),
+            ProjectStatus s => GetProjectStatusInfo(s),
             HITSTaskStatus s => GetTastStatusInfo(s),
+            ProjectMemberRole r => GetProjectMemberRoleInfo(r),
+            SprintStatus s => GetSprintStatusInfo(s),
             ProfileModalCategory c => GetProfileCategoryInfo(c),
+            ProjectViewCategory c => GetProjectCategoryInfo(c),
             EndedSprintModalStatCategory c => GetSprintModalStatCategoryInfo(c),
             MenuAction a => GetActionMenuInfo(a),
             NotificationType n => GetNotificationTypeInfo(n),
@@ -33,8 +38,12 @@ namespace HITSBlazor.Utils.EnumUIConverters
             SkillType t => GetSkillTypeInfo(t),
             IdeaStatusType s => GetIdeasStatusInfo(s),
             IdeaMarketStatusType s => GetMarketIdeaStatusInfo(s),
+            ProjectStatus s => GetProjectStatusInfo(s),
             HITSTaskStatus s => GetTastStatusInfo(s),
+            ProjectMemberRole r => GetProjectMemberRoleInfo(r),
+            SprintStatus s => GetSprintStatusInfo(s),
             ProfileModalCategory c => GetProfileCategoryInfo(c),
+            ProjectViewCategory c => GetProjectCategoryInfo(c),
             EndedSprintModalStatCategory c => GetSprintModalStatCategoryInfo(c),
             MenuAction a => GetActionMenuInfo(a),
             NotificationType n => GetNotificationTypeInfo(n),

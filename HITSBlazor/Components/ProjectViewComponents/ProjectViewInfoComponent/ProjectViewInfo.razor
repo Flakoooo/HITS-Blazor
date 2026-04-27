@@ -1,0 +1,106 @@
+﻿@namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewInfoComponent
+@using HITSBlazor.Components.ActionMenus.BaseActionMenu
+@using HITSBlazor.Components.Button
+@using HITSBlazor.Components.ListPageComponents.ListPageSearch
+@using HITSBlazor.Components.Modals.Components.RightSideModaCollapselInfo
+@using HITSBlazor.Components.Modals.Components.RightSideModalInfoItemComponent
+@using HITSBlazor.Components.Statuses.EnumStatus
+@using HITSBlazor.Components.Tables.TableActionMenu
+@using HITSBlazor.Components.Tables.TableBodyRow
+@using HITSBlazor.Components.Tables.TableComponent
+@using HITSBlazor.Components.Tables.TableHeader
+@using HITSBlazor.Components.Typography
+@using HITSBlazor.Models.Projects.Entities
+@using HITSBlazor.Models.Projects.Enums
+@using HITSBlazor.Services.Modal
+
+<div class="d-flex gap-3 mt-4">
+    <div class="w-75">
+        <RightSideModaCollapselInfo IsLoading="IsLoading" Data="_projectInfoData" />
+        <div class="w-100 bg-white p-3">
+            <ListPageSearch IsLoading="IsLoading" ValueChanged="@((value) => SeacrhMember(value))" />
+            <TableComponent IsLoading="IsLoading" HeaderItems="_membersTableHeader" TableActionMenuIsEnable="true">
+                <TableContent>
+                    @foreach (var member in CurrentProject?.Members ?? [])
+                    {
+                        <tr>
+                            <TableBodyRow>
+                                <div class="data-link" @onclick="() => ShowProfileModal(member.UserId)">
+                                    @member.Email
+                                </div>
+                            </TableBodyRow>
+                            <TableBodyRow>@member.FirstName</TableBodyRow>
+                            <TableBodyRow>@member.LastName</TableBodyRow>
+                            <TableBodyRow IsCentered="true">
+                                <EnumStatus Statustype="member.ProjectRole" />
+                            </TableBodyRow>
+                            <TableActionMenu ItemId="member.UserId"
+                                                StrategyPosition="Strategy.Fixed"
+                                                OnAction="@OnMemberAction"
+                                                ActionIds="@(new Dictionary<MenuAction, object> {
+                                                    [MenuAction.ViewProfile] = member.UserId
+                                                })" />
+                        </tr>
+                    }
+                </TableContent>
+            </TableComponent>
+        </div>
+    </div>
+    <div class="w-25">
+        <div class="text-center p-2 bg-primary rounded-top text-white fs-4 border border-bottom-0">
+            Информация
+        </div>
+        <div class="d-flex flex-column gap-2 bg-white rounded-bottom p-3 border border-top-0">
+            <div class="px-2">
+                <RightSideModalInfoItemComponent IsLoading="IsLoading"
+                                                    Label="Инициатор" 
+                                                    Icon="bi-person-circle"
+                                                    Text="@CurrentProject?.Initiator.FullName"
+                                                    TextColor="TextColor.Primary" />
+            </div>
+            <div class="px-2">
+                <RightSideModalInfoItemComponent IsLoading="IsLoading"
+                                                    Label="Заказчик" 
+                                                    Icon="bi-person-circle"
+                                                    Text="@CurrentProject?.Customer"
+                                                    TextColor="TextColor.Primary" />
+            </div>
+            <div class="px-2">
+                <RightSideModalInfoItemComponent IsLoading="IsLoading"
+                                                    Label="Дата старта" 
+                                                    Icon="bi-person-circle"
+                                                    Text="@CurrentProject?.StartDate.ToString("dd.MM.yyyy")"
+                                                    TextColor="TextColor.Primary" />
+            </div>
+            <div class="px-2">
+                <RightSideModalInfoItemComponent IsLoading="IsLoading"
+                                                    Label="Дата окончания" 
+                                                    Icon="bi-person-circle"
+                                                    Text="@CurrentProject?.FinishDate.ToString("dd.MM.yyyy")"
+                                                    TextColor="TextColor.Primary" />
+            </div>
+            <div class="d-flex flex-column gap-2 mt-2">
+
+                <Button IsLoading="IsLoading"
+                        Text="Перейти в идею" 
+                        Variant="ButtonVariant.Primary"
+                        OnButtonClick="() => ShowIdeaModal(CurrentProject?.IdeaId)" />
+                @if (CurrentProject?.Status is ProjectStatus.Done)
+                {
+                    <Button IsLoading="IsLoading"
+                            Text="Информация о проекте" 
+                            Variant="ButtonVariant.Primary"
+                            OnButtonClick="@(() => Console.WriteLine("Какое то модальное окно"))" />
+                }
+                //TODO: тут вызывается модальное окно завершения спринта, но я думаю надо сделать лучше
+                else
+                {
+                    <Button IsLoading="IsLoading"
+                            Text="Завершить проект" 
+                            Variant="ButtonVariant.Primary"
+                            OnButtonClick="@(() => Console.WriteLine("Какое то модальное окно"))" />
+                }
+            </div>
+        </div>
+    </div>
+</div>

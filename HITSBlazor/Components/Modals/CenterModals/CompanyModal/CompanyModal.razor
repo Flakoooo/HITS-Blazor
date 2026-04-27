@@ -30,7 +30,8 @@
                      HeaderText="Пользователи:"
                      SelectedUserChanged="SelectUser"
                      DataLoaderMethod="async (page, searchText) => await UserService.GetUsersAsync(page, searchText: searchText)"
-                     DebounceDelay="500"/>
+                     DebounceDelay="500" 
+                     DisplayPredicate="(user) => !_companyUsers.Contains(user)" />
         <UsersColumn IsLoading="_isLoading"
                      HeaderText="Представители компании:"
                      AllUsers="_companyUsers.ToList()"

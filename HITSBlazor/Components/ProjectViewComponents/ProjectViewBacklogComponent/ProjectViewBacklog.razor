@@ -1,0 +1,43 @@
+﻿@namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewBacklogComponent
+@using HITSBlazor.Components.Button
+@using HITSBlazor.Components.Filters.CheckboxFilter
+@using HITSBlazor.Components.Filters.ResetFilterButton
+@using HITSBlazor.Components.TaskComponent
+@using HITSBlazor.Models.Common.Entities
+@using HITSBlazor.Models.Projects.Entities
+@using HITSBlazor.Models.Users.Enums
+@using HITSBlazor.Pages
+@using HITSBlazor.Services.Auth
+@using HITSBlazor.Services.Modal
+@using HITSBlazor.Services.Tags
+@inherits ListPageDataLoader
+
+<div class="d-flex gap-3 mt-4">
+    <div class="w-100" @ref="_tableContainer">
+        @foreach (var task in _projectTasks)
+        {
+            <TaskComponent Task="task" 
+                           CollapseTaskAllowed="true"
+                           ShowTaskModalAllowed="task.Status is Models.Projects.Enums.TaskStatus.InBackLog"
+                           DeleteTaskAllowed="AuthService.CurrentUser?.Role is RoleType.TeamLeader or RoleType.Admin" />
+        }
+    </div>
+    <div class="d-flex flex-column gap-3 w-25">
+        <Button IsLoading="IsOnLoading"
+                Variant="ButtonVariant.Primary" 
+                ButtonClass="p-2"
+                Text="Создать задачу" 
+                OnButtonClick="() => ShowTaskModal()" />
+        <div class="filter w-25 bg-white p-2 border-start w-100">
+            <CheckboxFilter T="Tag" 
+                            IsLoading="IsOnLoading"
+                            Label="Теги" 
+                            @bind-SearchText="SearchTagFilterText"
+                            @bind-SelectedValues="SelectedTagNames"
+                            FilterChanged="FiltersHasChanged"
+                            DataLoaderMethod="async (page, searchText) => await TagService.GetTagsAsync(page, searchText)"
+                            DebounceDelay="500" />
+            <ResetFilterButton IsLoading="IsOnLoading" ResetMethod="ResetFilters" />
+        </div>
+    </div>
+</div>

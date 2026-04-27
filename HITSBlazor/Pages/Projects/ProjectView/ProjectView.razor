@@ -11,6 +11,11 @@
 @using HITSBlazor.Components.Modals.Components.RightSideModaCollapselInfo
 @using HITSBlazor.Components.Modals.Components.RightSideModalInfoItemComponent
 @using HITSBlazor.Components.NavigationTabs
+@using HITSBlazor.Components.Placeholders.Placeholder
+@using HITSBlazor.Components.ProjectViewComponents.ProjectViewActiveSprintComponent
+@using HITSBlazor.Components.ProjectViewComponents.ProjectViewBacklogComponent
+@using HITSBlazor.Components.ProjectViewComponents.ProjectViewInfoComponent
+@using HITSBlazor.Components.ProjectViewComponents.ProjectViewSprintComponent
 @using HITSBlazor.Components.Statuses.EnumStatus
 @using HITSBlazor.Components.Tables.TableActionMenu
 @using HITSBlazor.Components.Tables.TableBodyRow
@@ -26,12 +31,19 @@
 
 <div class="bg-white h-auto">
     <div class="px-4 py-3 h-100">
-        <div class="d-flex gap-3 align-items-center mb-2">
-            <Typography FontSize="4" TextColor="TextColor.Primary">
-                @_currentProject?.Name
-            </Typography>
-            <EnumStatus Statustype="_currentProject?.Status" />
-        </div>
+        @if (_isLoading)
+        {
+            <Placeholder Height="PlaceholderHeight.Smaller" />
+        }
+        else
+        {
+            <div class="d-flex gap-3 align-items-center mb-2">
+                <Typography FontSize="4" TextColor="TextColor.Primary">
+                    @_currentProject?.Name
+                </Typography>
+                <EnumStatus Statustype="_currentProject?.Status" />
+            </div>
+        }
         <div>
             <!-- TODO: сделать категорию со всей статистикой проекта, кто сколько сделал, какой прогресс спринтов и так далее -->
             <div class="px-3">
@@ -44,250 +56,22 @@
             </div>
             @if (_activeCategory is ProjectViewCategory.Info)
             {
-                <div class="d-flex gap-3 mt-4">
-                    <div class="w-75">
-                        <RightSideModaCollapselInfo Data="_projectInfoData" />
-                        <div class="w-100 bg-white p-3">
-                            <ListPageSearch IsLoading="_isLoading" ValueChanged="@((value) => SeacrhMember(value))" />
-                            <div class="w-100 d-flex">
-                                <div class="w-100">
-                                    <table class="table table-hover mb-0">
-                                        <TableHeader Items="_membersTableHeader" TableActionMenuIsEnable="true" />
-                                        <tbody>
-                                            @foreach (var member in _currentProject?.Members ?? [])
-                                            {
-                                                <tr>
-                                                    <TableBodyRow>
-                                                        <div class="data-link" @onclick="() => ShowProfileModal(member.UserId)">
-                                                            @member.Email
-                                                        </div>
-                                                    </TableBodyRow>
-                                                    <TableBodyRow>
-                                                        @member.FirstName
-                                                    </TableBodyRow>
-                                                    <TableBodyRow>
-                                                        @member.LastName
-                                                    </TableBodyRow>
-                                                    <TableBodyRow IsCentered="true">
-                                                        <EnumStatus Statustype="member.ProjectRole" />
-                                                    </TableBodyRow>
-                                                    <TableActionMenu ItemId="member.UserId"
-                                                                     StrategyPosition="Strategy.Fixed"
-                                                                     OnAction="@OnMemberAction"
-                                                                     ActionIds="@(new Dictionary<MenuAction, object> {
-                                                                         [MenuAction.ViewProfile] = member.UserId
-                                                                     })" />
-                                                </tr>
-                                            }
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="w-25">
-                        <div class="text-center p-2 bg-primary rounded-top text-white fs-4 border border-bottom-0">
-                            Информация
-                        </div>
-                        <div class="d-flex flex-column gap-2 bg-white rounded-bottom p-3 border border-top-0">
-                            <div class="px-2">
-                                <RightSideModalInfoItemComponent Label="Инициатор" 
-                                                                 Icon="bi-person-circle"
-                                                                 Text="@_currentProject?.Initiator.FullName"
-                                                                 TextColor="TextColor.Primary" />
-                            </div>
-                            <div class="px-2">
-                                <RightSideModalInfoItemComponent Label="Заказчик" 
-                                                                 Icon="bi-person-circle"
-                                                                 Text="@_currentProject?.Customer"
-                                                                 TextColor="TextColor.Primary" />
-                            </div>
-                            <div class="px-2">
-                                <RightSideModalInfoItemComponent Label="Дата старта" 
-                                                                 Icon="bi-person-circle"
-                                                                 Text="@_currentProject?.StartDate.ToString("dd.MM.yyyy")"
-                                                                 TextColor="TextColor.Primary" />
-                            </div>
-                            <div class="px-2">
-                                <RightSideModalInfoItemComponent Label="Дата окончания" 
-                                                                 Icon="bi-person-circle"
-                                                                 Text="@_currentProject?.FinishDate.ToString("dd.MM.yyyy")"
-                                                                 TextColor="TextColor.Primary" />
-                            </div>
-                            <div class="d-flex flex-column gap-2 mt-2">
-
-                                <Button IsLoading="_isLoading"
-                                        Text="Перейти в идею" 
-                                        Variant="ButtonVariant.Primary"
-                                        OnButtonClick="() => ModalService.ShowIdeaModal(_currentProject.IdeaId)" />
-                                @if (_currentProject.Status is ProjectStatus.Done)
-                                {
-                                    <Button IsLoading="_isLoading"
-                                            Text="Информация о проекте" 
-                                            Variant="ButtonVariant.Primary"
-                                            OnButtonClick="@(() => Console.WriteLine("Какое то модальное окно"))" />
-                                }
-                                //TODO: тут вызывается модальное окно завершения спринта, но я думаю надо сделать лучше
-                                else
-                                {
-                                    <Button IsLoading="_isLoading"
-                                            Text="Завершить проект" 
-                                            Variant="ButtonVariant.Primary"
-                                            OnButtonClick="@(() => Console.WriteLine("Какое то модальное окно"))" />
-                                }
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <ProjectViewInfo CurrentProject="_currentProject" IsLoading="_isLoading" />
             }
             else if (_activeCategory is ProjectViewCategory.Backlog)
             {
-                <div class="d-flex gap-3 mt-4">
-                    <div class="w-100">
-                        @foreach (var task in _projectTasks)
-                        {
-                            <TaskComponent Task="task" 
-                                           CollapseTaskAllowed="true"
-                                           ShowTaskModalAllowed="task.Status is Models.Projects.Enums.TaskStatus.InBackLog"
-                                           DeleteTaskAllowed="AuthService.CurrentUser?.Role is RoleType.TeamLeader or RoleType.Admin" />
-                        }
-                    </div>
-                    <div class="d-flex flex-column gap-3 w-25">
-                        <Button IsLoading="_isLoading" 
-                                Variant="ButtonVariant.Primary" 
-                                ButtonClass="p-2"
-                                Text="Создать задачу" 
-                                OnButtonClick="() => ShowTaskModal()" />
-                        <div class="filter w-25 bg-white p-2 border-start w-100">
-                            <CheckboxFilter T="Tag" 
-                                            IsLoading="_isLoading"
-                                            Label="Теги" 
-                                            @bind-SearchText="SearchTagFilterText"
-                                            @bind-SelectedValues="SelectedTagNames"
-                                            FilterChanged="LoadTasksAsync"
-                                            DataLoaderMethod="async (page, searchText) => await TagService.GetTagsAsync(page, searchText)"
-                                            DebounceDelay="500" />
-                            <ResetFilterButton IsLoading="_isLoading" />
-                        </div>
-                    </div>
-                </div>
+                <ProjectViewBacklog CurrentProject="_currentProject" IsLoading="_isLoading" />
             }
             else if (_activeCategory is ProjectViewCategory.Sprints)
             {
-                <div class="overflow-y-scroll">
-                    <div class="w-100 bg-white p-3">
-                        <ListPageHeader IsLoading="_isLoading"
-                                        HeaderText="@($"Список спринтов: {_projectSprints.Count}")"
-                                        ShowCreateButton="AuthService.CurrentUser?.Role is RoleType.TeamLeader or RoleType.Initiator or RoleType.Admin"
-                                        CreateButtonText="Создать спринт" 
-                                        OnButtonClick="() => ShowSprintModal()"/>
-                        <InputSearch Width="50" IsLoading="_isLoading" ValueChanged="@((value) => SeacrhSprint(value))" />
-                        <TableComponent IsLoading="_isLoading" HeaderItems="_sprintsTableHeader">
-                            <TableContent>
-                                @foreach (var sprint in _projectSprints)
-                                {
-                                    <tr>
-                                        <TableBodyRow>
-                                            <div class="data-link" @onclick="() => ShowSprintModal(sprint)">
-                                                @sprint.Name
-                                            </div>
-                                        </TableBodyRow>
-                                        <TableBodyRow IsCentered="true">
-                                            <EnumStatus Statustype="sprint.Status" />
-                                        </TableBodyRow>
-                                        <TableBodyRow IsCentered="true">
-                                            @sprint.StartDate.ToString("dd.MM.yyyy")
-                                        </TableBodyRow>
-                                        <TableBodyRow IsCentered="true">
-                                            @sprint.FinishDate.ToString("dd.MM.yyyy")
-                                        </TableBodyRow>
-                                    </tr>
-                                }
-                            </TableContent>
-                        </TableComponent>
-                    </div>
-                </div>
+                <ProjectViewSprintComponent CurrentProject="_currentProject"
+                                            IsLoading="_isLoading" />
             }
             else if (_activeSprint is not null && _activeCategory is ProjectViewCategory.ActiveSprint)
             {
-                <div>
-                    <div class="active-sprint-header mt-4 mb-2 w-100">
-                        <div class="active-sprint-header-name border-bottom w-100">
-                            <div class="data-link fs-5 fw-semibold text-primary">
-                                @_activeSprint.Name
-                            </div>
-                            <Typography FontSize="6">
-                                (до @_activeSprint.FinishDate.ToString("dd.MM.yyyy"))
-                            </Typography>
-                        </div>
-                        @if (AuthService.CurrentUser?.Role is RoleType.TeamLeader or RoleType.Initiator or RoleType.Admin)
-                        {
-                            <Button Variant="ButtonVariant.Danger" 
-                                    Text="Завершить спринт" 
-                                    Style="width: 100%; margin-left: 16px; max-width: fit-content;"
-                                    OnButtonClick="ShowFinishSprintModal" />                            
-                        }
-                    </div>
-                    <div class="active-sprint-columns w-100">
-                        @foreach (var taskCategory in Enum.GetValues<HITSBlazor.Models.Projects.Enums.TaskStatus>().Where(s => s is not Models.Projects.Enums.TaskStatus.InBackLog))
-                        {
-                            string color = GetTaskCategoryColor(taskCategory);
-                            <div class="w-100">
-                                <div class="mb-1">
-                                    <div class="rounded-top" style="height: 6px; background-color: @color;">
-                                    </div>
-                                    <div class="active-sprint-header p-2 border-start border-end border-bottom rounded-bottom">
-                                        <div class="d-flex gap-2">
-                                            <i class="bi bi-flag-fill fs-6" style="color: @color;"></i>
-                                            <Typography FontSize="6">
-                                                @EnumUIConverter.GetInfo(taskCategory).DisplayText
-                                            </Typography>
-                                        </div>
-                                        <div class="d-flex align-items-center gap-2">
-                                            @if (taskCategory is Models.Projects.Enums.TaskStatus.NewTask)
-                                            {
-                                                <i class="bi bi-plus active-sprint-add-task p-1 rounded" @onclick="() => ShowTaskModal()"></i>
-                                            }
-                                            <Hint Text="@GetHintTaskStatusText(taskCategory)" IconColor="TextColor.Dark" />
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="list-group active-sprint-column">
-                                    @foreach (var task in _activeSprint.Tasks.Where(t => t.Status == taskCategory))
-                                    {
-                                        <div>
-                                            <div class="d-flex my-1" style="cursor: pointer;">
-                                                <div class="rounded-start" style="width: 6px; background-color: rgb(@GetTaskExecuteColor(task.Executor));">
-                                                </div>
-                                                <div class="bg-white p-2 border-top border-end border-bottom w-100 rounded-end">
-                                                    <div class="d-flex flex-column border-bottom pb-2">
-                                                        <div class="active-sprint-task">
-                                                            <div class="text-ellipsis">
-                                                                @task.Name
-                                                            </div>
-                                                        </div>
-                                                        <div class="d-flex gap-1 text-secondary">
-                                                            @task.Executor?.FullName
-                                                        </div>
-                                                    </div>
-                                                    <div class="d-flex flex-wrap gap-2 w-100 mt-2">
-                                                        @foreach (var tag in task.Tags)
-                                                        {
-                                                            <div class="px-2 py-1 rounded-2 text-center align-self-start" 
-                                                                 style="background-color: @($"{tag.Color}4D"); color: @tag.Color;">
-                                                                 @tag.Name
-                                                            </div>
-                                                        }
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    }
-                                </div>
-                            </div>
-                        }
-                    </div>
-                </div>
+                <ProjectViewActiveSprint CurrentProject="_currentProject"
+                                         ActiveSprint="_activeSprint"
+                                         IsLoading="_isLoading" />
             }
         </div>
     </div>
