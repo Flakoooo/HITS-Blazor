@@ -1,13 +1,4 @@
-﻿.filter {
-    display: flex;
-    flex-direction: column;
-    flex-wrap: nowrap;
-    align-items: stretch;
-    justify-content: flex-start;
-    gap: 8px;
-}
-
-.active-sprint-header {
+﻿.active-sprint-header {
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;

@@ -45,6 +45,8 @@ namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewBacklogComponen
         {
             _isLoading = true;
 
+            ProjectService.OnTaskHasCreated += TaskHasCreated;
+            ProjectService.OnTaskHasUpdated += TaskHasUpdated;
             ProjectService.OnTaskHasDeleted += TaskHasDeleted;
 
             await LoadTasksAsync();
@@ -67,7 +69,9 @@ namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewBacklogComponen
             {
                 await LoadDataAsync(
                     _projectTasks,
-                    () => ProjectService.GetTasksByProjectIdAsync(CurrentProject.Id, _currentPage),
+                    () => ProjectService.GetTasksByQueryParamsAsync(
+                        _currentPage, projectId: CurrentProject.Id
+                    ),
                     append: append
                 );
             }
@@ -88,6 +92,25 @@ namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewBacklogComponen
 
         private void ShowTaskModal(HITSTask? task = null) => ModalService.ShowTaskModal(task);
 
+        private void TaskHasCreated(HITSTask newTask)
+        {
+            _projectTasks.Add(newTask);
+            ++_totalCount;
+            StateHasChanged();
+        }
+
+        private void TaskHasUpdated(HITSTask updatedTask)
+        {
+            var taskForUpdate = _projectTasks.FirstOrDefault(t => t.Id == updatedTask.Id);
+            if (taskForUpdate is null) return;
+
+            taskForUpdate.Name = updatedTask.Name;
+            taskForUpdate.Description = updatedTask.Description;
+            taskForUpdate.Tags = updatedTask.Tags;
+            taskForUpdate.WorkHour = updatedTask.WorkHour;
+            StateHasChanged();
+        }
+
         private void TaskHasDeleted(HITSTask task)
         {
             if (_projectTasks.Remove(task))
@@ -99,6 +122,8 @@ namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewBacklogComponen
 
         protected override async ValueTask DisposeAsyncCore()
         {
+            ProjectService.OnTaskHasCreated -= TaskHasCreated;
+            ProjectService.OnTaskHasUpdated -= TaskHasUpdated;
             ProjectService.OnTaskHasDeleted -= TaskHasDeleted;
 
             await ValueTask.CompletedTask;

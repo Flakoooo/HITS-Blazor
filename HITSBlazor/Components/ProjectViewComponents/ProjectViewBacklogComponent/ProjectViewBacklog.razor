@@ -13,10 +13,11 @@
 @inherits ListPageDataLoader
 
 <div class="d-flex gap-3 mt-4">
-    <div class="w-100" @ref="_tableContainer">
+    <div class="w-100" style="max-height: 75vh; overflow-y: auto;" @ref="_tableContainer">
         @foreach (var task in _projectTasks)
         {
             <TaskComponent Task="task" 
+                           TaskWidth="_projectTasks.Count <= 13 ? 100 : 99"
                            CollapseTaskAllowed="true"
                            ShowTaskModalAllowed="task.Status is Models.Projects.Enums.TaskStatus.InBackLog"
                            DeleteTaskAllowed="AuthService.CurrentUser?.Role is RoleType.TeamLeader or RoleType.Admin" />

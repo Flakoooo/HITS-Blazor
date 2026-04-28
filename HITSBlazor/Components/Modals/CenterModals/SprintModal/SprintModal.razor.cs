@@ -68,9 +68,9 @@ namespace HITSBlazor.Components.Modals.CenterModals.SprintModal
 
         private async SharpTask LoadTasksAsync(bool append = false) => await LoadDataAsync(
             _allTasksInBacklog,
-            () => ProjectService.GetTasksByProjectIdAsync(
-                ProjectId,
+            () => ProjectService.GetTasksByQueryParamsAsync(
                 _currentPage,
+                projectId: ProjectId,
                 selectedStatuses: [HITSTaskStatus.InBackLog]
             ),
             append: append

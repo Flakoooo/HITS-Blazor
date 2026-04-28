@@ -11,7 +11,7 @@
 @using HITSTask = HITSBlazor.Models.Projects.Entities.Task;
 @using HITSTaskStatus = HITSBlazor.Models.Projects.Enums.TaskStatus;
 
-<div class="d-flex gap-2 mb-2 w-100">
+<div class="d-flex gap-2 mb-2" style="width: @TaskWidth%;">
     <div class="bg-white overflow-hidden rounded border w-100" style="cursor: pointer;">
         <Collapse>
             <MainContent Context="collapse">
@@ -96,6 +96,9 @@
 
     [Parameter]
     public bool ShowTaskModalAllowed { get; set; } = false;
+
+    [Parameter]
+    public int TaskWidth { get; set; } = 100;
 
     private (string Hint, string Color) GetHintAndColor(HITSTaskStatus status) => status switch
     {

@@ -36,9 +36,10 @@ namespace HITSBlazor.Services.Projects
         Task<bool> UpdateSprintAsync(Guid projectId, UpdateSprintRequest request);
 
         //Tasks
-        Task<ListDataResponse<HITSTask>> GetTasksByProjectIdAsync(
-            Guid proectId,
+        Task<ListDataResponse<HITSTask>> GetTasksByQueryParamsAsync(
             int page,
+            Guid? projectId = null,
+            Guid? sprintId = null,
             IEnumerable<HITSTaskStatus>? selectedStatuses = null
         );
         Task<bool> CreateNewTaskAsync(CreateTaskRequest request);

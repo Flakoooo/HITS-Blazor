@@ -328,22 +328,22 @@ namespace HITSBlazor.Utils.Mocks.Projects
                     StartDate = firstSprintDate.AddDays(SumSprintDate(2, false)),
                     FinishDate = firstSprintDate.AddDays(SumSprintDate(2, true)),
                     WorkingHours = 15,
-                    Status = SprintStatus.Done,
+                    Status = SprintStatus.Active,
                     Tasks = [.. _tasks.Where(t => t.SprintId == Sprint3Id)]
                 },
-                new Sprint
-                {
-                    Id = ScrumDesignSprintId,
-                    ProjectId = MockProjects.ChatBotId,
-                    Name = "Проектировка скрама",
-                    Goal = "Цель 4",
-                    Report = "Отчет 4",
-                    StartDate = firstSprintDate.AddDays(SumSprintDate(3, false)),
-                    FinishDate = firstSprintDate.AddDays(SumSprintDate(3, true)),
-                    WorkingHours = 20,
-                    Status = SprintStatus.Active,
-                    Tasks = [.. _tasks.Where(t => t.SprintId == Guid.Empty)]
-                }
+                //new Sprint
+                //{
+                //    Id = ScrumDesignSprintId,
+                //    ProjectId = MockProjects.ChatBotId,
+                //    Name = "Проектировка скрама",
+                //    Goal = "Цель 4",
+                //    Report = "Отчет 4",
+                //    StartDate = firstSprintDate.AddDays(SumSprintDate(3, false)),
+                //    FinishDate = firstSprintDate.AddDays(SumSprintDate(3, true)),
+                //    WorkingHours = 20,
+                //    Status = SprintStatus.Active,
+                //    Tasks = [.. _tasks.Where(t => t.SprintId == Guid.Empty)]
+                //}
             ];
         }
 
@@ -363,7 +363,7 @@ namespace HITSBlazor.Utils.Mocks.Projects
         }
 
         public static Sprint? GetActiveSprintByProjectId(Guid projectId)
-            => _sprints.FirstOrDefault(s => s.Id == projectId);
+            => _sprints.FirstOrDefault(s => s.ProjectId == projectId && s.Status is SprintStatus.Active);
 
         public static Sprint? CreateSprint(Guid projectId, CreateSprintRequest request)
         {
@@ -403,14 +403,21 @@ namespace HITSBlazor.Utils.Mocks.Projects
         public static HITSTask? GetTaskById(Guid taskId) =>
             _tasks.FirstOrDefault(t => t.Id == taskId);
 
-        public static ListDataResponse<HITSTask> GetTasksByProjectId(
-            Guid projectId, 
+        public static ListDataResponse<HITSTask> GetTasksByQueryParams( 
             int page, 
             int pageSize = 40,
+            Guid? projectId = null,
+            Guid? sprintId = null,
             HashSet<HITSTaskStatus>? selectedStatuses = null
         )
         {
-            var query = _tasks.Where(t => t.ProjectId == projectId);
+            var query = (projectId, sprintId) switch
+            {
+                (null, null) => _tasks.AsEnumerable(),
+                (_, null) => _tasks.Where(t => t.ProjectId == projectId),
+                (null, _) => _tasks.Where(t => t.SprintId == sprintId),
+                (_, _) => _tasks.Where(t => t.ProjectId == projectId && t.SprintId == sprintId),
+            };
 
             if (selectedStatuses?.Count > 0)
                 query = query.Where(t => selectedStatuses.Contains(t.Status));
@@ -472,8 +479,9 @@ namespace HITSBlazor.Utils.Mocks.Projects
         {
             var isRemoved = _tasks.Remove(task);
 
-            foreach (var sprint in _sprints)
-                isRemoved = sprint.Tasks.Remove(task);
+            if (isRemoved)
+                foreach (var sprint in _sprints)
+                    sprint.Tasks.Remove(task);
 
             return isRemoved;
         }

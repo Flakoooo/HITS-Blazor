@@ -61,12 +61,16 @@ namespace HITSBlazor.Services.Projects
         }
 
         //Tasks
-        public async Task<ListDataResponse<HITSTask>> GetTasksByProjectIdAsync(
-            Guid proectId,
+        public async Task<ListDataResponse<HITSTask>> GetTasksByQueryParamsAsync(
             int page,
+            Guid? projectId,
+            Guid? sprintId,
             IEnumerable<HITSTaskStatus>? selectedStatuses
-        ) => MockSprints.GetTasksByProjectId(
-            proectId, page, selectedStatuses: selectedStatuses?.ToHashSet()
+        ) => MockSprints.GetTasksByQueryParams(
+            page, 
+            projectId: projectId, 
+            sprintId: sprintId, 
+            selectedStatuses: selectedStatuses?.ToHashSet()
         );
 
         public async Task<bool> CreateNewTaskAsync(CreateTaskRequest request)
