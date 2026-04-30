@@ -3,7 +3,7 @@ using HITSBlazor.Services;
 using HITSBlazor.Services.ActionMenus;
 using HITSBlazor.Services.Auth;
 using HITSBlazor.Services.Companies;
-using HITSBlazor.Services.UsersGroups;
+using HITSBlazor.Services.IdeaMarkets;
 using HITSBlazor.Services.Ideas;
 using HITSBlazor.Services.Invitation;
 using HITSBlazor.Services.Markets;
@@ -12,18 +12,18 @@ using HITSBlazor.Services.Notifications;
 using HITSBlazor.Services.Profiles;
 using HITSBlazor.Services.Projects;
 using HITSBlazor.Services.Skills;
+using HITSBlazor.Services.Tags;
 using HITSBlazor.Services.Teams;
+using HITSBlazor.Services.TestResults;
 using HITSBlazor.Services.Tests;
 using HITSBlazor.Services.Users;
+using HITSBlazor.Services.UsersGroups;
 using HITSBlazor.Services.UserSkills;
 using HITSBlazor.Utils.Properties;
 using KristofferStrube.Blazor.Popper;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
-using HITSBlazor.Services.Tags;
-using HITSBlazor.Services.IdeaMarkets;
-using HITSBlazor.Services.TestResults;
 
 
 

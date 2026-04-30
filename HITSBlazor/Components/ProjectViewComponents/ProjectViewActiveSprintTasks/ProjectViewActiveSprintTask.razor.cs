@@ -4,7 +4,8 @@ using HITSBlazor.Services.Auth;
 using HITSBlazor.Services.Modal;
 using HITSBlazor.Services.Projects;
 using Microsoft.AspNetCore.Components;
-
+using Microsoft.AspNetCore.Components.Web;
+using Microsoft.JSInterop;
 using HITSTask = HITSBlazor.Models.Projects.Entities.Task;
 using HITSTaskStatus = HITSBlazor.Models.Projects.Enums.TaskStatus;
 using ShrapTask = System.Threading.Tasks.Task;
@@ -28,19 +29,42 @@ namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewActiveSprintTas
         [Parameter]
         public required HITSTaskStatus TaskCategory { get; set; }
 
+        private static IJSRuntime? _jsRuntime;
+
         private bool _isLoading = true;
 
-        private List<HITSTask> _sprintTasks = [];
+        private static HITSTask? _draggedTask;
+        private static string? _draggedFromCategory;
+        private static event Action? OnDragStateChanged;
+
+        private static double _mouseX;
+        private static double _mouseY;
+
+        private bool _isDragOver;
+        private bool _isMouseDown;
+        private HITSTask? _potentialDragTask;
+
+        private readonly List<HITSTask> _sprintTasks = [];
+
+        private static bool IsDragging => _draggedTask != null;
 
         protected override async ShrapTask OnInitializedAsync()
         {
             _isLoading = true;
+
+            _jsRuntime = JSRuntime;
+
+            ProjectService.OnTaskHasCreated += TaskHasCreated;
+            ProjectService.OnTaskHasMoved += TaskHasMoved;
+            OnDragStateChanged += HandleDragStateChanged;
 
             await LoadTasksAsync();
 
             _isLoading = false;
             MarkAsInitialized();
         }
+
+        private void HandleDragStateChanged() => InvokeAsync(StateHasChanged);
 
         protected override int GetCurrentItemsCount() => _sprintTasks.Count;
 
@@ -52,12 +76,145 @@ namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewActiveSprintTas
         private async ShrapTask LoadTasksAsync(bool append = false) => await LoadDataAsync(
             _sprintTasks,
             () => ProjectService.GetTasksByQueryParamsAsync(
-                _currentPage, 
+                _currentPage,
                 sprintId: CurrentSprint?.Id,
                 selectedStatuses: [TaskCategory]
             ),
             append: append
         );
+
+        private void HandleMouseDown(MouseEventArgs e, HITSTask task)
+        {
+            _isMouseDown = true;
+            _potentialDragTask = task;
+            _mouseX = e.ClientX;
+            _mouseY = e.ClientY;
+        }
+
+        private void HandleMouseUp(MouseEventArgs e)
+        {
+            _isMouseDown = false;
+            _potentialDragTask = null;
+        }
+
+        private void HandleMouseMove(MouseEventArgs e)
+        {
+            if (IsDragging)
+            {
+                _mouseX = e.ClientX;
+                _mouseY = e.ClientY;
+                OnDragStateChanged?.Invoke();
+            }
+            else if (_isMouseDown && _potentialDragTask != null)
+            {
+                StartDrag(_potentialDragTask);
+                _isMouseDown = false;
+            }
+        }
+
+        private void HandleGlobalMouseUp(MouseEventArgs e)
+        {
+            if (IsDragging)
+            {
+                EndDrag();
+            }
+            _isMouseDown = false;
+            _potentialDragTask = null;
+        }
+
+        private static void HandleGlobalMouseMove(MouseEventArgs e)
+        {
+            if (IsDragging)
+            {
+                _mouseX = e.ClientX;
+                _mouseY = e.ClientY;
+                OnDragStateChanged?.Invoke();
+            }
+        }
+
+        private static async void StartDrag(HITSTask task)
+        {
+            _draggedTask = task;
+            _draggedFromCategory = task.Status.ToString();
+
+            if (_jsRuntime != null)
+            {
+                await _jsRuntime.InvokeVoidAsync("dragDrop.preventSelection");
+            }
+
+            OnDragStateChanged?.Invoke();
+        }
+
+        private static async void EndDrag()
+        {
+            _draggedTask = null;
+            _draggedFromCategory = null;
+
+            if (_jsRuntime != null)
+            {
+                await _jsRuntime.InvokeVoidAsync("dragDrop.allowSelection");
+            }
+
+            OnDragStateChanged?.Invoke();
+        }
+
+
+        private async void HandleDrop()
+        {
+            _isDragOver = false;
+
+            var taskToMove = _draggedTask;
+
+            EndDrag();
+
+            if (taskToMove != null && taskToMove.Status != TaskCategory)
+            {
+                try
+                {
+                    var executor = AuthService.CurrentUser;
+                    if (executor is not null)
+                        await ProjectService.UpdateTaskStatusAsync(taskToMove, TaskCategory, executor);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error updating task status: {ex.Message}");
+                }
+            }
+        }
+
+        private void TaskHasCreated(HITSTask newTask)
+        {
+            _sprintTasks.Add(newTask);
+            ++_totalCount;
+            StateHasChanged();
+        }
+
+        private void TaskHasMoved(HITSTask updatedTask, HITSTaskStatus oldStatus)
+        {
+            if (updatedTask.SprintId != CurrentSprint?.Id) return;
+
+            if (updatedTask.Status == TaskCategory)
+            {
+                if (!_sprintTasks.Any(t => t.Id == updatedTask.Id))
+                {
+                    _sprintTasks.Add(updatedTask);
+                    ++_totalCount;
+                    StateHasChanged();
+                }
+            }
+            else if (oldStatus == TaskCategory)
+            {
+                var taskToRemove = _sprintTasks.FirstOrDefault(t => t.Id == updatedTask.Id);
+                if (taskToRemove is not null)
+                {
+                    if (_sprintTasks.Remove(taskToRemove))
+                    {
+                        --_totalCount;
+                        StateHasChanged();
+                    }
+                }
+            }
+        }
 
         private static string GetHintTaskStatusText(HITSTaskStatus status) => status switch
         {
@@ -94,5 +251,14 @@ namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewActiveSprintTas
         }
 
         private void ShowTaskModal(HITSTask? task = null) => ModalService.ShowTaskModal(task);
+
+        protected override async ValueTask DisposeAsyncCore()
+        {
+            ProjectService.OnTaskHasCreated -= TaskHasCreated;
+            ProjectService.OnTaskHasMoved -= TaskHasMoved;
+            OnDragStateChanged -= HandleDragStateChanged;
+
+            await ValueTask.CompletedTask;
+        }
     }
 }

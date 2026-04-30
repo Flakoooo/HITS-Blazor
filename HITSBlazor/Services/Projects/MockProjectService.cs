@@ -17,6 +17,7 @@ namespace HITSBlazor.Services.Projects
 
         public event Action<HITSTask>? OnTaskHasCreated;
         public event Action<HITSTask>? OnTaskHasUpdated;
+        public event Action<HITSTask, HITSTaskStatus>? OnTaskHasMoved;
         public event Action<HITSTask>? OnTaskHasDeleted;
 
         public async Task<ListDataResponse<Project>> GetProjectsByQueryAsync(
@@ -91,12 +92,14 @@ namespace HITSBlazor.Services.Projects
             return true;
         }
 
-        public async Task<bool> UpdateTaskStatusAsync(Guid taskId, HITSTaskStatus newStatus, User executor)
+        public async Task<bool> UpdateTaskStatusAsync(HITSTask task, HITSTaskStatus newStatus, User executor)
         {
-            var updatedTask = MockSprints.UpdateTaskStatus(taskId, newStatus, executor);
+            var oldStatus = task.Status;
+
+            var updatedTask = MockSprints.UpdateTaskStatus(task.Id, newStatus, executor);
             if (updatedTask is null) return false;
 
-            OnTaskHasUpdated?.Invoke(updatedTask);
+            OnTaskHasMoved?.Invoke(updatedTask, oldStatus);
             return true;
         }
 

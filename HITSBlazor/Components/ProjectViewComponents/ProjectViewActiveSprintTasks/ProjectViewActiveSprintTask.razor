@@ -12,13 +12,21 @@
 
 @using HITSTaskStatus = HITSBlazor.Models.Projects.Enums.TaskStatus;
 
-<div class="w-100">
+<div class="w-100"
+     @onmouseup="HandleGlobalMouseUp"
+     @onmousemove="HandleGlobalMouseMove"
+     style="@(IsDragging ? "user-select: none; -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none;" : "")">
     @{
         string color = GetTaskCategoryColor(TaskCategory);
+        bool isDragOverTarget = _isDragOver && _draggedTask?.Status != TaskCategory;
+        string dragOverClass = isDragOverTarget ? "active-sprint-column-dragover" : "";
         <div class="mb-1">
             <div class="rounded-top" style="height: 6px; background-color: @color;">
             </div>
-            <div class="active-sprint-header p-2 border-start border-end border-bottom rounded-bottom">
+            <div class="active-sprint-header p-2 border-start border-end border-bottom rounded-bottom"
+                 @onmouseup="HandleDrop"
+                 @onmouseenter="() => _isDragOver = _draggedTask != null && _draggedTask.Status != TaskCategory"
+                 @onmouseleave="() => _isDragOver = false">
                 <div class="d-flex gap-2">
                     <i class="bi bi-flag-fill fs-6" style="color: @color;"></i>
                     <Typography FontSize="6">
@@ -35,10 +43,19 @@
             </div>
         </div>
     }
-    <div class="list-group active-sprint-column" @ref="_tableContainer">
+    <div class="list-group active-sprint-column @dragOverClass"
+         @ref="_tableContainer"
+         @onmouseup="HandleDrop"
+         @onmouseenter="() => _isDragOver = _draggedTask != null && _draggedTask.Status != TaskCategory"
+         @onmouseleave="() => _isDragOver = false">
         @foreach (var task in _sprintTasks)
         {
-            <div class="d-flex my-1" style="cursor: pointer;">
+            <div class="d-flex my-1 task-item"
+                 style="cursor: grab; opacity: @(_draggedTask?.Id == task.Id ? "0.3" : "1")"
+                 @onmousedown="(e) => HandleMouseDown(e, task)"
+                 @onmousemove="HandleMouseMove"
+                 @onmouseup="HandleMouseUp"
+                 @onmousedown:preventDefault="true">
                 <div class="rounded-start" style="width: 6px; background-color: rgb(@GetTaskExecuteColor(task.Executor));">
                 </div>
                 <div class="bg-white p-2 border-top border-end border-bottom w-100 rounded-end">
@@ -66,3 +83,36 @@
         }
     </div>
 </div>
+
+@if (_draggedTask is not null)
+{
+    <div class="drag-overlay" style="left: @($"{_mouseX}px"); top: @($"{_mouseY}px");">
+        <div class="drag-card shadow-lg">
+            <div class="d-flex">
+                <div class="rounded-start" style="width: 6px; background-color: rgb(@GetTaskExecuteColor(_draggedTask.Executor));">
+                </div>
+                <div class="bg-white p-2 w-100 rounded-end">
+                    <div class="d-flex flex-column border-bottom pb-2">
+                        <div class="active-sprint-task">
+                            <div class="text-ellipsis">
+                                @_draggedTask.Name
+                            </div>
+                        </div>
+                        <div class="d-flex gap-1 text-secondary">
+                            @_draggedTask.Executor?.FullName
+                        </div>
+                    </div>
+                    <div class="d-flex flex-wrap gap-2 w-100 mt-2">
+                        @foreach (var tag in _draggedTask.Tags)
+                        {
+                            <div class="px-2 py-1 rounded-2 text-center align-self-start"
+                                 style="background-color: @($"{tag.Color}4D"); color: @tag.Color;">
+                                @tag.Name
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}

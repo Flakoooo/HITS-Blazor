@@ -15,6 +15,7 @@ namespace HITSBlazor.Services.Projects
 
         event Action<HITSTask>? OnTaskHasCreated;
         event Action<HITSTask>? OnTaskHasUpdated;
+        event Action<HITSTask, HITSTaskStatus>? OnTaskHasMoved;
         event Action<HITSTask>? OnTaskHasDeleted;
 
         //Projects
@@ -44,7 +45,7 @@ namespace HITSBlazor.Services.Projects
         );
         Task<bool> CreateNewTaskAsync(CreateTaskRequest request);
         Task<bool> UpdateTaskAsync(Guid taskId, UpdateTaskRequest request);
-        Task<bool> UpdateTaskStatusAsync(Guid taskId, HITSTaskStatus newStatus, User executor);
+        Task<bool> UpdateTaskStatusAsync(HITSTask task, HITSTaskStatus newStatus, User executor);
         Task<bool> DeleteTaskAsync(HITSTask task);
     }
 }
