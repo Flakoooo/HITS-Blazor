@@ -1,4 +1,5 @@
-﻿using HITSBlazor.Models.Projects.Entities;
+﻿using HITSBlazor.Components.Modals.RightSideModals.TaskInfoModal;
+using HITSBlazor.Models.Projects.Entities;
 using HITSBlazor.Models.Projects.Enums;
 using HITSBlazor.Models.Users.Entities;
 using HITSBlazor.Models.Users.Enums;
@@ -95,16 +96,22 @@ namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewActiveSprintTas
             append: append
         );
 
+        //TODOO: участник не может перенести идею в На доработке и На проверке
+        //TODOO: можно переносить спокойно из Новая в В работе и наоборот
+        //TODOO: также нужно сделать так, чтобы расположение задач в колонке можно было менять (с анимацией)
         private bool CanDragTask(HITSTask task)
         {
             var currentUser = AuthService.CurrentUser;
             if (currentUser?.Role is RoleType.Admin) return true;
 
             if (currentUser?.Id == CurrentMember?.UserId 
-                && CurrentMember?.ProjectRole is ProjectMemberRole.TeamLeader) return true;
+                && CurrentMember?.ProjectRole is ProjectMemberRole.TeamLeader or ProjectMemberRole.Initiator) return true;
 
-            if (task.Status is not HITSTaskStatus.Done 
-                && (task.Executor is null || AuthService.CurrentUser?.Id == task.Executor?.Id)) return true;
+            if (task.Status is HITSTaskStatus.OnVerification or HITSTaskStatus.OnModification or HITSTaskStatus.Done)
+                return false;
+
+            if (task.Executor is null || AuthService.CurrentUser?.Id == task.Executor?.Id)
+                return true;
 
             return false;
         }
@@ -112,7 +119,6 @@ namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewActiveSprintTas
         private void HandleMouseDown(MouseEventArgs e, HITSTask task)
         {
             if (!CanDragTask(task)) return;
-
 
             _isMouseDown = true;
             _potentialDragTask = task;
@@ -122,6 +128,11 @@ namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewActiveSprintTas
 
         private void HandleMouseUp(MouseEventArgs e)
         {
+            if (IsDragging) return;
+
+            if (_isMouseDown && _potentialDragTask is not null)
+                ShowSprintTaskModal(_potentialDragTask.Id);
+
             _isMouseDown = false;
             _potentialDragTask = null;
         }
@@ -289,6 +300,14 @@ namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewActiveSprintTas
         }
 
         private void ShowTaskModal(HITSTask? task = null) => ModalService.ShowTaskModal(task);
+
+        private void ShowSprintTaskModal(Guid taskId)
+        {
+            ModalService.Show<TaskInfoModal>(
+                ModalType.RightSide,
+                parameters: new Dictionary<string, object> { [nameof(TaskInfoModal.TaskId)] = taskId }
+            );
+        }
 
         protected override async ValueTask DisposeAsyncCore()
         {

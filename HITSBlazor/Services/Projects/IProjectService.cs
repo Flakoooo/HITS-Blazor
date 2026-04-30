@@ -44,6 +44,10 @@ namespace HITSBlazor.Services.Projects
             Guid? sprintId = null,
             IEnumerable<HITSTaskStatus>? selectedStatuses = null
         );
+        Task<ListDataResponse<TaskMovementLog>> GetTasksLogsAsync(
+            Guid taskId,
+            int page
+        );
         Task<bool> CreateNewTaskAsync(CreateTaskRequest request);
         Task<bool> UpdateTaskAsync(Guid taskId, UpdateTaskRequest request);
         Task<bool> UpdateTaskStatusAsync(HITSTask task, HITSTaskStatus newStatus);

@@ -90,6 +90,11 @@ namespace HITSBlazor.Services.Projects
             selectedStatuses: selectedStatuses?.ToHashSet()
         );
 
+        public async Task<ListDataResponse<TaskMovementLog>> GetTasksLogsAsync(
+            Guid taskId,
+            int page
+        ) => MockTaskMovementLogs.GetTasksLogsById(taskId, page);
+
         public async Task<bool> CreateNewTaskAsync(CreateTaskRequest request)
         {
             var newTask = MockSprints.CreateTask(request);

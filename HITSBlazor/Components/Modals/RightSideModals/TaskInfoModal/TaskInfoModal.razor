@@ -1,0 +1,58 @@
+﻿@namespace HITSBlazor.Components.Modals.RightSideModals.TaskInfoModal
+@using HITSBlazor.Components.Button
+@using HITSBlazor.Components.Inputs.Checkbox
+@using HITSBlazor.Components.Inputs.CheckboxDropdown
+@using HITSBlazor.Components.Inputs.Input
+@using HITSBlazor.Components.Inputs.TextArea
+@using HITSBlazor.Components.Modals.Components.ModalHeader
+
+@using HITSBlazor.Components.Tables.TableComponent
+@using HITSBlazor.Components.Tables.TaskLogTable
+@using HITSBlazor.Components.Tags
+@using HITSBlazor.Models.Common.Entities
+@using HITSTask = HITSBlazor.Models.Projects.Entities.Task;
+@using HITSTaskStatus = HITSBlazor.Models.Projects.Enums.TaskStatus;
+
+<div class="p-3 h-100 overflow-y-scroll right-side-modal" @onclick:stopPropagation="true">
+    <div class="task-modal-left-side w-75">
+        <RightSideModalHeader IsLoading="_isLoading" HeaderText="@_currentTask?.Name" />
+        <div class="task-data p-3 w-100 bg-white rounded">
+            <Input IsLoading="_isLoading" />
+            <TextArea IsLoading="_isLoading" />
+            <div class="d-flex flex-column gap-2 w-100">
+                <CheckboxDropdown T="Tag" IsLoading="_isLoading" />
+                <Tags AllTags="_currentTask?.Tags" />
+            </div>
+            <div class="d-flex gap-3">
+                @* TODOO: не все могут редактировать, только исполнитель, тим лидер и инициатор *@
+                <Button IsLoading="_isLoading" Text="Редактировать" Variant="ButtonVariant.Primary" />
+                <Button IsLoading="_isLoading" Text="Удалить" Variant="ButtonVariant.Danger" />
+                @* TODOO: показывать это при редактировании *@
+                <Button IsLoading="_isLoading" Text="Сохранить" Variant="ButtonVariant.Success" />
+                <Button IsLoading="_isLoading" Text="Отменить" Variant="ButtonVariant.Danger" />
+            </div>
+        </div>
+        <div>
+            <div class="w-100 bg-white rounded-top text-primary p-2 border-bottom">
+                История перемещений
+            </div>
+            @if (_currentTask is not null)
+            {
+                <div class="task-history w-100 bg-white rounded-bottom">
+                    <TaskLogTable IsLoading="_isLoading" TaskId="_currentTask.Id" />
+                </div>
+            }
+        </div>
+    </div>
+    <div class="task-modal-right-side w-25">
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public Guid TaskId { get; set; } 
+
+    private bool _isLoading = true;
+
+    private HITSTask? _currentTask;
+}

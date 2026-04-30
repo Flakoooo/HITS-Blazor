@@ -1,6 +1,5 @@
 ﻿using ApexCharts;
 using HITSBlazor.Components.Modals.Components.RightSideModaCollapselInfo;
-using HITSBlazor.Components.Tables.TableHeader;
 using HITSBlazor.Models.Common.Entities;
 using HITSBlazor.Models.Projects.Entities;
 using HITSBlazor.Services.Tags;
@@ -35,17 +34,8 @@ namespace HITSBlazor.Components.Modals.CenterModals.EndedSprintModal
 
         private Models.Projects.Entities.Task? _selectedTask;
         private List<CollapseItem> _taskData = [];
-        private List<TaskMovementLog> _taskLogs = [];
 
         private ApexChartOptions<DatePoint> _taskApexChart = new();
-
-        private List<TableHeaderItem> _tableTaskLogHeader = 
-        [
-            new() { Text = "Статус",            InCentered = true,  ColumnClass = "col-3"   },
-            new() { Text = "Дата вступления",   InCentered = true                           },
-            new() { Text = "Дата окончания",    InCentered = true                           },
-            new() { Text = "Продолжительность", InCentered = true                           }
-        ];
 
         protected override async System.Threading.Tasks.Task OnInitializedAsync()
         {
@@ -76,7 +66,6 @@ namespace HITSBlazor.Components.Modals.CenterModals.EndedSprintModal
 
             _selectedTask = task;
             _taskData = [new() { Title = "Описание", Data = task.Description }];
-            _taskLogs = MockTaskMovementLogs.GetTaskMovementLogsByTaskId(task.Id);
 
             StateHasChanged();
         }

@@ -8,7 +8,7 @@ namespace HITSBlazor.Components.Tables.TableHeader
         public bool IsLoading { get; set; } = false;
 
         [Parameter]
-        public List<TableHeaderItem> Items { get; set; } = [];
+        public ICollection<TableHeaderItem> Items { get; set; } = [];
 
         [Parameter]
         public bool TableActionMenuIsEnable { get; set; } = false;

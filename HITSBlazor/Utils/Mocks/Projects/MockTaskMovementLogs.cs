@@ -1,6 +1,8 @@
-﻿using HITSBlazor.Models.Projects.Entities;
+﻿using HITSBlazor.Models.Common.Responses;
+using HITSBlazor.Models.Projects.Entities;
 using HITSBlazor.Models.Projects.Enums;
 using HITSBlazor.Models.Users.Entities;
+using HITSBlazor.Pages;
 using HITSBlazor.Utils.Mocks.Users;
 
 using HITSTask = HITSBlazor.Models.Projects.Entities.Task;
@@ -97,6 +99,26 @@ namespace HITSBlazor.Utils.Mocks.Projects
             return logs;
         }
 
+        public static string FormatDuration(TimeSpan duration)
+        {
+            var parts = new List<string>();
+
+            int hours = (int)duration.TotalHours;
+            int minutes = duration.Minutes;
+            int seconds = duration.Seconds;
+
+            if (hours > 0) 
+                parts.Add($"{hours}ч");
+
+            if (minutes > 0)
+                parts.Add($"{minutes}мин");
+
+            if (seconds > 0 && parts.Count < 2)
+                parts.Add($"{seconds}сек");
+
+            return string.Join(" ", parts);
+        }
+
         private static TaskMovementLog CreateTaskLog(
             HITSTaskStatus targetStatus, HITSTask task, TaskMovementLog? lastLog, Guid executorId, Sprint sprint
         )
@@ -111,6 +133,11 @@ namespace HITSBlazor.Utils.Mocks.Projects
             else if (lastLog?.EndDate is not null)
             {
                 startDate = lastLog.EndDate.Value;
+            }
+
+            if (lastLog?.EndDate is not null)
+            {
+                lastLog.WastedTime = FormatDuration(lastLog.EndDate.Value - lastLog.StartDate);
             }
 
             var newlog = new TaskMovementLog()
@@ -138,6 +165,17 @@ namespace HITSBlazor.Utils.Mocks.Projects
         public static List<TaskMovementLog> GetTaskMovementLogsByTaskId(Guid taskId)
             => [.. _taskMovementLogs.Where(tml => tml.Task.Id == taskId)];
 
+        public static ListDataResponse<TaskMovementLog> GetTasksLogsById(Guid taskId, int page, int pageSize = 20)
+        {
+            var query = _taskMovementLogs.Where(tml => tml.Task.Id == taskId);
+
+            int count = query.Count();
+
+            query = query.Skip((page - 1) * pageSize).Take(pageSize);
+
+            return new ListDataResponse<TaskMovementLog> { Count = count, List = query.ToList() };
+        }
+
         public static bool CreateNewTaskLog(HITSTask task, User creator, User? executor = null)
         {
             var lastLog = _taskMovementLogs.LastOrDefault(tml => tml.Task.Id == task.Id);
@@ -159,7 +197,7 @@ namespace HITSBlazor.Utils.Mocks.Projects
                 var endDate = DateTime.UtcNow;
 
                 lastLog.EndDate = endDate;
-                lastLog.WastedTime = (lastLog.EndDate - lastLog.StartDate).ToString() ?? string.Empty;
+                lastLog.WastedTime = FormatDuration(lastLog.EndDate.Value - lastLog.StartDate);
 
                 newLog = new TaskMovementLog
                 {

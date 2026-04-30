@@ -60,7 +60,7 @@
     }
 
 .task-item-not-draggable {
-    cursor: default;
+    cursor: pointer;
 }
 
 .drag-overlay {

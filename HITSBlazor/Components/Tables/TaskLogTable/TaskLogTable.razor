@@ -1,0 +1,34 @@
+﻿@namespace HITSBlazor.Components.Tables.TaskLogTable
+@using HITSBlazor.Components.Statuses.EnumStatus
+@using HITSBlazor.Components.Tables.TableBodyRow
+@using HITSBlazor.Components.Tables.TableComponent
+@using HITSBlazor.Components.Tables.TableHeader
+@using HITSBlazor.Models.Projects.Entities
+@using HITSBlazor.Pages
+@using HITSBlazor.Services.Projects
+@inherits ListPageDataLoader
+
+<TableComponent IsLoading="IsOnLoading" HeaderItems="_tableTaskLogHeader" @ref="_tableComponent">
+    <TableContent>
+        @foreach (var taskLog in _taskLogs)
+        {
+            <tr>
+                <TableBodyRow IsCentered="true">
+                    <EnumStatus Statustype="taskLog.Status" />
+                </TableBodyRow>
+                <TableBodyRow IsCentered="true">
+                    @taskLog.StartDate.ToString("dd.MM.yyyy, hhч mmмин")
+                </TableBodyRow>
+                <TableBodyRow IsCentered="true">
+                    @if (taskLog.EndDate.HasValue)
+                    {
+                        @taskLog.EndDate.Value.ToString("dd.MM.yyyy, hhч mmмин")
+                    }
+                </TableBodyRow>
+                <TableBodyRow IsCentered="true">
+                    @taskLog.WastedTime
+                </TableBodyRow>
+            </tr>
+        }
+    </TableContent>
+</TableComponent>

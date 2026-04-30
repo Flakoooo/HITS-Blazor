@@ -12,7 +12,9 @@
 @using HITSBlazor.Components.NavigationTabs
 @using HITSBlazor.Components.Statuses.EnumStatus
 @using HITSBlazor.Components.Tables.TableBodyRow
+@using HITSBlazor.Components.Tables.TableComponent
 @using HITSBlazor.Components.Tables.TableHeader
+@using HITSBlazor.Components.Tables.TaskLogTable
 @using HITSBlazor.Components.TaskComponent
 @using HITSBlazor.Components.Typography
 @using HITSBlazor.Models.Common.Entities
@@ -211,41 +213,7 @@
                                 <div class="d-flex gap-3 w-100 overflow-y-scroll">
                                     <div class="w-75">
                                         <RightSideModaCollapselInfo IsLoading="_isLoading" Data="_taskData" />
-                                        <div class="w-100 bg-white">
-                                            <div class="py-2 d-flex justify-content-between">
-
-                                            </div>
-                                            <div class="w-100 d-flex">
-                                                <div class="w-100">
-                                                    <table class="table table-hover mb-0">
-                                                        <TableHeader Items="_tableTaskLogHeader" />
-                                                        <tbody>
-                                                            @foreach (var taskLog in _taskLogs)
-                                                            {
-                                                                <tr>
-                                                                    <TableBodyRow IsCentered="true">
-                                                                        <EnumStatus Statustype="taskLog.Status" />
-                                                                    </TableBodyRow>
-                                                                    <TableBodyRow IsCentered="true">
-                                                                        @taskLog.StartDate.ToString("dd.MM.yyyy, hhч mmмин")
-                                                                    </TableBodyRow>
-                                                                    <TableBodyRow IsCentered="true">
-                                                                        @if (taskLog.EndDate.HasValue)
-                                                                        {
-                                                                            @taskLog.EndDate.Value.ToString("dd.MM.yyyy, hhч mmмин")
-                                                                        }
-                                                                    </TableBodyRow>
-                                                                    <!-- TODO: продолжительность в часах? -->
-                                                                    <TableBodyRow IsCentered="true">
-                                                                        @taskLog.WastedTime
-                                                                    </TableBodyRow>
-                                                                </tr>
-                                                            }
-                                                        </tbody>
-                                                    </table>
-                                                </div>
-                                            </div>
-                                        </div>
+                                        <TaskLogTable IsLoading="_isLoading" TaskId="_selectedTask.Id" />
                                     </div>
                                     <div class="w-25">
                                         <div class="text-center p-2 bg-primary rounded-top text-white fs-5 border border-bottom-0">
