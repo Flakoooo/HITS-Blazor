@@ -470,6 +470,12 @@ namespace HITSBlazor.Utils.Mocks.Projects
             if (taskForUpdate is null) return null;
 
             taskForUpdate.Status = newStatus;
+
+            if (newStatus > HITSTaskStatus.NewTask && taskForUpdate.Executor is null)
+                taskForUpdate.Executor = executor;
+            else if (newStatus <= HITSTaskStatus.NewTask)
+                taskForUpdate.Executor = null;
+
             MockTaskMovementLogs.CreateNewTaskLog(taskForUpdate, taskForUpdate.Initiator, executor);
 
             return taskForUpdate;

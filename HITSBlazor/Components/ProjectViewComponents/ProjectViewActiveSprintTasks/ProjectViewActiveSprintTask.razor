@@ -13,6 +13,7 @@
 @using HITSTaskStatus = HITSBlazor.Models.Projects.Enums.TaskStatus;
 
 <div class="w-100 sprint-column-wrapper"
+     data-category="@TaskCategory.ToString()"
      @onmouseup="HandleDrop"
      @onmouseenter="() => _isDragOver = _draggedTask != null && _draggedTask.Status != TaskCategory"
      @onmouseleave="() => _isDragOver = false"
@@ -41,12 +42,11 @@
             </div>
         </div>
     }
-    <div class="list-group active-sprint-column @dragOverClass"
-         @ref="_tableContainer">
+    <div class="list-group active-sprint-column @dragOverClass" @ref="_tableContainer">
         @foreach (var task in _sprintTasks)
         {
-            <div class="d-flex my-1 task-item"
-                 style="cursor: grab; opacity: @(_draggedTask?.Id == task.Id ? "0.3" : "1")"
+            <div class="d-flex my-1 task-item task-item-@(CanDragTask(task) ? "draggable" : "not-draggable")"
+                 style="opacity: @(_draggedTask?.Id == task.Id ? "0.3" : "1")"
                  @onmousedown="(e) => HandleMouseDown(e, task)"
                  @onmousemove="HandleMouseMove"
                  @onmouseup="HandleMouseUp"

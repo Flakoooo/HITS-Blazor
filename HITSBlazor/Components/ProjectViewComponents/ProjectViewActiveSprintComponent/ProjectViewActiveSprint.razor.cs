@@ -13,9 +13,6 @@ namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewActiveSprintCom
         private IAuthService AuthService { get; set; } = null!;
 
         [Inject]
-        private IProjectService ProjectService { get; set; } = null!;
-
-        [Inject]
         private ModalService ModalService { get; set; } = null!;
 
         [Parameter]
@@ -23,6 +20,9 @@ namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewActiveSprintCom
 
         [Parameter]
         public Project? CurrentProject { get; set; }
+
+        [Parameter]
+        public ProjectMember? CurrentMember { get; set; }
 
         [Parameter]
         public Sprint? ActiveSprint { get; set; }

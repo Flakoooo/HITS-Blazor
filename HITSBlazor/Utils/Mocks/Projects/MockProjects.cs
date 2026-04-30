@@ -172,5 +172,8 @@ namespace HITSBlazor.Utils.Mocks.Projects
 
         public static Project? GetProjectById(Guid projectId)
             => _projects.FirstOrDefault(p => p.Id == projectId);
+
+        public static ProjectMember? GetCurrentProjectMember(Guid projectId, Guid userId)
+            => _projects.FirstOrDefault(p => p.Id == projectId)?.Members.FirstOrDefault(m => m.UserId == userId);
     }
 }

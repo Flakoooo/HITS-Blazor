@@ -391,11 +391,12 @@ namespace HITSBlazor.Services
                         RoleType.Initiator,
                         RoleType.Member,
                         RoleType.TeamOwner,
-                        RoleType.TeamLeader
+                        RoleType.TeamLeader,
+                        RoleType.Admin
                     };
                     if (projectAllowedRoles.Contains(userRole))
                     {
-                        var activeProjects = await _projectService.GetAllActiveProjectsAsync(_authService.CurrentUser.Id);
+                        var activeProjects = await _projectService.GetAllActiveProjectsAsync();
                         int count = nav.SubItems.Count;
                         foreach (var project in activeProjects)
                         {

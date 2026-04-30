@@ -3,6 +3,7 @@ using HITSBlazor.Models.Projects.Entities;
 using HITSBlazor.Models.Projects.Enums;
 using HITSBlazor.Models.Projects.Requests;
 using HITSBlazor.Models.Users.Entities;
+using HITSBlazor.Services.Auth;
 using HITSBlazor.Utils.Mocks.Projects;
 
 using HITSTask = HITSBlazor.Models.Projects.Entities.Task;
@@ -10,8 +11,10 @@ using HITSTaskStatus = HITSBlazor.Models.Projects.Enums.TaskStatus;
 
 namespace HITSBlazor.Services.Projects
 {
-    public class MockProjectService : IProjectService
+    public class MockProjectService(IAuthService authService) : IProjectService
     {
+        private IAuthService _authService = authService;
+
         public event Action<Sprint>? OnSprintHasCreated;
         public event Action<Sprint>? OnSprintHasUpdated;
 
@@ -28,11 +31,24 @@ namespace HITSBlazor.Services.Projects
             page, searchText: searchText, selectedStatus: selectedStatus
         );
 
-        public async Task<List<Project>> GetAllActiveProjectsAsync(Guid userId)
-            => MockProjects.GetActiveProjects(userId);
+        public async Task<List<Project>> GetAllActiveProjectsAsync()
+        {
+            var currentUser = _authService.CurrentUser;
+            if (currentUser is null) return [];
+
+            return MockProjects.GetActiveProjects(currentUser.Id);
+        }
 
         public async Task<Project?> GetProjectByIdAsync(Guid projectId)
             => MockProjects.GetProjectById(projectId);
+
+        public async Task<ProjectMember?> GetCurrentProjectMemberAsync(Guid projectId)
+        {
+            var currentUser = _authService.CurrentUser;
+            if (currentUser is null) return null;
+            
+            return MockProjects.GetCurrentProjectMember(projectId, currentUser.Id);
+        }
 
         //Sprints
         public async Task<ListDataResponse<Sprint>> GetSprintsByProjectIdAsync(
@@ -92,11 +108,14 @@ namespace HITSBlazor.Services.Projects
             return true;
         }
 
-        public async Task<bool> UpdateTaskStatusAsync(HITSTask task, HITSTaskStatus newStatus, User executor)
+        public async Task<bool> UpdateTaskStatusAsync(HITSTask task, HITSTaskStatus newStatus)
         {
+            var currentUser = _authService.CurrentUser;
+            if (currentUser is null) return false;
+
             var oldStatus = task.Status;
 
-            var updatedTask = MockSprints.UpdateTaskStatus(task.Id, newStatus, executor);
+            var updatedTask = MockSprints.UpdateTaskStatus(task.Id, newStatus, currentUser);
             if (updatedTask is null) return false;
 
             OnTaskHasMoved?.Invoke(updatedTask, oldStatus);

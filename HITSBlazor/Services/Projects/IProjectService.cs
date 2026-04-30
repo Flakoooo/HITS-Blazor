@@ -24,8 +24,9 @@ namespace HITSBlazor.Services.Projects
             string? searchText = null,
             ProjectStatus? selectedStatus = null
         );
-        Task<List<Project>> GetAllActiveProjectsAsync(Guid userId);
+        Task<List<Project>> GetAllActiveProjectsAsync();
         Task<Project?> GetProjectByIdAsync(Guid projectId);
+        Task<ProjectMember?> GetCurrentProjectMemberAsync(Guid projectId);
 
         //Sprints
         Task<ListDataResponse<Sprint>> GetSprintsByProjectIdAsync(
@@ -45,7 +46,7 @@ namespace HITSBlazor.Services.Projects
         );
         Task<bool> CreateNewTaskAsync(CreateTaskRequest request);
         Task<bool> UpdateTaskAsync(Guid taskId, UpdateTaskRequest request);
-        Task<bool> UpdateTaskStatusAsync(HITSTask task, HITSTaskStatus newStatus, User executor);
+        Task<bool> UpdateTaskStatusAsync(HITSTask task, HITSTaskStatus newStatus);
         Task<bool> DeleteTaskAsync(HITSTask task);
     }
 }

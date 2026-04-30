@@ -9,11 +9,8 @@
     startGlobalDrag: function () {
         this.isDragging = true;
 
-        // Добавляем глобальные обработчики на document
         document.addEventListener('mousemove', this.globalMouseMoveHandler);
         document.addEventListener('mouseup', this.globalMouseUpHandler);
-
-        // Также добавляем на window для обработки за пределами документа
         window.addEventListener('mousemove', this.globalMouseMoveHandler);
         window.addEventListener('mouseup', this.globalMouseUpHandler);
     },
@@ -31,7 +28,13 @@
 
     globalMouseUpHandler: function (e) {
         if (window.dragDrop.dotNetHelper && window.dragDrop.isDragging) {
-            window.dragDrop.dotNetHelper.invokeMethodAsync('OnGlobalMouseUp', e.clientX, e.clientY);
+            var element = document.elementFromPoint(e.clientX, e.clientY);
+
+            var column = element ? element.closest('.sprint-column-wrapper') : null;
+
+            var category = column ? column.getAttribute('data-category') : null;
+
+            window.dragDrop.dotNetHelper.invokeMethodAsync('OnGlobalMouseUp', e.clientX, e.clientY, category);
         }
         window.dragDrop.isDragging = false;
         window.dragDrop.removeGlobalMouseEvents();

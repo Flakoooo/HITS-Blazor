@@ -1,5 +1,7 @@
 ﻿using HITSBlazor.Models.Projects.Entities;
+using HITSBlazor.Models.Projects.Enums;
 using HITSBlazor.Models.Users.Entities;
+using HITSBlazor.Models.Users.Enums;
 using HITSBlazor.Services.Auth;
 using HITSBlazor.Services.Modal;
 using HITSBlazor.Services.Projects;
@@ -25,10 +27,13 @@ namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewActiveSprintTas
         private ModalService ModalService { get; set; } = null!;
 
         [Parameter]
+        public required HITSTaskStatus TaskCategory { get; set; }
+
+        [Parameter]
         public Sprint? CurrentSprint { get; set; }
 
         [Parameter]
-        public required HITSTaskStatus TaskCategory { get; set; }
+        public ProjectMember? CurrentMember { get; set; }
 
         private static IJSRuntime? _jsRuntime;
 
@@ -90,8 +95,25 @@ namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewActiveSprintTas
             append: append
         );
 
+        private bool CanDragTask(HITSTask task)
+        {
+            var currentUser = AuthService.CurrentUser;
+            if (currentUser?.Role is RoleType.Admin) return true;
+
+            if (currentUser?.Id == CurrentMember?.UserId 
+                && CurrentMember?.ProjectRole is ProjectMemberRole.TeamLeader) return true;
+
+            if (task.Status is not HITSTaskStatus.Done 
+                && (task.Executor is null || AuthService.CurrentUser?.Id == task.Executor?.Id)) return true;
+
+            return false;
+        }
+
         private void HandleMouseDown(MouseEventArgs e, HITSTask task)
         {
+            if (!CanDragTask(task)) return;
+
+
             _isMouseDown = true;
             _potentialDragTask = task;
             _mouseX = e.ClientX;
@@ -131,7 +153,7 @@ namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewActiveSprintTas
         }
 
         [JSInvokable]
-        public void OnGlobalMouseUp(double clientX, double clientY)
+        public void OnGlobalMouseUp(double clientX, double clientY, string? targetCategory)
         {
             if (IsDragging)
             {
@@ -139,7 +161,14 @@ namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewActiveSprintTas
                 _mouseY = clientY;
                 OnDragStateChanged?.Invoke();
 
-                InvokeAsync(HandleDrop);
+                if (!string.IsNullOrEmpty(targetCategory) && targetCategory == TaskCategory.ToString())
+                {
+                    InvokeAsync(HandleDrop);
+                }
+                else
+                {
+                    EndDrag();
+                }
             }
             else
             {
@@ -188,9 +217,7 @@ namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewActiveSprintTas
             {
                 try
                 {
-                    var executor = AuthService.CurrentUser;
-                    if (executor is not null)
-                        await ProjectService.UpdateTaskStatusAsync(taskToMove, TaskCategory, executor);
+                    await ProjectService.UpdateTaskStatusAsync(taskToMove, TaskCategory);
                 }
                 catch (Exception ex)
                 {
@@ -210,25 +237,19 @@ namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewActiveSprintTas
         {
             if (updatedTask.SprintId != CurrentSprint?.Id) return;
 
-            if (updatedTask.Status == TaskCategory)
+            if (updatedTask.Status == TaskCategory && !_sprintTasks.Any(t => t.Id == updatedTask.Id))
             {
-                if (!_sprintTasks.Any(t => t.Id == updatedTask.Id))
-                {
-                    _sprintTasks.Add(updatedTask);
-                    ++_totalCount;
-                    StateHasChanged();
-                }
+                _sprintTasks.Add(updatedTask);
+                ++_totalCount;
+                StateHasChanged();
             }
             else if (oldStatus == TaskCategory)
             {
                 var taskToRemove = _sprintTasks.FirstOrDefault(t => t.Id == updatedTask.Id);
-                if (taskToRemove is not null)
+                if (taskToRemove is not null && _sprintTasks.Remove(taskToRemove))
                 {
-                    if (_sprintTasks.Remove(taskToRemove))
-                    {
-                        --_totalCount;
-                        StateHasChanged();
-                    }
+                    --_totalCount;
+                    StateHasChanged();
                 }
             }
         }

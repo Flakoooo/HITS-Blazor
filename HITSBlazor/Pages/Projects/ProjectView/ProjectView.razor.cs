@@ -21,6 +21,7 @@ namespace HITSBlazor.Pages.Projects.ProjectView
         private bool _isLoading = true;
 
         private Project? _currentProject;
+        private ProjectMember? _currentMember;
         private Sprint? _activeSprint;
 
         private ProjectViewCategory _activeCategory = ProjectViewCategory.Info;
@@ -34,6 +35,7 @@ namespace HITSBlazor.Pages.Projects.ProjectView
                 _currentProject = await ProjectService.GetProjectByIdAsync(guid);
                 if (_currentProject is null) return;
 
+                _currentMember = await ProjectService.GetCurrentProjectMemberAsync(guid);
                 _activeSprint = await ProjectService.GetActiveSprintByProjectIdAsync(_currentProject.Id);
             }
 

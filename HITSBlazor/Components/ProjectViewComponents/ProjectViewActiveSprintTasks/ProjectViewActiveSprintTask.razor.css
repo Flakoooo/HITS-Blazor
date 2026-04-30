@@ -6,34 +6,35 @@
     justify-content: space-between;
 }
 
-.active-sprint-header-name {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: nowrap;
-    align-items: center;
-    justify-content: flex-start;
-    gap: 12px;
-}
-
-.active-sprint-columns {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: nowrap;
-    align-items: stretch;
-    justify-content: space-between;
-    gap: 16px;
-}
-
 .sprint-column-wrapper {
     display: flex;
+    height: calc(100vh - 320px);
     flex-direction: column;
-    min-height: 100%;
 }
 
 .active-sprint-column {
     flex: 1;
-    min-height: 200px;
+    overflow-y: auto;
     transition: background-color 0.2s ease;
+}
+
+.active-sprint-add-task {
+    transition: all .15s linear;
+    -webkit-transition: all .15s linear
+}
+
+    .active-sprint-add-task:hover {
+        cursor: pointer;
+        color: #fff;
+        background-color: #0d6efd
+    }
+
+.active-sprint-task {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis
 }
 
 .active-sprint-column-dragover {
@@ -50,13 +51,17 @@
     transition: opacity 0.2s ease, transform 0.2s ease;
 }
 
-    .task-item:hover {
-        cursor: grab;
-    }
+.task-item-draggable {
+    cursor: grab;
+}
 
-    .task-item:active {
+    .task-item-draggable:active {
         cursor: grabbing;
     }
+
+.task-item-not-draggable {
+    cursor: default;
+}
 
 .drag-overlay {
     position: fixed;
