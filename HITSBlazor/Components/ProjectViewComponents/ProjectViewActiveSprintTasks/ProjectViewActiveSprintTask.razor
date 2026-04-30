@@ -12,9 +12,10 @@
 
 @using HITSTaskStatus = HITSBlazor.Models.Projects.Enums.TaskStatus;
 
-<div class="w-100"
-     @onmouseup="HandleGlobalMouseUp"
-     @onmousemove="HandleGlobalMouseMove"
+<div class="w-100 sprint-column-wrapper"
+     @onmouseup="HandleDrop"
+     @onmouseenter="() => _isDragOver = _draggedTask != null && _draggedTask.Status != TaskCategory"
+     @onmouseleave="() => _isDragOver = false"
      style="@(IsDragging ? "user-select: none; -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none;" : "")">
     @{
         string color = GetTaskCategoryColor(TaskCategory);
@@ -23,10 +24,7 @@
         <div class="mb-1">
             <div class="rounded-top" style="height: 6px; background-color: @color;">
             </div>
-            <div class="active-sprint-header p-2 border-start border-end border-bottom rounded-bottom"
-                 @onmouseup="HandleDrop"
-                 @onmouseenter="() => _isDragOver = _draggedTask != null && _draggedTask.Status != TaskCategory"
-                 @onmouseleave="() => _isDragOver = false">
+            <div class="active-sprint-header p-2 border-start border-end border-bottom rounded-bottom">
                 <div class="d-flex gap-2">
                     <i class="bi bi-flag-fill fs-6" style="color: @color;"></i>
                     <Typography FontSize="6">
@@ -44,10 +42,7 @@
         </div>
     }
     <div class="list-group active-sprint-column @dragOverClass"
-         @ref="_tableContainer"
-         @onmouseup="HandleDrop"
-         @onmouseenter="() => _isDragOver = _draggedTask != null && _draggedTask.Status != TaskCategory"
-         @onmouseleave="() => _isDragOver = false">
+         @ref="_tableContainer">
         @foreach (var task in _sprintTasks)
         {
             <div class="d-flex my-1 task-item"

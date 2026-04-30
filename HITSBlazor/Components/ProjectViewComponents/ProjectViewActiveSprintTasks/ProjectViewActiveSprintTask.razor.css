@@ -19,19 +19,26 @@
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
-    align-items: flex-start;
+    align-items: stretch;
     justify-content: space-between;
     gap: 16px;
 }
 
+.sprint-column-wrapper {
+    display: flex;
+    flex-direction: column;
+    min-height: 100%;
+}
+
 .active-sprint-column {
-    min-height: 100px;
+    flex: 1;
+    min-height: 200px;
     transition: background-color 0.2s ease;
 }
 
 .active-sprint-column-dragover {
     background-color: rgba(13, 110, 253, 0.1);
-    border: 2px dashed #0d6efd;
+    border: 2px dashed #0d6efd !important;
     border-radius: 4px;
 }
 
@@ -51,24 +58,29 @@
         cursor: grabbing;
     }
 
-/* Стили для Drag Overlay */
 .drag-overlay {
     position: fixed;
     pointer-events: none;
     z-index: 10000;
     transform: translate(-50%, -50%);
-    width: 300px;
+    width: 338px;
+    max-width: 90vw;
 }
 
 .drag-card {
     opacity: 0.95;
-    transform: rotate(2deg) scale(1.05);
+    transform: rotate(2deg);
     border-radius: 8px;
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
-    transition: transform 0.1s ease;
 }
 
-/* Блокировка выделения текста при перетаскивании */
+    .drag-card .text-ellipsis {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 100%;
+    }
+
 .no-select {
     user-select: none !important;
     -webkit-user-select: none !important;

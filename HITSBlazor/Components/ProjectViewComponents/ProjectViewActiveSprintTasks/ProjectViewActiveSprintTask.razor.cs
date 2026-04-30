@@ -6,9 +6,10 @@ using HITSBlazor.Services.Projects;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
+
 using HITSTask = HITSBlazor.Models.Projects.Entities.Task;
 using HITSTaskStatus = HITSBlazor.Models.Projects.Enums.TaskStatus;
-using ShrapTask = System.Threading.Tasks.Task;
+using SharpTask = System.Threading.Tasks.Task;
 
 namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewActiveSprintTasks
 {
@@ -48,7 +49,7 @@ namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewActiveSprintTas
 
         private static bool IsDragging => _draggedTask != null;
 
-        protected override async ShrapTask OnInitializedAsync()
+        protected override async SharpTask OnInitializedAsync()
         {
             _isLoading = true;
 
@@ -64,16 +65,22 @@ namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewActiveSprintTas
             MarkAsInitialized();
         }
 
+        protected override async SharpTask AdditionalAfterRenderMethod()
+        {
+            if (_jsRuntime != null)
+                await _jsRuntime.InvokeVoidAsync("dragDrop.initializeGlobalMouseEvents", _dotNetHelper);
+        }
+
         private void HandleDragStateChanged() => InvokeAsync(StateHasChanged);
 
         protected override int GetCurrentItemsCount() => _sprintTasks.Count;
 
-        protected override async ShrapTask OnLoadMoreItemsAsync()
+        protected override async SharpTask OnLoadMoreItemsAsync()
         {
             await LoadTasksAsync(append: true);
         }
 
-        private async ShrapTask LoadTasksAsync(bool append = false) => await LoadDataAsync(
+        private async SharpTask LoadTasksAsync(bool append = false) => await LoadDataAsync(
             _sprintTasks,
             () => ProjectService.GetTasksByQueryParamsAsync(
                 _currentPage,
@@ -112,23 +119,32 @@ namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewActiveSprintTas
             }
         }
 
-        private void HandleGlobalMouseUp(MouseEventArgs e)
+        [JSInvokable]
+        public void OnGlobalMouseMove(double clientX, double clientY)
         {
             if (IsDragging)
             {
-                EndDrag();
+                _mouseX = clientX;
+                _mouseY = clientY;
+                OnDragStateChanged?.Invoke();
             }
-            _isMouseDown = false;
-            _potentialDragTask = null;
         }
 
-        private static void HandleGlobalMouseMove(MouseEventArgs e)
+        [JSInvokable]
+        public void OnGlobalMouseUp(double clientX, double clientY)
         {
             if (IsDragging)
             {
-                _mouseX = e.ClientX;
-                _mouseY = e.ClientY;
+                _mouseX = clientX;
+                _mouseY = clientY;
                 OnDragStateChanged?.Invoke();
+
+                InvokeAsync(HandleDrop);
+            }
+            else
+            {
+                _isMouseDown = false;
+                _potentialDragTask = null;
             }
         }
 
@@ -140,6 +156,7 @@ namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewActiveSprintTas
             if (_jsRuntime != null)
             {
                 await _jsRuntime.InvokeVoidAsync("dragDrop.preventSelection");
+                await _jsRuntime.InvokeVoidAsync("dragDrop.startGlobalDrag");
             }
 
             OnDragStateChanged?.Invoke();
@@ -153,11 +170,11 @@ namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewActiveSprintTas
             if (_jsRuntime != null)
             {
                 await _jsRuntime.InvokeVoidAsync("dragDrop.allowSelection");
+                await _jsRuntime.InvokeVoidAsync("dragDrop.endGlobalDrag");
             }
 
             OnDragStateChanged?.Invoke();
         }
-
 
         private async void HandleDrop()
         {
@@ -257,6 +274,13 @@ namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewActiveSprintTas
             ProjectService.OnTaskHasCreated -= TaskHasCreated;
             ProjectService.OnTaskHasMoved -= TaskHasMoved;
             OnDragStateChanged -= HandleDragStateChanged;
+
+            _dotNetHelper?.Dispose();
+
+            if (_jsRuntime != null)
+            {
+                await _jsRuntime.InvokeVoidAsync("dragDrop.removeGlobalMouseEvents");
+            }
 
             await ValueTask.CompletedTask;
         }
