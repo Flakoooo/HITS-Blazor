@@ -2,7 +2,6 @@
 using HITSBlazor.Models.Projects.Entities;
 using HITSBlazor.Models.Projects.Enums;
 using HITSBlazor.Models.Projects.Requests;
-using HITSBlazor.Models.Users.Entities;
 using HITSTask = HITSBlazor.Models.Projects.Entities.Task;
 using HITSTaskStatus = HITSBlazor.Models.Projects.Enums.TaskStatus;
 
@@ -15,6 +14,7 @@ namespace HITSBlazor.Services.Projects
 
         event Action<HITSTask>? OnTaskHasCreated;
         event Action<HITSTask>? OnTaskHasUpdated;
+        event Action<Guid, string, ProjectMemberRole>? OnTaskCommentUpdated;
         event Action<HITSTask, HITSTaskStatus>? OnTaskHasMoved;
         event Action<HITSTask>? OnTaskHasDeleted;
 
@@ -49,9 +49,10 @@ namespace HITSBlazor.Services.Projects
             int page
         );
         Task<HITSTask?> GetTaskByIdAsync(Guid taskId);
+        Task<bool> MemberHasTaskInProgressAsync(Guid? sprintId);
         Task<bool> CreateNewTaskAsync(CreateTaskRequest request);
         Task<bool> UpdateTaskAsync(Guid taskId, UpdateTaskRequest request);
-        Task<HITSTask?> UpdateSprintTaskInfoAsync(Guid taskId, UpdateSprintTaskInfoRequest request);
+        Task<bool> UpdateTaskCommentAsync(Guid taskId, string comment, ProjectMemberRole executorRole);
         Task<bool> UpdateTaskStatusAsync(HITSTask task, HITSTaskStatus newStatus);
         Task<bool> DeleteTaskAsync(HITSTask task);
     }

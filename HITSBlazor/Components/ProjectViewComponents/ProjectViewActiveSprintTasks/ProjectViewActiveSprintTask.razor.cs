@@ -63,6 +63,7 @@ namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewActiveSprintTas
 
             ProjectService.OnTaskHasCreated += TaskHasCreated;
             ProjectService.OnTaskHasUpdated += TaskHasUpdated;
+            ProjectService.OnTaskCommentUpdated += TaskCommentHasUpdated;
             ProjectService.OnTaskHasMoved += TaskHasMoved;
             OnDragStateChanged += HandleDragStateChanged;
 
@@ -97,25 +98,50 @@ namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewActiveSprintTas
             append: append
         );
 
-        //TODOO: участник не может перенести идею в На доработке и На проверке
-        //TODOO: можно переносить спокойно из Новая в В работе и наоборот
-        //TODOO: также нужно сделать так, чтобы расположение задач в колонке можно было менять (с анимацией)
-        //TODOO: при переноске задачи, вносить ее в самый вверх 
-        //TODOO: участник может ВЗЯТЬ ТОЛЬКО ОДНУ задачу на В РАБОТЕ
-        //TODOO: переносить задачу сразу в На проверке нельзя, сначала В работе, потом На проверке
         private bool CanDragTask(HITSTask task)
         {
             var currentUser = AuthService.CurrentUser;
-            if (currentUser?.Role is RoleType.Admin) return true;
+            if (currentUser is null) return false;
 
-            if (currentUser?.Id == CurrentMember?.UserId 
-                && CurrentMember?.ProjectRole is ProjectMemberRole.TeamLeader or ProjectMemberRole.Initiator) return true;
+            if (currentUser.Role is RoleType.Admin) return true;
+            if (currentUser.Id == CurrentMember?.UserId
+                && CurrentMember?.ProjectRole is ProjectMemberRole.TeamLeader or ProjectMemberRole.Initiator)
+                return task.Status != HITSTaskStatus.Done;
 
-            if (task.Status is HITSTaskStatus.OnVerification or HITSTaskStatus.OnModification or HITSTaskStatus.Done)
-                return false;
+            if (task.Status is HITSTaskStatus.Done) return false;
 
-            if (task.Executor is null || AuthService.CurrentUser?.Id == task.Executor?.Id)
+            if (task.Status is HITSTaskStatus.OnVerification) return false;
+
+            if (task.Status is HITSTaskStatus.OnModification)
+                return task.Executor != null && task.Executor.Id == currentUser.Id;
+
+            if (task.Executor is null || task.Executor.Id == currentUser.Id)
                 return true;
+
+            return false;
+        }
+
+        private bool CanDropTask(HITSTask task)
+        {
+            var currentUser = AuthService.CurrentUser;
+            if (currentUser is null) return false;
+            if (task.Status == TaskCategory) return false;
+
+            if (currentUser.Role is RoleType.Admin) return true;
+
+            if (currentUser.Id == CurrentMember?.UserId
+                && CurrentMember?.ProjectRole is ProjectMemberRole.TeamLeader or ProjectMemberRole.Initiator)
+                return true;
+
+            var from = task.Status;
+            var to = TaskCategory;
+
+            if (from == HITSTaskStatus.NewTask && to == HITSTaskStatus.InProgress) return true;
+            if (from == HITSTaskStatus.InProgress && to == HITSTaskStatus.NewTask) return true;
+
+            if (from == HITSTaskStatus.InProgress && to == HITSTaskStatus.OnVerification) return true;
+
+            if (from == HITSTaskStatus.OnModification && to == HITSTaskStatus.OnVerification) return true;
 
             return false;
         }
@@ -135,7 +161,9 @@ namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewActiveSprintTas
             if (IsDragging) return;
 
             if (_isMouseDown && _potentialDragTask is not null)
+            {
                 ShowSprintTaskModal(_potentialDragTask.Id);
+            }
 
             _isMouseDown = false;
             _potentialDragTask = null;
@@ -151,8 +179,15 @@ namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewActiveSprintTas
             }
             else if (_isMouseDown && _potentialDragTask != null)
             {
-                StartDrag(_potentialDragTask);
-                _isMouseDown = false;
+                var deltaX = Math.Abs(e.ClientX - _mouseX);
+                var deltaY = Math.Abs(e.ClientY - _mouseY);
+
+                if (deltaX > 5 || deltaY > 5)
+                {
+                    _draggedTask = _potentialDragTask;
+                    StartDrag(_potentialDragTask);
+                    _isMouseDown = false;
+                }
             }
         }
 
@@ -194,7 +229,6 @@ namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewActiveSprintTas
 
         private static async void StartDrag(HITSTask task)
         {
-            _draggedTask = task;
             _draggedFromCategory = task.Status.ToString();
 
             if (_jsRuntime != null)
@@ -223,21 +257,48 @@ namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewActiveSprintTas
         private async void HandleDrop()
         {
             _isDragOver = false;
-
             var taskToMove = _draggedTask;
 
-            EndDrag();
-
-            if (taskToMove != null && taskToMove.Status != TaskCategory)
+            if (taskToMove == null || taskToMove.Status == TaskCategory)
             {
-                try
+                EndDrag();
+                return;
+            }
+
+            if (!CanDropTask(taskToMove))
+            {
+                EndDrag();
+                return;
+            }
+
+            if (TaskCategory == HITSTaskStatus.InProgress)
+            {
+                var currentUser = AuthService.CurrentUser;
+                var isTeamLeaderOrAdmin = currentUser?.Role is RoleType.Admin
+                    || (currentUser?.Id == CurrentMember?.UserId
+                        && CurrentMember?.ProjectRole is ProjectMemberRole.TeamLeader or ProjectMemberRole.Initiator);
+
+                if (!isTeamLeaderOrAdmin)
                 {
-                    await ProjectService.UpdateTaskStatusAsync(taskToMove, TaskCategory);
+                    if (await ProjectService.MemberHasTaskInProgressAsync(CurrentSprint?.Id))
+                    {
+                        EndDrag();
+                        return;
+                    }
                 }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Error updating task status: {ex.Message}");
-                }
+            }
+
+            try
+            {
+                await ProjectService.UpdateTaskStatusAsync(taskToMove, TaskCategory);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error updating task status: {ex.Message}");
+            }
+            finally
+            {
+                EndDrag();
             }
         }
 
@@ -258,8 +319,21 @@ namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewActiveSprintTas
             taskForUpdate.Name = updatedTask.Name;
             taskForUpdate.Description = updatedTask.Description;
             taskForUpdate.Tags = updatedTask.Tags;
-            taskForUpdate.LeaderComment = updatedTask.LeaderComment;
-            taskForUpdate.ExecutorComment = updatedTask.ExecutorComment;
+            StateHasChanged();
+        }
+
+        private void TaskCommentHasUpdated(Guid taskId, string comment, ProjectMemberRole executorRole)
+        {
+            var taskForUpdate = _sprintTasks.FirstOrDefault(t => t.Id == taskId);
+            if (taskForUpdate is null) return;
+
+            if (executorRole is ProjectMemberRole.TeamLeader)
+                taskForUpdate.LeaderComment = comment;
+            else if (executorRole is ProjectMemberRole.Member)
+                taskForUpdate.ExecutorComment = comment;
+            else
+                return;
+
             StateHasChanged();
         }
 
@@ -339,6 +413,7 @@ namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewActiveSprintTas
         {
             ProjectService.OnTaskHasCreated -= TaskHasCreated;
             ProjectService.OnTaskHasUpdated -= TaskHasUpdated;
+            ProjectService.OnTaskCommentUpdated -= TaskCommentHasUpdated;
             ProjectService.OnTaskHasMoved -= TaskHasMoved;
             OnDragStateChanged -= HandleDragStateChanged;
 

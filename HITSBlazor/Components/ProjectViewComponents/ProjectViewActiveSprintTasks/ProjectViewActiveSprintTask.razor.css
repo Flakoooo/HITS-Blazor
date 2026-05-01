@@ -52,16 +52,24 @@
 }
 
 .task-item-draggable {
-    cursor: grab;
+    cursor: pointer;
 }
 
-    .task-item-draggable:active {
-        cursor: grabbing;
+    .task-item-draggable:hover {
+        cursor: pointer;
     }
+
+.task-item-dragging {
+    cursor: grabbing !important;
+}
 
 .task-item-not-draggable {
     cursor: pointer;
 }
+
+    .task-item-not-draggable:hover {
+        cursor: pointer;
+    }
 
 .comment {
     display: -webkit-box;

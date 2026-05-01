@@ -28,6 +28,7 @@
             <textarea value="@Value"
                       placeholder="@Placeholder"
                       @oninput="@OnInputChanged"
+                      @onblur="@HandleBlur"
                       class="form-control rounded-end @(_showError ? "is-invalid" : string.Empty)"
                       style="@Style"
                       @attributes="GetInputAttributes()">

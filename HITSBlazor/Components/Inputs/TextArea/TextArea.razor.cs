@@ -1,5 +1,6 @@
 ﻿using HITSBlazor.Utils.Validation;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Web;
 
 namespace HITSBlazor.Components.Inputs.TextArea
 {
@@ -77,6 +78,14 @@ namespace HITSBlazor.Components.Inputs.TextArea
         {
             if (ValueChanged.HasDelegate)
                 await ValueChanged.InvokeAsync(e.Value?.ToString());
+        }
+
+        private async Task HandleBlur(FocusEventArgs e)
+        {
+            if (OnEnterMethod.HasDelegate)
+            {
+                await OnEnterMethod.InvokeAsync(Value);
+            }
         }
     }
 }

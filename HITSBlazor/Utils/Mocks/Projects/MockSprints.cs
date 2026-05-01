@@ -429,6 +429,11 @@ namespace HITSBlazor.Utils.Mocks.Projects
             return new ListDataResponse<HITSTask> { Count = count, List = query.ToList() };
         }
 
+        public static bool MemberHasTaskInProgress(Guid sprintId, Guid userId)
+            => _tasks.Any(t => 
+                t.SprintId == sprintId && t.Executor?.Id == userId && t.Status is HITSTaskStatus.InProgress
+            );
+
         public static HITSTask? CreateTask(CreateTaskRequest request)
         {
             var newTask = new HITSTask
@@ -464,18 +469,19 @@ namespace HITSBlazor.Utils.Mocks.Projects
             return taskForUpdate;
         }
 
-        public static HITSTask? UpdateSprintTaskInfo(Guid taskId, UpdateSprintTaskInfoRequest request)
+        public static bool UpdateTaskComment(Guid taskId, string comment, ProjectMemberRole executorRole)
         {
             var taskForUpdate = _tasks.FirstOrDefault(t => t.Id == taskId);
-            if (taskForUpdate is null) return null;
+            if (taskForUpdate is null) return false;
 
-            taskForUpdate.Name = request.Name ?? taskForUpdate.Name;
-            taskForUpdate.Description = request.Description ?? taskForUpdate.Description;
-            taskForUpdate.Tags = request.Tags?.ToList() ?? taskForUpdate.Tags;
-            taskForUpdate.LeaderComment = request.TeamLeadComment ?? taskForUpdate.LeaderComment;
-            taskForUpdate.ExecutorComment = request.ExecutorComment ?? taskForUpdate.ExecutorComment;
+            if (executorRole is ProjectMemberRole.TeamLeader)
+                taskForUpdate.LeaderComment = comment;
+            else if (executorRole is ProjectMemberRole.Member)
+                taskForUpdate.ExecutorComment = comment;
+            else
+                return false;
 
-            return taskForUpdate;
+            return true;
         }
 
         public static HITSTask? UpdateTaskStatus(Guid taskId, HITSTaskStatus newStatus, User executor)
@@ -485,10 +491,13 @@ namespace HITSBlazor.Utils.Mocks.Projects
 
             taskForUpdate.Status = newStatus;
 
-            if (newStatus > HITSTaskStatus.NewTask && taskForUpdate.Executor is null)
-                taskForUpdate.Executor = executor;
-            else if (newStatus <= HITSTaskStatus.NewTask)
-                taskForUpdate.Executor = null;
+            if (newStatus is not HITSTaskStatus.OnModification)
+            {
+                if (newStatus > HITSTaskStatus.NewTask && taskForUpdate.Executor is null)
+                    taskForUpdate.Executor = executor;
+                else if (newStatus <= HITSTaskStatus.NewTask)
+                    taskForUpdate.Executor = null;
+            }
 
             MockTaskMovementLogs.CreateNewTaskLog(taskForUpdate, taskForUpdate.Initiator, executor);
 

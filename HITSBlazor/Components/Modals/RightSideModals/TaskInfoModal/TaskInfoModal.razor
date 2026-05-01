@@ -84,7 +84,7 @@
     <div class="task-modal-right-side w-25">
         <div>
             <div class="text-center p-2 bg-primary rounded-top text-white fs-4 border border-bottom-0">
-                @EnumUIConverter.GetInfo(_currentTask?.Status).DisplayText;
+                @EnumUIConverter.GetInfo(_currentTask?.Status).DisplayText
             </div>
             <div class="d-flex flex-column gap-2 bg-white rounded-bottom p-3 border border-top-0">
                 <div class="px-2">
@@ -121,7 +121,9 @@
                               Placeholder="Комментарий тим-лидера"
                               Style="resize: none;"
                               @bind-Value="TeamLeadComment"
-                              IsDisabled="!_isEditorMode" />
+                              OnEnterMethod="HandleTextSubmit"
+                              IsDisabled="CurrentProjectMember.ProjectRole is not ProjectMemberRole.TeamLeader" />
+                              @* TODOO: проверить условие задачи *@
                 </div>
                 <div class="h-100 w-100">
                     <TextArea IsLoading="_isLoading" 
@@ -129,7 +131,8 @@
                               Placeholder="Комментарий исполнителя"
                               Style="resize: none;"
                               @bind-Value="ExecutorComment"
-                              IsDisabled="!_isEditorMode" />
+                              OnEnterMethod="HandleTextSubmit"
+                              IsDisabled="AuthService.CurrentUser?.Id != _currentTask?.Executor?.Id" />
                 </div>
             </div>
         </div>

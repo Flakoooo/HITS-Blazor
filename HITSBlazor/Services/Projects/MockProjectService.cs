@@ -2,6 +2,7 @@
 using HITSBlazor.Models.Projects.Entities;
 using HITSBlazor.Models.Projects.Enums;
 using HITSBlazor.Models.Projects.Requests;
+using HITSBlazor.Models.Quests.Entities;
 using HITSBlazor.Services.Auth;
 using HITSBlazor.Utils.Mocks.Projects;
 
@@ -19,6 +20,7 @@ namespace HITSBlazor.Services.Projects
 
         public event Action<HITSTask>? OnTaskHasCreated;
         public event Action<HITSTask>? OnTaskHasUpdated;
+        public event Action<Guid, string, ProjectMemberRole>? OnTaskCommentUpdated;
         public event Action<HITSTask, HITSTaskStatus>? OnTaskHasMoved;
         public event Action<HITSTask>? OnTaskHasDeleted;
 
@@ -96,6 +98,14 @@ namespace HITSBlazor.Services.Projects
 
         public async Task<HITSTask?> GetTaskByIdAsync(Guid taskId) => MockSprints.GetTaskById(taskId);
 
+        public async Task<bool> MemberHasTaskInProgressAsync(Guid? sprintId)
+        {
+            if (!sprintId.HasValue) return false;
+            if (_authService.CurrentUser is null) return false;
+
+            return MockSprints.MemberHasTaskInProgress(sprintId.Value, _authService.CurrentUser.Id);
+        }
+
         public async Task<bool> CreateNewTaskAsync(CreateTaskRequest request)
         {
             var newTask = MockSprints.CreateTask(request);
@@ -114,13 +124,13 @@ namespace HITSBlazor.Services.Projects
             return true;
         }
 
-        public async Task<HITSTask?> UpdateSprintTaskInfoAsync(Guid taskId, UpdateSprintTaskInfoRequest request)
+        public async Task<bool> UpdateTaskCommentAsync(Guid taskId, string comment, ProjectMemberRole executorRole)
         {
-            var updatedTask = MockSprints.UpdateSprintTaskInfo(taskId, request);
-            if (updatedTask is null) return updatedTask;
+            var taskHasUpdated = MockSprints.UpdateTaskComment(taskId, comment, executorRole);
+            if (!taskHasUpdated) return false;
 
-            OnTaskHasUpdated?.Invoke(updatedTask);
-            return updatedTask;
+            OnTaskCommentUpdated?.Invoke(taskId, comment, executorRole);
+            return true;
         }
 
         public async Task<bool> UpdateTaskStatusAsync(HITSTask task, HITSTaskStatus newStatus)

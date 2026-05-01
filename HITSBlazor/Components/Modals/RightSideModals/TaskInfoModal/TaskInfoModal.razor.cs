@@ -62,6 +62,15 @@ namespace HITSBlazor.Components.Modals.RightSideModals.TaskInfoModal
             _isLoading = false;
         }
 
+        //TODOO: нужно как то это разделить на изменение коммента тимлида и исполнителя
+        private async SharpTask HandleTextSubmit(string value)
+        {
+            if (_currentTask is not null && CurrentProjectMember is not null)
+                await ProjectService.UpdateTaskCommentAsync(
+                    _currentTask.Id, value, CurrentProjectMember.ProjectRole
+                );
+        }
+
         private bool EditIsAllowed()
         {
             var currentUser = AuthService.CurrentUser;
@@ -104,23 +113,20 @@ namespace HITSBlazor.Components.Modals.RightSideModals.TaskInfoModal
         {
             if (_currentTask is null) return;
 
-            var request = new UpdateSprintTaskInfoRequest
+            var request = new UpdateTaskRequest
             {
                 Name = Name,
                 Description = Description,
                 Tags = SelectedTags,
-                TeamLeadComment = TeamLeadComment,
-                ExecutorComment = ExecutorComment
+                WorkHour = _currentTask.WorkHour
             };
 
-            var result = await ProjectService.UpdateSprintTaskInfoAsync(_currentTask.Id, request);
-            if (result is null) return;
+            var result = await ProjectService.UpdateTaskAsync(_currentTask.Id, request);
+            if (!result) return;
 
-            _currentTask.Name = result.Name;
-            _currentTask.Description = result.Description;
-            _currentTask.Tags = result.Tags;
-            _currentTask.LeaderComment = result.LeaderComment;
-            _currentTask.ExecutorComment = result.ExecutorComment;
+            _currentTask.Name = request.Name;
+            _currentTask.Description = request.Description;
+            _currentTask.Tags = request.Tags.ToList();
 
             _isEditorMode = false;
             StateHasChanged();
