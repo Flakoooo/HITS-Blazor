@@ -2,7 +2,6 @@
 using HITSBlazor.Models.Projects.Entities;
 using HITSBlazor.Models.Projects.Enums;
 using HITSBlazor.Models.Projects.Requests;
-using HITSBlazor.Models.Users.Entities;
 using HITSBlazor.Services.Auth;
 using HITSBlazor.Utils.Mocks.Projects;
 
@@ -95,6 +94,8 @@ namespace HITSBlazor.Services.Projects
             int page
         ) => MockTaskMovementLogs.GetTasksLogsById(taskId, page);
 
+        public async Task<HITSTask?> GetTaskByIdAsync(Guid taskId) => MockSprints.GetTaskById(taskId);
+
         public async Task<bool> CreateNewTaskAsync(CreateTaskRequest request)
         {
             var newTask = MockSprints.CreateTask(request);
@@ -111,6 +112,15 @@ namespace HITSBlazor.Services.Projects
 
             OnTaskHasUpdated?.Invoke(updatedTask);
             return true;
+        }
+
+        public async Task<HITSTask?> UpdateSprintTaskInfoAsync(Guid taskId, UpdateSprintTaskInfoRequest request)
+        {
+            var updatedTask = MockSprints.UpdateSprintTaskInfo(taskId, request);
+            if (updatedTask is null) return updatedTask;
+
+            OnTaskHasUpdated?.Invoke(updatedTask);
+            return updatedTask;
         }
 
         public async Task<bool> UpdateTaskStatusAsync(HITSTask task, HITSTaskStatus newStatus)

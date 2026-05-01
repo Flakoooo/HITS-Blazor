@@ -38,6 +38,9 @@ namespace HITSBlazor.Components.Inputs.CheckboxDropdown
         [Parameter]
         public int DebounceDelay { get; set; } = 0;
 
+        [Parameter]
+        public bool? IsDisabled { get; set; }
+
         private ElementReference _inputRef;
         private DebounceHelper? _searchDebounce;
 
@@ -96,6 +99,16 @@ namespace HITSBlazor.Components.Inputs.CheckboxDropdown
 
                 _values = AllValues.ToList();
             }
+        }
+
+        private Dictionary<string, object> GetInputAttributes()
+        {
+            var attributes = new Dictionary<string, object>();
+
+            if (IsDisabled.HasValue && IsDisabled.Value)
+                attributes["disabled"] = "disabled";
+
+            return attributes;
         }
 
         private async Task OpenDropdown()

@@ -24,6 +24,9 @@ namespace HITSBlazor.Components.Inputs.TextArea
         public EventCallback<string> ValueChanged { get; set; }
 
         [Parameter]
+        public EventCallback<string> OnEnterMethod { get; set; }
+
+        [Parameter]
         public bool NeedValidation { get; set; } = false;
 
         [Parameter]

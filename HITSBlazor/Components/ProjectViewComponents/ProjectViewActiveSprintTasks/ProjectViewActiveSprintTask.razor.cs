@@ -62,6 +62,7 @@ namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewActiveSprintTas
             _jsRuntime = JSRuntime;
 
             ProjectService.OnTaskHasCreated += TaskHasCreated;
+            ProjectService.OnTaskHasUpdated += TaskHasUpdated;
             ProjectService.OnTaskHasMoved += TaskHasMoved;
             OnDragStateChanged += HandleDragStateChanged;
 
@@ -99,6 +100,9 @@ namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewActiveSprintTas
         //TODOO: участник не может перенести идею в На доработке и На проверке
         //TODOO: можно переносить спокойно из Новая в В работе и наоборот
         //TODOO: также нужно сделать так, чтобы расположение задач в колонке можно было менять (с анимацией)
+        //TODOO: при переноске задачи, вносить ее в самый вверх 
+        //TODOO: участник может ВЗЯТЬ ТОЛЬКО ОДНУ задачу на В РАБОТЕ
+        //TODOO: переносить задачу сразу в На проверке нельзя, сначала В работе, потом На проверке
         private bool CanDragTask(HITSTask task)
         {
             var currentUser = AuthService.CurrentUser;
@@ -244,6 +248,21 @@ namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewActiveSprintTas
             StateHasChanged();
         }
 
+        private void TaskHasUpdated(HITSTask updatedTask)
+        {
+            if (TaskCategory != updatedTask.Status) return;
+
+            var taskForUpdate = _sprintTasks.FirstOrDefault(t => t.Id == updatedTask.Id);
+            if (taskForUpdate is null) return;
+
+            taskForUpdate.Name = updatedTask.Name;
+            taskForUpdate.Description = updatedTask.Description;
+            taskForUpdate.Tags = updatedTask.Tags;
+            taskForUpdate.LeaderComment = updatedTask.LeaderComment;
+            taskForUpdate.ExecutorComment = updatedTask.ExecutorComment;
+            StateHasChanged();
+        }
+
         private void TaskHasMoved(HITSTask updatedTask, HITSTaskStatus oldStatus)
         {
             if (updatedTask.SprintId != CurrentSprint?.Id) return;
@@ -303,15 +322,23 @@ namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewActiveSprintTas
 
         private void ShowSprintTaskModal(Guid taskId)
         {
-            ModalService.Show<TaskInfoModal>(
-                ModalType.RightSide,
-                parameters: new Dictionary<string, object> { [nameof(TaskInfoModal.TaskId)] = taskId }
-            );
+            if (CurrentMember is not null)
+            {
+                ModalService.Show<TaskInfoModal>(
+                    ModalType.RightSide,
+                    parameters: new Dictionary<string, object>
+                    {
+                        [nameof(TaskInfoModal.TaskId)] = taskId,
+                        [nameof(TaskInfoModal.CurrentProjectMember)] = CurrentMember
+                    }
+                );
+            }
         }
 
         protected override async ValueTask DisposeAsyncCore()
         {
             ProjectService.OnTaskHasCreated -= TaskHasCreated;
+            ProjectService.OnTaskHasUpdated -= TaskHasUpdated;
             ProjectService.OnTaskHasMoved -= TaskHasMoved;
             OnDragStateChanged -= HandleDragStateChanged;
 

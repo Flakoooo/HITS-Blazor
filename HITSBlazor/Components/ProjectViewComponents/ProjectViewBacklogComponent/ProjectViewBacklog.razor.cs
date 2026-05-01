@@ -3,7 +3,6 @@ using HITSBlazor.Models.Projects.Entities;
 using HITSBlazor.Services.Auth;
 using HITSBlazor.Services.Modal;
 using HITSBlazor.Services.Projects;
-using HITSBlazor.Services.Skills;
 using HITSBlazor.Services.Tags;
 using Microsoft.AspNetCore.Components;
 

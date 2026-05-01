@@ -34,6 +34,7 @@
                            placeholder="@($"{Placeholder}{(SelectedValues.Count > 0 ? $" ({SelectedValues.Count})" : "")}")"
                            class="form-control"
                            style="color: #000 !important;"
+                           @attributes="GetInputAttributes()"
                            @onclick="OpenDropdown"
                            @onfocus="OpenDropdown"
                            @onkeydown="OnInputKeyDown" />

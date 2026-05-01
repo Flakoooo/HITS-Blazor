@@ -464,6 +464,20 @@ namespace HITSBlazor.Utils.Mocks.Projects
             return taskForUpdate;
         }
 
+        public static HITSTask? UpdateSprintTaskInfo(Guid taskId, UpdateSprintTaskInfoRequest request)
+        {
+            var taskForUpdate = _tasks.FirstOrDefault(t => t.Id == taskId);
+            if (taskForUpdate is null) return null;
+
+            taskForUpdate.Name = request.Name ?? taskForUpdate.Name;
+            taskForUpdate.Description = request.Description ?? taskForUpdate.Description;
+            taskForUpdate.Tags = request.Tags?.ToList() ?? taskForUpdate.Tags;
+            taskForUpdate.LeaderComment = request.TeamLeadComment ?? taskForUpdate.LeaderComment;
+            taskForUpdate.ExecutorComment = request.ExecutorComment ?? taskForUpdate.ExecutorComment;
+
+            return taskForUpdate;
+        }
+
         public static HITSTask? UpdateTaskStatus(Guid taskId, HITSTaskStatus newStatus, User executor)
         {
             var taskForUpdate = _tasks.FirstOrDefault(t => t.Id == taskId);

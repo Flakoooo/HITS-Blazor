@@ -5,31 +5,68 @@
 @using HITSBlazor.Components.Inputs.Input
 @using HITSBlazor.Components.Inputs.TextArea
 @using HITSBlazor.Components.Modals.Components.ModalHeader
-
+@using HITSBlazor.Components.Modals.Components.RightSideModalInfo
+@using HITSBlazor.Components.Modals.Components.RightSideModalInfoItemComponent
 @using HITSBlazor.Components.Tables.TableComponent
 @using HITSBlazor.Components.Tables.TaskLogTable
 @using HITSBlazor.Components.Tags
+@using HITSBlazor.Components.Typography
 @using HITSBlazor.Models.Common.Entities
-@using HITSTask = HITSBlazor.Models.Projects.Entities.Task;
-@using HITSTaskStatus = HITSBlazor.Models.Projects.Enums.TaskStatus;
+@using HITSBlazor.Models.Projects.Entities
+@using HITSBlazor.Models.Projects.Enums
+@using HITSBlazor.Models.Projects.Requests
+@using HITSBlazor.Models.Users.Enums
+@using HITSBlazor.Services.Auth
+@using HITSBlazor.Services.Modal
+@using HITSBlazor.Services.Projects
+@using HITSBlazor.Utils.EnumUIConverters
 
 <div class="p-3 h-100 overflow-y-scroll right-side-modal" @onclick:stopPropagation="true">
     <div class="task-modal-left-side w-75">
         <RightSideModalHeader IsLoading="_isLoading" HeaderText="@_currentTask?.Name" />
         <div class="task-data p-3 w-100 bg-white rounded">
-            <Input IsLoading="_isLoading" />
-            <TextArea IsLoading="_isLoading" />
+            <Input IsLoading="_isLoading" 
+                   Label="Название*"
+                   Placeholder="Введите название задачи"
+                   @bind-Value="Name"
+                   IsDisabled="!_isEditorMode" />
+            <TextArea IsLoading="_isLoading" 
+                      Label="Описание*"
+                      Placeholder="Введите описание задачи"
+                      Style="resize: none; height: 100px;" 
+                      @bind-Value="Description"
+                      IsDisabled="!_isEditorMode" />
             <div class="d-flex flex-column gap-2 w-100">
-                <CheckboxDropdown T="Tag" IsLoading="_isLoading" />
+                <CheckboxDropdown T="Tag" 
+                                  IsLoading="_isLoading" 
+                                  Placeholder="Теги"
+                                  @bind-SelectedValues="SelectedTags" 
+                                  IsDisabled="!_isEditorMode" />
                 <Tags AllTags="_currentTask?.Tags" />
             </div>
             <div class="d-flex gap-3">
-                @* TODOO: не все могут редактировать, только исполнитель, тим лидер и инициатор *@
-                <Button IsLoading="_isLoading" Text="Редактировать" Variant="ButtonVariant.Primary" />
-                <Button IsLoading="_isLoading" Text="Удалить" Variant="ButtonVariant.Danger" />
-                @* TODOO: показывать это при редактировании *@
-                <Button IsLoading="_isLoading" Text="Сохранить" Variant="ButtonVariant.Success" />
-                <Button IsLoading="_isLoading" Text="Отменить" Variant="ButtonVariant.Danger" />
+                @if (EditIsAllowed())
+                {
+                    <Button IsLoading="_isLoading" 
+                            Text="Редактировать" 
+                            Variant="ButtonVariant.Primary"
+                            OnButtonClick="StartEditTask" />
+                    <Button IsLoading="_isLoading" 
+                            Text="Удалить" 
+                            Variant="ButtonVariant.Danger"
+                            OnButtonClick="DeleteTask" />
+                }
+                @if (_isEditorMode)
+                {
+                    <Button IsLoading="_isLoading" 
+                            Text="Сохранить" 
+                            Variant="ButtonVariant.Success"
+                            OnButtonClick="ConfirmTaskUpdate" />
+                    <Button IsLoading="_isLoading" 
+                            Text="Отменить" 
+                            Variant="ButtonVariant.Danger"
+                            OnButtonClick="EndEditTask" />
+                }
             </div>
         </div>
         <div>
@@ -45,14 +82,56 @@
         </div>
     </div>
     <div class="task-modal-right-side w-25">
+        <div>
+            <div class="text-center p-2 bg-primary rounded-top text-white fs-4 border border-bottom-0">
+                @EnumUIConverter.GetInfo(_currentTask?.Status).DisplayText;
+            </div>
+            <div class="d-flex flex-column gap-2 bg-white rounded-bottom p-3 border border-top-0">
+                <div class="px-2">
+                    <RightSideModalInfoItemComponent IsLoading="_isLoading"
+                                                     Label="Постановщик"
+                                                     Icon="bi-person-circle"
+                                                     Text="@_currentTask?.Initiator.FullName"
+                                                     TextColor="TextColor.Primary" />
+                </div>
+                <div class="px-2">
+                    <RightSideModalInfoItemComponent IsLoading="_isLoading"
+                                                     Label="Исполнитель"
+                                                     Icon="bi-person-circle"
+                                                     Text="@(_currentTask?.Executor?.FullName ?? "Не назначен")"
+                                                     TextColor="TextColor.Primary" />
+                </div>
+                <div class="px-2">
+                    <RightSideModalInfoItemComponent IsLoading="_isLoading"
+                                                     Label="Трудоемксть"
+                                                     Icon="bi-clock"
+                                                     Text="@($"{_currentTask?.WorkHour}ч")"
+                                                     TextColor="TextColor.Primary" />
+                </div>
+            </div>
+        </div>
+        <div class="d-flex flex-column h-100">
+            <div class="text-center p-2 bg-primary rounded-top text-white fs-4 border border-bottom-0">
+                Комментарии
+            </div>
+            <div class="task-comments bg-white rounded-bottom p-3 border border-top-0">
+                <div class="h-100 w-100">
+                    <TextArea IsLoading="_isLoading" 
+                              Label="Тим-лидер" 
+                              Placeholder="Комментарий тим-лидера"
+                              Style="resize: none;"
+                              @bind-Value="TeamLeadComment"
+                              IsDisabled="!_isEditorMode" />
+                </div>
+                <div class="h-100 w-100">
+                    <TextArea IsLoading="_isLoading" 
+                              Label="Исполнитель" 
+                              Placeholder="Комментарий исполнителя"
+                              Style="resize: none;"
+                              @bind-Value="ExecutorComment"
+                              IsDisabled="!_isEditorMode" />
+                </div>
+            </div>
+        </div>
     </div>
 </div>
-
-@code {
-    [Parameter]
-    public Guid TaskId { get; set; } 
-
-    private bool _isLoading = true;
-
-    private HITSTask? _currentTask;
-}

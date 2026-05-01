@@ -48,8 +48,10 @@ namespace HITSBlazor.Services.Projects
             Guid taskId,
             int page
         );
+        Task<HITSTask?> GetTaskByIdAsync(Guid taskId);
         Task<bool> CreateNewTaskAsync(CreateTaskRequest request);
         Task<bool> UpdateTaskAsync(Guid taskId, UpdateTaskRequest request);
+        Task<HITSTask?> UpdateSprintTaskInfoAsync(Guid taskId, UpdateSprintTaskInfoRequest request);
         Task<bool> UpdateTaskStatusAsync(HITSTask task, HITSTaskStatus newStatus);
         Task<bool> DeleteTaskAsync(HITSTask task);
     }

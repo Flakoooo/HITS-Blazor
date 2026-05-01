@@ -59,13 +59,27 @@
                     <div class="bg-white p-2 border-top border-end border-bottom w-100 rounded-end">
                         <div class="d-flex flex-column border-bottom pb-2">
                             <div class="active-sprint-task">
-                                <div class="text-ellipsis">
-                                    @task.Name
-                                </div>
+                                <div class="text-ellipsis">@task.Name</div>
                             </div>
                             <div class="d-flex gap-1 text-secondary">
                                 @task.Executor?.FullName
                             </div>
+                            @if (task.Status is HITSTaskStatus.OnModification && !string.IsNullOrWhiteSpace(task.LeaderComment))
+                            {
+                                <div class="d-flex gap-1 text-secondary text-info">
+                                    <Typography FontSize="6">
+                                        <div class="comment">@task.LeaderComment</div>
+                                    </Typography>
+                                </div>
+                            }
+                            @if (task.Status is HITSTaskStatus.OnVerification && !string.IsNullOrWhiteSpace(task.ExecutorComment))
+                            {
+                                <div class="d-flex gap-1 text-secondary text-info">
+                                    <Typography FontSize="6">
+                                        <div class="comment">@task.ExecutorComment</div>
+                                    </Typography>
+                                </div>
+                            }
                         </div>
                         <Tags AllTags="task.Tags" CustomClass="w-100 mt-2" />
                     </div>
@@ -107,13 +121,27 @@
                 <div class="bg-white p-2 w-100 rounded-end">
                     <div class="d-flex flex-column border-bottom pb-2">
                         <div class="active-sprint-task">
-                            <div class="text-ellipsis">
-                                @_draggedTask.Name
-                            </div>
+                            <div class="text-ellipsis">@_draggedTask.Name</div>
                         </div>
                         <div class="d-flex gap-1 text-secondary">
                             @_draggedTask.Executor?.FullName
                         </div>
+                        @if (_draggedTask.Status is HITSTaskStatus.OnModification && !string.IsNullOrWhiteSpace(_draggedTask.LeaderComment))
+                        {
+                            <div class="d-flex gap-1 text-secondary text-info">
+                                <Typography FontSize="6">
+                                    <div class="comment">@_draggedTask.LeaderComment</div>
+                                </Typography>
+                            </div>
+                        }
+                        @if (_draggedTask.Status is HITSTaskStatus.OnVerification && !string.IsNullOrWhiteSpace(_draggedTask.ExecutorComment))
+                        {
+                            <div class="d-flex gap-1 text-secondary text-info">
+                                <Typography FontSize="6">
+                                    <div class="comment">@_draggedTask.ExecutorComment</div>
+                                </Typography>
+                            </div>
+                        }
                     </div>
                     <Tags AllTags="_draggedTask.Tags" CustomClass="w-100 mt-2" />
                 </div>
