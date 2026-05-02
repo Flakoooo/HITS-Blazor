@@ -47,10 +47,12 @@
     <div class="list-group active-sprint-column @dragOverClass" @ref="_tableContainer">
         @foreach (var task in _sprintTasks)
         {
+            var order = _sprintTasks.IndexOf(task);
             @if (CanDragTask(task))
             {
                 <div class="d-flex my-1 task-item task-item-draggable @(_draggedTask?.Id == task.Id ? "task-item-dragging" : "")"
-                     style="opacity: @(_draggedTask?.Id == task.Id ? "0.3" : "1")"
+                     data-task-id="@task.Id"
+                     style="opacity: @(_draggedTask?.Id == task.Id ? "0.3" : "1"); order: @order"
                      @onmousedown="(e) => HandleMouseDown(e, task)"
                      @onmousemove="HandleMouseMove"
                      @onmouseup="HandleMouseUp"

@@ -2,7 +2,6 @@
 using HITSBlazor.Models.Projects.Entities;
 using HITSBlazor.Models.Projects.Enums;
 using HITSBlazor.Models.Projects.Requests;
-using HITSBlazor.Models.Quests.Entities;
 using HITSBlazor.Services.Auth;
 using HITSBlazor.Utils.Mocks.Projects;
 
@@ -133,17 +132,25 @@ namespace HITSBlazor.Services.Projects
             return true;
         }
 
-        public async Task<bool> UpdateTaskStatusAsync(HITSTask task, HITSTaskStatus newStatus)
+        public async Task<bool> UpdateTaskStatusAsync(HITSTask task, HITSTaskStatus newStatus, int taskIndex)
         {
             var currentUser = _authService.CurrentUser;
             if (currentUser is null) return false;
 
             var oldStatus = task.Status;
 
-            var updatedTask = MockSprints.UpdateTaskStatus(task.Id, newStatus, currentUser);
+            var updatedTask = MockSprints.UpdateTaskStatus(task.Id, newStatus, currentUser, taskIndex);
             if (updatedTask is null) return false;
 
             OnTaskHasMoved?.Invoke(updatedTask, oldStatus);
+            return true;
+        }
+
+        public async Task<bool> UpdateTaskPositionAsync(HITSTask task, int newIndex)
+        {
+            var taskHasUpdated = MockSprints.UpdateTaskPosition(task.Id, newIndex);
+            if (taskHasUpdated is null) return false;
+
             return true;
         }
 

@@ -16,6 +16,8 @@
     flex: 1;
     overflow-y: auto;
     transition: background-color 0.2s ease;
+    display: flex;
+    flex-direction: column;
 }
 
 .active-sprint-add-task {
@@ -48,7 +50,7 @@
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
-    transition: opacity 0.2s ease, transform 0.2s ease;
+    transition: order 0.1s ease, opacity 0.15s ease;
 }
 
 .task-item-draggable {

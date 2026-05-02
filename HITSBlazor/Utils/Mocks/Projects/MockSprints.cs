@@ -484,12 +484,14 @@ namespace HITSBlazor.Utils.Mocks.Projects
             return true;
         }
 
-        public static HITSTask? UpdateTaskStatus(Guid taskId, HITSTaskStatus newStatus, User executor)
+        public static HITSTask? UpdateTaskStatus(Guid taskId, HITSTaskStatus newStatus, User executor, int taskIndex = -100)
         {
             var taskForUpdate = _tasks.FirstOrDefault(t => t.Id == taskId);
             if (taskForUpdate is null) return null;
 
             taskForUpdate.Status = newStatus;
+            if (taskIndex >= 0)
+                taskForUpdate.Position = taskIndex;
 
             if (newStatus is not HITSTaskStatus.OnModification)
             {
@@ -500,6 +502,16 @@ namespace HITSBlazor.Utils.Mocks.Projects
             }
 
             MockTaskMovementLogs.CreateNewTaskLog(taskForUpdate, taskForUpdate.Initiator, executor);
+
+            return taskForUpdate;
+        }
+
+        public static HITSTask? UpdateTaskPosition(Guid taskId, int newIndex)
+        {
+            var taskForUpdate = _tasks.FirstOrDefault(t => t.Id == taskId);
+            if (taskForUpdate is null) return null;
+
+            taskForUpdate.Position = newIndex;
 
             return taskForUpdate;
         }

@@ -43,6 +43,8 @@ namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewActiveSprintTas
         private static HITSTask? _draggedTask;
         private static string? _draggedFromCategory;
         private static event Action? OnDragStateChanged;
+        private string? _targetCategory;
+        private int _targetDropIndex = -1;
 
         private static double _mouseX;
         private static double _mouseY;
@@ -72,11 +74,11 @@ namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewActiveSprintTas
             _isLoading = false;
             MarkAsInitialized();
         }
-
+        
         protected override async SharpTask AdditionalAfterRenderMethod()
         {
             if (_jsRuntime != null)
-                await _jsRuntime.InvokeVoidAsync("dragDrop.initializeGlobalMouseEvents", _dotNetHelper);
+                await _jsRuntime.InvokeVoidAsync("dragDrop.initializeGlobalMouseEvents", _dotNetHelper, TaskCategory.ToString());
         }
 
         private void HandleDragStateChanged() => InvokeAsync(StateHasChanged);
@@ -192,23 +194,40 @@ namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewActiveSprintTas
         }
 
         [JSInvokable]
-        public void OnGlobalMouseMove(double clientX, double clientY)
+        public void OnGlobalMouseMove(double clientX, double clientY, string? targetCategory, int dropIndex)
         {
             if (IsDragging)
             {
                 _mouseX = clientX;
                 _mouseY = clientY;
+                _targetCategory = targetCategory;
+                _targetDropIndex = dropIndex;
+
+                if (_draggedFromCategory == TaskCategory.ToString()
+                    && targetCategory == TaskCategory.ToString()
+                    && dropIndex >= 0
+                    && _draggedTask != null)
+                {
+                    MoveTaskToIndex(_draggedTask, dropIndex);
+                }
+
+                _isDragOver = targetCategory == TaskCategory.ToString()
+                    && _draggedFromCategory != targetCategory
+                    && _draggedTask != null
+                    && CanDropTask(_draggedTask);
+
                 OnDragStateChanged?.Invoke();
             }
         }
 
         [JSInvokable]
-        public void OnGlobalMouseUp(double clientX, double clientY, string? targetCategory)
+        public void OnGlobalMouseUp(double clientX, double clientY, string? targetCategory, int dropIndex)
         {
             if (IsDragging)
             {
                 _mouseX = clientX;
                 _mouseY = clientY;
+                _targetDropIndex = dropIndex;
                 OnDragStateChanged?.Invoke();
 
                 if (!string.IsNullOrEmpty(targetCategory) && targetCategory == TaskCategory.ToString())
@@ -227,6 +246,19 @@ namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewActiveSprintTas
             }
         }
 
+        private void MoveTaskToIndex(HITSTask task, int newIndex)
+        {
+            if (newIndex < 0 || newIndex > _sprintTasks.Count) return;
+
+            var currentIndex = _sprintTasks.IndexOf(task);
+            if (currentIndex < 0 || currentIndex == newIndex) return;
+
+            _sprintTasks.RemoveAt(currentIndex);
+            if (currentIndex < newIndex) newIndex--;
+            _sprintTasks.Insert(newIndex, task);
+            StateHasChanged();
+        }
+
         private static async void StartDrag(HITSTask task)
         {
             _draggedFromCategory = task.Status.ToString();
@@ -234,7 +266,7 @@ namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewActiveSprintTas
             if (_jsRuntime != null)
             {
                 await _jsRuntime.InvokeVoidAsync("dragDrop.preventSelection");
-                await _jsRuntime.InvokeVoidAsync("dragDrop.startGlobalDrag");
+                await _jsRuntime.InvokeVoidAsync("dragDrop.startGlobalDrag", task.Status.ToString());
             }
 
             OnDragStateChanged?.Invoke();
@@ -258,9 +290,21 @@ namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewActiveSprintTas
         {
             _isDragOver = false;
             var taskToMove = _draggedTask;
+            var dropIndex = _targetDropIndex;
 
-            if (taskToMove == null || taskToMove.Status == TaskCategory)
+            if (taskToMove == null)
             {
+                EndDrag();
+                return;
+            }
+
+            if (taskToMove.Status == TaskCategory && _draggedFromCategory == TaskCategory.ToString())
+            {
+                if (dropIndex >= 0 && dropIndex != _sprintTasks.IndexOf(taskToMove))
+                {
+                    MoveTaskToIndex(taskToMove, dropIndex);
+                    await ProjectService.UpdateTaskPositionAsync(taskToMove, dropIndex);
+                }
                 EndDrag();
                 return;
             }
@@ -290,11 +334,11 @@ namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewActiveSprintTas
 
             try
             {
-                await ProjectService.UpdateTaskStatusAsync(taskToMove, TaskCategory);
+                await ProjectService.UpdateTaskStatusAsync(taskToMove, TaskCategory, dropIndex);
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error updating task status: {ex.Message}");
+                Console.WriteLine($"Error: {ex.Message}");
             }
             finally
             {
