@@ -155,5 +155,11 @@
     },
     allowSelection: function () {
         document.body.style.userSelect = '';
-    }
+    },
+    removeGlobalMouseEvents: function () {
+        document.removeEventListener('mousemove', this.globalMouseMoveHandler);
+        document.removeEventListener('mouseup', this.globalMouseUpHandler);
+        window.removeEventListener('mousemove', this.globalMouseMoveHandler);
+        window.removeEventListener('mouseup', this.globalMouseUpHandler);
+    },
 };

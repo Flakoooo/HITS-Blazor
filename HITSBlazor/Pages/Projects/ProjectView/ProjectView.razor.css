@@ -1,0 +1,22 @@
+﻿.drag-overlay {
+    position: fixed;
+    pointer-events: none;
+    z-index: 10000;
+    transform: translate(-50%, -50%);
+    width: 338px;
+    max-width: 90vw;
+}
+
+.drag-card {
+    opacity: 0.95;
+    transform: rotate(2deg);
+    border-radius: 8px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+}
+
+    .drag-card .text-ellipsis {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 100%;
+    }

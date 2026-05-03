@@ -38,3 +38,38 @@
     justify-content: space-between;
     transition: background-color;
 }
+
+.task-item {
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    transition: order 0.1s ease, opacity 0.15s ease;
+}
+
+.task-item-draggable {
+    cursor: pointer;
+}
+
+    .task-item-draggable:hover {
+        cursor: pointer;
+    }
+
+.task-item-dragging {
+    cursor: grabbing !important;
+}
+
+.task-item-not-draggable {
+    cursor: pointer;
+}
+
+    .task-item-not-draggable:hover {
+        cursor: pointer;
+    }
+
+.no-select {
+    user-select: none !important;
+    -webkit-user-select: none !important;
+    -moz-user-select: none !important;
+    -ms-user-select: none !important;
+}

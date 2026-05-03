@@ -12,27 +12,53 @@
 @using HITSBlazor.Services.Tags
 @inherits ListPageDataLoader
 
+@using HITSTaskStatus = HITSBlazor.Models.Projects.Enums.TaskStatus;
+
 <div class="d-flex gap-3 mt-4">
-    <div class="w-100" style="max-height: 75vh; overflow-y: auto;" @ref="_tableContainer">
+    <div class="w-100 sprint-column-wrapper"
+         style="max-height: 75vh; overflow-y: auto;"
+         @ref="_tableContainer"
+         data-category="InBackLog">
         @foreach (var task in _projectTasks)
         {
-            <TaskComponent Task="task" 
-                           TaskWidth="_projectTasks.Count <= 13 ? 100 : 99"
-                           CollapseTaskAllowed="true"
-                           ShowTaskModalAllowed="task.Status is Models.Projects.Enums.TaskStatus.InBackLog"
-                           DeleteTaskAllowed="AuthService.CurrentUser?.Role is RoleType.TeamLeader or RoleType.Admin" />
+            @if (CanDragTask(task))
+            {
+                <div class="task-item task-item-draggable @(DragDrop.DraggedTask?.Id == task.Id ? "task-item-dragging" : string.Empty)"
+                     data-task-id="@task.Id"
+                     style="opacity: @(DragDrop.DraggedTask?.Id == task.Id ? "0.3" : "1")"
+                     @onmousedown="(e) => HandleMouseDown(e, task)"
+                     @onmousemove="HandleMouseMove"
+                     @onmouseup="HandleMouseUp"
+                     @onmousedown:preventDefault="true">
+                    <TaskComponent Task="task"
+                                   TaskWidth="_projectTasks.Count <= 13 ? 100 : 99"
+                                   CollapseTaskAllowed="true"
+                                   ShowTaskModalAllowed="task.Status is Models.Projects.Enums.TaskStatus.InBackLog"
+                                   DeleteTaskAllowed="AuthService.CurrentUser?.Role is RoleType.TeamLeader or RoleType.Admin" />
+                </div>
+            }
+            else
+            {
+                <div class="task-item task-item-not-draggable"
+                     style="cursor: pointer;">
+                    <TaskComponent Task="task"
+                                   TaskWidth="_projectTasks.Count <= 13 ? 100 : 99"
+                                   CollapseTaskAllowed="true"
+                                   DeleteTaskAllowed="AuthService.CurrentUser?.Role is RoleType.TeamLeader or RoleType.Admin" />
+                </div>
+            }
         }
     </div>
     <div class="d-flex flex-column gap-3 w-25">
         <Button IsLoading="IsOnLoading"
-                Variant="ButtonVariant.Primary" 
+                Variant="ButtonVariant.Primary"
                 ButtonClass="p-2"
-                Text="Создать задачу" 
+                Text="Создать задачу"
                 OnButtonClick="() => ShowTaskModal()" />
         <div class="filter w-25 bg-white p-2 border-start w-100">
-            <CheckboxFilter T="Tag" 
+            <CheckboxFilter T="Tag"
                             IsLoading="IsOnLoading"
-                            Label="Теги" 
+                            Label="Теги"
                             @bind-SearchText="SearchTagFilterText"
                             @bind-SelectedValues="SelectedTagNames"
                             FilterChanged="FiltersHasChanged"

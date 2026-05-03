@@ -13,6 +13,7 @@
 @using HITSBlazor.Components.NavigationTabs
 @using HITSBlazor.Components.Placeholders.Placeholder
 @using HITSBlazor.Components.ProjectViewComponents.ProjectViewActiveSprintComponent
+@using HITSBlazor.Components.ProjectViewComponents.ProjectViewActiveSprintTaskContent
 @using HITSBlazor.Components.ProjectViewComponents.ProjectViewBacklogComponent
 @using HITSBlazor.Components.ProjectViewComponents.ProjectViewInfoComponent
 @using HITSBlazor.Components.ProjectViewComponents.ProjectViewSprintComponent
@@ -28,6 +29,8 @@
 @using HITSBlazor.Models.Users.Enums
 @using HITSBlazor.Utils.EnumUIConverters
 @using HITSBlazor.Utils.Models
+
+@using HITSTaskStatus = HITSBlazor.Models.Projects.Enums.TaskStatus;
 
 <div class="bg-white h-auto">
     <div class="px-4 py-3 h-100">
@@ -77,3 +80,27 @@
         </div>
     </div>
 </div>
+
+@if (DragDrop.DraggedTask != null)
+{
+    <div class="drag-overlay" style="left: @($"{DragDrop.MouseX}px"); top: @($"{DragDrop.MouseY}px");">
+        @if (DragDrop.DraggedFromCategory == HITSTaskStatus.InBackLog.ToString())
+        {
+            <div style="width: 1300px;">
+                <TaskComponent Task="DragDrop.DraggedTask"
+                               TaskWidth="100"
+                               CollapseTaskAllowed="false"
+                               ShowTaskModalAllowed="false"
+                               DeleteTaskAllowed="false" />
+            </div>
+        }
+        else
+        {
+            <div class="drag-card shadow-lg">
+                <div class="d-flex">
+                    <ProjectViewActiveSprintTaskContent CurrentTask="DragDrop.DraggedTask" />
+                </div>
+            </div>
+        }
+    </div>
+}

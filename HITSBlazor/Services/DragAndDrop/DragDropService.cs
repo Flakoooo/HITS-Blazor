@@ -1,0 +1,80 @@
+﻿using Microsoft.JSInterop;
+
+using HITSTask = HITSBlazor.Models.Projects.Entities.Task;
+using HITSTaskStatus = HITSBlazor.Models.Projects.Enums.TaskStatus;
+using SharpTask = System.Threading.Tasks.Task;
+
+
+namespace HITSBlazor.Services.DragAndDrop
+{
+    public class DragDropService
+    {
+        private IJSRuntime? _jsRuntime;
+
+        public HITSTask? DraggedTask { get; private set; }
+        public string? DraggedFromCategory { get; private set; }
+        public string? TargetCategory { get; private set; }
+        public int TargetDropIndex { get; private set; } = -1;
+        public double MouseX { get; private set; }
+        public double MouseY { get; private set; }
+        public bool IsDragging => DraggedTask != null;
+
+        public string? LastTempCategory { get; set; }
+
+        public event Action? OnDragStateChanged;
+        public event Action? OnCleanupTempTask;
+
+        public void SetJSRuntime(IJSRuntime jsRuntime) => _jsRuntime = jsRuntime;
+
+        public void UpdateMouseMove(double clientX, double clientY, string? targetCategory, int dropIndex)
+        {
+            MouseX = clientX;
+            MouseY = clientY;
+            TargetCategory = targetCategory;
+            TargetDropIndex = dropIndex;
+        }
+
+        public async SharpTask StartDrag(HITSTask task, string fromCategory)
+        {
+            DraggedTask = task;
+            DraggedFromCategory = fromCategory;
+
+            if (_jsRuntime != null)
+            {
+                await _jsRuntime.InvokeVoidAsync("dragDrop.preventSelection");
+                await _jsRuntime.InvokeVoidAsync("dragDrop.startGlobalDrag", fromCategory);
+            }
+
+            OnDragStateChanged?.Invoke();
+        }
+
+        public async SharpTask EndDrag()
+        {
+            OnCleanupTempTask?.Invoke();
+            LastTempCategory = null;
+            DraggedTask = null;
+            DraggedFromCategory = null;
+
+            if (_jsRuntime != null)
+            {
+                await _jsRuntime.InvokeVoidAsync("dragDrop.allowSelection");
+            }
+
+            OnDragStateChanged?.Invoke();
+        }
+
+        public void CleanupTempTask(Func<bool> hasTask, Action removeTask, string taskCategory, HITSTaskStatus currentStatus)
+        {
+            if (DraggedTask != null && hasTask()
+                && taskCategory != DraggedFromCategory
+                && DraggedTask.Status != currentStatus)
+            {
+                removeTask();
+            }
+        }
+
+        public void NotifyStateChanged() => OnDragStateChanged?.Invoke();
+
+        public void NotifyCleanUp() => OnCleanupTempTask?.Invoke();
+    }
+}

@@ -17,12 +17,12 @@
 <div class="w-100 sprint-column-wrapper"
      data-category="@TaskCategory.ToString()"
      @onmouseup="HandleDrop"
-     @onmouseenter="() => _isDragOver = _draggedTask != null && _draggedTask.Status != TaskCategory && CanDropTask(_draggedTask)"
+     @onmouseenter="() => _isDragOver = DragDrop.DraggedTask != null && DragDrop.DraggedTask.Status != TaskCategory && CanDropTask(DragDrop.DraggedTask)"
      @onmouseleave="() => _isDragOver = false"
      style="@(IsDragging ? "user-select: none; -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none;" : "")">
     @{
         string color = GetTaskCategoryColor(TaskCategory);
-        bool canDrop = _draggedTask != null && CanDropTask(_draggedTask);
+        bool canDrop = DragDrop.DraggedTask != null && CanDropTask(DragDrop.DraggedTask);
         bool isDragOverTarget = _isDragOver && canDrop;
         string dragOverClass = isDragOverTarget ? "active-sprint-column-dragover" : "";
         <div class="mb-1">
@@ -51,9 +51,9 @@
             var order = _sprintTasks.IndexOf(task);
             @if (CanDragTask(task))
             {
-                <div class="d-flex my-1 task-item task-item-draggable @(_draggedTask?.Id == task.Id ? "task-item-dragging" : "")"
+                <div class="d-flex my-1 task-item task-item-draggable @(DragDrop.DraggedTask?.Id == task.Id ? "task-item-dragging" : "")"
                      data-task-id="@task.Id"
-                     style="opacity: @(_draggedTask?.Id == task.Id ? "0.3" : "1"); order: @order"
+                     style="opacity: @(DragDrop.DraggedTask?.Id == task.Id ? "0.3" : "1"); order: @order"
                      @onmousedown="(e) => HandleMouseDown(e, task)"
                      @onmousemove="HandleMouseMove"
                      @onmouseup="HandleMouseUp"

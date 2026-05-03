@@ -3,6 +3,7 @@ using HITSBlazor.Services;
 using HITSBlazor.Services.ActionMenus;
 using HITSBlazor.Services.Auth;
 using HITSBlazor.Services.Companies;
+using HITSBlazor.Services.DragAndDrop;
 using HITSBlazor.Services.IdeaMarkets;
 using HITSBlazor.Services.Ideas;
 using HITSBlazor.Services.Invitation;
@@ -70,6 +71,7 @@ namespace HITSBlazor
             builder.Services.AddScoped<ModalService>();
             builder.Services.AddScoped<ActionMenuService>();
             builder.Services.AddScoped<NavigationService>();
+            builder.Services.AddSingleton<DragDropService>();
 
             // Auth
 #if DEBUG && !DEBUGAPI

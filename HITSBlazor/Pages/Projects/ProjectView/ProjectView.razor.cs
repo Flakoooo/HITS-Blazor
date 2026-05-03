@@ -1,4 +1,6 @@
-﻿using HITSBlazor.Models.Projects.Entities;
+﻿using HITSBlazor.Components.ProjectViewComponents.ProjectViewActiveSprintTasks;
+using HITSBlazor.Models.Projects.Entities;
+using HITSBlazor.Services.DragAndDrop;
 using HITSBlazor.Services.Projects;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
@@ -10,10 +12,13 @@ namespace HITSBlazor.Pages.Projects.ProjectView
 {
     [Authorize]
     [Route("projects/{ProjectId}")]
-    public partial class ProjectView
+    public partial class ProjectView : IDisposable
     {
         [Inject]
         private IProjectService ProjectService { get; set; } = null!;
+
+        [Inject]
+        private DragDropService DragDrop { get; set; } = null!;
 
         [Parameter]
         public string? ProjectId { get; set; }
@@ -29,6 +34,8 @@ namespace HITSBlazor.Pages.Projects.ProjectView
         protected override async SharpTask OnInitializedAsync()
         {
             _isLoading = true;
+
+            DragDrop.OnDragStateChanged += StateHasChanged;
 
             if (!string.IsNullOrWhiteSpace(ProjectId) && Guid.TryParse(ProjectId, out Guid guid))
             {
@@ -60,6 +67,11 @@ namespace HITSBlazor.Pages.Projects.ProjectView
         private async SharpTask ChangeCategory(ProjectViewCategory category)
         {
             _activeCategory = category;
+        }
+
+        public void Dispose()
+        {
+            DragDrop.OnDragStateChanged -= StateHasChanged;
         }
     }
 }
