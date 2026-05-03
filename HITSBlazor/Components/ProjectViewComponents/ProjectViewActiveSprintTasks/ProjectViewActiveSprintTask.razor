@@ -1,6 +1,7 @@
 ﻿@namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewActiveSprintTasks
 @using HITSBlazor.Components.Hint
 @using HITSBlazor.Components.Modals.CenterModals.FinishSprintModal
+@using HITSBlazor.Components.ProjectViewComponents.ProjectViewActiveSprintTaskContent
 @using HITSBlazor.Components.Tags
 @using HITSBlazor.Components.Typography
 @using HITSBlazor.Models.Projects.Entities
@@ -57,35 +58,7 @@
                      @onmousemove="HandleMouseMove"
                      @onmouseup="HandleMouseUp"
                      @onmousedown:preventDefault="true">
-                    <div class="rounded-start" style="width: 2%; background-color: rgb(@GetTaskExecuteColor(task.Executor));">
-                    </div>
-                    <div class="bg-white p-2 border-top border-end border-bottom w-100 rounded-end">
-                        <div class="d-flex flex-column border-bottom pb-2">
-                            <div class="active-sprint-task">
-                                <div class="text-ellipsis">@task.Name</div>
-                            </div>
-                            <div class="d-flex gap-1 text-secondary">
-                                @task.Executor?.FullName
-                            </div>
-                            @if (task.Status is HITSTaskStatus.OnModification && !string.IsNullOrWhiteSpace(task.LeaderComment))
-                            {
-                                <div class="d-flex gap-1 text-secondary text-info">
-                                    <Typography FontSize="6">
-                                        <div class="comment">@task.LeaderComment</div>
-                                    </Typography>
-                                </div>
-                            }
-                            @if (task.Status is HITSTaskStatus.OnVerification && !string.IsNullOrWhiteSpace(task.ExecutorComment))
-                            {
-                                <div class="d-flex gap-1 text-secondary text-info">
-                                    <Typography FontSize="6">
-                                        <div class="comment">@task.ExecutorComment</div>
-                                    </Typography>
-                                </div>
-                            }
-                        </div>
-                        <Tags AllTags="task.Tags" CustomClass="w-100 mt-2" />
-                    </div>
+                    <ProjectViewActiveSprintTaskContent CurrentTask="task" />
                 </div>
             }
             else
@@ -93,62 +66,9 @@
                 <div class="d-flex my-1 task-item task-item-not-draggable"
                      style="opacity: 1"
                      @onclick="() => ShowSprintTaskModal(task.Id)">
-                    <div class="rounded-start" style="width: 2%; background-color: rgb(@GetTaskExecuteColor(task.Executor));">
-                    </div>
-                    <div class="bg-white p-2 border-top border-end border-bottom w-100 rounded-end">
-                        <div class="d-flex flex-column border-bottom pb-2">
-                            <div class="active-sprint-task">
-                                <div class="text-ellipsis">
-                                    @task.Name
-                                </div>
-                            </div>
-                            <div class="d-flex gap-1 text-secondary">
-                                @task.Executor?.FullName
-                            </div>
-                        </div>
-                        <Tags AllTags="task.Tags" CustomClass="w-100 mt-2" />
-                    </div>
+                    <ProjectViewActiveSprintTaskContent CurrentTask="task" />
                 </div>
             }
         }
     </div>
 </div>
-
-@if (_draggedTask is not null)
-{
-    <div class="drag-overlay" style="left: @($"{_mouseX}px"); top: @($"{_mouseY}px");">
-        <div class="drag-card shadow-lg">
-            <div class="d-flex">
-                <div class="rounded-start" style="width: 2%; background-color: rgb(@GetTaskExecuteColor(_draggedTask.Executor));">
-                </div>
-                <div class="bg-white p-2 w-100 rounded-end">
-                    <div class="d-flex flex-column border-bottom pb-2">
-                        <div class="active-sprint-task">
-                            <div class="text-ellipsis">@_draggedTask.Name</div>
-                        </div>
-                        <div class="d-flex gap-1 text-secondary">
-                            @_draggedTask.Executor?.FullName
-                        </div>
-                        @if (_draggedTask.Status is HITSTaskStatus.OnModification && !string.IsNullOrWhiteSpace(_draggedTask.LeaderComment))
-                        {
-                            <div class="d-flex gap-1 text-secondary text-info">
-                                <Typography FontSize="6">
-                                    <div class="comment">@_draggedTask.LeaderComment</div>
-                                </Typography>
-                            </div>
-                        }
-                        @if (_draggedTask.Status is HITSTaskStatus.OnVerification && !string.IsNullOrWhiteSpace(_draggedTask.ExecutorComment))
-                        {
-                            <div class="d-flex gap-1 text-secondary text-info">
-                                <Typography FontSize="6">
-                                    <div class="comment">@_draggedTask.ExecutorComment</div>
-                                </Typography>
-                            </div>
-                        }
-                    </div>
-                    <Tags AllTags="_draggedTask.Tags" CustomClass="w-100 mt-2" />
-                </div>
-            </div>
-        </div>
-    </div>
-}

@@ -1,4 +1,5 @@
 ﻿using HITSBlazor.Components.Modals.CenterModals.FinishSprintModal;
+using HITSBlazor.Components.ProjectViewComponents.ProjectViewActiveSprintTasks;
 using HITSBlazor.Models.Projects.Entities;
 using HITSBlazor.Services.Auth;
 using HITSBlazor.Services.Modal;
@@ -7,7 +8,7 @@ using Microsoft.AspNetCore.Components;
 
 namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewActiveSprintComponent
 {
-    public partial class ProjectViewActiveSprint
+    public partial class ProjectViewActiveSprint : IDisposable
     {
         [Inject]
         private IAuthService AuthService { get; set; } = null!;
@@ -27,6 +28,10 @@ namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewActiveSprintCom
         [Parameter]
         public Sprint? ActiveSprint { get; set; }
 
+        protected override void OnInitialized()
+        {
+            ProjectViewActiveSprintTask.OnDragStateChanged += StateHasChanged;
+        }
         private void ShowFinishSprintModal() => ModalService.Show<FinishSprintModal>(
             ModalType.Center,
             parameters: new Dictionary<string, object>
@@ -34,5 +39,11 @@ namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewActiveSprintCom
                 [nameof(FinishSprintModal.ProjectMembers)] = CurrentProject?.Members ?? []
             }
         );
+
+        public void Dispose()
+        {
+            ProjectViewActiveSprintTask.OnDragStateChanged -= StateHasChanged;
+        }
+
     }
 }

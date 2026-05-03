@@ -54,24 +54,32 @@
             var allTasks = column.querySelectorAll('.task-item');
             var draggedIndex = dragged ? Array.from(allTasks).indexOf(dragged) : -1;
 
-            var found = false;
-            for (var i = 0; i < tasks.length; i++) {
-                var rect = tasks[i].getBoundingClientRect();
-                var threshold;
-
-                if (i < draggedIndex) {
-                    threshold = rect.top + rect.height * 0.5;
-                } else {
-                    threshold = rect.top + rect.height * 0.1;
+            // Для чужой колонки (dragged нет) — простой порог 50%
+            if (draggedIndex === -1) {
+                for (var i = 0; i < tasks.length; i++) {
+                    var rect = tasks[i].getBoundingClientRect();
+                    if (e.clientY < rect.top + rect.height * 0.5) {
+                        dropIndex = i;
+                        break;
+                    }
                 }
-
-                if (e.clientY < threshold) {
-                    dropIndex = i;
-                    found = true;
-                    break;
+            } else {
+                for (var i = 0; i < tasks.length; i++) {
+                    var rect = tasks[i].getBoundingClientRect();
+                    var threshold;
+                    if (i < draggedIndex) {
+                        threshold = rect.top + rect.height * 0.5;
+                    } else {
+                        threshold = rect.top + rect.height * 0.1;
+                    }
+                    if (e.clientY < threshold) {
+                        dropIndex = i;
+                        break;
+                    }
                 }
             }
-            if (!found) {
+
+            if (dropIndex === -1) {
                 var colRect = column.getBoundingClientRect();
                 if (e.clientY >= colRect.top && e.clientY <= colRect.bottom) {
                     dropIndex = tasks.length;
@@ -109,6 +117,10 @@
         var dropIndex = -1;
         if (column) {
             var tasks = column.querySelectorAll('.task-item:not(.task-item-dragging)');
+            var dragged = column.querySelector('.task-item-dragging');
+            var allTasks = column.querySelectorAll('.task-item');
+            var draggedIndex = dragged ? Array.from(allTasks).indexOf(dragged) : -1;
+
             for (var i = 0; i < tasks.length; i++) {
                 var rect = tasks[i].getBoundingClientRect();
                 if (e.clientY < rect.top + rect.height / 2) {
@@ -117,6 +129,10 @@
                 }
             }
             if (dropIndex === -1) dropIndex = tasks.length;
+
+            if (dropIndex !== -1 && draggedIndex !== -1 && dropIndex >= draggedIndex) {
+                dropIndex = dropIndex + 1;
+            }
         }
 
         var sourceHelper = window.dragDrop.helpers[window.dragDrop.sourceCategory];

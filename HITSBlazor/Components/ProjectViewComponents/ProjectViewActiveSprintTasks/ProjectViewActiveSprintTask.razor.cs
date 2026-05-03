@@ -42,7 +42,9 @@ namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewActiveSprintTas
 
         private static HITSTask? _draggedTask;
         private static string? _draggedFromCategory;
-        private static event Action? OnDragStateChanged;
+        public static event Action? OnDragStateChanged;
+        private static event Action? OnCleanupTempTask;
+        private static string? _lastTempCategory;
         private string? _targetCategory;
         private int _targetDropIndex = -1;
 
@@ -53,9 +55,16 @@ namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewActiveSprintTas
         private bool _isMouseDown;
         private HITSTask? _potentialDragTask;
 
+        private bool _lastIsDragOver;
+        private bool _renderScheduled;
+
         private readonly List<HITSTask> _sprintTasks = [];
 
         private static bool IsDragging => _draggedTask != null;
+
+        public static HITSTask? DraggedTask => _draggedTask;
+        public static double MouseX => _mouseX;
+        public static double MouseY => _mouseY;
 
         protected override async SharpTask OnInitializedAsync()
         {
@@ -68,6 +77,7 @@ namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewActiveSprintTas
             ProjectService.OnTaskCommentUpdated += TaskCommentHasUpdated;
             ProjectService.OnTaskHasMoved += TaskHasMoved;
             OnDragStateChanged += HandleDragStateChanged;
+            OnCleanupTempTask += CleanupTempTask;
 
             await LoadTasksAsync();
 
@@ -81,7 +91,28 @@ namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewActiveSprintTas
                 await _jsRuntime.InvokeVoidAsync("dragDrop.initializeGlobalMouseEvents", _dotNetHelper, TaskCategory.ToString());
         }
 
-        private void HandleDragStateChanged() => InvokeAsync(StateHasChanged);
+        private void HandleDragStateChanged()
+        {
+            if (!_renderScheduled)
+            {
+                _renderScheduled = true;
+                InvokeAsync(() =>
+                {
+                    _renderScheduled = false;
+                    StateHasChanged();
+                });
+            }
+        }
+        private void CleanupTempTask()
+        {
+            if (_draggedTask != null && _sprintTasks.Any(t => t.Id == _draggedTask.Id)
+                && TaskCategory.ToString() != _draggedFromCategory
+                && _draggedTask.Status != TaskCategory) // ← не удалять если статус уже правильный
+            {
+                _sprintTasks.Remove(_draggedTask);
+                StateHasChanged();
+            }
+        }
 
         protected override int GetCurrentItemsCount() => _sprintTasks.Count;
 
@@ -177,7 +208,6 @@ namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewActiveSprintTas
             {
                 _mouseX = e.ClientX;
                 _mouseY = e.ClientY;
-                OnDragStateChanged?.Invoke();
             }
             else if (_isMouseDown && _potentialDragTask != null)
             {
@@ -201,22 +231,62 @@ namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewActiveSprintTas
                 _mouseX = clientX;
                 _mouseY = clientY;
                 _targetCategory = targetCategory;
-                _targetDropIndex = dropIndex;
 
+                bool changed = false;
+
+                if (targetCategory == TaskCategory.ToString())
+                {
+                    if (_targetDropIndex != dropIndex) changed = true;
+                    _targetDropIndex = dropIndex;
+                }
+
+                // Чужая колонка — временно добавляем задачу
+                if (_draggedTask != null && targetCategory != null
+                    && targetCategory == TaskCategory.ToString()
+                    && targetCategory != _draggedFromCategory
+                    && CanDropTask(_draggedTask))
+                {
+                    if (_lastTempCategory != null && _lastTempCategory != targetCategory)
+                    {
+                        OnCleanupTempTask?.Invoke();
+                        changed = true;
+                    }
+                    _lastTempCategory = targetCategory;
+
+                    if (!_sprintTasks.Any(t => t.Id == _draggedTask.Id))
+                    {
+                        _sprintTasks.Insert(dropIndex >= 0 && dropIndex <= _sprintTasks.Count ? dropIndex : 0, _draggedTask);
+                        changed = true;
+                    }
+                    else if (dropIndex >= 0)
+                    {
+                        MoveTaskToIndex(_draggedTask, dropIndex);
+                        changed = true;
+                    }
+                }
+
+                // Своя колонка
                 if (_draggedFromCategory == TaskCategory.ToString()
                     && targetCategory == TaskCategory.ToString()
                     && dropIndex >= 0
                     && _draggedTask != null)
                 {
+                    OnCleanupTempTask?.Invoke();
                     MoveTaskToIndex(_draggedTask, dropIndex);
+                    changed = true;
                 }
 
-                _isDragOver = targetCategory == TaskCategory.ToString()
+                bool newDragOver = targetCategory == TaskCategory.ToString()
                     && _draggedFromCategory != targetCategory
                     && _draggedTask != null
                     && CanDropTask(_draggedTask);
 
-                OnDragStateChanged?.Invoke();
+                if (newDragOver != _lastIsDragOver) changed = true;
+                _lastIsDragOver = newDragOver;
+                _isDragOver = newDragOver;
+
+                if (changed)
+                    OnDragStateChanged?.Invoke();
             }
         }
 
@@ -228,7 +298,7 @@ namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewActiveSprintTas
                 _mouseX = clientX;
                 _mouseY = clientY;
                 _targetDropIndex = dropIndex;
-                OnDragStateChanged?.Invoke();
+                // OnDragStateChanged?.Invoke(); ← УДАЛИТЕ
 
                 if (!string.IsNullOrEmpty(targetCategory) && targetCategory == TaskCategory.ToString())
                 {
@@ -274,6 +344,9 @@ namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewActiveSprintTas
 
         private static async void EndDrag()
         {
+            OnCleanupTempTask?.Invoke();
+            _lastTempCategory = null;
+
             _draggedTask = null;
             _draggedFromCategory = null;
 
@@ -291,6 +364,7 @@ namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewActiveSprintTas
             _isDragOver = false;
             var taskToMove = _draggedTask;
             var dropIndex = _targetDropIndex;
+            var fromCategory = _draggedFromCategory;
 
             if (taskToMove == null)
             {
@@ -298,7 +372,8 @@ namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewActiveSprintTas
                 return;
             }
 
-            if (taskToMove.Status == TaskCategory && _draggedFromCategory == TaskCategory.ToString())
+            // Перемещение внутри той же колонки
+            if (fromCategory == TaskCategory.ToString())
             {
                 if (dropIndex >= 0 && dropIndex != _sprintTasks.IndexOf(taskToMove))
                 {
@@ -309,6 +384,7 @@ namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewActiveSprintTas
                 return;
             }
 
+            // В другую колонку
             if (!CanDropTask(taskToMove))
             {
                 EndDrag();
@@ -332,18 +408,20 @@ namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewActiveSprintTas
                 }
             }
 
+            // Сохраняем индекс до очистки
+            var finalIndex = _sprintTasks.IndexOf(taskToMove);
+            if (finalIndex < 0) finalIndex = _targetDropIndex >= 0 ? _targetDropIndex : 0;
+
             try
             {
-                await ProjectService.UpdateTaskStatusAsync(taskToMove, TaskCategory, dropIndex);
+                await ProjectService.UpdateTaskStatusAsync(taskToMove, TaskCategory, finalIndex);
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Error: {ex.Message}");
             }
-            finally
-            {
-                EndDrag();
-            }
+
+            EndDrag();
         }
 
         private void TaskHasCreated(HITSTask newTask)
@@ -387,7 +465,11 @@ namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewActiveSprintTas
 
             if (updatedTask.Status == TaskCategory && !_sprintTasks.Any(t => t.Id == updatedTask.Id))
             {
-                _sprintTasks.Add(updatedTask);
+                var pos = updatedTask.Position ?? _sprintTasks.Count;
+                if (pos >= _sprintTasks.Count)
+                    _sprintTasks.Add(updatedTask);
+                else
+                    _sprintTasks.Insert(pos, updatedTask);
                 ++_totalCount;
                 StateHasChanged();
             }
@@ -426,16 +508,6 @@ namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewActiveSprintTas
             _ => string.Empty
         };
 
-        private string GetTaskExecuteColor(User? executor)
-        {
-            if (AuthService.CurrentUser is not null
-                && executor is not null
-                && executor.Id == AuthService.CurrentUser.Id
-            ) return "13, 110, 253";
-
-            return "158, 158, 158";
-        }
-
         private void ShowTaskModal(HITSTask? task = null) => ModalService.ShowTaskModal(task);
 
         private void ShowSprintTaskModal(Guid taskId)
@@ -460,6 +532,7 @@ namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewActiveSprintTas
             ProjectService.OnTaskCommentUpdated -= TaskCommentHasUpdated;
             ProjectService.OnTaskHasMoved -= TaskHasMoved;
             OnDragStateChanged -= HandleDragStateChanged;
+            OnCleanupTempTask -= CleanupTempTask;
 
             _dotNetHelper?.Dispose();
 

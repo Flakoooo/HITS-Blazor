@@ -1,6 +1,7 @@
 ﻿@namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewActiveSprintComponent
 @using HITSBlazor.Components.Button
 @using HITSBlazor.Components.Hint
+@using HITSBlazor.Components.ProjectViewComponents.ProjectViewActiveSprintTaskContent
 @using HITSBlazor.Components.ProjectViewComponents.ProjectViewActiveSprintTasks
 @using HITSBlazor.Components.Typography
 @using HITSBlazor.Models.Users.Enums
@@ -35,3 +36,14 @@
         <ProjectViewActiveSprintTask CurrentSprint="ActiveSprint" CurrentMember="CurrentMember" TaskCategory="HITSTaskStatus.Done" />
     </div>
 </div>
+
+@if (ProjectViewActiveSprintTask.DraggedTask != null)
+{
+    <div class="drag-overlay" style="left: @($"{ProjectViewActiveSprintTask.MouseX}px"); top: @($"{ProjectViewActiveSprintTask.MouseY}px");">
+        <div class="drag-card shadow-lg">
+            <div class="d-flex">
+                <ProjectViewActiveSprintTaskContent CurrentTask="ProjectViewActiveSprintTask.DraggedTask" />
+            </div>
+        </div>
+    </div>
+}
