@@ -516,6 +516,15 @@ namespace HITSBlazor.Utils.Mocks.Projects
             return taskForUpdate;
         }
 
+        public static bool UpdateTaskPositions(ICollection<HITSTask> tasks)
+        {
+            foreach (var updatedTask in tasks)
+            {
+                _tasks.FirstOrDefault(t => t.Id == updatedTask.Id)?.Position = updatedTask.Position;
+            }
+            return true;
+        }
+
         public static bool DeleteTask(HITSTask task)
         {
             var isRemoved = _tasks.Remove(task);

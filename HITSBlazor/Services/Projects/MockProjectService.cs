@@ -154,6 +154,9 @@ namespace HITSBlazor.Services.Projects
             return true;
         }
 
+        public async Task<bool> UpdateTaskPositionsAsync(ICollection<HITSTask> tasks)
+            => MockSprints.UpdateTaskPositions(tasks);
+
         public async Task<bool> DeleteTaskAsync(HITSTask task)
         {
             if (!MockSprints.DeleteTask(task))
