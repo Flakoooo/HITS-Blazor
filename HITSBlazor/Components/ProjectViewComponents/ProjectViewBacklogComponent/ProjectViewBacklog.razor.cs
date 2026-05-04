@@ -50,6 +50,8 @@ namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewBacklogComponen
         private HITSTask? _potentialDragTask;
         private bool _renderScheduled;
 
+        private int _inBackLogCount;
+
         private bool _lastIsDragOver;
         private int _lastDropIndex = -2;
 
@@ -84,6 +86,14 @@ namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewBacklogComponen
         protected override async SharpTask OnLoadMoreItemsAsync()
         {
             await LoadTasksAsync(append: true);
+        }
+
+        private void RecalculateInBackLogCount()
+        {
+            _inBackLogCount = 0;
+            foreach (var t in _projectTasks)
+                if (t.Status == HITSTaskStatus.InBackLog)
+                    _inBackLogCount++;
         }
 
         private async SharpTask LoadTasksAsync(bool append = false)
@@ -121,6 +131,8 @@ namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewBacklogComponen
                     _projectTasks.Clear();
                     _projectTasks.AddRange(sorted);
                 }
+
+                RecalculateInBackLogCount();
             }
         }
 
@@ -186,26 +198,23 @@ namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewBacklogComponen
             if (!IsDragging) return;
 
             DragDrop.UpdateMouseMove(clientX, clientY, targetCategory, dropIndex);
-            bool changed = false;
+            DragDrop.UpdateOverlayIfNeeded();
 
             if (targetCategory == HITSTaskStatus.InBackLog.ToString())
             {
-                if (_lastDropIndex != dropIndex) changed = true;
-                _lastDropIndex = dropIndex;
-            }
+                if (_lastDropIndex != dropIndex)
+                {
+                    _lastDropIndex = dropIndex;
 
-            var task = DragDrop.DraggedTask;
-            if (task != null
-                && DragDrop.DraggedFromCategory == HITSTaskStatus.InBackLog.ToString()
-                && targetCategory == HITSTaskStatus.InBackLog.ToString()
-                && dropIndex >= 0)
-            {
-                MoveTaskToIndex(task, dropIndex);
-                changed = true;
+                    var task = DragDrop.DraggedTask;
+                    if (task != null
+                        && DragDrop.DraggedFromCategory == HITSTaskStatus.InBackLog.ToString()
+                        && dropIndex >= 0)
+                    {
+                        MoveTaskToIndex(task, dropIndex);
+                    }
+                }
             }
-
-            if (changed)
-                DragDrop.NotifyStateChanged();
         }
 
         [JSInvokable]
@@ -221,9 +230,8 @@ namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewBacklogComponen
 
         private void MoveTaskToIndex(HITSTask task, int newIndex)
         {
-            var maxIndex = _projectTasks.Count(t => t.Status == HITSTaskStatus.InBackLog);
             if (newIndex < 0) newIndex = 0;
-            if (newIndex > maxIndex) newIndex = maxIndex;
+            if (newIndex > _inBackLogCount) newIndex = _inBackLogCount;
 
             var currentIndex = _projectTasks.IndexOf(task);
             if (currentIndex < 0 || currentIndex == newIndex) return;
@@ -233,8 +241,11 @@ namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewBacklogComponen
             _projectTasks.Insert(newIndex, task);
 
             int pos = 1;
-            foreach (var t in _projectTasks.Where(t => t.Status == HITSTaskStatus.InBackLog))
-                t.Position = pos++;
+            foreach (var t in _projectTasks)
+            {
+                if (t.Status == HITSTaskStatus.InBackLog)
+                    t.Position = pos++;
+            }
 
             StateHasChanged();
         }

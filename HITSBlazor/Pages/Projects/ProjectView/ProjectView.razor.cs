@@ -35,7 +35,8 @@ namespace HITSBlazor.Pages.Projects.ProjectView
         {
             _isLoading = true;
 
-            DragDrop.OnDragStateChanged += StateHasChanged;
+            DragDrop.OnOverlayNeedsUpdate += () => InvokeAsync(StateHasChanged);
+            DragDrop.OnDragStateChanged += () => InvokeAsync(StateHasChanged);
 
             if (!string.IsNullOrWhiteSpace(ProjectId) && Guid.TryParse(ProjectId, out Guid guid))
             {
@@ -71,7 +72,8 @@ namespace HITSBlazor.Pages.Projects.ProjectView
 
         public void Dispose()
         {
-            DragDrop.OnDragStateChanged -= StateHasChanged;
+            DragDrop.OnOverlayNeedsUpdate -= () => InvokeAsync(StateHasChanged);
+            DragDrop.OnDragStateChanged -= () => InvokeAsync(StateHasChanged);
         }
     }
 }
