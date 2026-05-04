@@ -86,11 +86,12 @@
     <div class="drag-overlay" style="left: @($"{DragDrop.MouseX}px"); top: @($"{DragDrop.MouseY}px");">
         @if (DragDrop.DraggedFromCategory == HITSTaskStatus.InBackLog.ToString())
         {
-            <div style="width: 1300px;">
+            <div style="width: 400px;">
                 <TaskComponent Task="DragDrop.DraggedTask"
                                TaskWidth="100"
                                CollapseTaskAllowed="false"
                                ShowTaskModalAllowed="false"
+                               StripTaskName="true"
                                DeleteTaskAllowed="false" />
             </div>
         }
