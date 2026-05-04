@@ -76,7 +76,6 @@ namespace HITSBlazor.Services.DragAndDrop
         {
             if (DraggedTask is not null && hasTask()
                 && taskCategory != DraggedFromCategory
-                && DraggedTask.Status != currentStatus
             ) removeTask();
         }
 

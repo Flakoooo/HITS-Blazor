@@ -411,12 +411,12 @@ namespace HITSBlazor.Utils.Mocks.Projects
             HashSet<HITSTaskStatus>? selectedStatuses = null
         )
         {
-            var query = (projectId, sprintId) switch
+            IEnumerable<HITSTask> query = (projectId, sprintId) switch
             {
-                (null, null) => _tasks.AsEnumerable(),
-                (_, null) => _tasks.Where(t => t.ProjectId == projectId),
-                (null, _) => _tasks.Where(t => t.SprintId == sprintId),
-                (_, _) => _tasks.Where(t => t.ProjectId == projectId && t.SprintId == sprintId),
+                (null, null) => _tasks.OrderBy(t => t.Position).AsEnumerable(),
+                (_, null) => _tasks.Where(t => t.ProjectId == projectId).OrderBy(t => t.Position),
+                (null, _) => _tasks.Where(t => t.SprintId == sprintId).OrderBy(t => t.Position),
+                (_, _) => _tasks.Where(t => t.ProjectId == projectId && t.SprintId == sprintId).OrderBy(t => t.Position),
             };
 
             if (selectedStatuses?.Count > 0)

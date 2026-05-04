@@ -54,7 +54,6 @@
             var allTasks = column.querySelectorAll('.task-item');
             var draggedIndex = dragged ? Array.from(allTasks).indexOf(dragged) : -1;
 
-            // Для чужой колонки (dragged нет) — простой порог 50%
             if (draggedIndex === -1) {
                 for (var i = 0; i < tasks.length; i++) {
                     var rect = tasks[i].getBoundingClientRect();
@@ -161,5 +160,6 @@
         document.removeEventListener('mouseup', this.globalMouseUpHandler);
         window.removeEventListener('mousemove', this.globalMouseMoveHandler);
         window.removeEventListener('mouseup', this.globalMouseUpHandler);
+        this._eventsInitialized = false;
     },
 };
