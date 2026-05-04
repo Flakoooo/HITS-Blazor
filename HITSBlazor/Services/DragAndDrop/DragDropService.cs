@@ -56,21 +56,17 @@ namespace HITSBlazor.Services.DragAndDrop
             DraggedFromCategory = null;
 
             if (_jsRuntime != null)
-            {
                 await _jsRuntime.InvokeVoidAsync("dragDrop.allowSelection");
-            }
 
             OnDragStateChanged?.Invoke();
         }
 
         public void CleanupTempTask(Func<bool> hasTask, Action removeTask, string taskCategory, HITSTaskStatus currentStatus)
         {
-            if (DraggedTask != null && hasTask()
+            if (DraggedTask is not null && hasTask()
                 && taskCategory != DraggedFromCategory
-                && DraggedTask.Status != currentStatus)
-            {
-                removeTask();
-            }
+                && DraggedTask.Status != currentStatus
+            ) removeTask();
         }
 
         public void NotifyStateChanged() => OnDragStateChanged?.Invoke();

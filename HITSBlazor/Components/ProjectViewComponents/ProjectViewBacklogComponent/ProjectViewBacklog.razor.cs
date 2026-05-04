@@ -1,4 +1,5 @@
-﻿using HITSBlazor.Models.Common.Entities;
+﻿using HITSBlazor.Components.Button;
+using HITSBlazor.Models.Common.Entities;
 using HITSBlazor.Models.Projects.Entities;
 using HITSBlazor.Models.Projects.Enums;
 using HITSBlazor.Models.Users.Enums;
@@ -48,6 +49,9 @@ namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewBacklogComponen
         private bool _isMouseDown;
         private HITSTask? _potentialDragTask;
         private bool _renderScheduled;
+
+        private bool _lastIsDragOver;
+        private int _lastDropIndex = -2;
 
         private bool IsDragging => DragDrop.IsDragging;
 
@@ -157,25 +161,20 @@ namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewBacklogComponen
         private void HandleMouseUp(MouseEventArgs e)
         {
             if (IsDragging) return;
-            if (_isMouseDown && _potentialDragTask is not null)
-                ShowTaskModal(_potentialDragTask);
+
             _isMouseDown = false;
             _potentialDragTask = null;
         }
 
-        private async void HandleMouseMove(MouseEventArgs e)
+        private void HandleMouseMove(MouseEventArgs e)
         {
-            if (IsDragging)
-            {
-                DragDrop.UpdateMouseMove(e.ClientX, e.ClientY, DragDrop.TargetCategory, DragDrop.TargetDropIndex);
-            }
-            else if (_isMouseDown && _potentialDragTask != null)
+            if (!IsDragging && _isMouseDown && _potentialDragTask != null)
             {
                 var deltaX = Math.Abs(e.ClientX - DragDrop.MouseX);
                 var deltaY = Math.Abs(e.ClientY - DragDrop.MouseY);
                 if (deltaX > 5 || deltaY > 5)
                 {
-                    await DragDrop.StartDrag(_potentialDragTask, HITSTaskStatus.InBackLog.ToString());
+                    _ = DragDrop.StartDrag(_potentialDragTask, HITSTaskStatus.InBackLog.ToString());
                     _isMouseDown = false;
                 }
             }
@@ -187,6 +186,13 @@ namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewBacklogComponen
             if (!IsDragging) return;
 
             DragDrop.UpdateMouseMove(clientX, clientY, targetCategory, dropIndex);
+            bool changed = false;
+
+            if (targetCategory == HITSTaskStatus.InBackLog.ToString())
+            {
+                if (_lastDropIndex != dropIndex) changed = true;
+                _lastDropIndex = dropIndex;
+            }
 
             var task = DragDrop.DraggedTask;
             if (task != null
@@ -195,8 +201,11 @@ namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewBacklogComponen
                 && dropIndex >= 0)
             {
                 MoveTaskToIndex(task, dropIndex);
-                DragDrop.NotifyStateChanged();
+                changed = true;
             }
+
+            if (changed)
+                DragDrop.NotifyStateChanged();
         }
 
         [JSInvokable]

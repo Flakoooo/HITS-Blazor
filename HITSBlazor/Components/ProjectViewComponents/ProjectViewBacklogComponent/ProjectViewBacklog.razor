@@ -11,7 +11,6 @@
 @using HITSBlazor.Services.Modal
 @using HITSBlazor.Services.Tags
 @inherits ListPageDataLoader
-
 @using HITSTaskStatus = HITSBlazor.Models.Projects.Enums.TaskStatus;
 
 <div class="d-flex gap-3 mt-4">
@@ -23,7 +22,7 @@
         {
             @if (CanDragTask(task))
             {
-                <div class="task-item task-item-draggable @(DragDrop.DraggedTask?.Id == task.Id ? "task-item-dragging" : string.Empty)"
+                <div class="task-item task-item-draggable @(DragDrop.DraggedTask?.Id == task.Id ? "task-item-dragging" : "")"
                      data-task-id="@task.Id"
                      style="opacity: @(DragDrop.DraggedTask?.Id == task.Id ? "0.3" : "1")"
                      @onmousedown="(e) => HandleMouseDown(e, task)"
@@ -33,7 +32,7 @@
                     <TaskComponent Task="task"
                                    TaskWidth="_projectTasks.Count <= 13 ? 100 : 99"
                                    CollapseTaskAllowed="true"
-                                   ShowTaskModalAllowed="task.Status is Models.Projects.Enums.TaskStatus.InBackLog"
+                                   ShowTaskModalAllowed="true"
                                    DeleteTaskAllowed="AuthService.CurrentUser?.Role is RoleType.TeamLeader or RoleType.Admin" />
                 </div>
             }
@@ -44,6 +43,7 @@
                     <TaskComponent Task="task"
                                    TaskWidth="_projectTasks.Count <= 13 ? 100 : 99"
                                    CollapseTaskAllowed="true"
+                                   ShowTaskModalAllowed="task.Status == HITSTaskStatus.InBackLog"
                                    DeleteTaskAllowed="AuthService.CurrentUser?.Role is RoleType.TeamLeader or RoleType.Admin" />
                 </div>
             }
