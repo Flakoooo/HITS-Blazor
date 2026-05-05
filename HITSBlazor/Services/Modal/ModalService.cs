@@ -200,9 +200,17 @@ namespace HITSBlazor.Services.Modal
             parameters: new Dictionary<string, object> { [nameof(TeamModal.TeamId)] = teamId }
         );
 
-        public void ShowTaskModal(Models.Projects.Entities.Task? task = null) => Show<TaskModal>(
-            ModalType.Center,
-            parameters: task is not null ? new Dictionary<string, object> { [nameof(TaskModal.CurrentTask)] = task } : null
-        );
+        public void ShowTaskModal(Guid projectId, Models.Projects.Entities.Task? task = null)
+        {
+            var parameters = new Dictionary<string, object>
+            {
+                [nameof(TaskModal.ProjectId)] = projectId
+            };
+
+            if (task is not null)
+                parameters.Add(nameof(TaskModal.CurrentTask), task);
+
+            Show<TaskModal>(ModalType.Center, parameters: parameters);
+        }
     }
 }

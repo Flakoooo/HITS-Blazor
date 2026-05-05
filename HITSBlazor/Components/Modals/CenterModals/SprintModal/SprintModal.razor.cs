@@ -1,9 +1,7 @@
 ﻿using HITSBlazor.Models.Projects.Entities;
-using HITSBlazor.Models.Projects.Enums;
 using HITSBlazor.Models.Projects.Requests;
 using HITSBlazor.Services.Modal;
 using HITSBlazor.Services.Projects;
-using HITSBlazor.Utils.Mocks.Projects;
 using Microsoft.AspNetCore.Components;
 using System.Globalization;
 
@@ -61,10 +59,7 @@ namespace HITSBlazor.Components.Modals.CenterModals.SprintModal
 
         protected override int GetCurrentItemsCount() => _allTasksInBacklog.Count;
 
-        protected override async SharpTask OnLoadMoreItemsAsync()
-        {
-            await LoadTasksAsync(append: true);
-        }
+        protected override async SharpTask OnLoadMoreItemsAsync() => await LoadTasksAsync(append: true);
 
         private async SharpTask LoadTasksAsync(bool append = false) => await LoadDataAsync(
             _allTasksInBacklog,
@@ -76,8 +71,18 @@ namespace HITSBlazor.Components.Modals.CenterModals.SprintModal
             append: append
         );
 
-        private void SelectTask(HITSTask task) => _sprintTasks.Add(task);
-        private void UnSelectTask(HITSTask task) => _sprintTasks.Remove(task);
+        private void SelectTask(HITSTask task)
+        {
+            _sprintTasks.Add(task);
+            WorkingHours = _sprintTasks.Sum(t => t.WorkHour);
+        }
+        private void UnSelectTask(HITSTask task)
+        {
+            if (CurrentSprint is not null && task.Status is not HITSTaskStatus.InBackLog) return;
+
+            _sprintTasks.Remove(task);
+            WorkingHours = _sprintTasks.Sum(t => t.WorkHour);
+        }
 
         private static DateTime? ConvertStringToDate(string date)
         {
@@ -114,13 +119,15 @@ namespace HITSBlazor.Components.Modals.CenterModals.SprintModal
                     Tasks = _sprintTasks
                 };
 
-                var result = await ProjectService.CreateSprintAsync(ProjectId, createRequest);
-                if (result)  await ModalService.Close(ModalType.Center);
+                if (await ProjectService.CreateSprintAsync(ProjectId, createRequest))  
+                    await ModalService.Close(ModalType.Center);
             }
         }
 
         private async SharpTask UpdateSprint()
         {
+            if (CurrentSprint is null) return;
+
             if (CheckValidValues(out var startDate, out var finishDate))
             {
                 var updateSprint = new UpdateSprintRequest
@@ -133,8 +140,8 @@ namespace HITSBlazor.Components.Modals.CenterModals.SprintModal
                     Tasks = _sprintTasks
                 };
 
-                var result = await ProjectService.UpdateSprintAsync(ProjectId, updateSprint);
-                if (result)  await ModalService.Close(ModalType.Center);
+                if (await ProjectService.UpdateSprintAsync(CurrentSprint.Id, updateSprint))  
+                    await ModalService.Close(ModalType.Center);
             }
         }
     }

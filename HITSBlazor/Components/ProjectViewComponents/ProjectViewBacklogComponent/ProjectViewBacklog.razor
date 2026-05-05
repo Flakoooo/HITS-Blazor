@@ -39,6 +39,7 @@
             else
             {
                 <div class="task-item task-item-not-draggable"
+                     data-task-id="@task.Id"
                      style="cursor: pointer;">
                     <TaskComponent Task="task"
                                    TaskWidth="_projectTasks.Count <= 13 ? 100 : 99"

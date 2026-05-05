@@ -552,10 +552,16 @@ namespace HITSBlazor.Utils.Mocks.Projects
         public static List<Sprint> GetAllMockSprints() => _sprints;
 
         public static ListDataResponse<Sprint> GetSprintsByProjectId(
-            Guid projectId, int page, int pageSize = 20
+            Guid projectId, 
+            int page, 
+            int pageSize = 20,
+            string? searchText = null
         )
         {
             var query = _sprints.Where(s => s.ProjectId == projectId);
+
+            if (!string.IsNullOrWhiteSpace(searchText))
+                query = query.Where(s => s.Name.Contains(searchText, StringComparison.CurrentCultureIgnoreCase));
 
             int count = query.Count();
 
@@ -587,9 +593,9 @@ namespace HITSBlazor.Utils.Mocks.Projects
             return newSprint;
         }
 
-        public static Sprint? UpdateSprint(Guid projectId, UpdateSprintRequest request)
+        public static Sprint? UpdateSprint(Guid sprintId, User updateInitiator, UpdateSprintRequest request)
         {
-            var sprintForUpdate = _sprints.FirstOrDefault(s => s.ProjectId == projectId);
+            var sprintForUpdate = _sprints.FirstOrDefault(s => s.Id == sprintId);
             if (sprintForUpdate is null) return null;
 
             sprintForUpdate.Name = request.Name ?? sprintForUpdate.Name;
@@ -597,6 +603,14 @@ namespace HITSBlazor.Utils.Mocks.Projects
             sprintForUpdate.StartDate = request.StartDate ?? sprintForUpdate.StartDate;
             sprintForUpdate.FinishDate = request.FinishDate ?? sprintForUpdate.FinishDate;
             sprintForUpdate.WorkingHours = request.WorkingHours ?? sprintForUpdate.WorkingHours;
+
+            foreach (var task in request.Tasks?.Where(t => t.Status is HITSTaskStatus.InBackLog) ?? [])
+            {
+                task.Status = HITSTaskStatus.NewTask;
+                task.SprintId = sprintId;
+                UpdateTaskStatus(task.Id, HITSTaskStatus.NewTask, updateInitiator);
+            }
+
             sprintForUpdate.Tasks = request.Tasks?.ToList() ?? sprintForUpdate.Tasks;
 
             return sprintForUpdate;
@@ -653,6 +667,9 @@ namespace HITSBlazor.Utils.Mocks.Projects
                 Tags = request.Tags.ToList(),
                 Status = request.Status
             };
+
+            if (newTask.Status is HITSTaskStatus.InBackLog)
+                newTask.Position = _tasks.Count(t => t.ProjectId == request.ProjectId && t.Status is HITSTaskStatus.InBackLog) + 1;
 
             _tasks.Add(newTask);
             MockTaskMovementLogs.CreateNewTaskLog(newTask, request.Initiator);
@@ -758,6 +775,11 @@ namespace HITSBlazor.Utils.Mocks.Projects
                 }
 
             }
+
+            int position = 1;
+            foreach (var task in _tasks.Where(t => t.ProjectId == currentSprint.ProjectId && t.Status is HITSTaskStatus.InBackLog).OrderBy(t => t.Position))
+                task.Position = position++;
+
 
             MockSprintMarks.CreateSprintMarks(
                 currentSprint.ProjectId, sprintId, completedTasks, marks

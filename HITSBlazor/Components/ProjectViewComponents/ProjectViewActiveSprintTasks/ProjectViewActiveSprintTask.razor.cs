@@ -427,7 +427,12 @@ namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewActiveSprintTas
             _ => string.Empty
         };
 
-        private void ShowTaskModal(HITSTask? task = null) => ModalService.ShowTaskModal(task);
+        private void ShowTaskModal(HITSTask? task = null)
+        {
+            if (CurrentSprint is null) return;
+
+            ModalService.ShowTaskModal(CurrentSprint.ProjectId, task);
+        }
 
         private void ShowSprintTaskModal(Guid taskId)
         {

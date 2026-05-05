@@ -21,7 +21,7 @@
                     ShowCreateButton="AuthService.CurrentUser?.Role is RoleType.TeamLeader or RoleType.Initiator or RoleType.Admin"
                     CreateButtonText="Создать спринт" 
                     OnButtonClick="() => ShowSprintModal()"/>
-    <InputSearch Width="50" IsLoading="IsOnLoading" ValueChanged="@((value) => SeacrhSprint(value))" />
+    <InputSearch Width="50" IsLoading="IsOnLoading" ValueChanged="@((value) => SeacrhSprint(value))" DebounceDelay="500" />
     <TableComponent IsLoading="IsOnLoading" HeaderItems="_sprintsTableHeader" @ref="_tableComponent">
         <TableContent>
             @foreach (var sprint in _projectSprints)

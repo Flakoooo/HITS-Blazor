@@ -293,7 +293,12 @@ namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewBacklogComponen
             await FiltersHasChanged();
         }
 
-        private void ShowTaskModal(HITSTask? task = null) => ModalService.ShowTaskModal(task);
+        private void ShowTaskModal(HITSTask? task = null)
+        {
+            if (CurrentProject is null) return;
+
+            ModalService.ShowTaskModal(CurrentProject.Id, task);
+        }
 
         private void TaskHasCreated(HITSTask newTask)
         {

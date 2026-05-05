@@ -23,11 +23,6 @@
     height: 70vh;
 }
 
-.sprint-form-content-tasks {
-    width: 70%;
-    overflow-y: scroll;
-}
-
 .sprint-form-backlog-name {
     display: flex;
     flex-direction: row;

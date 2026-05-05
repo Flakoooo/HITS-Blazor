@@ -61,8 +61,9 @@ namespace HITSBlazor.Services.Projects
         //Sprints
         public async Task<ListDataResponse<Sprint>> GetSprintsByProjectIdAsync(
             Guid proectId,
-            int page
-        ) => MockSprints.GetSprintsByProjectId(proectId, page);
+            int page,
+            string? searchText
+        ) => MockSprints.GetSprintsByProjectId(proectId, page, searchText: searchText);
 
         public async Task<Sprint?> GetActiveSprintByProjectIdAsync(Guid proectId)
             => MockSprints.GetActiveSprintByProjectId(proectId);
@@ -76,9 +77,13 @@ namespace HITSBlazor.Services.Projects
             return true;
         }
 
-        public async Task<bool> UpdateSprintAsync(Guid projectId, UpdateSprintRequest request)
+        public async Task<bool> UpdateSprintAsync(Guid sprintId, UpdateSprintRequest request)
         {
-            var newSprint = MockSprints.UpdateSprint(projectId, request);
+            var currentUser = _authService.CurrentUser;
+            if (currentUser is null) return false;
+
+
+            var newSprint = MockSprints.UpdateSprint(sprintId, currentUser, request);
             if (newSprint is null) return false;
 
             OnSprintHasUpdated?.Invoke(newSprint);
