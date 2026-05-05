@@ -1,6 +1,5 @@
 ﻿using HITSBlazor.Models.Projects.Entities;
 using HITSBlazor.Models.Projects.Enums;
-using HITSBlazor.Utils.Mocks.Users;
 
 using HITSTask = HITSBlazor.Models.Projects.Entities.Task;
 using HITSTaskStatus = HITSBlazor.Models.Projects.Enums.TaskStatus;
@@ -13,15 +12,6 @@ namespace HITSBlazor.Utils.Mocks.Projects
 
         private static List<AverageMark> CreateAverageMarks()
         {
-            var kirill = MockUsers.GetUserById(MockUsers.KirillId)!;
-            var ivan = MockUsers.GetUserById(MockUsers.IvanId)!;
-            var manager = MockUsers.GetUserById(MockUsers.ManagerId)!;
-
-            var authIntegrationTask = MockSprints.GetTaskById(MockSprints.AuthIntegrationTaskId)!;
-            var blackThemeTask = MockSprints.GetTaskById(MockSprints.BlackThemeTaskId)!;
-            var fileUploadTask = MockSprints.GetTaskById(MockSprints.FileUploadTaskId)!;
-            var templatesTask = MockSprints.GetTaskById(MockSprints.TaskTemplatesTaskId)!;
-
             var averageMarks = new List<AverageMark>();
 
             foreach (var project in MockProjects.GetAllMockProject())
@@ -60,7 +50,7 @@ namespace HITSBlazor.Utils.Mocks.Projects
             => [.. _averageMarks.Where(am => am.ProjectId == projectId)];
 
 
-        public static bool UpdateProjectMarks(Guid projectId, Guid sprintId, Dictionary<Guid, List<HITSTask>> memberTasks)
+        public static bool UpdateProjectMarks(Guid projectId, Dictionary<Guid, List<HITSTask>> memberTasks)
         {
             foreach (var pair in memberTasks)
             {

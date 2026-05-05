@@ -66,10 +66,10 @@ namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewActiveSprintTas
             MarkAsInitialized();
         }
 
-        protected override async SharpTask AdditionalAfterRenderMethod()
-        {
-            await JSRuntime.InvokeVoidAsync("dragDrop.initializeGlobalMouseEvents", _dotNetHelper, TaskCategory.ToString());
-        }
+        protected override async SharpTask AdditionalAfterRenderMethod() => await JSRuntime.InvokeVoidAsync(
+            "dragDrop.initializeGlobalMouseEvents",
+            _dotNetHelper, TaskCategory.ToString()
+        );
 
         private void HandleDragStateChanged()
         {
@@ -80,22 +80,19 @@ namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewActiveSprintTas
             }
         }
 
-        private void CleanupTempTask()
-        {
-            DragDrop.CleanupTempTask(
-                () => _sprintTasks.Any(t => t.Id == DragDrop.DraggedTask?.Id),
-                () => { _sprintTasks.Remove(DragDrop.DraggedTask!); StateHasChanged(); },
-                TaskCategory.ToString(),
-                TaskCategory
-            );
-        }
+        private void CleanupTempTask() => DragDrop.CleanupTempTask(
+            () => _sprintTasks.Any(t => t.Id == DragDrop.DraggedTask?.Id),
+            () => { 
+                _sprintTasks.Remove(DragDrop.DraggedTask!); 
+                StateHasChanged(); 
+            },
+            TaskCategory.ToString(),
+            TaskCategory
+        );
 
         protected override int GetCurrentItemsCount() => _sprintTasks.Count;
 
-        protected override async SharpTask OnLoadMoreItemsAsync()
-        {
-            await LoadTasksAsync(append: true);
-        }
+        protected override async SharpTask OnLoadMoreItemsAsync() => await LoadTasksAsync(append: true);
 
         private async SharpTask LoadTasksAsync(bool append = false) => await LoadDataAsync(
             _sprintTasks,
@@ -115,7 +112,7 @@ namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewActiveSprintTas
             if (currentUser.Role is RoleType.Admin) return true;
             if (currentUser.Id == CurrentMember?.UserId
                 && CurrentMember?.ProjectRole is ProjectMemberRole.TeamLeader or ProjectMemberRole.Initiator)
-                return task.Status != HITSTaskStatus.Done;
+                return task.Status is not HITSTaskStatus.Done;
 
             if (DragDrop.DraggedTask is not null) return true;
 
@@ -124,7 +121,7 @@ namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewActiveSprintTas
             if (task.Status is HITSTaskStatus.OnVerification) return false;
 
             if (task.Status is HITSTaskStatus.OnModification)
-                return task.Executor != null && task.Executor.Id == currentUser.Id;
+                return task.Executor is not null && task.Executor.Id == currentUser.Id;
 
             if (task.Executor is null || task.Executor.Id == currentUser.Id)
                 return true;
@@ -147,10 +144,10 @@ namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewActiveSprintTas
             var from = task.Status;
             var to = TaskCategory;
 
-            if (from == HITSTaskStatus.NewTask && to == HITSTaskStatus.InProgress) return true;
-            if (from == HITSTaskStatus.InProgress && to == HITSTaskStatus.NewTask) return true;
-            if (from == HITSTaskStatus.InProgress && to == HITSTaskStatus.OnVerification) return true;
-            if (from == HITSTaskStatus.OnModification && to == HITSTaskStatus.OnVerification) return true;
+            if (from is HITSTaskStatus.NewTask && to is HITSTaskStatus.InProgress) return true;
+            if (from is HITSTaskStatus.InProgress && to is HITSTaskStatus.NewTask) return true;
+            if (from is HITSTaskStatus.InProgress && to is HITSTaskStatus.OnVerification) return true;
+            if (from is HITSTaskStatus.OnModification && to is HITSTaskStatus.OnVerification) return true;
 
             return false;
         }
@@ -178,7 +175,7 @@ namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewActiveSprintTas
             {
                 DragDrop.UpdateMouseMove(e.ClientX, e.ClientY, DragDrop.TargetCategory, DragDrop.TargetDropIndex);
             }
-            else if (_isMouseDown && _potentialDragTask != null)
+            else if (_isMouseDown && _potentialDragTask is not null)
             {
                 var deltaX = Math.Abs(e.ClientX - DragDrop.MouseX);
                 var deltaY = Math.Abs(e.ClientY - DragDrop.MouseY);
@@ -199,18 +196,16 @@ namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewActiveSprintTas
             DragDrop.UpdateOverlayIfNeeded();
             bool changed = false;
 
-            if (targetCategory == TaskCategory.ToString())
-            {
-                if (DragDrop.TargetDropIndex != dropIndex) changed = true;
-            }
+            if (targetCategory == TaskCategory.ToString() && DragDrop.TargetDropIndex != dropIndex)
+                changed = true;
 
             var task = DragDrop.DraggedTask;
-            if (task != null && targetCategory != null
+            if (task is not null && targetCategory is not null
                 && targetCategory == TaskCategory.ToString()
                 && targetCategory != DragDrop.DraggedFromCategory
                 && CanDropTask(task))
             {
-                if (DragDrop.LastTempCategory != null && DragDrop.LastTempCategory != targetCategory)
+                if (DragDrop.LastTempCategory is not null && DragDrop.LastTempCategory != targetCategory)
                 {
                     DragDrop.NotifyCleanUp();
                     changed = true;
@@ -231,7 +226,7 @@ namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewActiveSprintTas
 
             if (DragDrop.DraggedFromCategory == TaskCategory.ToString()
                 && targetCategory == TaskCategory.ToString()
-                && dropIndex >= 0 && task != null)
+                && dropIndex >= 0 && task is not null)
             {
                 DragDrop.NotifyCleanUp();
                 MoveTaskToIndex(task, dropIndex);
@@ -252,7 +247,12 @@ namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewActiveSprintTas
         [JSInvokable]
         public void OnGlobalMouseUp(double clientX, double clientY, string? targetCategory, int dropIndex)
         {
-            if (!IsDragging) { _isMouseDown = false; _potentialDragTask = null; return; }
+            if (!IsDragging) 
+            { 
+                _isMouseDown = false; 
+                _potentialDragTask = null; 
+                return; 
+            }
 
             DragDrop.UpdateMouseMove(clientX, clientY, targetCategory, dropIndex);
             if (!string.IsNullOrEmpty(targetCategory) && targetCategory == TaskCategory.ToString())
@@ -282,7 +282,7 @@ namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewActiveSprintTas
             var dropIndex = DragDrop.TargetDropIndex;
             var fromCategory = DragDrop.DraggedFromCategory;
 
-            if (taskToMove == null) 
+            if (taskToMove is null) 
             { 
                 await DragDrop.EndDrag(); 
                 return; 
@@ -327,8 +327,14 @@ namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewActiveSprintTas
 
             await DragDrop.EndDrag();
 
-            try { await ProjectService.UpdateTaskStatusAsync(taskToMove, TaskCategory, finalIndex); }
-            catch (Exception ex) { Console.WriteLine($"Error: {ex.Message}"); }
+            try 
+            { 
+                await ProjectService.UpdateTaskStatusAsync(taskToMove, TaskCategory, finalIndex); 
+            }
+            catch (Exception ex) 
+            { 
+                Console.WriteLine($"Error: {ex.Message}"); 
+            }
 
             await ProjectService.UpdateTaskPositionsAsync(_sprintTasks.ToList());
         }
@@ -425,17 +431,16 @@ namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewActiveSprintTas
 
         private void ShowSprintTaskModal(Guid taskId)
         {
-            if (CurrentMember is not null)
-            {
-                ModalService.Show<TaskInfoModal>(
-                    ModalType.RightSide,
-                    parameters: new Dictionary<string, object>
-                    {
-                        [nameof(TaskInfoModal.TaskId)] = taskId,
-                        [nameof(TaskInfoModal.CurrentProjectMember)] = CurrentMember
-                    }
-                );
-            }
+            if (CurrentMember is null) return;
+
+            ModalService.Show<TaskInfoModal>(
+                ModalType.RightSide,
+                parameters: new Dictionary<string, object>
+                {
+                    [nameof(TaskInfoModal.TaskId)] = taskId,
+                    [nameof(TaskInfoModal.CurrentProjectMember)] = CurrentMember
+                }
+            );
         }
 
         protected override async ValueTask DisposeAsyncCore()

@@ -9,7 +9,7 @@ namespace HITSBlazor.Utils.Mocks.Projects
 {
     public static class MockSprintMarks
     {
-        private static Random _random = new();
+        private static readonly Random _random = new();
 
         private static readonly List<SprintMarks> _sprintMarks = CreateSprintMarks();
 

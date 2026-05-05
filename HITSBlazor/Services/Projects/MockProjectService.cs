@@ -12,7 +12,7 @@ namespace HITSBlazor.Services.Projects
 {
     public class MockProjectService(IAuthService authService) : IProjectService
     {
-        private IAuthService _authService = authService;
+        private readonly IAuthService _authService = authService;
 
         public event Action<Sprint>? OnSprintHasCreated;
         public event Action<Sprint>? OnSprintHasUpdated;

@@ -1,4 +1,5 @@
 ﻿@namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewActiveSprintTaskContent
+@using HITSBlazor.Components.Placeholders.Placeholder
 @using HITSBlazor.Components.Tags
 @using HITSBlazor.Components.Typography
 @using HITSBlazor.Models.Users.Entities
@@ -11,30 +12,46 @@
 </div>
 <div class="bg-white p-2 border-top border-end border-bottom w-100 rounded-end">
     <div class="d-flex flex-column border-bottom pb-2">
-        <div class="active-sprint-task">
-            <div class="text-ellipsis">@CurrentTask.Name</div>
-        </div>
-        <div class="d-flex gap-1 text-secondary">
-            @CurrentTask.Executor?.FullName
-        </div>
-        @if (CurrentTask.Status is HITSTaskStatus.OnModification && !string.IsNullOrWhiteSpace(CurrentTask.LeaderComment))
+        @if (IsLoading)
         {
-            <div class="d-flex gap-1 text-secondary text-info">
-                <Typography FontSize="6">
-                    <div class="comment">@CurrentTask.LeaderComment</div>
-                </Typography>
-            </div>
+            <Placeholder />
+            <Placeholder Width="w-50" />
+            @if (CurrentTask.Status is HITSTaskStatus.OnModification)
+            {
+                <Placeholder Width="w-75" />
+            }
+            @if (CurrentTask.Status is HITSTaskStatus.OnVerification)
+            {
+                <Placeholder Width="w-75" />
+            }
         }
-        @if (CurrentTask.Status is HITSTaskStatus.OnVerification && !string.IsNullOrWhiteSpace(CurrentTask.ExecutorComment))
+        else
         {
-            <div class="d-flex gap-1 text-secondary text-info">
-                <Typography FontSize="6">
-                    <div class="comment">@CurrentTask.ExecutorComment</div>
-                </Typography>
+            <div class="active-sprint-task">
+                <div class="text-ellipsis">@CurrentTask.Name</div>
             </div>
+            <div class="d-flex gap-1 text-secondary">
+                @CurrentTask.Executor?.FullName
+            </div>
+            @if (CurrentTask.Status is HITSTaskStatus.OnModification && !string.IsNullOrWhiteSpace(CurrentTask.LeaderComment))
+            {
+                <div class="d-flex gap-1 text-secondary text-info">
+                    <Typography FontSize="6">
+                        <div class="comment">@CurrentTask.LeaderComment</div>
+                    </Typography>
+                </div>
+            }
+            @if (CurrentTask.Status is HITSTaskStatus.OnVerification && !string.IsNullOrWhiteSpace(CurrentTask.ExecutorComment))
+            {
+                <div class="d-flex gap-1 text-secondary text-info">
+                    <Typography FontSize="6">
+                        <div class="comment">@CurrentTask.ExecutorComment</div>
+                    </Typography>
+                </div>
+            }
         }
     </div>
-    <Tags AllTags="CurrentTask.Tags" CustomClass="w-100 mt-2" />
+    <Tags IsLoading="IsLoading" AllTags="CurrentTask.Tags" CustomClass="w-100 mt-2" />
 </div>
 
 @code {
@@ -42,10 +59,15 @@
     private IAuthService AuthService { get; set; } = null!;
 
     [Parameter]
+    public bool IsLoading { get; set; } = false;
+
+    [Parameter]
     public required HITSTask CurrentTask { get; set; }
 
     private string GetTaskExecuteColor(User? executor)
     {
+        if (IsLoading) return "158, 158, 158";
+
         if (AuthService.CurrentUser is not null
             && executor is not null
             && executor.Id == AuthService.CurrentUser.Id

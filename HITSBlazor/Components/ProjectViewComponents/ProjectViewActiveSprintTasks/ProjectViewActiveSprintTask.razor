@@ -46,29 +46,41 @@
         </div>
     }
     <div class="list-group active-sprint-column @dragOverClass" @ref="_tableContainer">
-        @foreach (var task in _sprintTasks)
+        @if (_isLoading)
         {
-            var order = _sprintTasks.IndexOf(task);
-            @if (CanDragTask(task))
+            @for (int i = 0; i < TaskCategory.ToString().Length / 2; ++i)
             {
-                <div class="d-flex my-1 task-item task-item-draggable @(DragDrop.DraggedTask?.Id == task.Id ? "task-item-dragging" : "")"
-                     data-task-id="@task.Id"
-                     style="opacity: @(DragDrop.DraggedTask?.Id == task.Id ? "0.3" : "1"); order: @order"
-                     @onmousedown="(e) => HandleMouseDown(e, task)"
-                     @onmousemove="HandleMouseMove"
-                     @onmouseup="HandleMouseUp"
-                     @onmousedown:preventDefault="true">
-                    <ProjectViewActiveSprintTaskContent CurrentTask="task" />
+                <div class="d-flex my-1 task-item">
+                    <ProjectViewActiveSprintTaskContent IsLoading="true" CurrentTask="new Models.Projects.Entities.Task() { Status = TaskCategory }" />
                 </div>
             }
-            else
+        }
+        else
+        {
+            @foreach (var task in _sprintTasks)
             {
-                <div class="d-flex my-1 task-item task-item-not-draggable"
-                     data-task-id="@task.Id"
-                     style="opacity: 1; order: @order"
-                     @onclick="() => ShowSprintTaskModal(task.Id)">
-                    <ProjectViewActiveSprintTaskContent CurrentTask="task" />
-                </div>
+                var order = _sprintTasks.IndexOf(task);
+                @if (CanDragTask(task))
+                {
+                    <div class="d-flex my-1 task-item task-item-draggable @(DragDrop.DraggedTask?.Id == task.Id ? "task-item-dragging" : "")"
+                         data-task-id="@task.Id"
+                         style="opacity: @(DragDrop.DraggedTask?.Id == task.Id ? "0.3" : "1"); order: @order"
+                         @onmousedown="(e) => HandleMouseDown(e, task)"
+                         @onmousemove="HandleMouseMove"
+                         @onmouseup="HandleMouseUp"
+                         @onmousedown:preventDefault="true">
+                        <ProjectViewActiveSprintTaskContent CurrentTask="task" />
+                    </div>
+                }
+                else
+                {
+                    <div class="d-flex my-1 task-item task-item-not-draggable"
+                         data-task-id="@task.Id"
+                         style="opacity: 1; order: @order"
+                         @onclick="() => ShowSprintTaskModal(task.Id)">
+                        <ProjectViewActiveSprintTaskContent CurrentTask="task" />
+                    </div>
+                }
             }
         }
     </div>

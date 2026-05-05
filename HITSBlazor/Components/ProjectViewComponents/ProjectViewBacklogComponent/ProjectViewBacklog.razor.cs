@@ -52,7 +52,6 @@ namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewBacklogComponen
 
         private int _inBackLogCount;
 
-        private bool _lastIsDragOver;
         private int _lastDropIndex = -2;
 
         private bool IsDragging => DragDrop.IsDragging;
@@ -76,17 +75,15 @@ namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewBacklogComponen
             MarkAsInitialized();
         }
 
-        protected override async SharpTask AdditionalAfterRenderMethod()
-        {
-            await JSRuntime.InvokeVoidAsync("dragDrop.initializeGlobalMouseEvents", _dotNetHelper, HITSTaskStatus.InBackLog.ToString());
-        }
+        protected override async SharpTask AdditionalAfterRenderMethod() => await JSRuntime.InvokeVoidAsync(
+            "dragDrop.initializeGlobalMouseEvents", 
+            _dotNetHelper, HITSTaskStatus.InBackLog.ToString()
+        );
 
         protected override int GetCurrentItemsCount() => _projectTasks.Count;
 
-        protected override async SharpTask OnLoadMoreItemsAsync()
-        {
-            await LoadTasksAsync(append: true);
-        }
+        protected override async SharpTask OnLoadMoreItemsAsync() 
+            => await LoadTasksAsync(append: true);
 
         private void RecalculateInBackLogCount()
         {
@@ -98,42 +95,41 @@ namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewBacklogComponen
 
         private async SharpTask LoadTasksAsync(bool append = false)
         {
-            if (CurrentProject is not null)
+            if (CurrentProject is null) return;
+
+            var beforeCount = _projectTasks.Count;
+            var beforeTasks = _projectTasks.Select(t => t.Id).ToHashSet();
+
+            await LoadDataAsync(
+                _projectTasks,
+                () => ProjectService.GetTasksByQueryParamsAsync(
+                    _currentPage, projectId: CurrentProject.Id
+                ),
+                append: append
+            );
+
+            if (append && _projectTasks.Count > beforeCount)
             {
-                var beforeCount = _projectTasks.Count;
-                var beforeTasks = _projectTasks.Select(t => t.Id).ToHashSet();
-
-                await LoadDataAsync(
-                    _projectTasks,
-                    () => ProjectService.GetTasksByQueryParamsAsync(
-                        _currentPage, projectId: CurrentProject.Id
-                    ),
-                    append: append
-                );
-
-                if (append && _projectTasks.Count > beforeCount)
-                {
-                    var sorted = _projectTasks
-                        .OrderBy(t => t.Status == HITSTaskStatus.InBackLog ? 0
-                                    : t.Status == HITSTaskStatus.Done ? 2 : 1)
-                        .ThenBy(t => t.Position)
-                        .ToList();
-                    _projectTasks.Clear();
-                    _projectTasks.AddRange(sorted);
-                }
-                else if (!append)
-                {
-                    var sorted = _projectTasks
-                        .OrderBy(t => t.Status == HITSTaskStatus.InBackLog ? 0
-                                    : t.Status == HITSTaskStatus.Done ? 2 : 1)
-                        .ThenBy(t => t.Position)
-                        .ToList();
-                    _projectTasks.Clear();
-                    _projectTasks.AddRange(sorted);
-                }
-
-                RecalculateInBackLogCount();
+                var sorted = _projectTasks
+                    .OrderBy(t => t.Status == HITSTaskStatus.InBackLog ? 0
+                                : t.Status == HITSTaskStatus.Done ? 2 : 1)
+                    .ThenBy(t => t.Position)
+                    .ToList();
+                _projectTasks.Clear();
+                _projectTasks.AddRange(sorted);
             }
+            else if (!append)
+            {
+                var sorted = _projectTasks
+                    .OrderBy(t => t.Status == HITSTaskStatus.InBackLog ? 0
+                                : t.Status == HITSTaskStatus.Done ? 2 : 1)
+                    .ThenBy(t => t.Position)
+                    .ToList();
+                _projectTasks.Clear();
+                _projectTasks.AddRange(sorted);
+            }
+
+            RecalculateInBackLogCount();
         }
 
         private void HandleDragStateChanged()
@@ -141,7 +137,10 @@ namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewBacklogComponen
             if (!_renderScheduled)
             {
                 _renderScheduled = true;
-                InvokeAsync(() => { _renderScheduled = false; StateHasChanged(); });
+                InvokeAsync(() => { 
+                    _renderScheduled = false; 
+                    StateHasChanged(); 
+                });
             }
         }
 
@@ -149,7 +148,7 @@ namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewBacklogComponen
 
         private bool CanDragTask(HITSTask task)
         {
-            if (task.Status != HITSTaskStatus.InBackLog) return false;
+            if (task.Status is not HITSTaskStatus.InBackLog) return false;
 
             var currentUser = AuthService.CurrentUser;
             if (currentUser is null) return false;
@@ -220,7 +219,12 @@ namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewBacklogComponen
         [JSInvokable]
         public void OnGlobalMouseUp(double clientX, double clientY, string? targetCategory, int dropIndex)
         {
-            if (!IsDragging) { _isMouseDown = false; return; }
+            if (!IsDragging)
+            { 
+                _isMouseDown = false; 
+                return; 
+            }
+
             DragDrop.UpdateMouseMove(clientX, clientY, targetCategory, dropIndex);
             if (targetCategory == HITSTaskStatus.InBackLog.ToString())
                 InvokeAsync(HandleDrop);
@@ -243,7 +247,7 @@ namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewBacklogComponen
             int pos = 1;
             foreach (var t in _projectTasks)
             {
-                if (t.Status == HITSTaskStatus.InBackLog)
+                if (t.Status is HITSTaskStatus.InBackLog)
                     t.Position = pos++;
             }
 
@@ -254,9 +258,13 @@ namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewBacklogComponen
         {
             var taskToMove = DragDrop.DraggedTask;
             var dropIndex = DragDrop.TargetDropIndex;
-            if (taskToMove == null) { await DragDrop.EndDrag(); return; }
+            if (taskToMove == null) 
+            { 
+                await DragDrop.EndDrag(); 
+                return; 
+            }
 
-            var maxIndex = _projectTasks.Count(t => t.Status == HITSTaskStatus.InBackLog);
+            var maxIndex = _projectTasks.Count(t => t.Status is HITSTaskStatus.InBackLog);
             if (dropIndex < 0) dropIndex = 0;
             if (dropIndex > maxIndex) dropIndex = maxIndex;
 
@@ -290,18 +298,18 @@ namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewBacklogComponen
         private void TaskHasCreated(HITSTask newTask)
         {
             var insertIndex = _projectTasks.Count;
-            if (newTask.Status == HITSTaskStatus.InBackLog)
+            if (newTask.Status is HITSTaskStatus.InBackLog)
             {
-                insertIndex = _projectTasks.FindIndex(t => t.Status != HITSTaskStatus.InBackLog);
+                insertIndex = _projectTasks.FindIndex(t => t.Status is not HITSTaskStatus.InBackLog);
                 if (insertIndex < 0) insertIndex = _projectTasks.Count;
             }
-            else if (newTask.Status == HITSTaskStatus.Done)
+            else if (newTask.Status is HITSTaskStatus.Done)
             {
                 insertIndex = _projectTasks.Count;
             }
             else
             {
-                insertIndex = _projectTasks.FindIndex(t => t.Status == HITSTaskStatus.Done);
+                insertIndex = _projectTasks.FindIndex(t => t.Status is HITSTaskStatus.Done);
                 if (insertIndex < 0) insertIndex = _projectTasks.Count;
             }
 

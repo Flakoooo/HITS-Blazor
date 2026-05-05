@@ -5,23 +5,28 @@
 @using HITSBlazor.Utils.Validation
 
 <div @onclick:stopPropagation="true" class="market-modal p-3 bg-white rounded">
-    <CenterModalHeader HeaderText="@(Market is not null ? "Редактирование биржи" : "Создание биржи")" />
-    <Input Label="Название"
+    <CenterModalHeader IsLoading="_isLoading" 
+                       HeaderText="@(Market is not null ? "Редактирование биржи" : "Создание биржи")" />
+    <Input IsLoading="_isLoading"
+           Label="Название"
            Placeholder="Введите название биржи"
            NeedValidation="_submitted"
            CustomValidation="MarketValidation.NameValidation"
            @bind-Value="MarketName" />
-    <Input Label="Дата старта"
+    <Input IsLoading="_isLoading"
+           Label="Дата старта"
            InputType="InputType.Date"
            NeedValidation="_submitted"
            CustomValidation="MarketValidation.StartDateValidation"
            @bind-Value="MarketStartDate" />
-    <Input Label="Дата окончания"
+    <Input IsLoading="_isLoading"
+           Label="Дата окончания"
            InputType="InputType.Date"
            NeedValidation="_submitted"
            CustomValidation="ValidFinishDate"
            @bind-Value="MarketFinishDate" />
-    <Button Variant="ButtonVariant.Primary"
+    <Button IsLoading="_isLoading"
+            Variant="ButtonVariant.Primary"
             InProgress="_submitting"
             Text="@(Market is not null ? "Сохранить изменения" : "Добавить")"
             LoadingText="@(Market is not null ? "Сохранение" : "Добавление")"

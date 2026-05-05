@@ -764,7 +764,7 @@ namespace HITSBlazor.Utils.Mocks.Projects
             );
 
             MockAverageMarks.UpdateProjectMarks(
-                currentSprint.ProjectId, sprintId, completedTasks
+                currentSprint.ProjectId, completedTasks
             );
 
             return true;

@@ -1,17 +1,30 @@
 ﻿@namespace HITSBlazor.Components.Tags
+@using HITSBlazor.Components.Placeholders.Placeholder
 @using HITSBlazor.Models.Common.Entities
 
 <div class="d-flex flex-wrap gap-2 @CustomClass">
-    @foreach (var tag in AllTags)
+    @if (IsLoading)
     {
-        <div class="px-2 py-1 rounded-2 text-center align-self-start"
-             style="background-color: @($"{tag.Color}4D"); color: @tag.Color;">
-            @tag.Name
-        </div>
+        <Placeholder Width="w-25" />
+        <Placeholder Width="w-25" />
+        <Placeholder Width="w-25" />
+    }
+    else
+    {
+        @foreach (var tag in AllTags)
+        {
+            <div class="px-2 py-1 rounded-2 text-center align-self-start"
+                 style="background-color: @($"{tag.Color}4D"); color: @tag.Color;">
+                @tag.Name
+            </div>
+        }
     }
 </div>
 
 @code {
+    [Parameter]
+    public bool IsLoading { get; set; } = false;
+
     [Parameter]
     public ICollection<Tag> AllTags { get; set; } = [];
 
