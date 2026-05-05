@@ -28,6 +28,9 @@ namespace HITSBlazor.Components.Inputs.Number
         [Parameter]
         public string? ErrorMessage { get; set; } = string.Empty;
 
+        [Parameter]
+        public bool? IsDisabled { get; set; }
+
         private bool _showError = false;
 
         protected override void OnInitialized()
@@ -51,6 +54,16 @@ namespace HITSBlazor.Components.Inputs.Number
 
             if (ValueChanged.HasDelegate)
                 await ValueChanged.InvokeAsync(value);
+        }
+
+        private Dictionary<string, object> GetInputAttributes()
+        {
+            var attributes = new Dictionary<string, object>();
+
+            if (IsDisabled.HasValue && IsDisabled.Value)
+                attributes["disabled"] = "disabled";
+
+            return attributes;
         }
     }
 }

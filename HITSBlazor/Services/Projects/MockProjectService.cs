@@ -16,6 +16,7 @@ namespace HITSBlazor.Services.Projects
 
         public event Action<Sprint>? OnSprintHasCreated;
         public event Action<Sprint>? OnSprintHasUpdated;
+        public event Action? OnSprintHasFinished;
 
         public event Action<HITSTask>? OnTaskHasCreated;
         public event Action<HITSTask>? OnTaskHasUpdated;
@@ -50,6 +51,13 @@ namespace HITSBlazor.Services.Projects
             return MockProjects.GetCurrentProjectMember(projectId, currentUser.Id);
         }
 
+        public async Task<bool> FinishProjectAsync(Guid projectId, string report)
+            => MockProjects.FinishProject(projectId, report);
+
+        //ProjectMarks
+        public async Task<List<AverageMark>> GetProjectMarksAsync(Guid projectId)
+            => MockAverageMarks.GetAverageMarkByProjectId(projectId);
+
         //Sprints
         public async Task<ListDataResponse<Sprint>> GetSprintsByProjectIdAsync(
             Guid proectId,
@@ -74,6 +82,15 @@ namespace HITSBlazor.Services.Projects
             if (newSprint is null) return false;
 
             OnSprintHasUpdated?.Invoke(newSprint);
+            return true;
+        }
+
+        public async Task<bool> FinishSprintAsync(Guid sprintId, IEnumerable<SprintMarkRequest> marks)
+        {
+            var result = MockSprints.FinishSprint(sprintId, marks);
+            if (!result) return false;
+
+            OnSprintHasFinished?.Invoke();
             return true;
         }
 

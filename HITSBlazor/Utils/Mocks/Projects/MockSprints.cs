@@ -47,6 +47,8 @@ namespace HITSBlazor.Utils.Mocks.Projects
             var integrationTag = MockTags.GetTagById(MockTags.IntegrationId)!;
             var securityTag = MockTags.GetTagById(MockTags.SecurityId)!;
 
+            var chatBotProject = MockProjects.GetProjectById(MockProjects.ChatBotId);
+
             var tags015 = new List<Tag>() { frontendTag, backendTag, uiuxTag };
 
             return
@@ -58,7 +60,15 @@ namespace HITSBlazor.Utils.Mocks.Projects
                     ProjectId = MockProjects.ChatBotId,
                     Name = "Разработка административной панели управления задачами",
                     Description = "Необходимо создать административную панель для управления задачами, включая просмотр, создание, редактирование и удаление задач",
-                    Initiator = kirill,
+                    Initiator = chatBotProject?.Members
+                        .Where(m => m.ProjectRole is ProjectMemberRole.TeamLeader)
+                        .Select(m => new User {
+                            Id = m.UserId,
+                            Email = m.Email,
+                            FirstName = m.FirstName,
+                            LastName = m.LastName
+                        })
+                        .FirstOrDefault() ?? kirill,
                     Executor = null,
                     WorkHour = 3,
                     StartDate = new DateTime(2023, 9, 25, 11, 2, 17, DateTimeKind.Utc),
@@ -72,7 +82,15 @@ namespace HITSBlazor.Utils.Mocks.Projects
                     ProjectId = MockProjects.ChatBotId,
                     Name = "Добавление функционала перетаскивания",
                     Description = "Расширить функционал системы задач, добавив возможность перетаскивать задачи для изменения их приоритета или порядка выполнения",
-                    Initiator = ivan,
+                    Initiator = chatBotProject?.Members
+                        .Where(m => m.ProjectRole is ProjectMemberRole.Member)
+                        .Select(m => new User{
+                            Id = m.UserId,
+                            Email = m.Email,
+                            FirstName = m.FirstName,
+                            LastName = m.LastName
+                        })
+                        .FirstOrDefault() ?? ivan,
                     Executor = null,
                     WorkHour = 1,
                     StartDate = new DateTime(2023, 9, 25, 11, 2, 17, DateTimeKind.Utc),
@@ -86,7 +104,15 @@ namespace HITSBlazor.Utils.Mocks.Projects
                     ProjectId = MockProjects.ChatBotId,
                     Name = "Интеграция с системой уведомлений",
                     Description = "Настроить интеграцию с системой уведомлений для отправки уведомлений о новых задачах, изменении статусов и прочих событиях",
-                    Initiator = manager,
+                    Initiator = chatBotProject?.Members
+                        .Where(m => m.ProjectRole is ProjectMemberRole.TeamLeader)
+                        .Select(m => new User{
+                            Id = m.UserId,
+                            Email = m.Email,
+                            FirstName = m.FirstName,
+                            LastName = m.LastName
+                        })
+                        .FirstOrDefault() ?? manager,
                     Executor = null,
                     WorkHour = 3,
                     StartDate = new DateTime(2023, 9, 25, 11, 2, 17, DateTimeKind.Utc),
@@ -100,7 +126,15 @@ namespace HITSBlazor.Utils.Mocks.Projects
                     ProjectId = MockProjects.ChatBotId,
                     Name = "Улучшение производительности",
                     Description = "Провести оптимизацию работы с базой данных и алгоритмов для обеспечения быстрой работы системы даже при большом объеме задач",
-                    Initiator = kirill,
+                    Initiator = chatBotProject?.Members
+                        .Where(m => m.ProjectRole is ProjectMemberRole.TeamLeader)
+                        .Select(m => new User{
+                            Id = m.UserId,
+                            Email = m.Email,
+                            FirstName = m.FirstName,
+                            LastName = m.LastName
+                        })
+                        .FirstOrDefault() ?? kirill,
                     Executor = null,
                     WorkHour = 3,
                     StartDate = new DateTime(2023, 9, 25, 11, 2, 17, DateTimeKind.Utc),
@@ -114,8 +148,24 @@ namespace HITSBlazor.Utils.Mocks.Projects
                     ProjectId = MockProjects.ChatBotId,
                     Name = "Внедрение системы фильтрации и поиска задач",
                     Description = "Добавить возможность фильтрации и поиска задач по различным критериям для удобства работы пользователей",
-                    Initiator = ivan,
-                    Executor = winrit,
+                    Initiator = chatBotProject?.Members
+                        .Where(m => m.ProjectRole is ProjectMemberRole.Member)
+                        .Select(m => new User{
+                            Id = m.UserId,
+                            Email = m.Email,
+                            FirstName = m.FirstName,
+                            LastName = m.LastName
+                        })
+                        .FirstOrDefault() ?? ivan,
+                    Executor = chatBotProject?.Members
+                        .Where(m => m.ProjectRole is ProjectMemberRole.Member)
+                        .Select(m => new User{
+                            Id = m.UserId,
+                            Email = m.Email,
+                            FirstName = m.FirstName,
+                            LastName = m.LastName
+                        })
+                        .FirstOrDefault() ?? winrit,
                     WorkHour = 1,
                     StartDate = new DateTime(2023, 9, 25, 11, 2, 17, DateTimeKind.Utc),
                     Tags = [.. tags015],
@@ -129,8 +179,24 @@ namespace HITSBlazor.Utils.Mocks.Projects
                     ProjectId = MockProjects.ChatBotId,
                     Name = "Создание отчетности и статистики по выполненным задачам",
                     Description = "Разработать модуль для формирования отчетов и статистики по выполненным задачам в удобном для анализа формате",
-                    Initiator = MockUsers.GetUserById(MockUsers.OwnerId)!,
-                    Executor = kirill,
+                    Initiator = chatBotProject?.Members
+                        .Where(m => m.ProjectRole is ProjectMemberRole.Member)
+                        .Select(m => new User{
+                            Id = m.UserId,
+                            Email = m.Email,
+                            FirstName = m.FirstName,
+                            LastName = m.LastName
+                        })
+                        .FirstOrDefault() ?? MockUsers.GetUserById(MockUsers.OwnerId)!,
+                    Executor = chatBotProject?.Members
+                        .Where(m => m.ProjectRole is ProjectMemberRole.TeamLeader)
+                        .Select(m => new User{
+                            Id = m.UserId,
+                            Email = m.Email,
+                            FirstName = m.FirstName,
+                            LastName = m.LastName
+                        })
+                        .FirstOrDefault() ?? kirill,
                     WorkHour = 3,
                     StartDate = new DateTime(2023, 9, 25, 11, 2, 17, DateTimeKind.Utc),
                     Tags = [backendTag, MockTags.GetTagById(MockTags.StatisticId)!],
@@ -143,8 +209,24 @@ namespace HITSBlazor.Utils.Mocks.Projects
                     ProjectId = MockProjects.ChatBotId,
                     Name = "Разработка механизма повторяющихся задач и напоминаний",
                     Description = "Добавить возможность создания повторяющихся задач и настройки напоминаний о них",
-                    Initiator = kirill,
-                    Executor = manager,
+                    Initiator = chatBotProject?.Members
+                        .Where(m => m.ProjectRole is ProjectMemberRole.TeamLeader)
+                        .Select(m => new User{
+                            Id = m.UserId,
+                            Email = m.Email,
+                            FirstName = m.FirstName,
+                            LastName = m.LastName
+                        })
+                        .FirstOrDefault() ?? kirill,
+                    Executor = chatBotProject?.Members
+                        .Where(m => m.ProjectRole is ProjectMemberRole.Member)
+                        .Select(m => new User{
+                            Id = m.UserId,
+                            Email = m.Email,
+                            FirstName = m.FirstName,
+                            LastName = m.LastName
+                        })
+                        .FirstOrDefault() ??  manager,
                     WorkHour = 3,
                     StartDate = new DateTime(2023, 9, 25, 11, 2, 17, DateTimeKind.Utc),
                     Tags = [frontendTag, backendTag, notificationTag],
@@ -157,8 +239,24 @@ namespace HITSBlazor.Utils.Mocks.Projects
                     ProjectId = MockProjects.ChatBotId,
                     Name = "Интеграция с календарем",
                     Description = "Настроить интеграцию с календарем для отображения задач в виде событий и синхронизации данных",
-                    Initiator = kirill,
-                    Executor = ivan,
+                    Initiator = chatBotProject?.Members
+                        .Where(m => m.ProjectRole is ProjectMemberRole.TeamLeader)
+                        .Select(m => new User{
+                            Id = m.UserId,
+                            Email = m.Email,
+                            FirstName = m.FirstName,
+                            LastName = m.LastName
+                        })
+                        .FirstOrDefault() ?? kirill,
+                    Executor = chatBotProject?.Members
+                        .Where(m => m.ProjectRole is ProjectMemberRole.TeamLeader)
+                        .Select(m => new User{
+                            Id = m.UserId,
+                            Email = m.Email,
+                            FirstName = m.FirstName,
+                            LastName = m.LastName
+                        })
+                        .FirstOrDefault() ?? ivan,
                     WorkHour = 3,
                     StartDate = new DateTime(2023, 9, 25, 11, 2, 17, DateTimeKind.Utc),
                     Tags = [frontendTag, integrationTag],
@@ -171,8 +269,24 @@ namespace HITSBlazor.Utils.Mocks.Projects
                     ProjectId = MockProjects.ChatBotId,
                     Name = "Добавление комментариев к задачам",
                     Description = "Расширить функционал задач путем добавления комментариев, обсуждений и возможности прикрепления файлов",
-                    Initiator = ivan,
-                    Executor = ivan,
+                    Initiator = chatBotProject?.Members
+                        .Where(m => m.ProjectRole is ProjectMemberRole.Member)
+                        .Select(m => new User{
+                            Id = m.UserId,
+                            Email = m.Email,
+                            FirstName = m.FirstName,
+                            LastName = m.LastName
+                        })
+                        .FirstOrDefault() ?? ivan,
+                    Executor = chatBotProject?.Members
+                        .Where(m => m.ProjectRole is ProjectMemberRole.Member)
+                        .Select(m => new User{
+                            Id = m.UserId,
+                            Email = m.Email,
+                            FirstName = m.FirstName,
+                            LastName = m.LastName
+                        })
+                        .FirstOrDefault() ??  ivan,
                     WorkHour = 1,
                     StartDate = new DateTime(2023, 9, 25, 11, 2, 17, DateTimeKind.Utc),
                     Tags = [frontendTag, backendTag],
@@ -185,8 +299,24 @@ namespace HITSBlazor.Utils.Mocks.Projects
                     ProjectId = MockProjects.ChatBotId,
                     Name = "Интеграция с системой аутентификации и авторизации",
                     Description = "Настроить интеграцию с системой аутентификации и авторизации пользователей для защиты данных и контроля доступа",
-                    Initiator = kirill,
-                    Executor = kirill,
+                    Initiator = chatBotProject?.Members
+                        .Where(m => m.ProjectRole is ProjectMemberRole.TeamLeader)
+                        .Select(m => new User{
+                            Id = m.UserId,
+                            Email = m.Email,
+                            FirstName = m.FirstName,
+                            LastName = m.LastName
+                        })
+                        .FirstOrDefault() ?? kirill,
+                    Executor = chatBotProject?.Members
+                        .Where(m => m.ProjectRole is ProjectMemberRole.TeamLeader)
+                        .Select(m => new User{
+                            Id = m.UserId,
+                            Email = m.Email,
+                            FirstName = m.FirstName,
+                            LastName = m.LastName
+                        })
+                        .FirstOrDefault() ?? kirill,
                     WorkHour = 3,
                     StartDate = new DateTime(2023, 9, 25, 11, 2, 17, DateTimeKind.Utc),
                     FinishDate = new DateTime(2024, 1, 25, 11, 2, 17, DateTimeKind.Utc),
@@ -200,8 +330,24 @@ namespace HITSBlazor.Utils.Mocks.Projects
                     ProjectId = MockProjects.ChatBotId,
                     Name = "Разработка темной темы интерфейса",
                     Description = "Создать альтернативную темную тему интерфейса для удобства пользователей",
-                    Initiator = ivan,
-                    Executor = ivan,
+                    Initiator = chatBotProject?.Members
+                        .Where(m => m.ProjectRole is ProjectMemberRole.Member)
+                        .Select(m => new User{
+                            Id = m.UserId,
+                            Email = m.Email,
+                            FirstName = m.FirstName,
+                            LastName = m.LastName
+                        })
+                        .FirstOrDefault() ?? ivan,
+                    Executor = chatBotProject?.Members
+                        .Where(m => m.ProjectRole is ProjectMemberRole.Member)
+                        .Select(m => new User{
+                            Id = m.UserId,
+                            Email = m.Email,
+                            FirstName = m.FirstName,
+                            LastName = m.LastName
+                        })
+                        .FirstOrDefault() ?? ivan,
                     WorkHour = 1,
                     StartDate = new DateTime(2023, 9, 25, 11, 2, 17, DateTimeKind.Utc),
                     FinishDate = new DateTime(2024, 1, 22, 11, 2, 17, DateTimeKind.Utc),
@@ -215,8 +361,24 @@ namespace HITSBlazor.Utils.Mocks.Projects
                     ProjectId = MockProjects.ChatBotId,
                     Name = "Добавление возможности прикрепления файлов",
                     Description = "Расширить функционал задач с возможностью прикрепления файлов, изображений и документов",
-                    Initiator = kirill,
-                    Executor = manager,
+                    Initiator = chatBotProject?.Members
+                        .Where(m => m.ProjectRole is ProjectMemberRole.TeamLeader)
+                        .Select(m => new User{
+                            Id = m.UserId,
+                            Email = m.Email,
+                            FirstName = m.FirstName,
+                            LastName = m.LastName
+                        })
+                        .FirstOrDefault() ?? kirill,
+                    Executor = chatBotProject?.Members
+                        .Where(m => m.ProjectRole is ProjectMemberRole.Member)
+                        .Select(m => new User{
+                            Id = m.UserId,
+                            Email = m.Email,
+                            FirstName = m.FirstName,
+                            LastName = m.LastName
+                        })
+                        .FirstOrDefault() ?? manager,
                     WorkHour = 3,
                     StartDate = new DateTime(2023, 9, 25, 11, 2, 17, DateTimeKind.Utc),
                     FinishDate = new DateTime(2024, 1, 21, 11, 2, 17, DateTimeKind.Utc),
@@ -230,8 +392,24 @@ namespace HITSBlazor.Utils.Mocks.Projects
                     ProjectId = MockProjects.ChatBotId,
                     Name = "Разработка системы шаблонов задач",
                     Description = "Создать возможность создания и использования шаблонов задач для быстрого добавления типовых задач",
-                    Initiator = manager,
-                    Executor = kirill,
+                    Initiator = chatBotProject?.Members
+                        .Where(m => m.ProjectRole is ProjectMemberRole.Member)
+                        .Select(m => new User{
+                            Id = m.UserId,
+                            Email = m.Email,
+                            FirstName = m.FirstName,
+                            LastName = m.LastName
+                        })
+                        .FirstOrDefault() ?? manager,
+                    Executor = chatBotProject?.Members
+                        .Where(m => m.ProjectRole is ProjectMemberRole.TeamLeader)
+                        .Select(m => new User{
+                            Id = m.UserId,
+                            Email = m.Email,
+                            FirstName = m.FirstName,
+                            LastName = m.LastName
+                        })
+                        .FirstOrDefault() ?? kirill,
                     WorkHour = 3,
                     StartDate = new DateTime(2023, 9, 25, 11, 2, 17, DateTimeKind.Utc),
                     FinishDate = new DateTime(2024, 1, 25, 11, 2, 17, DateTimeKind.Utc),
@@ -246,7 +424,15 @@ namespace HITSBlazor.Utils.Mocks.Projects
                     Position = 1,
                     Name = "Разработка мобильного приложения для работы с задачами",
                     Description = "Создание мобильного приложения для удобной работы с задачами на мобильных устройствах",
-                    Initiator = ivan,
+                    Initiator = chatBotProject?.Members
+                        .Where(m => m.ProjectRole is ProjectMemberRole.Member)
+                        .Select(m => new User{
+                            Id = m.UserId,
+                            Email = m.Email,
+                            FirstName = m.FirstName,
+                            LastName = m.LastName
+                        })
+                        .FirstOrDefault() ?? ivan,
                     Executor = null,
                     WorkHour = 8,
                     StartDate = new DateTime(2023, 9, 25, 11, 2, 17, DateTimeKind.Utc),
@@ -261,7 +447,15 @@ namespace HITSBlazor.Utils.Mocks.Projects
                     Position = 2,
                     Name = "Интеграция с системой управления версиями",
                     Description = "Настроить интеграцию с системой управления версиями для контроля изменений и хранения истории задач",
-                    Initiator = manager,
+                    Initiator = chatBotProject?.Members
+                        .Where(m => m.ProjectRole is ProjectMemberRole.TeamLeader)
+                        .Select(m => new User{
+                            Id = m.UserId,
+                            Email = m.Email,
+                            FirstName = m.FirstName,
+                            LastName = m.LastName
+                        })
+                        .FirstOrDefault() ?? manager,
                     Executor = null,
                     WorkHour = 4,
                     StartDate = new DateTime(2023, 9, 25, 11, 2, 17, DateTimeKind.Utc),
@@ -276,7 +470,15 @@ namespace HITSBlazor.Utils.Mocks.Projects
                     Position = 3,
                     Name = "Внедрение системы контроля доступа ",
                     Description = "Настройка системы контроля доступа и ролевой модели для управления правами пользователей и доступом к функционалу",
-                    Initiator = winrit,
+                    Initiator = chatBotProject?.Members
+                        .Where(m => m.ProjectRole is ProjectMemberRole.TeamLeader)
+                        .Select(m => new User{
+                            Id = m.UserId,
+                            Email = m.Email,
+                            FirstName = m.FirstName,
+                            LastName = m.LastName
+                        })
+                        .FirstOrDefault() ?? winrit,
                     Executor = null,
                     WorkHour = 2,
                     StartDate = new DateTime(2023, 9, 25, 11, 2, 17, DateTimeKind.Utc),
@@ -327,7 +529,7 @@ namespace HITSBlazor.Utils.Mocks.Projects
                     Report = "Отчет 3",
                     StartDate = firstSprintDate.AddDays(SumSprintDate(2, false)),
                     FinishDate = firstSprintDate.AddDays(SumSprintDate(2, true)),
-                    WorkingHours = 15,
+                    WorkingHours = _tasks.Where(t => t.SprintId == Sprint3Id).Sum(t => t.WorkHour),
                     Status = SprintStatus.Active,
                     Tasks = [.. _tasks.Where(t => t.SprintId == Sprint3Id)]
                 },
@@ -399,6 +601,8 @@ namespace HITSBlazor.Utils.Mocks.Projects
 
             return sprintForUpdate;
         }
+
+        public static List<HITSTask> GetMockTasks() => _tasks;
 
         public static HITSTask? GetTaskById(Guid taskId) =>
             _tasks.FirstOrDefault(t => t.Id == taskId);
@@ -522,6 +726,47 @@ namespace HITSBlazor.Utils.Mocks.Projects
             {
                 _tasks.FirstOrDefault(t => t.Id == updatedTask.Id)?.Position = updatedTask.Position;
             }
+            return true;
+        }
+
+        public static bool FinishSprint(Guid sprintId, IEnumerable<SprintMarkRequest> marks)
+        {
+            var currentSprint = _sprints.FirstOrDefault(s => s.Id == sprintId && s.Status is SprintStatus.Active);
+            if (currentSprint is null) return false;
+
+            currentSprint.Status = SprintStatus.Done;
+
+            var completedTasks = new Dictionary<Guid, List<HITSTask>>();
+
+            var sprintTasks = _tasks.Where(t => t.SprintId == sprintId);
+            foreach (var task in sprintTasks)
+            {
+                task.SprintId = null;
+
+                if (task.Status is HITSTaskStatus.Done)
+                {
+                    if (task.Executor is null) continue;
+
+                    if (completedTasks.TryGetValue(task.Executor.Id, out var tasks))
+                        tasks.Add(task);
+                    else
+                        completedTasks.Add(task.Executor.Id, [task]);
+                }
+                else
+                {
+                    task.Status = HITSTaskStatus.InBackLog;
+                }
+
+            }
+
+            MockSprintMarks.CreateSprintMarks(
+                currentSprint.ProjectId, sprintId, completedTasks, marks
+            );
+
+            MockAverageMarks.UpdateProjectMarks(
+                currentSprint.ProjectId, sprintId, completedTasks
+            );
+
             return true;
         }
 

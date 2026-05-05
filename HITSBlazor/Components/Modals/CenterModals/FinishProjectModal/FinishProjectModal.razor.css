@@ -1,4 +1,4 @@
-﻿.finish-sprint-modal {
+﻿.finish-project-modal {
     width: 100%;
     max-width: 600px;
     height: -moz-fit-content;
@@ -15,13 +15,13 @@
     transition: all .15s ease-out;
 }
 
-.finish-sprint-modal-mark {
+.finish-project-modal-mark {
     height: 100%;
     max-height: 220px;
     overflow-y: scroll;
 }
 
-.finish-sprint-modal-member {
+.finish-project-modal-member {
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
@@ -29,7 +29,7 @@
     justify-content: space-between;
 }
 
-.finish-sprint-modal-member-name {
+.finish-project-modal-member-name {
     display: -webkit-box;
     -webkit-line-clamp: 1;
     -webkit-box-orient: vertical;

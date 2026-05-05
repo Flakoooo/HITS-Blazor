@@ -1,0 +1,76 @@
+﻿@namespace HITSBlazor.Components.Modals.CenterModals.FinishProjectModal
+@using HITSBlazor.Components.Button
+@using HITSBlazor.Components.Hint
+@using HITSBlazor.Components.Inputs.Input
+@using HITSBlazor.Components.Inputs.Number
+@using HITSBlazor.Components.Inputs.TextArea
+@using HITSBlazor.Components.Modals.Components.CenterModalHeader
+@using HITSBlazor.Components.Placeholders.Placeholder
+@using HITSBlazor.Components.Statuses.EnumStatus
+@using HITSBlazor.Models.Projects.Enums
+@using HITSBlazor.Utils.Models
+
+<div class="finish-project-modal bg-white rounded p-3 w-1" @onclick:stopPropagation="true">
+    <CenterModalHeader IsLoading="_isLoading" 
+                       HeaderText="@(CurrentProject.Status is ProjectStatus.Done ? "Информация о проекте" : "Завершение проекта")" />
+    <div class="d-flex flex-column gap-2 w-100">
+        <div class="d-flex gap-3 text-primary">
+            @if (_isLoading)
+            {
+                <Placeholder Width="w-25" />
+                <Placeholder Width="w-25" />
+            }
+            else
+            {
+                <div class="d-flex gap-1 w-25">
+                    Оценка
+                    <Hint Text="Оценка - число вещественное от 0 до 10" />
+                </div>
+                <div class="w-75">
+                    Участник
+                </div>
+            }
+        </div>
+        <div class="finish-project-modal-mark d-flex flex-column gap-2">
+            @foreach (var member in CurrentProject.Members)
+            {
+                <div class="d-flex gap-3">
+                    <div class="w-25">
+                        <Input IsLoading="_isLoading" 
+                               Placeholder="Оценка" 
+                               Value="@_projectMembersScores[member.UserId].ToString()"
+                               IsDisabled="true" />
+                    </div>
+                    <div class="finish-project-modal-member border rounded px-2 w-75">
+                        <div class="finish-project-modal-member-name">@member.FullName</div>
+                        <EnumStatus Statustype="member.ProjectRole" />
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+    <TextArea IsLoading="_isLoading" 
+              Label="Отчет" 
+              Placeholder="Отчет" 
+              Style="resize: none; height: 150px;"
+              IsDisabled="CurrentProject.Status is ProjectStatus.Done"
+              @bind-Value="Report" />
+    @if (CurrentProject.Status is not ProjectStatus.Done)
+    {
+        <div class="d-flex gap-2 align-items-center">
+            @if (!_hasActiveSprint)
+            {
+                <Button IsLoading="_isLoading"
+                        Variant="ButtonVariant.Primary"
+                        Text="Завершить спринт"
+                        OnButtonClick="FinishProject" />
+            }
+            @if (_hasActiveSprint)
+            {
+                <div class="text-danger">
+                    Завершите активный спринт, чтобы завершить проект
+                </div>
+            }
+        </div>
+    }
+</div>

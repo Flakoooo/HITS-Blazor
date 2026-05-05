@@ -1,52 +1,80 @@
 ﻿using HITSBlazor.Models.Projects.Entities;
 using HITSBlazor.Models.Projects.Enums;
-using HITSBlazor.Utils.Mocks.Users;
+using HITSBlazor.Models.Projects.Requests;
+
+using HITSTask = HITSBlazor.Models.Projects.Entities.Task;
+using HITSTaskStatus = HITSBlazor.Models.Projects.Enums.TaskStatus;
 
 namespace HITSBlazor.Utils.Mocks.Projects
 {
     public static class MockSprintMarks
     {
+        private static Random _random = new();
+
         private static readonly List<SprintMarks> _sprintMarks = CreateSprintMarks();
 
         private static List<SprintMarks> CreateSprintMarks()
         {
-            var kirill = MockUsers.GetUserById(MockUsers.KirillId)!;
-            var ivan = MockUsers.GetUserById(MockUsers.IvanId)!;
-            var manager = MockUsers.GetUserById(MockUsers.ManagerId)!;
+            var sprintMarks = new List<SprintMarks>();
 
-            return
-            [
-                new SprintMarks
+            foreach (var project in MockProjects.GetAllMockProject())
+                foreach (var sprint in MockSprints.GetAllMockSprints().Where(s => s.ProjectId == project.Id && s.Status is SprintStatus.Done))
+                    foreach (var member in project.Members)
+                        sprintMarks.Add(new SprintMarks
+                        {
+                            SprintId = sprint.Id,
+                            UserId = member.UserId,
+                            FirstName = member.FirstName,
+                            LastName = member.LastName,
+                            ProjectRole = member.ProjectRole,
+                            Mark = _random.Next(11),
+                            CountCompletedTasks = MockSprints.GetMockTasks()
+                                .Count(t => t.SprintId == sprint.Id && t.Status is HITSTaskStatus.Done && t.Executor?.Id == member.UserId)
+                        });
+
+            return sprintMarks;
+        }
+
+        public static List<SprintMarks> GetSprintMarks(Guid projectId, Guid userId)
+        {
+            var sprintMarks = new List<SprintMarks>();
+
+            foreach (var sprint in MockSprints.GetAllMockSprints().Where(s => s.ProjectId == projectId && s.Status is SprintStatus.Done))
+            {
+                var sprintMark = _sprintMarks.FirstOrDefault(sm => sm.SprintId == sprint.Id && sm.UserId == userId);
+                if (sprintMark is null) continue;
+
+                sprintMarks.Add(sprintMark);
+            }
+
+            return sprintMarks;
+        }
+
+        public static bool CreateSprintMarks(
+            Guid projectId, Guid sprintId, Dictionary<Guid, List<HITSTask>> memberTasks, IEnumerable<SprintMarkRequest> marks
+        )
+        {
+            var marksByUser = marks.ToDictionary(m => m.UserId, m => m.Mark);
+            foreach (var tasks in memberTasks)
+            {
+                var member = MockProjects.GetCurrentProjectMember(projectId, tasks.Key);
+                if (member is null) continue;
+
+                var sprintMark = new SprintMarks
                 {
-                    SprintId = MockSprints.Sprint3Id,
-                    UserId = kirill.Id,
-                    FirstName = kirill.FirstName,
-                    LastName = kirill.LastName,
-                    ProjectRole = ProjectMemberRole.TeamLeader,
-                    Mark = null,
-                    CountCompletedTasks = 2
-                },
-                new SprintMarks
-                {
-                    SprintId = MockSprints.Sprint3Id,
-                    UserId = ivan.Id,
-                    FirstName = ivan.FirstName,
-                    LastName = ivan.LastName,
-                    ProjectRole = ProjectMemberRole.Member,
-                    Mark = null,
-                    CountCompletedTasks = 2
-                },
-                new SprintMarks
-                {
-                    SprintId = MockSprints.Sprint3Id,
-                    UserId = manager.Id,
-                    FirstName = manager.FirstName,
-                    LastName = manager.LastName,
-                    ProjectRole = ProjectMemberRole.Member,
-                    Mark = null,
-                    CountCompletedTasks = 2
-                }
-            ];
+                    SprintId = sprintId,
+                    UserId = member.UserId,
+                    FirstName = member.FirstName,
+                    LastName = member.LastName,
+                    ProjectRole = member.ProjectRole,
+                    Mark = marksByUser.GetValueOrDefault(member.UserId),
+                    CountCompletedTasks = tasks.Value.Count
+                };
+
+                _sprintMarks.Add(sprintMark);
+            }
+
+            return true;
         }
     }
 }

@@ -84,12 +84,6 @@ namespace HITSBlazor.Utils.Mocks.Projects
                             ProjectRole = ProjectMemberRole.Member
                         }
                     ],
-                    Report = new ReportProject
-                    {
-                        ProjectId = ChatBotId,
-                        Marks = MockAverageMarks.GetAverageMarkByProjectId(ChatBotId),
-                        Report = "Это отчет"
-                    },
                     StartDate = new DateTime(2023, 10, 25, 11, 2, 17, DateTimeKind.Utc),
                     FinishDate = new DateTime(2024, 10, 25, 11, 2, 17, DateTimeKind.Utc),
                     Status = ProjectStatus.Active
@@ -132,18 +126,15 @@ namespace HITSBlazor.Utils.Mocks.Projects
                             ProjectRole = ProjectMemberRole.TeamLeader
                         }
                     ],
-                    Report = new ReportProject
-                    {
-                        ProjectId = ArmatureId,
-                        Marks = [],
-                        Report = ""
-                    },
+                    Report = "репорт",
                     StartDate = new DateTime(2023, 10, 25, 11, 2, 17, DateTimeKind.Utc),
                     FinishDate = new DateTime(2024, 1, 18, 11, 2, 17, DateTimeKind.Utc),
                     Status = ProjectStatus.Done
                 }
             ];
         }
+
+        public static List<Project> GetAllMockProject() => _projects;
 
         public static ListDataResponse<Project> GetAllProjects(
             int page,
@@ -175,5 +166,16 @@ namespace HITSBlazor.Utils.Mocks.Projects
 
         public static ProjectMember? GetCurrentProjectMember(Guid projectId, Guid userId)
             => _projects.FirstOrDefault(p => p.Id == projectId)?.Members.FirstOrDefault(m => m.UserId == userId);
+
+        public static bool FinishProject(Guid projectId, string report)
+        {
+            var project = _projects.FirstOrDefault(p => p.Id == projectId);
+            if (project is null) return false;
+
+            project.Status = ProjectStatus.Done;
+            MockTeams.GetTeamById(project.Team.Id)?.HasActiveProject = false;
+
+            return true;
+        }
     }
 }

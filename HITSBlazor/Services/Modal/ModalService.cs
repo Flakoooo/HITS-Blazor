@@ -68,7 +68,7 @@ namespace HITSBlazor.Services.Modal
             }
         }
 
-        public async System.Threading.Tasks.Task Close(ModalType type)
+        public async Task Close(ModalType type)
         {
             switch (type)
             {
@@ -77,7 +77,7 @@ namespace HITSBlazor.Services.Modal
 
                     CenterModals.Last().State = ModalState.Leave;
                     OnCenterModalsUpdated?.Invoke();
-                    await System.Threading.Tasks.Task.Delay(100);
+                    await Task.Delay(100);
 
                     CenterModals.Remove(CenterModals.Last());
                     OnCenterModalsUpdated?.Invoke();
@@ -88,7 +88,7 @@ namespace HITSBlazor.Services.Modal
 
                     SideModals.Peek().State = ModalState.Leave;
                     OnRightSideModalsUpdated?.Invoke();
-                    await System.Threading.Tasks.Task.Delay(100);
+                    await Task.Delay(100);
 
                     SideModals.Pop();
                     OnRightSideModalsUpdated?.Invoke();
@@ -102,7 +102,7 @@ namespace HITSBlazor.Services.Modal
             OnAllModalsUpdated?.Invoke();
         }
 
-        public async System.Threading.Tasks.Task CloseAll(ModalType type)
+        public async Task CloseAll(ModalType type)
         {
             switch (type)
             {

@@ -85,21 +85,10 @@
                         Text="Перейти в идею" 
                         Variant="ButtonVariant.Primary"
                         OnButtonClick="() => ShowIdeaModal(CurrentProject?.IdeaId)" />
-                @if (CurrentProject?.Status is ProjectStatus.Done)
-                {
-                    <Button IsLoading="IsLoading"
-                            Text="Информация о проекте" 
-                            Variant="ButtonVariant.Primary"
-                            OnButtonClick="@(() => Console.WriteLine("Какое то модальное окно"))" />
-                }
-                //TODO: тут вызывается модальное окно завершения спринта, но я думаю надо сделать лучше
-                else
-                {
-                    <Button IsLoading="IsLoading"
-                            Text="Завершить проект" 
-                            Variant="ButtonVariant.Primary"
-                            OnButtonClick="@(() => Console.WriteLine("Какое то модальное окно"))" />
-                }
+                <Button IsLoading="IsLoading"
+                        Text="@(CurrentProject?.Status is ProjectStatus.Done ? "Информация о проекте" : "Завершить проект")" 
+                        Variant="ButtonVariant.Primary"
+                        OnButtonClick="ShowFinishProjectModal" />
             </div>
         </div>
     </div>

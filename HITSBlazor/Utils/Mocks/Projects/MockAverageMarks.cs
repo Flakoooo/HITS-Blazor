@@ -2,6 +2,9 @@
 using HITSBlazor.Models.Projects.Enums;
 using HITSBlazor.Utils.Mocks.Users;
 
+using HITSTask = HITSBlazor.Models.Projects.Entities.Task;
+using HITSTaskStatus = HITSBlazor.Models.Projects.Enums.TaskStatus;
+
 namespace HITSBlazor.Utils.Mocks.Projects
 {
     public static class MockAverageMarks
@@ -19,42 +22,83 @@ namespace HITSBlazor.Utils.Mocks.Projects
             var fileUploadTask = MockSprints.GetTaskById(MockSprints.FileUploadTaskId)!;
             var templatesTask = MockSprints.GetTaskById(MockSprints.TaskTemplatesTaskId)!;
 
-            return
-            [
-                new AverageMark
+            var averageMarks = new List<AverageMark>();
+
+            foreach (var project in MockProjects.GetAllMockProject())
+            {
+                foreach (var member in project.Members)
                 {
-                    ProjectId = MockProjects.ChatBotId,
-                    UserId = kirill.Id,
-                    FirstName = kirill.FirstName,
-                    LastName = kirill.LastName,
-                    ProjectRole = ProjectMemberRole.TeamLeader,
-                    Mark = 9.9,
-                    Tasks = [authIntegrationTask, templatesTask]
-                },
-                new AverageMark
-                {
-                    ProjectId = MockProjects.ChatBotId,
-                    UserId = ivan.Id,
-                    FirstName = ivan.FirstName,
-                    LastName = ivan.LastName,
-                    ProjectRole = ProjectMemberRole.Member,
-                    Mark = 6.7,
-                    Tasks = [blackThemeTask]
-                },
-                new AverageMark
-                {
-                    ProjectId = MockProjects.ChatBotId,
-                    UserId = manager.Id,
-                    FirstName = manager.FirstName,
-                    LastName = manager.LastName,
-                    ProjectRole = ProjectMemberRole.Member,
-                    Mark = 7.8,
-                    Tasks = [fileUploadTask]
+                    var sprintMarks = MockSprintMarks.GetSprintMarks(project.Id, member.UserId);
+                    int sumMark = sprintMarks.Sum(sm => sm.Mark) ?? 0;
+                    double averageMark = sumMark > 0 ? (double)sumMark / sprintMarks.Count : 0.0;
+
+                    var activeSprint = MockSprints.GetActiveSprintByProjectId(project.Id);
+                    var executedTasks = MockSprints.GetMockTasks()
+                        .Where(t => t.SprintId != activeSprint?.Id && t.Executor?.Id == member.UserId && t.Status is HITSTaskStatus.Done);
+
+                    var mark = averageMarks.FirstOrDefault(am => am.UserId == member.UserId && am.ProjectId == project.Id);
+                    if (mark is null)
+                    {
+                        averageMarks.Add(new AverageMark
+                        {
+                            ProjectId = project.Id,
+                            UserId = member.UserId,
+                            FirstName = member.FirstName,
+                            LastName = member.LastName,
+                            ProjectRole = ProjectMemberRole.TeamLeader,
+                            Mark = averageMark,
+                            Tasks = executedTasks.ToList()
+                        });
+                    }
                 }
-            ];
+            }
+
+            return averageMarks;
         }
 
         public static List<AverageMark> GetAverageMarkByProjectId(Guid projectId)
             => [.. _averageMarks.Where(am => am.ProjectId == projectId)];
+
+
+        public static bool UpdateProjectMarks(Guid projectId, Guid sprintId, Dictionary<Guid, List<HITSTask>> memberTasks)
+        {
+            foreach (var pair in memberTasks)
+            {
+                var sprintMarks = MockSprintMarks.GetSprintMarks(projectId, pair.Key);
+                if (sprintMarks.Count == 0) continue;
+
+                var projectMember = MockProjects.GetCurrentProjectMember(projectId, pair.Key);
+                if (projectMember is null) continue;
+
+                int sumMark = sprintMarks.Sum(sm => sm.Mark) ?? 0;
+                double averageMark = sumMark > 0 ? (double)sumMark / sprintMarks.Count : 0.0;
+
+                var projectMark = _averageMarks.FirstOrDefault(am => am.ProjectId == projectId && am.UserId == pair.Key);
+                if (projectMark is null)
+                {
+                    var newProjectMark = new AverageMark
+                    {
+                        ProjectId = projectId,
+                        UserId = projectMember.UserId,
+                        FirstName = projectMember.FirstName, 
+                        LastName = projectMember.LastName,
+                        ProjectRole = projectMember.ProjectRole,
+                        Mark = averageMark,
+                        Tasks = pair.Value.ToList()
+                    };
+                    _averageMarks.Add(newProjectMark);
+                }
+                else
+                {
+                    projectMark.Mark = averageMark;
+                    projectMark.Tasks = projectMark.Tasks?
+                        .Concat(pair.Value)
+                        .DistinctBy(t => t.Id)
+                        .ToList();
+                }
+            }
+
+            return true;
+        }
     }
 }

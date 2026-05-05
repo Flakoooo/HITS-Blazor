@@ -1,4 +1,5 @@
 ﻿using HITSBlazor.Components.ActionMenus.BaseActionMenu;
+using HITSBlazor.Components.Modals.CenterModals.FinishProjectModal;
 using HITSBlazor.Components.Modals.Components.RightSideModaCollapselInfo;
 using HITSBlazor.Components.Tables.TableHeader;
 using HITSBlazor.Models.Projects.Entities;
@@ -52,6 +53,19 @@ namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewInfoComponent
         private void ShowIdeaModal(Guid? ideaid)
         {
             if (ideaid.HasValue) ModalService.ShowIdeaModal(ideaid.Value);
+        }
+
+        private void ShowFinishProjectModal()
+        {
+            if (CurrentProject is null) return;
+
+            ModalService.Show<FinishProjectModal>(
+                ModalType.Center,
+                parameters: new Dictionary<string, object>
+                {
+                    [nameof(FinishProjectModal.CurrentProject)] = CurrentProject
+                }
+            );
         }
 
         private async SharpTask OnMemberAction(TableActionContext context)

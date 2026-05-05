@@ -26,12 +26,18 @@ namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewActiveSprintCom
         [Parameter]
         public Sprint? ActiveSprint { get; set; }
 
-        private void ShowFinishSprintModal() => ModalService.Show<FinishSprintModal>(
-            ModalType.Center,
-            parameters: new Dictionary<string, object>
-            {
-                [nameof(FinishSprintModal.ProjectMembers)] = CurrentProject?.Members ?? []
-            }
-        );
+        private void ShowFinishSprintModal()
+        {
+            if (ActiveSprint is null) return;
+
+            ModalService.Show<FinishSprintModal>(
+                ModalType.Center,
+                parameters: new Dictionary<string, object>
+                {
+                    [nameof(FinishSprintModal.ProjectMembers)] = CurrentProject?.Members ?? [],
+                    [nameof(FinishSprintModal.SprintId)] = ActiveSprint.Id
+                }
+            );
+        }
     }
 }

@@ -11,6 +11,7 @@ namespace HITSBlazor.Services.Projects
     {
         event Action<Sprint>? OnSprintHasCreated;
         event Action<Sprint>? OnSprintHasUpdated;
+        event Action? OnSprintHasFinished;
 
         event Action<HITSTask>? OnTaskHasCreated;
         event Action<HITSTask>? OnTaskHasUpdated;
@@ -27,6 +28,10 @@ namespace HITSBlazor.Services.Projects
         Task<List<Project>> GetAllActiveProjectsAsync();
         Task<Project?> GetProjectByIdAsync(Guid projectId);
         Task<ProjectMember?> GetCurrentProjectMemberAsync(Guid projectId);
+        Task<bool> FinishProjectAsync(Guid projectId, string report);
+
+        //ProjectMarks
+        Task<List<AverageMark>> GetProjectMarksAsync(Guid projectId);
 
         //Sprints
         Task<ListDataResponse<Sprint>> GetSprintsByProjectIdAsync(
@@ -36,6 +41,7 @@ namespace HITSBlazor.Services.Projects
         Task<Sprint?> GetActiveSprintByProjectIdAsync(Guid proectId);
         Task<bool> CreateSprintAsync(Guid projectId, CreateSprintRequest request);
         Task<bool> UpdateSprintAsync(Guid projectId, UpdateSprintRequest request);
+        Task<bool> FinishSprintAsync(Guid sprintId, IEnumerable<SprintMarkRequest> marks);
 
         //Tasks
         Task<ListDataResponse<HITSTask>> GetTasksByQueryParamsAsync(
