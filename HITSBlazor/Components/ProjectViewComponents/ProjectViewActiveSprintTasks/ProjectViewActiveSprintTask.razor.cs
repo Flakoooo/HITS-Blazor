@@ -73,14 +73,11 @@ namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewActiveSprintTas
 
         private void HandleDragStateChanged()
         {
-            Console.WriteLine($"!_renderScheduled {!_renderScheduled}");
             if (!_renderScheduled)
             {
                 _renderScheduled = true;
                 InvokeAsync(() => { _renderScheduled = false; StateHasChanged(); });
             }
-            if (TaskCategory is HITSTaskStatus.InProgress)
-                Console.WriteLine($"SPRINT ORDER: {string.Join(", ", _sprintTasks.Select(t => t.Name))}");
         }
 
         private void CleanupTempTask()
@@ -271,6 +268,7 @@ namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewActiveSprintTas
             var currentIndex = _sprintTasks.IndexOf(task);
             if (currentIndex < 0 || currentIndex == newIndex) return;
 
+            
             _sprintTasks.RemoveAt(currentIndex);
             if (currentIndex < newIndex) newIndex--;
             _sprintTasks.Insert(newIndex, task);

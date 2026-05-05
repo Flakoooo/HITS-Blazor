@@ -64,7 +64,8 @@
             else
             {
                 <div class="d-flex my-1 task-item task-item-not-draggable"
-                     style="opacity: 1"
+                     data-task-id="@task.Id"
+                     style="opacity: 1; order: @order"
                      @onclick="() => ShowSprintTaskModal(task.Id)">
                     <ProjectViewActiveSprintTaskContent CurrentTask="task" />
                 </div>
