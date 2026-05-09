@@ -1,4 +1,5 @@
-﻿using HITSBlazor.Models.Common.Responses;
+﻿using HITSBlazor.Models.Common.Entities;
+using HITSBlazor.Models.Common.Responses;
 using HITSBlazor.Models.Projects.Entities;
 using HITSBlazor.Models.Projects.Enums;
 using HITSBlazor.Models.Projects.Requests;
@@ -90,26 +91,36 @@ namespace HITSBlazor.Services.Projects
             return true;
         }
 
-        public async Task<bool> FinishSprintAsync(Guid sprintId, IEnumerable<SprintMarkRequest> marks)
+        public async Task<bool> FinishSprintAsync(Guid sprintId, string report, IEnumerable<SprintMarkRequest> marks)
         {
-            var result = MockSprints.FinishSprint(sprintId, marks);
+            var result = MockSprints.FinishSprint(sprintId, report, marks);
             if (!result) return false;
 
             OnSprintHasFinished?.Invoke();
             return true;
         }
 
+        //SprintMarks
+        public async Task<List<SprintMarks>> GetSprintMarksBySprintIdAsync(Guid sprintId)
+            => MockSprintMarks.GetSprintMarksBySprintId(sprintId);
+
         //Tasks
         public async Task<ListDataResponse<HITSTask>> GetTasksByQueryParamsAsync(
             int page,
             Guid? projectId,
             Guid? sprintId,
-            IEnumerable<HITSTaskStatus>? selectedStatuses
+            string? searchText,
+            IEnumerable<HITSTaskStatus>? selectedStatuses,
+            IEnumerable<Guid>? selectedTags,
+            IEnumerable<Guid>? selectedExecutors
         ) => MockSprints.GetTasksByQueryParams(
-            page, 
-            projectId: projectId, 
-            sprintId: sprintId, 
-            selectedStatuses: selectedStatuses?.ToHashSet()
+            page,
+            projectId: projectId,
+            sprintId: sprintId,
+            searchText: searchText,
+            selectedStatuses: selectedStatuses?.ToHashSet(),
+            selectedTags: selectedTags?.ToHashSet(),
+            selectedExecutors: selectedExecutors?.ToHashSet()
         );
 
         public async Task<ListDataResponse<TaskMovementLog>> GetTasksLogsAsync(

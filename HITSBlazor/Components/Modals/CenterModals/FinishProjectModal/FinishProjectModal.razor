@@ -53,7 +53,7 @@
               Label="Отчет" 
               Placeholder="Отчет" 
               Style="resize: none; height: 150px;"
-              IsDisabled="CurrentProject.Status is ProjectStatus.Done"
+              IsDisabled="IsDisabled"
               @bind-Value="Report" />
     @if (CurrentProject.Status is not ProjectStatus.Done)
     {
@@ -61,6 +61,7 @@
             @if (!_hasActiveSprint)
             {
                 <Button IsLoading="_isLoading"
+                        InProgress="IsDisabled"
                         Variant="ButtonVariant.Primary"
                         Text="Завершить спринт"
                         OnButtonClick="FinishProject" />

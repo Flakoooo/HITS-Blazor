@@ -15,12 +15,15 @@
 @using HITSBlazor.Components.Tables.TableComponent
 @using HITSBlazor.Components.Tables.TableHeader
 @using HITSBlazor.Components.Tables.TaskLogTable
+@using HITSBlazor.Components.Tags
 @using HITSBlazor.Components.TaskComponent
 @using HITSBlazor.Components.Typography
 @using HITSBlazor.Models.Common.Entities
 @using HITSBlazor.Models.Projects.Entities
 @using HITSBlazor.Models.Teams.Entities
+@using HITSBlazor.Pages
 @using HITSBlazor.Utils.Models
+@inherits ListPageDataLoader
 
 <div @onclick:stopPropagation="true" class="spint-info-modal bg-white rounded p-3">
     <div class="d-flex flex-column gap-2 w-100 h-100">
@@ -32,32 +35,29 @@
                         Задачи: @CurrentSprint.Tasks.Count
                     </div>
                     <div class="d-flex flex-column gap-2 border-bottom pb-3 w-100">
-                        <!-- TODO: реализовать поиск заадач по этим фильтрам -->
-                        <Input IsLoading="_isLoading" Placeholder="Поиск" ValueChanged="(value) => SeacrhTask(value)" />
+                        <Input IsLoading="_isLoading" 
+                               Placeholder="Поиск" 
+                               ValueChanged="(value) => SeacrhTask(value)" 
+                               DebounceDelay="500" />
                         <div class="d-flex flex-column gap-1">
                             <CheckboxDropdown T="Tag" 
                                               IsLoading="_isLoading"
                                               Placeholder="Теги" 
-                                              @bind-SelectedValues="SelectedTags"
+                                              SelectedValues="SelectedTags"
+                                              SelectedValuesChanged="(tags) => SelectTag(tags)"
                                               DataLoaderMethod="async (page, searchText) => await TagService.GetTagsAsync(page, searchText)"
                                               DebounceDelay="500" />
-                            <div class="d-flex flex-wrap gap-1">
-                                @foreach (var tag in SelectedTags)
-                                {
-                                    <div class="px-2 py-1 rounded-2 text-center align-self-start" style="background-color: @($"{tag.Color}4D"); color: @tag.Color;">
-                                        @tag.Name
-                                    </div>
-                                }
-                            </div>
+                            <Tags AllTags="SelectedTags" />
                         </div>
-                        <RadioDropdown T="ProjectMember" 
+                        <RadioDropdown T="SprintMarks" 
                                        IsLoading="_isLoading" 
-                                       AllValues="_members" 
+                                       AllValues="_sprintMarks" 
                                        Placeholder="Исполнитель" 
-                                       @bind-Value="SelectedMember" />
+                                       Value="SelectedMember"
+                                       ValueChanged="(member) => SelectMember(member)"/>
                     </div>
-                    <div class="d-flex flex-column gap-2 w-100 overflow-y-scroll">
-                        @foreach (var task in CurrentSprint.Tasks)
+                    <div class="d-flex flex-column gap-2 w-100 overflow-y-scroll" @ref="_tableContainer">
+                        @foreach (var task in _tasks)
                         {
                             <div style="cursor: pointer;" @onclick="() => SelectTask(task)">
                                 <div class="d-flex gap-2 p-2 border rounded @(_selectedTask?.Id == task.Id)">
@@ -160,7 +160,26 @@
                                         </div>
                                         @if (_activeInfoCategory is EndedSprintModalInfoCategory.Scores)
                                         {
-
+                                            <div class="d-flex flex-column gap-2 bg-white rounded-bottom p-2 border border-top-0 overflow-y-auto">
+                                                @foreach (var mark in _sprintMarks)
+                                                {
+                                                    <div class="px-2">
+                                                        <div class="text-secondary border-bottom pb-1 mb-1">
+                                                            @mark.FullName
+                                                        </div>
+                                                        <div>
+                                                            <div class="d-flex gap-1">
+                                                                Оценка:
+                                                                <div class="text-primary">@mark.Mark</div>
+                                                            </div>
+                                                            <div class="d-flex gap-1">
+                                                                Кол-во задач:
+                                                                <div class="text-primary">@(mark.CountCompletedTasks ?? 0)</div>
+                                                            </div>
+                                                        </div>
+                                                    </div>                                                    
+                                                }
+                                            </div>
                                         }
                                         else if (_activeInfoCategory is EndedSprintModalInfoCategory.Info)
                                         {

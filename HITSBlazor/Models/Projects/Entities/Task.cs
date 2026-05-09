@@ -22,5 +22,15 @@ namespace HITSBlazor.Models.Projects.Entities
 
         public List<Tag> Tags { get; set; } = [];
         public Enums.TaskStatus Status { get; set; }
+
+        public override bool Equals(object? obj)
+        {
+            if (obj is Task task)
+                return Id == task.Id;
+
+            return false;
+        }
+
+        public override int GetHashCode() => Id.GetHashCode();
     }
 }

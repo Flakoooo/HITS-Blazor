@@ -2,14 +2,23 @@
 using HITSBlazor.Components.Modals.Components.RightSideModaCollapselInfo;
 using HITSBlazor.Models.Common.Entities;
 using HITSBlazor.Models.Projects.Entities;
+using HITSBlazor.Services.Projects;
 using HITSBlazor.Services.Tags;
 using HITSBlazor.Utils.Mocks.Projects;
 using Microsoft.AspNetCore.Components;
+
+using HITSTask = HITSBlazor.Models.Projects.Entities.Task;
+using HITSTaskStatus = HITSBlazor.Models.Projects.Enums.TaskStatus;
+using SharpTask = System.Threading.Tasks.Task;
 
 namespace HITSBlazor.Components.Modals.CenterModals.EndedSprintModal
 {
     public partial class EndedSprintModal
     {
+        [Inject]
+        private IProjectService ProjectService { get; set; } = null!;
+
+
         [Inject]
         private ITagService TagService { get; set; } = null!;
 
@@ -22,45 +31,87 @@ namespace HITSBlazor.Components.Modals.CenterModals.EndedSprintModal
         private bool _isLoading = true;
         private string _seacrhText = string.Empty;
 
-        private List<ProjectMember> _members = [];
+        private readonly List<HITSTask> _tasks = [];
+
+        private List<SprintMarks> _sprintMarks = [];
 
         private HashSet<Tag> SelectedTags { get; set; } = [];
-        private ProjectMember? SelectedMember { get; set; }
+        private SprintMarks? SelectedMember { get; set; }
 
         private EndedSprintModalStatCategory _activeStatCategory = EndedSprintModalStatCategory.GeneralStat;
         private EndedSprintModalInfoCategory _activeInfoCategory = EndedSprintModalInfoCategory.Scores;
 
         private List<CollapseItem> _sprintData = [];
 
-        private Models.Projects.Entities.Task? _selectedTask;
+        private HITSTask? _selectedTask;
         private List<CollapseItem> _taskData = [];
 
         private ApexChartOptions<DatePoint> _taskApexChart = new();
 
-        protected override async System.Threading.Tasks.Task OnInitializedAsync()
+        protected override async SharpTask OnInitializedAsync()
         {
             _isLoading = true;
 
-            _members = MockProjects.GetProjectById(ProjectId)?.Members ?? [];
+            _sprintMarks = await ProjectService.GetSprintMarksBySprintIdAsync(CurrentSprint.Id);
+
+            await LoadTasksAsync();
 
             _sprintData = 
             [
                 new() { Title = "Описание", Data = CurrentSprint.Goal },
-                //TODO: узнать потом у Сани что и как по отчетам
-                new() { Title = "Отчет",    Data = "ну тут нужно брать наверно репорт спринта, при завершении" },
+                new() { Title = "Отчет",    Data = CurrentSprint.Report },
             ];
 
             _taskApexChart = GetSprintBurndownOptions();
 
             _isLoading = false;
+            MarkAsInitialized();
         }
 
-        private void SeacrhTask(string value)
+        protected override async SharpTask OnLoadMoreItemsAsync() => await LoadTasksAsync(append: true);
+
+        protected override int GetCurrentItemsCount() => _tasks.Count;
+
+        private async SharpTask LoadTasksAsync(bool append = false)
+        {
+            await LoadDataAsync(
+                _tasks,
+                () => ProjectService.GetTasksByQueryParamsAsync(
+                    _currentPage,
+                    sprintId: CurrentSprint.Id,
+                    searchText: _seacrhText,
+                    selectedTags: SelectedTags.Select(t => t.Id),
+                    selectedExecutors: SelectedMember?.UserId is not null ? [SelectedMember.UserId] : null
+                ),
+                append
+            );
+        }
+
+        private async SharpTask FiltersHasChanged()
+        {
+            ResetPagination();
+            await LoadTasksAsync();
+        }
+
+        private async SharpTask SeacrhTask(string value)
         {
             _seacrhText = value;
+            await FiltersHasChanged();
         }
 
-        private void SelectTask(Models.Projects.Entities.Task task)
+        private async SharpTask SelectTag(HashSet<Tag> newTags)
+        {
+            SelectedTags = newTags;
+            await FiltersHasChanged();
+        }
+
+        private async SharpTask SelectMember(SprintMarks? selectedMember)
+        {
+            SelectedMember = selectedMember;
+            await FiltersHasChanged();
+        }
+
+        private void SelectTask(HITSTask task)
         {
             if (_selectedTask?.Id == task.Id) return;
 

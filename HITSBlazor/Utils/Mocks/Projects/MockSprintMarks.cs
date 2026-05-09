@@ -50,6 +50,9 @@ namespace HITSBlazor.Utils.Mocks.Projects
             return sprintMarks;
         }
 
+        public static List<SprintMarks> GetSprintMarksBySprintId(Guid sprintId)
+            => _sprintMarks.Where(sm => sm.SprintId == sprintId).ToList();
+
         public static bool CreateSprintMarks(
             Guid projectId, Guid sprintId, Dictionary<Guid, List<HITSTask>> memberTasks, IEnumerable<SprintMarkRequest> marks
         )

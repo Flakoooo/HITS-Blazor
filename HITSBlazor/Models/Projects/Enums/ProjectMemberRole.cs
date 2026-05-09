@@ -5,16 +5,16 @@ namespace HITSBlazor.Models.Projects.Enums
 {
     public enum ProjectMemberRole
     {
-        [Description("Инициатор")]
-        [Style("bg-success-subtle text-success")]
-        Initiator,
+        [Description("Участник")]
+        [Style("bg-primary-subtle text-primary")]
+        Member = 0,
 
         [Description("Тим-лидер")]
         [Style("bg-warning-subtle text-warning")]
-        TeamLeader,
+        TeamLeader = 1,
 
-        [Description("Участник")]
-        [Style("bg-primary-subtle text-primary")]
-        Member,
+        [Description("Инициатор")]
+        [Style("bg-success-subtle text-success")]
+        Initiator = 2
     }
 }

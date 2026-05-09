@@ -38,6 +38,7 @@
                                 MinValue="0"
                                 MaxValue="10" 
                                 Placeholder="Оценка"
+                                IsDisabled="IsDisabled"
                                 Value="_projectMembersScores[userId]"
                                 ValueChanged="(value) => _projectMembersScores[userId] = value" />
                     </div>
@@ -49,8 +50,15 @@
             }
         </div>
     </div>
+    <TextArea IsLoading="_isLoading"
+              Label="Отчет"
+              Placeholder="Отчет"
+              Style="resize: none; height: 150px;"
+              IsDisabled="IsDisabled"
+              @bind-Value="Report" />
     <div class="d-flex gap-2 align-items-center">
         <Button IsLoading="_isLoading" 
+                InProgress="IsDisabled"
                 Variant="ButtonVariant.Primary" 
                 Text="Завершить спринт" 
                 OnButtonClick="FinishSprint" />

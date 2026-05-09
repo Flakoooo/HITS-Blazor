@@ -42,14 +42,20 @@ namespace HITSBlazor.Services.Projects
         Task<Sprint?> GetActiveSprintByProjectIdAsync(Guid proectId);
         Task<bool> CreateSprintAsync(Guid projectId, CreateSprintRequest request);
         Task<bool> UpdateSprintAsync(Guid sprintId, UpdateSprintRequest request);
-        Task<bool> FinishSprintAsync(Guid sprintId, IEnumerable<SprintMarkRequest> marks);
+        Task<bool> FinishSprintAsync(Guid sprintId, string report, IEnumerable<SprintMarkRequest> marks);
+
+        //SprintMarks
+        Task<List<SprintMarks>> GetSprintMarksBySprintIdAsync(Guid sprintId);
 
         //Tasks
         Task<ListDataResponse<HITSTask>> GetTasksByQueryParamsAsync(
             int page,
             Guid? projectId = null,
             Guid? sprintId = null,
-            IEnumerable<HITSTaskStatus>? selectedStatuses = null
+            string? searchText = null,
+            IEnumerable<HITSTaskStatus>? selectedStatuses = null,
+            IEnumerable<Guid>? selectedTags = null,
+            IEnumerable<Guid>? selectedExecutors = null
         );
         Task<ListDataResponse<TaskMovementLog>> GetTasksLogsAsync(
             Guid taskId,

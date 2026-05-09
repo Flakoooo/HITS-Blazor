@@ -35,6 +35,7 @@ namespace HITSBlazor.Pages.Projects.ProjectView
         {
             _isLoading = true;
 
+            ProjectService.OnSprintHasCreated += SprintHasCreated;
             ProjectService.OnSprintHasFinished += SprintHasFinished;
 
             DragDrop.OnOverlayNeedsUpdate += () => InvokeAsync(StateHasChanged);
@@ -72,6 +73,12 @@ namespace HITSBlazor.Pages.Projects.ProjectView
             _activeCategory = category;
         }
 
+        private void SprintHasCreated(Sprint newSprint)
+        {
+            _activeSprint = newSprint;
+            StateHasChanged();
+        }
+
         private void SprintHasFinished()
         {
             _activeCategory = ProjectViewCategory.Sprints;
@@ -81,6 +88,7 @@ namespace HITSBlazor.Pages.Projects.ProjectView
 
         public void Dispose()
         {
+            ProjectService.OnSprintHasCreated -= SprintHasCreated;
             ProjectService.OnSprintHasFinished -= SprintHasFinished;
 
             DragDrop.OnOverlayNeedsUpdate -= () => InvokeAsync(StateHasChanged);

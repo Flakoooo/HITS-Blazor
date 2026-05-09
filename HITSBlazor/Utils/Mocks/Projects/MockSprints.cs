@@ -3,7 +3,6 @@ using HITSBlazor.Models.Common.Responses;
 using HITSBlazor.Models.Projects.Entities;
 using HITSBlazor.Models.Projects.Enums;
 using HITSBlazor.Models.Projects.Requests;
-using HITSBlazor.Models.Quests.Entities;
 using HITSBlazor.Models.Users.Entities;
 using HITSBlazor.Utils.Mocks.Common;
 using HITSBlazor.Utils.Mocks.Users;
@@ -24,8 +23,17 @@ namespace HITSBlazor.Utils.Mocks.Projects
         public static Guid FileUploadTaskId { get; } = Guid.NewGuid();
         public static Guid TaskTemplatesTaskId { get; } = Guid.NewGuid();
 
+        private class TaskHistory
+        {
+            public required HITSTask Task { get; set; }
+            public Guid SprintId { get; set; }
+            public HITSTaskStatus Status { get; set; }
+            public User? ExecutorId { get; set; }
+        }
+
         private static readonly List<HITSTask> _tasks = CreateTasks();
         private static readonly List<Sprint> _sprints = CreateSprints();
+        private static readonly List<TaskHistory> _taskHistory = new List<TaskHistory>();
 
         private static int SumSprintDate(int sprintCount, bool isFinishDate, int sprintDurationDays = 7)
             => isFinishDate
@@ -549,6 +557,13 @@ namespace HITSBlazor.Utils.Mocks.Projects
             ];
         }
 
+        private static void UpdateTaskBackLogPosition(Guid projectId)
+        {
+            int position = 1;
+            foreach (var task in _tasks.Where(t => t.ProjectId == projectId && t.Status is HITSTaskStatus.InBackLog).OrderBy(t => t.Position))
+                task.Position = position++;
+        }
+
         public static List<Sprint> GetAllMockSprints() => _sprints;
 
         public static ListDataResponse<Sprint> GetSprintsByProjectId(
@@ -590,6 +605,12 @@ namespace HITSBlazor.Utils.Mocks.Projects
 
             _sprints.Add(newSprint);
 
+            foreach (var task in _tasks.Where(request.Tasks.Contains))
+            {
+                task.Status = HITSTaskStatus.NewTask;
+                task.SprintId = newSprint.Id;
+            }    
+
             return newSprint;
         }
 
@@ -604,16 +625,108 @@ namespace HITSBlazor.Utils.Mocks.Projects
             sprintForUpdate.FinishDate = request.FinishDate ?? sprintForUpdate.FinishDate;
             sprintForUpdate.WorkingHours = request.WorkingHours ?? sprintForUpdate.WorkingHours;
 
-            foreach (var task in request.Tasks?.Where(t => t.Status is HITSTaskStatus.InBackLog) ?? [])
+            if (sprintForUpdate.Tasks.Count < request.Tasks?.Count)
             {
-                task.Status = HITSTaskStatus.NewTask;
-                task.SprintId = sprintId;
-                UpdateTaskStatus(task.Id, HITSTaskStatus.NewTask, updateInitiator);
+                foreach (var task in request.Tasks?.Where(t => t.Status is HITSTaskStatus.InBackLog) ?? [])
+                {
+                    task.Status = HITSTaskStatus.NewTask;
+                    task.SprintId = sprintId;
+                    UpdateTaskStatus(task.Id, HITSTaskStatus.NewTask, updateInitiator);
+                }
+
+                sprintForUpdate.Tasks = request.Tasks?.ToList() ?? sprintForUpdate.Tasks;
+
+                UpdateTaskBackLogPosition(sprintForUpdate.ProjectId);
             }
 
-            sprintForUpdate.Tasks = request.Tasks?.ToList() ?? sprintForUpdate.Tasks;
-
             return sprintForUpdate;
+        }
+
+        private static User? CopyUser(User? copy)
+        {
+            if (copy is null) return null;
+
+            return new User
+            {
+                Id = copy.Id,
+                Email = copy.Email,
+                FirstName = copy.FirstName,
+                LastName = copy.LastName,
+                CreatedAt = copy.CreatedAt,
+                Roles = copy.Roles.ToList(),
+                Telephone = copy.Telephone,
+                StudyGroup = copy.StudyGroup
+            };
+        }
+
+        public static bool FinishSprint(Guid sprintId, string report, IEnumerable<SprintMarkRequest> marks)
+        {
+            var currentSprint = _sprints.FirstOrDefault(s => s.Id == sprintId && s.Status is SprintStatus.Active);
+            if (currentSprint is null) return false;
+
+            currentSprint.Report = report;
+
+            var completedTasks = new Dictionary<Guid, List<HITSTask>>();
+
+            var sprintTasks = _tasks.Where(t => t.SprintId == sprintId);
+            foreach (var task in sprintTasks)
+            {
+                _taskHistory.Add(new TaskHistory
+                {
+                    Task = new HITSTask
+                    {
+                        Id = task.Id,
+                        SprintId = task.SprintId,
+                        ProjectId = task.ProjectId,
+                        Name = task.Name,
+                        Description = task.Description,
+                        LeaderComment = task.LeaderComment,
+                        ExecutorComment = task.ExecutorComment,
+                        Initiator = CopyUser(task.Initiator)!,
+                        Executor = CopyUser(task.Executor),
+                        WorkHour = task.WorkHour,
+                        StartDate = task.StartDate,
+                        FinishDate = task.FinishDate,
+                        Tags = task.Tags.ToList(),
+                        Status = task.Status
+                    },
+                    SprintId = sprintId,
+                    Status = task.Status,
+                    ExecutorId = task.Executor
+                });
+
+                task.SprintId = null;
+
+                if (task.Status is HITSTaskStatus.Done)
+                {
+                    if (task.Executor is null) continue;
+
+                    if (completedTasks.TryGetValue(task.Executor.Id, out var tasks))
+                        tasks.Add(task);
+                    else
+                        completedTasks.Add(task.Executor.Id, [task]);
+                }
+                else
+                {
+                    task.Status = HITSTaskStatus.InBackLog;
+                    task.Executor = null;
+                }
+
+            }
+
+            UpdateTaskBackLogPosition(currentSprint.ProjectId);
+
+            MockSprintMarks.CreateSprintMarks(
+                currentSprint.ProjectId, sprintId, completedTasks, marks
+            );
+
+            MockAverageMarks.UpdateProjectMarks(
+                currentSprint.ProjectId, completedTasks
+            );
+
+            currentSprint.Status = SprintStatus.Done;
+
+            return true;
         }
 
         public static List<HITSTask> GetMockTasks() => _tasks;
@@ -626,19 +739,58 @@ namespace HITSBlazor.Utils.Mocks.Projects
             int pageSize = 40,
             Guid? projectId = null,
             Guid? sprintId = null,
-            HashSet<HITSTaskStatus>? selectedStatuses = null
+            string? searchText = null,
+            HashSet<HITSTaskStatus>? selectedStatuses = null,
+            HashSet<Guid>? selectedTags = null,
+            HashSet<Guid>? selectedExecutors = null
         )
         {
-            IEnumerable<HITSTask> query = (projectId, sprintId) switch
+            IEnumerable<HITSTask> query;
+            if (projectId.HasValue && sprintId.HasValue)
             {
-                (null, null) => _tasks.OrderBy(t => t.Position).AsEnumerable(),
-                (_, null) => _tasks.Where(t => t.ProjectId == projectId).OrderBy(t => t.Position),
-                (null, _) => _tasks.Where(t => t.SprintId == sprintId).OrderBy(t => t.Position),
-                (_, _) => _tasks.Where(t => t.ProjectId == projectId && t.SprintId == sprintId).OrderBy(t => t.Position),
-            };
+                query = _tasks.Where(t => t.ProjectId == projectId && t.SprintId == sprintId).OrderBy(t => t.Position);
+            }
+            else if (projectId.HasValue)
+            {
+                query = _tasks.Where(t => t.ProjectId == projectId).OrderBy(t => t.Position);
+            }
+            else if (sprintId.HasValue)
+            {
+                var sprint = _sprints.FirstOrDefault(s => s.Id == sprintId.Value);
+                if (sprint is not null)
+                {
+                    if (sprint.Status is SprintStatus.Active)
+                    {
+                        query = _tasks.Where(t => t.SprintId == sprintId).OrderBy(t => t.Position);
+                    }
+                    else
+                    {
+                        query = _taskHistory.Where(th => th.SprintId == sprintId).Select(t => t.Task);
+                    }
+                }
+                else
+                {
+                    query = _tasks.OrderBy(t => t.Position).AsEnumerable();
+                }
+            }
+            else
+            {
+                query = _tasks.OrderBy(t => t.Position).AsEnumerable();
+            }
+
+            if (selectedExecutors?.Count > 0)
+                query = query.Where(t => t.Executor is not null && selectedExecutors.Contains(t.Executor.Id));
 
             if (selectedStatuses?.Count > 0)
                 query = query.Where(t => selectedStatuses.Contains(t.Status));
+
+            if (selectedTags?.Count > 0)
+            {
+                query = query.Where(t => t.Tags.Any(tag => selectedTags.Contains(tag.Id)));
+            }    
+
+            if (!string.IsNullOrWhiteSpace(searchText))
+                query = query.Where(s => s.Name.Contains(searchText, StringComparison.CurrentCultureIgnoreCase));
 
             int count = query.Count();
 
@@ -743,52 +895,6 @@ namespace HITSBlazor.Utils.Mocks.Projects
             {
                 _tasks.FirstOrDefault(t => t.Id == updatedTask.Id)?.Position = updatedTask.Position;
             }
-            return true;
-        }
-
-        public static bool FinishSprint(Guid sprintId, IEnumerable<SprintMarkRequest> marks)
-        {
-            var currentSprint = _sprints.FirstOrDefault(s => s.Id == sprintId && s.Status is SprintStatus.Active);
-            if (currentSprint is null) return false;
-
-            currentSprint.Status = SprintStatus.Done;
-
-            var completedTasks = new Dictionary<Guid, List<HITSTask>>();
-
-            var sprintTasks = _tasks.Where(t => t.SprintId == sprintId);
-            foreach (var task in sprintTasks)
-            {
-                task.SprintId = null;
-
-                if (task.Status is HITSTaskStatus.Done)
-                {
-                    if (task.Executor is null) continue;
-
-                    if (completedTasks.TryGetValue(task.Executor.Id, out var tasks))
-                        tasks.Add(task);
-                    else
-                        completedTasks.Add(task.Executor.Id, [task]);
-                }
-                else
-                {
-                    task.Status = HITSTaskStatus.InBackLog;
-                }
-
-            }
-
-            int position = 1;
-            foreach (var task in _tasks.Where(t => t.ProjectId == currentSprint.ProjectId && t.Status is HITSTaskStatus.InBackLog).OrderBy(t => t.Position))
-                task.Position = position++;
-
-
-            MockSprintMarks.CreateSprintMarks(
-                currentSprint.ProjectId, sprintId, completedTasks, marks
-            );
-
-            MockAverageMarks.UpdateProjectMarks(
-                currentSprint.ProjectId, completedTasks
-            );
-
             return true;
         }
 

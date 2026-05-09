@@ -59,7 +59,7 @@
             </div>
             @if (_activeCategory is ProjectViewCategory.Info)
             {
-                <ProjectViewInfo CurrentProject="_currentProject" IsLoading="_isLoading" />
+                <ProjectViewInfo CurrentProjectMember="_currentMember" CurrentProject="_currentProject" IsLoading="_isLoading" />
             }
             else if (_activeCategory is ProjectViewCategory.Backlog)
             {

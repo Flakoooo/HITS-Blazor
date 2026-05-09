@@ -38,11 +38,14 @@ namespace HITSBlazor.Components.Tables.TaskLogTable
         {
             _isLoading = true;
 
-            await LoadTasksLogsAsync();
+            _isLoading = false;
 
             MarkAsInitialized();
+        }
 
-            _isLoading = false;
+        protected override async ShrapTask OnParametersSetAsync()
+        {
+            await LoadTasksLogsAsync();
         }
 
         protected override async ShrapTask AdditionalAfterRenderMethod()

@@ -1,4 +1,5 @@
-﻿using HITSBlazor.Components.Modals.CenterModals.FinishSprintModal;
+﻿using HITSBlazor.Components.Modals.CenterModals.FinishProjectModal;
+using HITSBlazor.Components.Modals.CenterModals.FinishSprintModal;
 using HITSBlazor.Models.Projects.Entities;
 using HITSBlazor.Services.Auth;
 using HITSBlazor.Services.Modal;
@@ -28,14 +29,15 @@ namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewActiveSprintCom
 
         private void ShowFinishSprintModal()
         {
-            if (ActiveSprint is null) return;
+            if (ActiveSprint is null || CurrentMember is null) return;
 
             ModalService.Show<FinishSprintModal>(
                 ModalType.Center,
                 parameters: new Dictionary<string, object>
                 {
                     [nameof(FinishSprintModal.ProjectMembers)] = CurrentProject?.Members ?? [],
-                    [nameof(FinishSprintModal.SprintId)] = ActiveSprint.Id
+                    [nameof(FinishSprintModal.SprintId)] = ActiveSprint.Id,
+                    [nameof(FinishProjectModal.CurrentProjectMember)] = CurrentMember
                 }
             );
         }

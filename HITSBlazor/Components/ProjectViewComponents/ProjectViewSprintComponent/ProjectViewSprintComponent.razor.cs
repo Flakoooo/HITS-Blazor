@@ -56,6 +56,7 @@ namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewSprintComponent
         {
             _isLoading = true;
 
+            ProjectService.OnSprintHasCreated += SprintHasCreated;
             ProjectService.OnSprintHasUpdated += SprintHasUpdated;
 
             await LoadSprintAsync();
@@ -93,6 +94,13 @@ namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewSprintComponent
         {
             _searchText = value;
             await LoadSprintAsync();
+        }
+
+        private void SprintHasCreated(Sprint newSprint)
+        {
+            _projectSprints.Add(newSprint);
+            ++_totalCount;
+            StateHasChanged();
         }
 
         private void SprintHasUpdated(Sprint updatedSprint)
@@ -145,6 +153,7 @@ namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewSprintComponent
 
         protected override async ValueTask DisposeAsyncCore()
         {
+            ProjectService.OnSprintHasCreated -= SprintHasCreated;
             ProjectService.OnSprintHasUpdated -= SprintHasUpdated;
 
             await ValueTask.CompletedTask;

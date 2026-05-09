@@ -22,6 +22,9 @@ namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewInfoComponent
         [Parameter]
         public Project? CurrentProject { get; set; }
 
+        [Parameter]
+        public required ProjectMember CurrentProjectMember { get; set; }
+
         private string _searchtext = string.Empty;
 
         private List<CollapseItem> _projectInfoData = [];
@@ -43,6 +46,7 @@ namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewInfoComponent
             new() { Title = "Описание необходимых ресурсов для реализации", Data = CurrentProject?.Description },
         ];
 
+        //TODOO: реализовать поиск уастников
         private async SharpTask SeacrhMember(string value)
         {
             _searchtext = value;
@@ -63,7 +67,8 @@ namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewInfoComponent
                 ModalType.Center,
                 parameters: new Dictionary<string, object>
                 {
-                    [nameof(FinishProjectModal.CurrentProject)] = CurrentProject
+                    [nameof(FinishProjectModal.CurrentProject)] = CurrentProject,
+                    [nameof(FinishProjectModal.CurrentProjectMember)] = CurrentProjectMember
                 }
             );
         }

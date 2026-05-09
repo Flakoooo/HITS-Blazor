@@ -3,6 +3,7 @@ using HITSBlazor.Models.Projects.Requests;
 using HITSBlazor.Services.Modal;
 using HITSBlazor.Services.Projects;
 using Microsoft.AspNetCore.Components;
+using Newtonsoft.Json.Bson;
 using System.Globalization;
 
 using HITSTask = HITSBlazor.Models.Projects.Entities.Task;
@@ -39,6 +40,8 @@ namespace HITSBlazor.Components.Modals.CenterModals.SprintModal
         protected override async SharpTask OnInitializedAsync()
         {
             _isLoading = true;
+
+            ProjectService.OnTaskHasCreated += TaskHasCreated;
 
             await LoadTasksAsync();
 
@@ -143,6 +146,20 @@ namespace HITSBlazor.Components.Modals.CenterModals.SprintModal
                 if (await ProjectService.UpdateSprintAsync(CurrentSprint.Id, updateSprint))  
                     await ModalService.Close(ModalType.Center);
             }
+        }
+
+        private void TaskHasCreated(HITSTask createdTask)
+        {
+            _allTasksInBacklog.Add(createdTask);
+            ++_totalCount;
+            StateHasChanged();
+        }
+
+        protected override async ValueTask DisposeAsyncCore()
+        {
+            ProjectService.OnTaskHasCreated -= TaskHasCreated;
+
+            await ValueTask.CompletedTask;
         }
     }
 }

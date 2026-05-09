@@ -1,4 +1,5 @@
 ﻿using HITSBlazor.Models.Projects.Entities;
+using HITSBlazor.Models.Projects.Enums;
 using HITSBlazor.Models.Projects.Requests;
 using HITSBlazor.Services;
 using HITSBlazor.Services.Modal;
@@ -24,11 +25,18 @@ namespace HITSBlazor.Components.Modals.CenterModals.FinishSprintModal
         public Guid SprintId { get; set; }
 
         [Parameter]
+        public required ProjectMember CurrentProjectMember { get; set; }
+
+        [Parameter]
         public List<ProjectMember> ProjectMembers { get; set; } = [];
 
         private bool _isLoading = true;
 
         private Dictionary<Guid, int?> _projectMembersScores = [];
+
+        private string Report { get; set; } = string.Empty;
+
+        private bool IsDisabled => CurrentProjectMember.ProjectRole is ProjectMemberRole.Member;
 
         protected override async SharpTask OnInitializedAsync()
         {
@@ -41,9 +49,17 @@ namespace HITSBlazor.Components.Modals.CenterModals.FinishSprintModal
 
         private async SharpTask FinishSprint()
         {
+            if (IsDisabled) return;
+
             if (_projectMembersScores.Any(t => !t.Value.HasValue))
             {
                 NotificationService.ShowError("Выставлены не все оценки");
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(Report))
+            {
+                NotificationService.ShowError("Поле отчета не заполнено");
                 return;
             }
 
@@ -59,7 +75,7 @@ namespace HITSBlazor.Components.Modals.CenterModals.FinishSprintModal
                 });
             }
 
-            if (await ProjectService.FinishSprintAsync(SprintId, marks))
+            if (await ProjectService.FinishSprintAsync(SprintId, Report, marks))
                 await ModalService.Close(ModalType.Center);
         }
     }
