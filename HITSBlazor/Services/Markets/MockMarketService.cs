@@ -1,7 +1,7 @@
-﻿using HITSBlazor.Models.Markets.Entities;
+﻿using HITSBlazor.Models.Common.Responses;
+using HITSBlazor.Models.Markets.Entities;
 using HITSBlazor.Models.Markets.Enums;
 using HITSBlazor.Utils.Mocks.Markets;
-using System.Xml.Linq;
 
 namespace HITSBlazor.Services.Markets
 {
@@ -11,51 +11,24 @@ namespace HITSBlazor.Services.Markets
     {
         private readonly GlobalNotificationService _globalNotificationService = globalNotificationService;
 
-        public event Func<Task>? OnMarketsStateChanged;
-        public event Action? OnMarketsStateUpdated;
+        public event Action<Market>? OnMarketsHasCreated;
+        public event Action<Market>? OnMarketHasUpdated;
+        public event Action<Guid, MarketStatus>? OnMarketStatusHasUpdated;
+        public event Action<Market>? OnMarketHasDeleted;
 
-        private List<Market> _cachedMarkets = [];
-        private DateTime _lastRefreshTime;
-        private readonly TimeSpan _cacheLifetime = TimeSpan.FromMinutes(5);
-
-        private async Task RefreshCacheAsync()
-        {
-            _cachedMarkets = MockMarkets.GetAllMarkets();
-            _lastRefreshTime = DateTime.UtcNow;
-        }
-
-        public async Task<List<Market>> GetMarketsAsync(
+        public async Task<ListDataResponse<Market>> GetMarketsAsync(
+            int page,
             string? searchText, 
-            HashSet<MarketStatus>? selectedStatuses, 
+            IEnumerable<MarketStatus>? selectedStatuses, 
             string? orderBy, 
             bool? byDescending
-        )
-        {
-            if (_cachedMarkets.Count == 0 || DateTime.UtcNow - _lastRefreshTime > _cacheLifetime)
-                await RefreshCacheAsync();
-
-            var query = _cachedMarkets.AsEnumerable();
-
-            if (selectedStatuses?.Count > 0)
-                query = query.Where(m => selectedStatuses.Contains(m.Status));
-
-            if (!string.IsNullOrWhiteSpace(searchText))
-                query = query.Where(m => m.Name.Contains(searchText, StringComparison.CurrentCultureIgnoreCase));
-
-            if (!string.IsNullOrWhiteSpace(orderBy) && byDescending.HasValue)
-            {
-                query = (orderBy, byDescending.Value) switch
-                {
-                    (nameof(Market.StartDate), true) => query.OrderByDescending(m => m.StartDate),
-                    (nameof(Market.StartDate), false) => query.OrderBy(m => m.StartDate),
-                    (nameof(Market.FinishDate), true) => query.OrderByDescending(m => m.FinishDate),
-                    (nameof(Market.FinishDate), false) => query.OrderBy(m => m.FinishDate),
-                    _ => query
-                };
-            }
-
-            return [.. query];
-        }
+        ) => MockMarkets.GetMarketsByQueryParams(
+            page,
+            searchText: searchText,
+            selectedStatuses: selectedStatuses?.ToHashSet(),
+            orderBy: orderBy,
+            byDescending: byDescending
+        );
 
         public async Task<Market?> GetMarketByIdAsync(Guid marketId)
         {
@@ -79,8 +52,7 @@ namespace HITSBlazor.Services.Markets
             }
 
             _globalNotificationService.ShowSuccess("Биржа успешно создана");
-            _cachedMarkets.Clear();
-            OnMarketsStateChanged?.Invoke();
+            OnMarketsHasCreated?.Invoke(market);
             return true;
         }
 
@@ -90,23 +62,14 @@ namespace HITSBlazor.Services.Markets
         )
         {
             var market = MockMarkets.UpdateMarket(marketId, name, startDate, finishDate, status);
-            if (!market)
+            if (market is null)
             {
                 _globalNotificationService.ShowError("Не удалось обновить биржу");
                 return false;
             }
 
-            var marketForUpdate = _cachedMarkets.FirstOrDefault(m => m.Id == marketId);
-            if (marketForUpdate is not null)
-            {
-                marketForUpdate.Name = name;
-                marketForUpdate.StartDate = startDate;
-                marketForUpdate.FinishDate = finishDate;
-                marketForUpdate.Status = status;
-            }
-
             _globalNotificationService.ShowSuccess("Биржа успешно обновлена");
-            OnMarketsStateUpdated?.Invoke();
+            OnMarketHasUpdated?.Invoke(market);
             return true;
         }
 
@@ -115,14 +78,26 @@ namespace HITSBlazor.Services.Markets
             var updatedmarket = MockMarkets.UpdateMarketStatus(marketId, status);
             if (!updatedmarket)
             {
-                _globalNotificationService.ShowError("Не удалось перевести биржу");
+                string error = status switch
+                {
+                    MarketStatus.Active => "Не удалось открыть биржу",
+                    MarketStatus.Done => "Не удалось закрыть биржу",
+                    _ => "Не удалось перевести биржу"
+                };
+
+                _globalNotificationService.ShowError(error);
                 return;
             }
 
-            _cachedMarkets.FirstOrDefault(m => m.Id == marketId)?.Status = status;
+            string success = status switch
+            {
+                MarketStatus.Active => "Биржа успешно открыта",
+                MarketStatus.Done => "Биржа успешно закрыта",
+                _ => "Биржа успешно переведена"
+            };
 
-            _globalNotificationService.ShowSuccess("Биржа успешно переведена");
-            OnMarketsStateUpdated?.Invoke();
+            _globalNotificationService.ShowSuccess(success);
+            OnMarketStatusHasUpdated?.Invoke(marketId, status);
             return;
         }
 
@@ -134,9 +109,8 @@ namespace HITSBlazor.Services.Markets
                 return;
             }
 
-            _cachedMarkets.Remove(market);
-            OnMarketsStateChanged?.Invoke();
             _globalNotificationService.ShowSuccess("Биржа успешно удалена");
+            OnMarketHasDeleted?.Invoke(market);
             return;
         }
     }

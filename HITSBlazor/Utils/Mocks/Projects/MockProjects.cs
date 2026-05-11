@@ -1,7 +1,10 @@
 ﻿using HITSBlazor.Models.Common.Responses;
+using HITSBlazor.Models.Markets.Entities;
+using HITSBlazor.Models.Markets.Enums;
 using HITSBlazor.Models.Projects.Entities;
 using HITSBlazor.Models.Projects.Enums;
 using HITSBlazor.Utils.Mocks.Ideas;
+using HITSBlazor.Utils.Mocks.Markets;
 using HITSBlazor.Utils.Mocks.Teams;
 using HITSBlazor.Utils.Mocks.Users;
 
@@ -46,9 +49,7 @@ namespace HITSBlazor.Utils.Mocks.Projects
                     [
                         new ProjectMember
                         {
-                            ProjectName = chatBotProjectName,
                             TeamId = cardTeam.Id,
-                            TeamName = cardTeam.Name,
                             UserId = alex.Id,
                             Email = alex.Email,
                             FirstName = alex.FirstName,
@@ -59,9 +60,7 @@ namespace HITSBlazor.Utils.Mocks.Projects
                         },
                         new ProjectMember
                         {
-                            ProjectName = chatBotProjectName,
                             TeamId = cardTeam.Id,
-                            TeamName = cardTeam.Name,
                             UserId = kirill.Id,
                             Email = kirill.Email,
                             FirstName = kirill.FirstName,
@@ -72,9 +71,7 @@ namespace HITSBlazor.Utils.Mocks.Projects
                         },
                         new ProjectMember
                         {
-                            ProjectName = chatBotProjectName,
                             TeamId = cardTeam.Id,
-                            TeamName = cardTeam.Name,
                             UserId = denis.Id,
                             Email = denis.Email,
                             FirstName = denis.FirstName,
@@ -101,9 +98,7 @@ namespace HITSBlazor.Utils.Mocks.Projects
                     [
                         new ProjectMember
                         {
-                            ProjectName = armatureProjectName,
                             TeamId = cactusTeam.Id,
-                            TeamName = cactusTeam.Name,
                             UserId = admin.Id,
                             Email = admin.Email,
                             FirstName = admin.FirstName,
@@ -114,9 +109,7 @@ namespace HITSBlazor.Utils.Mocks.Projects
                         },
                         new ProjectMember
                         {
-                            ProjectName = armatureProjectName,
                             TeamId = cactusTeam.Id,
-                            TeamName = cactusTeam.Name,
                             UserId = timur.Id,
                             Email = timur.Email,
                             FirstName = timur.FirstName,
@@ -166,6 +159,60 @@ namespace HITSBlazor.Utils.Mocks.Projects
 
         public static ProjectMember? GetCurrentProjectMember(Guid projectId, Guid userId)
             => _projects.FirstOrDefault(p => p.Id == projectId)?.Members.FirstOrDefault(m => m.UserId == userId);
+
+        public static bool CreateNewProject(IdeaMarket ideaMarket)
+        {
+            if (ideaMarket.Team is null) return false;
+
+            var market = MockMarkets.GetMarketById(ideaMarket.MarketId);
+            if (market is null) return false;
+
+            var newProject = new Project
+            {
+                Id = Guid.NewGuid(),
+                IdeaId = ideaMarket.IdeaId,
+                Name = ideaMarket.Name,
+                Description = ideaMarket.Description,
+                Customer = ideaMarket.Customer,
+                Initiator = ideaMarket.Initiator,
+                Team = ideaMarket.Team,
+                StartDate = DateTime.UtcNow,
+                FinishDate = market.FinishDate,
+                Status = ProjectStatus.Active
+            };
+
+            newProject.Members.Add(new ProjectMember
+            {
+                UserId = ideaMarket.Initiator.Id,
+                Email = ideaMarket.Initiator.Email,
+                FirstName = ideaMarket.Initiator.FirstName,
+                LastName = ideaMarket.Initiator.LastName,
+                StartDate = newProject.StartDate,
+                FinishDate = newProject.FinishDate,
+                ProjectRole = ProjectMemberRole.Initiator
+            });
+
+            foreach (var member in ideaMarket.Team.Members)
+            {
+                newProject.Members.Add(new ProjectMember
+                {
+                    TeamId = ideaMarket.Team.Id,
+                    UserId = member.Id,
+                    Email = member.Email,
+                    FirstName = member.FirstName,
+                    LastName = member.LastName,
+                    StartDate = newProject.StartDate,
+                    FinishDate = newProject.FinishDate,
+                    ProjectRole = member.UserId == ideaMarket.Team.Leader?.Id ? ProjectMemberRole.TeamLeader : ProjectMemberRole.Member
+                });
+            }
+
+            if (!MockIdeaMarkets.UpdateIdeaMarketStatus(ideaMarket.Id, IdeaMarketStatusType.Project))
+                return false;
+
+            _projects.Add(newProject);
+            return true;
+        }
 
         public static bool FinishProject(Guid projectId, string report)
         {

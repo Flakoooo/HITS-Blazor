@@ -2,6 +2,7 @@
 @using HITSBlazor.Components.Button
 @using HITSBlazor.Components.Inputs.RadioDropdown
 @using HITSBlazor.Components.Modals.Components.CenterModalHeader
+@using HITSBlazor.Components.Placeholders.Placeholder
 @using HITSBlazor.Components.Typography
 @using HITSBlazor.Models.Ideas.Entities
 @using HITSBlazor.Models.Markets.Entities
@@ -11,53 +12,49 @@
 @using HITSBlazor.Services.Modal
 
 <div class="send-ideas-on-market-modal bg-white rounded p-3" @onclick:stopPropagation="true">
-    <CenterModalHeader FontSize="5" 
+    <CenterModalHeader IsLoading="_isLoading"
+                       FontSize="5" 
                        HeaderText="@String.Format("Отправить иде{0} на биржу", IdeaForMarket.Count == 1 ? 'ю' : 'и')" />
     <RadioDropdown T="Market" 
+                   IsLoading="_isLoading"
                    AllValues="_market"
                    Label="Биржа"
                    Placeholder="Выберите биржу"
-                   @bind-Value="SelectedMarket" />
-    <div class="send-ideas-on-market-modal-ideas d-flex flex-column gap-2 w-100">
-        <Typography TextColor="TextColor.Primary" CustomClass="w-100">
-            @(IdeaForMarket.Count == 1 ? "Выбранная идея" : "Выбранные идеи")
-        </Typography>
-        @foreach (var idea in IdeaForMarket)
-        {
-            <div class="d-flex gap-2 w-100">
-                <Typography CustomClass="w-100 border rounded p-2 text-ellipsis">
-                    @idea.Name
-                </Typography>
-                <Button ButtonClass="btn-outline-danger" 
-                        IconStyle="bi-x"
-                        OnButtonClick="() => IdeaForMarket.Remove(idea)" />
-            </div>
-        }
-    </div>
-    <Button Variant="ButtonVariant.Success" 
+                   @bind-Value="SelectedMarket"
+                   DataLoaderMethod="async (page, searchText) => await MarketService.GetMarketsAsync(
+                       page,
+                       searchText: searchText,
+                       selectedStatuses: new HashSet<MarketStatus> { MarketStatus.Active }
+                   )"
+                   DebounceDelay="500" />
+    @if (_isLoading)
+    {
+        <Placeholder Height="PlaceholderHeight.Smaller" />
+    }
+    else
+    {
+        <div class="send-ideas-on-market-modal-ideas d-flex flex-column gap-2 w-100">
+            <Typography TextColor="TextColor.Primary" CustomClass="w-100">
+                @(IdeaForMarket.Count == 1 ? "Выбранная идея" : "Выбранные идеи")
+            </Typography>
+            @foreach (var idea in IdeaForMarket)
+            {
+                <div class="d-flex gap-2 w-100">
+                    <Typography CustomClass="w-100 border rounded p-2 text-ellipsis">
+                        @idea.Name
+                    </Typography>
+                    <Button ButtonClass="btn-outline-danger"
+                            IconStyle="bi-x"
+                            OnButtonClick="() => IdeaForMarket.Remove(idea)" />
+                </div>
+            }
+        </div>
+    }
+    <Button IsLoading="_isLoading"
+            Variant="ButtonVariant.Success" 
             Text="Отправить на биржу"
             OnButtonClick="() => SendIdeas()" />
 </div>
-
-<style>
-    .send-ideas-on-market-modal {
-        width: 500px;
-        display: flex;
-        flex-direction: column;
-        flex-wrap: nowrap;
-        align-items: stretch;
-        justify-content: flex-start;
-        gap: 8px;
-        align-self: center;
-        justify-self: center;
-        transition: all .15s ease-out;
-    }
-
-    .send-ideas-on-market-modal-ideas{
-        max-height: 192px;
-        overflow-y: scroll;
-    }
-</style>
 
 @code {
     [Inject]
@@ -81,21 +78,14 @@
     {
         _isLoading = true;
 
-        _market = await MarketService.GetMarketsAsync(
-            selectedStatuses: new HashSet<MarketStatus> { MarketStatus.Active }
-        );
-
         _isLoading = false;
     }
 
     private async Task SendIdeas()
     {
-        if (SelectedMarket is null)
-            return;
+        if (SelectedMarket is null) return;
 
-        var result = await IdeaMarketService.SendIdeasOnMarket(IdeaForMarket, SelectedMarket);
-
-        if (result)
+        if (await IdeaMarketService.SendIdeasOnMarket(IdeaForMarket, SelectedMarket))
             await ModalService.Close(ModalType.RightSide);
     }
 }

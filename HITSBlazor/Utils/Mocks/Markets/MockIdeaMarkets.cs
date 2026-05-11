@@ -1,13 +1,14 @@
 ﻿using HITSBlazor.Models.Common.Entities;
+using HITSBlazor.Models.Common.Responses;
 using HITSBlazor.Models.Ideas.Entities;
 using HITSBlazor.Models.Ideas.Enums;
 using HITSBlazor.Models.Markets.Entities;
 using HITSBlazor.Models.Markets.Enums;
 using HITSBlazor.Models.Users.Entities;
+using HITSBlazor.Models.Users.Enums;
 using HITSBlazor.Utils.Mocks.Common;
 using HITSBlazor.Utils.Mocks.Ideas;
 using HITSBlazor.Utils.Mocks.Teams;
-using System.Collections;
 
 namespace HITSBlazor.Utils.Mocks.Markets
 {
@@ -203,14 +204,14 @@ namespace HITSBlazor.Utils.Mocks.Markets
             ];
         }
 
-        private static List<IdeaMarket> GetIdeaMarkets(Guid userId, Func<IdeaMarket, bool> predicate)
+        private static IEnumerable<IdeaMarket> GetIdeaMarkets(Guid userId, Func<IdeaMarket, bool> predicate)
         {
             var favoriteIds = _favoriteIdeas
                 .Where(f => f.UserId == userId)
                 .Select(f => f.IdeaMarketId)
                 .ToHashSet();
 
-            return [.. _ideaMarkets
+            return _ideaMarkets
                 .Where(predicate)
                 .Select(im => new IdeaMarket
                 {
@@ -232,14 +233,54 @@ namespace HITSBlazor.Utils.Mocks.Markets
                     Requests = im.Requests,
                     AcceptedRequests = im.AcceptedRequests,
                     IsFavorite = favoriteIds.Contains(im.Id)
-                })];
+                });
         }
 
-        public static List<IdeaMarket> GetIdeaMarketsByMarketId(Guid marketId, Guid userId)
-            => GetIdeaMarkets(userId, im => im.MarketId == marketId);
+        public static ListDataResponse<IdeaMarket> GetIdeaMarketsByQueryParams(
+            int page,
+            Guid userId,
+            RoleType currentUserRole,
+            int pageSize = 20,
+            Guid? marketId = null,
+            bool? favorite = null,
+            string? searchText = null,
+            IdeaMarketStatusType? selectedStatus = null
+        )
+        {
+            IEnumerable<IdeaMarket> query;
+            if (currentUserRole == RoleType.Initiator)
+            {
+                query = GetIdeaMarkets(
+                    userId,
+                    marketId is not null
+                    ? im => im.MarketId == marketId.Value && im.Initiator.Id == userId
+                    : im => im.Initiator.Id == userId
+                );
+            }
+            else
+            {
+                query = marketId is not null
+                    ? _ideaMarkets.Where(im => im.MarketId == marketId.Value)
+                    : _ideaMarkets.AsEnumerable();
+            }
 
-        public static List<IdeaMarket> GetIdeaMarketsByMarketIdAndInitiatorId(Guid marketId, Guid initiatorId)
-            => GetIdeaMarkets(initiatorId, im => im.MarketId == marketId && im.Initiator.Id == initiatorId);
+            if (!query.Any()) return new ListDataResponse<IdeaMarket> { Count = 0, List = [] };
+
+            if (favorite.HasValue)
+                query = query.Where(im => im.IsFavorite == favorite.Value);
+
+            if (selectedStatus.HasValue)
+                query = query.Where(im => im.Status == selectedStatus);
+
+            if (!string.IsNullOrWhiteSpace(searchText))
+                query = query.Where(im => im.Name.Contains(searchText, StringComparison.CurrentCultureIgnoreCase));
+
+            int count = query.Count();
+
+            query = query.Skip((page - 1) * pageSize).Take(pageSize);
+
+            return new ListDataResponse<IdeaMarket> { Count = count, List = query.ToList() };
+        }
 
         public static IdeaMarket? GetIdeaMarketById(Guid id) =>
             _ideaMarkets.FirstOrDefault(im => im.Id == id);
@@ -289,6 +330,25 @@ namespace HITSBlazor.Utils.Mocks.Markets
             if (favorite is null) return false;
 
             return _favoriteIdeas.Remove(favorite);
+        }
+
+        public static void ReturnIdeasFromMarket(Guid marketId)
+        {
+            foreach (var ideaMarket in _ideaMarkets.Where(im => im.MarketId == marketId && im.Status != IdeaMarketStatusType.Project))
+            {
+                MockIdeas.GetIdeaById(ideaMarket.IdeaId)?.Status = IdeaStatusType.Confirmed;
+                ideaMarket.Status = IdeaMarketStatusType.RecruitmentIsClosed;
+            }
+        }
+
+        public static bool UpdateIdeaMarketStatus(Guid ideaMarketId, IdeaMarketStatusType status)
+        {
+            var ideaForUpdate = _ideaMarkets.FirstOrDefault(im => im.Id == ideaMarketId);
+            if (ideaForUpdate is null) return false;
+
+            ideaForUpdate.Status = status;
+
+            return true;
         }
     }
 }

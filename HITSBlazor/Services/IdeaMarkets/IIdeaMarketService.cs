@@ -1,4 +1,5 @@
-﻿using HITSBlazor.Models.Ideas.Entities;
+﻿using HITSBlazor.Models.Common.Responses;
+using HITSBlazor.Models.Ideas.Entities;
 using HITSBlazor.Models.Markets.Entities;
 using HITSBlazor.Models.Markets.Enums;
 using HITSBlazor.Models.Teams.Entities;
@@ -7,11 +8,9 @@ namespace HITSBlazor.Services.IdeaMarkets
 {
     public interface IIdeaMarketService
     {
-        event Func<Task>? OnIdeasMarketStateChanged;
-        event Action? OnIdeasMarketStateUpdated;
-
-        Task<List<IdeaMarket>> GetIdeasMarketAsync(
-            Guid marketId,
+        Task<ListDataResponse<IdeaMarket>> GetIdeasMarketAsync(
+            int page,
+            Guid? marketId = null,
             bool? favorite = null,
             string? searchText = null,
             IdeaMarketStatusType? selectedStatus = null

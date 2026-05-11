@@ -159,7 +159,7 @@ namespace HITSBlazor.Pages.Ideas.IdeasList
             }
 
             ModalService.Show<SendIdeaOnMarketModal>(
-                ModalType.RightSide,
+                ModalType.Center,
                 parameters: new Dictionary<string, object> { 
                     [nameof(SendIdeaOnMarketModal.IdeaForMarket)] = _selectedIdeas
                 }

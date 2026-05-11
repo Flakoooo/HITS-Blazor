@@ -1,5 +1,6 @@
 ﻿using HITSBlazor.Models.Common.Entities;
 using HITSBlazor.Models.Common.Responses;
+using HITSBlazor.Models.Markets.Entities;
 using HITSBlazor.Models.Projects.Entities;
 using HITSBlazor.Models.Projects.Enums;
 using HITSBlazor.Models.Projects.Requests;
@@ -51,6 +52,8 @@ namespace HITSBlazor.Services.Projects
             
             return MockProjects.GetCurrentProjectMember(projectId, currentUser.Id);
         }
+
+        public async Task<bool> CreateNewProjectAsync(IdeaMarket ideaMarket) => MockProjects.CreateNewProject(ideaMarket);
 
         public async Task<bool> FinishProjectAsync(Guid projectId, string report)
             => MockProjects.FinishProject(projectId, report);

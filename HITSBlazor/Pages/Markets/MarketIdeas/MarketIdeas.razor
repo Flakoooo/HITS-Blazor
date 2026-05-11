@@ -15,6 +15,7 @@
 @using HITSBlazor.Models.Users.Enums
 @using HITSBlazor.Utils.EnumUIConverters
 @using HITSBlazor.Utils.Models
+@inherits ListPageDataLoader
 
 <div class="ideas-market-content h-auto p-3 bg-white">
     <div class="w-100 d-flex flex-column">
@@ -50,7 +51,7 @@
     </div>
     <div class="w-100 d-flex justify-content-stretch align-items-start">
         <div class="w-100 d-grid">
-            <div class="row g-3 row-cols-1 row-cols-sm-1 row-cols-lg-2">
+            <div class="row g-3 row-cols-1 row-cols-sm-1 row-cols-lg-2 overflow-y-auto">
                 @if (_isLoading)
                 {
                     @for (int i = 0; i < 3; ++i)
@@ -80,7 +81,7 @@
                 }
                 else
                 {
-                    @foreach (var ideaMarket in _ideaMarkets)
+                    @foreach (var ideaMarket in _ideaMarkets.OrderBy(m => m.Position))
                     {
                         <div class="col">
                             <div class="p-3 w-100 h-100 rounded border shadow-sm d-flex flex-column gap-2">
@@ -148,10 +149,8 @@
                                                 IconSize="fs-6"
                                                 OnButtonClick="() => ShowCreateTeamRequestModal(ideaMarket)" />
                                     }
-                                    <!-- TODO: уточнить роли доступа -->
-                                    <!-- TODO: узнать что происходит при нажатии кнопки -->
                                     @if (ideaMarket.Status is IdeaMarketStatusType.RecruitmentIsClosed
-                                        && AuthService.CurrentUser?.Role is RoleType.Admin
+                                        && AuthService.CurrentUser?.Role is RoleType.Admin or RoleType.ProjectOffice
                                     )
                                     {
                                         <Button Variant="ButtonVariant.Success"
@@ -159,7 +158,7 @@
                                                 Text="Перевести в проект"
                                                 IconStyle="bi-plus-lg"
                                                 IconSize="fs-6"
-                                                OnButtonClick="() => ShowCreateTeamRequestModal(ideaMarket)" />
+                                                OnButtonClick="() => ConvertIdeaToProject(ideaMarket)" />
                                     }
                                 </div>
                             </div>
@@ -174,11 +173,11 @@
                          Label="Статус идеи"
                          AllValues="_filterIdeaMarketStatus"
                          @bind-Value="SelectedStatusType"
-                         OnFilterChanged="LoadMarketIdeasAsync" />
+                         OnFilterChanged="FiltersHasChanged" />
             <SkillFilter @bind-SeacrhSkillText="SeacrhSkillText"
                          @bind-SelectedSkillIds="SelectedSkillIds"
                          IsLoading="_isLoading"
-                         OnFilterChanged="LoadMarketIdeasAsync" />
+                         OnFilterChanged="FiltersHasChanged" />
             <ResetFilterButton IsLoading="_isLoading" ResetMethod="ResetFilters" />
         </FilterContainer>
     </div>

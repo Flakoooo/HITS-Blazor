@@ -93,46 +93,23 @@ namespace HITSBlazor.Pages.Teams.TeamsList
 
         protected override int GetCurrentItemsCount() => _teams.Count;
 
-        protected override async Task OnLoadMoreItemsAsync()
-        {
-            await LoadTeamsAsync(append: true);
-        }
+        protected override async Task OnLoadMoreItemsAsync() => await LoadTeamsAsync(append: true);
 
         private async Task LoadTeamsAsync(bool append = false)
         {
-            if (!append)
-            {
-                ResetPagination();
-                _teams.Clear();
-            }
-
-            StateHasChanged();
-
-            var listResponse = await TeamService.GetTeamsAsync(
-                _currentPage,
-                searchText: _searchText,
-                privacy: IsClosed?.Value,
-                hasActiveProject: HasActiveProjectState?.Value,
-                searchSkillIds: SelectedSkillIds,
-                orderBy: _orderTeamBy,
-                byDescending: _sortTeamState
+            await LoadDataAsync(
+                _teams,
+                () => TeamService.GetTeamsAsync(
+                    _currentPage,
+                    searchText: _searchText,
+                    privacy: IsClosed?.Value,
+                    hasActiveProject: HasActiveProjectState?.Value,
+                    searchSkillIds: SelectedSkillIds,
+                    orderBy: _orderTeamBy,
+                    byDescending: _sortTeamState
+                ),
+                append
             );
-
-            _totalCount = listResponse.Count;
-            if (listResponse.List.Count > 0)
-            {
-                if (append)
-                    _teams.AddRange(listResponse.List);
-                else
-                {
-                    _teams.Clear();
-                    _teams.AddRange(listResponse.List);
-                }
-
-                IncrementPage();
-            }
-
-            StateHasChanged();
         }
 
         private async Task SearchTeam(string value)

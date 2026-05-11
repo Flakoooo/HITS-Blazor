@@ -1,7 +1,8 @@
-﻿using HITSBlazor.Components.Modals.CenterModals.SelectActiveRoleModal;
+﻿using HITSBlazor.Models.Markets.Enums;
 using HITSBlazor.Models.Users.Enums;
 using HITSBlazor.Services;
 using HITSBlazor.Services.Auth;
+using HITSBlazor.Services.Markets;
 using HITSBlazor.Services.Modal;
 using Microsoft.AspNetCore.Components;
 
@@ -18,6 +19,9 @@ namespace HITSBlazor.Components.LeftSideNavigation
         [Inject]
         private ModalService ModalService { get; set; } = null!;
 
+        [Inject]
+        private IMarketService MarketService { get; set; } = null!;
+
         private RoleType? CurrentRole { get; set; } = null;
 
         private bool isLoading = true;
@@ -32,10 +36,14 @@ namespace HITSBlazor.Components.LeftSideNavigation
         protected override async Task OnInitializedAsync()
         {
             isLoading = true;
+
             AuthService.OnActiveRoleChanged += RoleStateChanged;
             NavigationService.OnNavigationChanged += HandleNavigationChanged;
+            MarketService.OnMarketStatusHasUpdated += MarketStatusHasChanged;
+
             _menuItems = NavigationService.MenuItems;
             UpdateActiveState();
+
             isLoading = false;
         }
 
@@ -58,6 +66,29 @@ namespace HITSBlazor.Components.LeftSideNavigation
 
             _menuItems = NavigationService.MenuItems;
             UpdateActiveState();
+
+            isLoading = false;
+            StateHasChanged();
+        }
+
+        //TODOO: скрее всего, также и для проектов нужно будет
+        private void MarketStatusHasChanged(Guid marketId, MarketStatus marketStatus)
+        {
+            if (marketStatus is not MarketStatus.Done) return;
+
+            isLoading = true;
+            StateHasChanged();
+
+            var navItem = NavigationService.MenuItems.FirstOrDefault(n => n.BaseUrl?.Equals("market", StringComparison.CurrentCultureIgnoreCase) ?? false);
+            if (navItem is not null)
+            {
+                var targetMarket = navItem.SubItems.FirstOrDefault(si => si.Url.Contains(marketId.ToString(), StringComparison.CurrentCultureIgnoreCase));
+                if (targetMarket is not null && navItem.SubItems.Remove(targetMarket))
+                {
+                    _menuItems = NavigationService.MenuItems;
+                    UpdateActiveState();
+                }
+            }
 
             isLoading = false;
             StateHasChanged();
@@ -132,6 +163,7 @@ namespace HITSBlazor.Components.LeftSideNavigation
         {
             AuthService.OnActiveRoleChanged -= RoleStateChanged;
             NavigationService.OnNavigationChanged -= HandleNavigationChanged;
+            MarketService.OnMarketStatusHasUpdated -= MarketStatusHasChanged;
         }
     }
 }

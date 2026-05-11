@@ -1,6 +1,7 @@
 ﻿using HITSBlazor.Components.ActionMenus.BaseActionMenu;
 using HITSBlazor.Components.Button;
 using HITSBlazor.Components.Modals.CenterModals.MarketModal;
+using HITSBlazor.Components.Tables.TableComponent;
 using HITSBlazor.Components.Tables.TableHeader;
 using HITSBlazor.Components.Typography;
 using HITSBlazor.Models.Markets.Entities;
@@ -16,7 +17,7 @@ namespace HITSBlazor.Pages.Markets.MarketsList
 {
     [Authorize]
     [Route("market/list")]
-    public partial class MarketsList : IDisposable
+    public partial class MarketsList
     {
         [Inject]
         private IMarketService MarketService { get; set; } = null!;
@@ -28,6 +29,7 @@ namespace HITSBlazor.Pages.Markets.MarketsList
         private NavigationService NavigationService { get; set; } = null!;
 
         private bool _isLoading = true;
+        private TableComponent? _tableComponent;
 
         private static readonly List<TableHeaderItem> _marketTableHeader =
         [
@@ -52,23 +54,40 @@ namespace HITSBlazor.Pages.Markets.MarketsList
         {
             _isLoading = true;
 
+            MarketService.OnMarketsHasCreated += MarketHasCreated;
+            MarketService.OnMarketHasUpdated += MarketHasUpdated;
+            MarketService.OnMarketStatusHasUpdated += MarketStatusHasUpdated;
+            MarketService.OnMarketHasDeleted += MarketHasDeleted;
+
             await LoadMarketsAsync();
-            MarketService.OnMarketsStateUpdated += StateHasChanged;
-            MarketService.OnMarketsStateChanged += LoadMarketsAsync;
 
             _isLoading = false;
+            MarkAsInitialized();
         }
 
-        private async Task LoadMarketsAsync()
+        protected override async Task AdditionalAfterRenderMethod()
         {
-            _markets = await MarketService.GetMarketsAsync(
-                searchText: _searchText, 
-                selectedStatuses: [.. SelectedStatuses.Select(s => s.Value)],
-                orderBy: _orderBy,
-                byDescending: _byDescending
-            );
+            if (_tableComponent != null)
+                _tableContainer = _tableComponent.ScrollContainer;
+        }
 
-            StateHasChanged();
+        protected override async Task OnLoadMoreItemsAsync() => await LoadMarketsAsync(append: true);
+
+        protected override int GetCurrentItemsCount() => _markets.Count;
+
+        private async Task LoadMarketsAsync(bool append = false)
+        {
+            await LoadDataAsync(
+                _markets,
+                () => MarketService.GetMarketsAsync(
+                    _currentPage,
+                    searchText: _searchText,
+                    selectedStatuses: [.. SelectedStatuses.Select(s => s.Value)],
+                    orderBy: _orderBy,
+                    byDescending: _byDescending
+                ),
+                append
+            );
         }
 
         private static Dictionary<MenuAction, object> GetTableActions(Market market)
@@ -92,55 +111,55 @@ namespace HITSBlazor.Pages.Markets.MarketsList
             return actions;
         }
 
+        private async Task FiltersHasChanged()
+        {
+            ResetPagination();
+            await LoadMarketsAsync();
+        }
+
         private async Task SearchMarket(string value)
         {
             _searchText = value;
-            await LoadMarketsAsync();
+            await FiltersHasChanged();
         }
 
         private async Task SortMarket(string? value, bool? state)
         {
             _orderBy = value;
             _byDescending = state;
-            await LoadMarketsAsync();
+            await FiltersHasChanged();
         }
 
         private async Task ResetFilters()
         {
             SelectedStatuses.Clear();
 
-            await LoadMarketsAsync();
+            foreach (var header in _marketTableHeader)
+                header.IsOrdered = null;
+
+            await FiltersHasChanged();
         }
 
         private async Task OpenMarket(Guid marketId)
             => await NavigationService.NavigateToAsync($"/market/{marketId}");
 
-        private void ShowMarketModal(Market? market = null)
-        {
-            if (market is not null)
-            {
-                ModalService.Show<MarketModal>(
-                    ModalType.Center,
-                    parameters: new Dictionary<string, object> { [nameof(MarketModal.Market)] = market }
-                );
-            }
-            else
-            {
-                ModalService.Show<MarketModal>(ModalType.Center);
-            }
-        }
+        private void ShowMarketModal(Market? market = null) => ModalService.Show<MarketModal>(
+            ModalType.Center,
+            parameters: market is not null
+            ? new Dictionary<string, object> { [nameof(MarketModal.Market)] = market }
+            : null
+        );
 
         private async Task OnMarketAction(TableActionContext context)
         {
-            if (context.Action == MenuAction.GoToMarket)
+            if (context.Item is Guid marketId)
             {
-                if (context.Item is Guid marketId)
+                if (context.Action is MenuAction.GoToMarket)
+                {
                     await OpenMarket(marketId);
-
-            }
-            else if (context.Action == MenuAction.StartMarket)
-            {
-                if (context.Item is Guid marketId)
+                }
+                else if (context.Action is MenuAction.StartMarket)
+                {
                     ModalService.ShowConfirmModal(
                         "Вы действительно хотите запустить биржу? Активную биржу можно будет ТОЛЬКО завершить.",
                         () => MarketService.UpdateMarketStatusAsync(marketId, MarketStatus.Active),
@@ -148,15 +167,9 @@ namespace HITSBlazor.Pages.Markets.MarketsList
                         confirmButtonVariant: ButtonVariant.Success,
                         confirmButtonText: "Запустить биржу"
                     );
-            }
-            else if (context.Action == MenuAction.Edit)
-            {
-                if (context.Item is Market market)
-                    ShowMarketModal(market);
-            }
-            else if (context.Action == MenuAction.FinishMarket)
-            {
-                if (context.Item is Guid marketId)
+                }
+                else if (context.Action is MenuAction.FinishMarket)
+                {
                     ModalService.ShowConfirmModal(
                         "Вы действительно хотите завершить биржу? Идеи, не нашедшие команды, попадут обратно в список идей.",
                         () => MarketService.UpdateMarketStatusAsync(marketId, MarketStatus.Done),
@@ -164,23 +177,70 @@ namespace HITSBlazor.Pages.Markets.MarketsList
                         confirmButtonVariant: ButtonVariant.Success,
                         confirmButtonText: "Завершить биржу"
                     );
+                }
             }
-            else if (context.Action == MenuAction.Delete)
+            else if (context.Item is Market market)
             {
-                if (context.Item is Market market)
+                if (context.Action is MenuAction.Edit)
+                {
+                    ShowMarketModal(market);
+                }
+                else if (context.Action is MenuAction.Delete)
+                {
                     ModalService.ShowConfirmModal(
                         $"Вы действительно хотите удалить \"{market.Name}\"?",
                         () => MarketService.DeleteMarketAsync(market),
                         confirmButtonVariant: ButtonVariant.Danger,
                         confirmButtonText: "Удалить"
                     );
+                }
             }
         }
 
-        public void Dispose()
+        private void MarketHasCreated(Market newMarket)
         {
-            MarketService.OnMarketsStateUpdated -= StateHasChanged;
-            MarketService.OnMarketsStateChanged -= LoadMarketsAsync;
+            _markets.Add(newMarket);
+            ++_totalCount;
+            StateHasChanged();
+        }
+
+        private void MarketHasUpdated(Market updatedMarket)
+        {
+            var marketForUpdate = _markets.FirstOrDefault(m => m.Id == updatedMarket.Id);
+            if (marketForUpdate is null) return;
+
+            marketForUpdate.Name = updatedMarket.Name;
+            marketForUpdate.StartDate = updatedMarket.StartDate;
+            marketForUpdate.FinishDate = updatedMarket.FinishDate;
+            StateHasChanged();
+        }
+
+        private void MarketStatusHasUpdated(Guid marketId, MarketStatus newStatus)
+        {
+            var marketForUpdate = _markets.FirstOrDefault(m => m.Id == marketId);
+            if (marketForUpdate is null) return;
+
+            marketForUpdate.Status = newStatus;
+            StateHasChanged();
+        }
+
+        private void MarketHasDeleted(Market market)
+        {
+            if (_markets.Remove(market))
+            {
+                --_totalCount;
+                StateHasChanged();
+            }
+        }
+
+        protected override async ValueTask DisposeAsyncCore()
+        {
+            MarketService.OnMarketsHasCreated -= MarketHasCreated;
+            MarketService.OnMarketHasUpdated -= MarketHasUpdated;
+            MarketService.OnMarketStatusHasUpdated -= MarketStatusHasUpdated;
+            MarketService.OnMarketHasDeleted -= MarketHasDeleted;
+
+            await ValueTask.CompletedTask;
         }
     }
 }

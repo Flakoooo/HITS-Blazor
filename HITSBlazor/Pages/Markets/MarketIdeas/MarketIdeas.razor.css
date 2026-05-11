@@ -1,5 +1,4 @@
 ﻿.ideas-market-content {
-    overflow-y: scroll;
     display: flex;
     flex-direction: column;
     flex-wrap: nowrap;

@@ -1,16 +1,20 @@
-﻿using HITSBlazor.Models.Markets.Entities;
+﻿using HITSBlazor.Models.Common.Responses;
+using HITSBlazor.Models.Markets.Entities;
 using HITSBlazor.Models.Markets.Enums;
 
 namespace HITSBlazor.Services.Markets
 {
     public interface IMarketService
     {
-        event Func<Task>? OnMarketsStateChanged;
-        event Action? OnMarketsStateUpdated;
+        event Action<Market>? OnMarketsHasCreated;
+        event Action<Market>? OnMarketHasUpdated;
+        event Action<Guid, MarketStatus>? OnMarketStatusHasUpdated;
+        event Action<Market>? OnMarketHasDeleted;
 
-        Task<List<Market>> GetMarketsAsync(
-            string? searchText = null, 
-            HashSet<MarketStatus>? selectedStatuses = null,
+        Task<ListDataResponse<Market>> GetMarketsAsync(
+            int page,
+            string? searchText = null,
+            IEnumerable<MarketStatus>? selectedStatuses = null,
             string? orderBy = null,
             bool? byDescending = null
         );

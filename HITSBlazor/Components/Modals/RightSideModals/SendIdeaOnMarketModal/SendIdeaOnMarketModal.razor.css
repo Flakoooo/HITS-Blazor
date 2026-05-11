@@ -1,0 +1,17 @@
+﻿.send-ideas-on-market-modal {
+    width: 500px;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: stretch;
+    justify-content: flex-start;
+    gap: 8px;
+    align-self: center;
+    justify-self: center;
+    transition: all .15s ease-out;
+}
+
+.send-ideas-on-market-modal-ideas {
+    max-height: 192px;
+    overflow-y: scroll;
+}

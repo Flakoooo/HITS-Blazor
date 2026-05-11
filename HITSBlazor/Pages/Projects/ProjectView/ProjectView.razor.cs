@@ -40,6 +40,11 @@ namespace HITSBlazor.Pages.Projects.ProjectView
 
             DragDrop.OnOverlayNeedsUpdate += () => InvokeAsync(StateHasChanged);
             DragDrop.OnDragStateChanged += () => InvokeAsync(StateHasChanged);
+        }
+
+        protected override async SharpTask OnParametersSetAsync()
+        {
+            _isLoading = true;
 
             if (!string.IsNullOrWhiteSpace(ProjectId) && Guid.TryParse(ProjectId, out Guid guid))
             {
@@ -48,6 +53,7 @@ namespace HITSBlazor.Pages.Projects.ProjectView
 
                 _currentMember = await ProjectService.GetCurrentProjectMemberAsync(guid);
                 _activeSprint = await ProjectService.GetActiveSprintByProjectIdAsync(_currentProject.Id);
+                _activeCategory = ProjectViewCategory.Info;
             }
 
             _isLoading = false;

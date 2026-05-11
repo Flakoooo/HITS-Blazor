@@ -1,4 +1,5 @@
-﻿using HITSBlazor.Models.Markets.Entities;
+﻿using HITSBlazor.Models.Common.Responses;
+using HITSBlazor.Models.Markets.Entities;
 using HITSBlazor.Models.Markets.Enums;
 using System.Xml.Linq;
 
@@ -49,7 +50,41 @@ namespace HITSBlazor.Utils.Mocks.Markets
             }
         ];
 
-        public static List<Market> GetAllMarkets() => [.. _markets];
+        public static ListDataResponse<Market> GetMarketsByQueryParams(
+            int page,
+            int pageSize = 20,
+            string? searchText = null,
+            HashSet<MarketStatus>? selectedStatuses = null,
+            string? orderBy = null,
+            bool? byDescending = null
+        )
+        {
+            var query = _markets.AsEnumerable();
+
+            if (selectedStatuses?.Count > 0)
+                query = query.Where(m => selectedStatuses.Contains(m.Status));
+
+            if (!string.IsNullOrWhiteSpace(searchText))
+                query = query.Where(m => m.Name.Contains(searchText, StringComparison.CurrentCultureIgnoreCase));
+
+            if (!string.IsNullOrWhiteSpace(orderBy) && byDescending.HasValue)
+            {
+                query = (orderBy, byDescending.Value) switch
+                {
+                    (nameof(Market.StartDate), true) => query.OrderByDescending(m => m.StartDate),
+                    (nameof(Market.StartDate), false) => query.OrderBy(m => m.StartDate),
+                    (nameof(Market.FinishDate), true) => query.OrderByDescending(m => m.FinishDate),
+                    (nameof(Market.FinishDate), false) => query.OrderBy(m => m.FinishDate),
+                    _ => query
+                };
+            }
+
+            int count = query.Count();
+
+            query = query.Skip((page - 1) * pageSize).Take(pageSize);
+
+            return new ListDataResponse<Market> { Count = count, List = query.ToList() };
+        }
 
         public static Market? GetMarketById(Guid marketId) => _markets.FirstOrDefault(m => m.Id == marketId);
 
@@ -68,17 +103,17 @@ namespace HITSBlazor.Utils.Mocks.Markets
             return market;
         }
 
-        public static bool UpdateMarket(Guid marketId, string name, DateTime startDate, DateTime finishDate, MarketStatus status)
+        public static Market? UpdateMarket(Guid marketId, string name, DateTime startDate, DateTime finishDate, MarketStatus status)
         {
             var marketForUpdate = _markets.FirstOrDefault(m => m.Id == marketId);
-            if (marketForUpdate is null) return false;
+            if (marketForUpdate is null) return null;
 
             marketForUpdate.Name = name;
             marketForUpdate.StartDate = startDate;
             marketForUpdate.FinishDate = finishDate;
             marketForUpdate.Status = status;
 
-            return true;
+            return marketForUpdate;
         }
 
         public static bool UpdateMarketStatus(Guid marketId, MarketStatus status)
@@ -87,6 +122,9 @@ namespace HITSBlazor.Utils.Mocks.Markets
             if (marketForUpdate is null) return false;
 
             marketForUpdate.Status = status;
+
+            if (marketForUpdate.Status is MarketStatus.Done)
+                MockIdeaMarkets.ReturnIdeasFromMarket(marketId);
 
             return true;
         }

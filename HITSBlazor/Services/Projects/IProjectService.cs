@@ -1,4 +1,5 @@
 ﻿using HITSBlazor.Models.Common.Responses;
+using HITSBlazor.Models.Markets.Entities;
 using HITSBlazor.Models.Projects.Entities;
 using HITSBlazor.Models.Projects.Enums;
 using HITSBlazor.Models.Projects.Requests;
@@ -28,6 +29,7 @@ namespace HITSBlazor.Services.Projects
         Task<List<Project>> GetAllActiveProjectsAsync();
         Task<Project?> GetProjectByIdAsync(Guid projectId);
         Task<ProjectMember?> GetCurrentProjectMemberAsync(Guid projectId);
+        Task<bool> CreateNewProjectAsync(IdeaMarket ideaMarket);
         Task<bool> FinishProjectAsync(Guid projectId, string report);
 
         //ProjectMarks

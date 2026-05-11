@@ -4,10 +4,12 @@ using HITSBlazor.Components.Modals.RightSideModals.RequestToIdeaModal;
 using HITSBlazor.Components.Typography;
 using HITSBlazor.Models.Markets.Entities;
 using HITSBlazor.Models.Markets.Enums;
+using HITSBlazor.Services;
 using HITSBlazor.Services.Auth;
 using HITSBlazor.Services.IdeaMarkets;
 using HITSBlazor.Services.Markets;
 using HITSBlazor.Services.Modal;
+using HITSBlazor.Services.Projects;
 using HITSBlazor.Utils.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
@@ -28,7 +30,13 @@ namespace HITSBlazor.Pages.Markets.MarketIdeas
         private IIdeaMarketService IdeaMarketService { get; set; } = null!;
 
         [Inject]
+        private IProjectService ProjectService { get; set; } = null!;
+
+        [Inject]
         private ModalService ModalService { get; set; } = null!;
+
+        [Inject]
+        private NavigationService NavigationService { get; set; } = null!;
 
         [Parameter]
         public string MarketId { get; set; } = string.Empty;
@@ -52,6 +60,8 @@ namespace HITSBlazor.Pages.Markets.MarketIdeas
         {
             _isLoading = true;
 
+            MarketService.OnMarketStatusHasUpdated += MarketStatusHasChanged;
+
             if (!string.IsNullOrWhiteSpace(MarketId) && Guid.TryParse(MarketId, out Guid guid))
             {
                 _currentMarket = await MarketService.GetMarketByIdAsync(guid);
@@ -59,34 +69,48 @@ namespace HITSBlazor.Pages.Markets.MarketIdeas
                 await LoadMarketIdeasAsync();
 
                 _isLoading = false;
+                MarkAsInitialized();
             }
-
-            IdeaMarketService.OnIdeasMarketStateUpdated += StateHasChanged;
-            IdeaMarketService.OnIdeasMarketStateChanged += LoadMarketIdeasAsync;
         }
 
-        private async Task LoadMarketIdeasAsync()
+        protected override async Task OnLoadMoreItemsAsync() 
+            => await LoadMarketIdeasAsync(append: true);
+
+        protected override int GetCurrentItemsCount() => _ideaMarkets.Count;
+
+        private async Task LoadMarketIdeasAsync(bool append = false)
         {
             if (_currentMarket is null) return;
 
-            _ideaMarkets = await IdeaMarketService.GetIdeasMarketAsync(
-                _currentMarket.Id,
-                favorite: _category == MarketIdeasCategory.Favorite ? true : null,
-                searchText: _searchText,
-                selectedStatus: SelectedStatusType?.Value
+            await LoadDataAsync(
+                _ideaMarkets,
+                () => IdeaMarketService.GetIdeasMarketAsync(
+                    _currentPage,
+                    _currentMarket.Id,
+                    favorite: _category == MarketIdeasCategory.Favorite ? true : null,
+                    searchText: _searchText,
+                    selectedStatus: SelectedStatusType?.Value
+                ),
+                append: append
             );
+        }
+
+        private async Task FiltersHasChanged()
+        {
+            ResetPagination();
+            await LoadMarketIdeasAsync();
         }
 
         private async Task SelectActiveCategory(MarketIdeasCategory category)
         {
             _category = category;
-            await LoadMarketIdeasAsync();
+            await FiltersHasChanged();
         }
 
         private async Task SearchMarketIdeas(string value)
         {
             _searchText = value;
-            await LoadMarketIdeasAsync();
+            await FiltersHasChanged();
         }
 
         private async Task CloseMarket()
@@ -104,47 +128,32 @@ namespace HITSBlazor.Pages.Markets.MarketIdeas
 
         private async Task ChangeIdeaFavorite(IdeaMarket ideaMarket)
         {
-            if (AuthService.CurrentUser is not null)
+            if (AuthService.CurrentUser is null) return;
+
+            if (ideaMarket.IsFavorite)
             {
-                if (ideaMarket.IsFavorite)
+                if (await IdeaMarketService.UnsetIdeaFromFavorite(AuthService.CurrentUser.Id, ideaMarket))
                 {
-                    var result = await IdeaMarketService.UnsetIdeaFromFavorite(AuthService.CurrentUser.Id, ideaMarket);
-                    if (result)
-                    {
-                        ideaMarket.IsFavorite = false; 
-                        StateHasChanged();
-                    }
+                    ideaMarket.IsFavorite = false;
+                    StateHasChanged();
                 }
-                else
+            }
+            else
+            {
+                if (await IdeaMarketService.SetIdeaFavorite(AuthService.CurrentUser.Id, ideaMarket))
                 {
-                    var result = await IdeaMarketService.SetIdeaFavorite(AuthService.CurrentUser.Id, ideaMarket);
-                    if (result)
-                    {
-                        ideaMarket.IsFavorite = true;
-                        StateHasChanged();
-                    }
+                    ideaMarket.IsFavorite = true;
+                    StateHasChanged();
                 }
             }
         }
 
-        private async Task SetIdeaFavorite(IdeaMarket ideaMarket)
+        private async Task ConvertIdeaToProject(IdeaMarket ideaMarket)
         {
-            if (AuthService.CurrentUser is not null)
-            {
-                var result = await IdeaMarketService.SetIdeaFavorite(AuthService.CurrentUser.Id, ideaMarket);
-                if (result) ideaMarket.IsFavorite = result;
-                StateHasChanged();
-            }
-        }
+            if (ideaMarket.Team is null || ideaMarket.Status is not IdeaMarketStatusType.RecruitmentIsClosed) return;
 
-        private async Task UnsetIdeaFromFavorite(IdeaMarket ideaMarket)
-        {
-            if (AuthService.CurrentUser is not null)
-            {
-                var result = await IdeaMarketService.UnsetIdeaFromFavorite(AuthService.CurrentUser.Id, ideaMarket);
-                if (result) ideaMarket.IsFavorite = !result;
-                StateHasChanged();
-            }
+            if (await ProjectService.CreateNewProjectAsync(ideaMarket))
+                ideaMarket.Status = IdeaMarketStatusType.Project;
         }
 
         private void ShowIdeaMarketModal(Guid ideaMarketId) => ModalService.Show<IdeaMarketModal>(
@@ -163,11 +172,25 @@ namespace HITSBlazor.Pages.Markets.MarketIdeas
             }
         );
 
+        private async void MarketStatusHasChanged(Guid marketId, MarketStatus newStatus)
+        {
+            if (_currentMarket?.Id == marketId && newStatus is MarketStatus.Done)
+                await NavigationService.NavigateToAsync("market/list");
+
+        }
+
         private async Task ResetFilters()
         {
             SeacrhSkillText = string.Empty;
             SelectedSkillIds.Clear();
-            await LoadMarketIdeasAsync();
+            await FiltersHasChanged();
+        }
+
+        protected override ValueTask DisposeAsyncCore()
+        {
+            MarketService.OnMarketStatusHasUpdated -= MarketStatusHasChanged;
+
+            return ValueTask.CompletedTask;
         }
     }
 }
