@@ -15,8 +15,9 @@ namespace HITSBlazor.Services.Companies
         );
         Task<Company?> GetCompanyByIdAsync(Guid companyId);
         Task<Company?> GetCompanyByNameAsync(string name);
-        Task<bool> CreateCompanyAsync(string name, User owner, HashSet<User> members);
-        Task<bool> UpdateCompanyAsync(Guid companyId, string name, User owner, HashSet<User> members);
+        Task<ListDataResponse<User>> GetCompanyMembersAsync(Guid companyId, int page, string? searchText = null);
+        Task<bool> CreateCompanyAsync(string name, User owner, IEnumerable<User> members);
+        Task<bool> UpdateCompanyAsync(Guid companyId, string name, User owner, IEnumerable<User> members);
         Task<bool> DeleteCompanyAsync(Company company);
     }
 }

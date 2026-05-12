@@ -9,7 +9,6 @@ namespace HITSBlazor.Components.Modals.CenterModals.CompanyModal
 {
     public partial class CompanyModal
     {
-        //TODO: сделать другую логику выбора учатсников
         [Inject]
         private IUserService UserService { get; set; } = null!;
 
@@ -31,7 +30,7 @@ namespace HITSBlazor.Components.Modals.CenterModals.CompanyModal
         private string CompanyName { get; set; } = string.Empty;
         private User? SelectedOwner { get; set; }
 
-        private HashSet<User> _companyUsers = [];
+        private List<User> CompanyMembers { get; set; } = [];
 
         protected override async Task OnInitializedAsync()
         {
@@ -42,21 +41,22 @@ namespace HITSBlazor.Components.Modals.CenterModals.CompanyModal
                 var company = await CompanyService.GetCompanyByIdAsync(CompanyId.Value);
                 CompanyName = company?.Name ?? string.Empty;
                 SelectedOwner = company?.Owner;
-                _companyUsers = company?.Members.ToHashSet() ?? [];
             }
 
             _isLoading = false;
         }
 
-        private void SelectUser(User user) => _companyUsers.Add(user);
-
-        private void UnSelectUser(User user) => _companyUsers.Remove(user);
+        private void SelectUser(User user)
+        {
+            if (!CompanyMembers.Contains(user)) CompanyMembers.Add(user);
+        }
+        private void UnSelectUser(User user) => CompanyMembers.Remove(user);
 
         private bool CheckValidValues()
         {
             if (string.IsNullOrWhiteSpace(CompanyName)) return false;
             if (SelectedOwner is null) return false;
-            if (_companyUsers.Count == 0) return false;
+            if (CompanyMembers.Count == 0) return false;
 
             return true;
         }
@@ -80,7 +80,7 @@ namespace HITSBlazor.Components.Modals.CenterModals.CompanyModal
                     CompanyId.Value,
                     CompanyName,
                     SelectedOwner,
-                    _companyUsers
+                    CompanyMembers
                 );
             }
             else
@@ -88,7 +88,7 @@ namespace HITSBlazor.Components.Modals.CenterModals.CompanyModal
                 result = await CompanyService.CreateCompanyAsync(
                     CompanyName,
                     SelectedOwner,
-                    _companyUsers
+                    CompanyMembers
                 );
             }
 #pragma warning restore CS8604 // Possible null reference argument.

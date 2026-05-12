@@ -115,7 +115,8 @@
                                Label="Контактное лицо"
                                Placeholder="Выберите контактное лицо"
                                @bind-Value="@SelectedContactPerson"
-                               AllValues="SelectedCompany.Members" />
+                               DataLoaderMethod="async (page, searchText) => await CompanyService.GetCompanyMembersAsync(SelectedCompany.Id, page, searchText: searchText)"
+                               DebounceDelay="500" />
             }
             <div class="row">
                 <div class="col">

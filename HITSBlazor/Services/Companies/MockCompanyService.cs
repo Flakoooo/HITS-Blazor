@@ -30,6 +30,8 @@ namespace HITSBlazor.Services.Companies
 
             return company;
         }
+        public async Task<ListDataResponse<User>> GetCompanyMembersAsync(Guid companyId, int page, string? searchText)
+            => MockCompanies.GetCompanyMembersByQueryParams(companyId, page, searchText: searchText);
 
         //TODO: надо это как то изменить
         public async Task<Company?> GetCompanyByNameAsync(string name)
@@ -37,7 +39,7 @@ namespace HITSBlazor.Services.Companies
             return MockCompanies.GetCompanyByName(name);
         }
 
-        public async Task<bool> CreateCompanyAsync(string name, User owner, HashSet<User> members)
+        public async Task<bool> CreateCompanyAsync(string name, User owner, IEnumerable<User> members)
         {
             var company = MockCompanies.CreateCompany(name, owner.Id, members.Select(u => u.Id).ToList());
             if (company is null)
@@ -51,7 +53,7 @@ namespace HITSBlazor.Services.Companies
             return true;
         }
 
-        public async Task<bool> UpdateCompanyAsync(Guid companyId, string name, User owner, HashSet<User> members)
+        public async Task<bool> UpdateCompanyAsync(Guid companyId, string name, User owner, IEnumerable<User> members)
         {
             var company = MockCompanies.UpdateCompany(companyId, name, owner.Id, members.Select(u => u.Id).ToList());
             if (company is null)

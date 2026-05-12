@@ -31,11 +31,15 @@
                      SelectedUserChanged="SelectUser"
                      DataLoaderMethod="async (page, searchText) => await UserService.GetUsersAsync(page, searchText: searchText)"
                      DebounceDelay="500" 
-                     DisplayPredicate="(user) => !_companyUsers.Contains(user)" />
+                     DisplayPredicate="(user) => !CompanyMembers.Contains(user)" />
         <UsersColumn IsLoading="_isLoading"
                      HeaderText="Представители компании:"
-                     AllUsers="_companyUsers.ToList()"
-                     SelectedUserChanged="UnSelectUser" />
+                     AllUsers="CompanyMembers"
+                     SelectedUserChanged="UnSelectUser"
+                     DataLoaderMethod="async (page, searchText) => CompanyId.HasValue 
+                        ? await CompanyService.GetCompanyMembersAsync(CompanyId.Value, page, searchText: searchText) 
+                        : null"
+                     DebounceDelay="500" />
     </div>
     <Button IsLoading="_isLoading"
             Variant="ButtonVariant.Primary"

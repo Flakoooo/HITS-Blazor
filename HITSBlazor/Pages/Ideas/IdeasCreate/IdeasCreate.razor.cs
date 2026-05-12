@@ -128,6 +128,7 @@ namespace HITSBlazor.Pages.Ideas.IdeasCreate
                         ContactPerson = idea.ContactPerson
                     };
 
+                    //TODOO: НУЖНО ИЗМЕНИТЬ ЛОГИКУ КОМПАНИЙ
                     SelectedCompany = await CompanyService.GetCompanyByNameAsync(idea.Customer);
                     if (SelectedCompany != null)
                     {

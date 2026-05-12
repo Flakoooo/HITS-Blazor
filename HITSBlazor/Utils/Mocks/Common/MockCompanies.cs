@@ -47,6 +47,31 @@ namespace HITSBlazor.Utils.Mocks.Common
         public static Company? GetCompanyById(Guid id)
             => _companies.FirstOrDefault(c => c.Id == id);
 
+        public static ListDataResponse<User> GetCompanyMembersByQueryParams(
+            Guid companyId,
+            int page,
+            int pageSize = 20,
+            string? searchText = null
+        )
+        {
+            var company = _companies.FirstOrDefault(c => c.Id == companyId);
+            if (company is null) return new ListDataResponse<User>(0, []);
+
+            var query = company.Members.AsEnumerable();
+
+            if (!string.IsNullOrWhiteSpace(searchText))
+                query = query.Where(m => 
+                    m.FullName.Contains(searchText, StringComparison.CurrentCultureIgnoreCase) 
+                    || m.Email.Contains(searchText, StringComparison.CurrentCultureIgnoreCase)
+                );
+
+            int count = query.Count();
+
+            query = query.Skip((page - 1) * pageSize).Take(pageSize);
+
+            return new ListDataResponse<User>(count, query.ToList());
+        }
+
         public static Company? GetCompanyByName(string name)
             => _companies.FirstOrDefault(c => c.Name.Contains(name, StringComparison.CurrentCultureIgnoreCase));
 
