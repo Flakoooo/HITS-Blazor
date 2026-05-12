@@ -264,7 +264,7 @@ namespace HITSBlazor.Utils.Mocks.Markets
                     : _ideaMarkets.AsEnumerable();
             }
 
-            if (!query.Any()) return new ListDataResponse<IdeaMarket> { Count = 0, List = [] };
+            if (!query.Any()) return new ListDataResponse<IdeaMarket>(0, []);
 
             if (favorite.HasValue)
                 query = query.Where(im => im.IsFavorite == favorite.Value);
@@ -279,7 +279,7 @@ namespace HITSBlazor.Utils.Mocks.Markets
 
             query = query.Skip((page - 1) * pageSize).Take(pageSize);
 
-            return new ListDataResponse<IdeaMarket> { Count = count, List = query.ToList() };
+            return new ListDataResponse<IdeaMarket>(count, query.ToList());
         }
 
         public static IdeaMarket? GetIdeaMarketById(Guid id) =>

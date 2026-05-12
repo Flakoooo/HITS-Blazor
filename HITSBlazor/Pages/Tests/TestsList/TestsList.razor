@@ -1,8 +1,8 @@
 ﻿@namespace HITSBlazor.Pages.Tests.TestsList
+@using HITSBlazor.Components.InputSearch
 @using HITSBlazor.Components.ListPageComponents.ListPageHeader
-@using HITSBlazor.Components.ListPageComponents.ListPageSearch
-@using HITSBlazor.Components.ListPageComponents.ListPageTable
 @using HITSBlazor.Components.Tables.TableBodyRow
+@using HITSBlazor.Components.Tables.TableComponent
 @using HITSBlazor.Components.Tables.TableHeader
 
 <div class="page-content-with-header bg-white">
@@ -13,22 +13,20 @@
                         ShowCreateButton="true"
                         CreateButtonText="Результаты пользователей" 
                         OnButtonClick="@(() => NavigationService.NavigateToAsync("tests/results"))" />
-        <ListPageSearch IsLoading="_isLoading" ValueChanged="@((value) => SearchTest(value))" />
-        <ListPageTable IsLoading="_isLoading" HeaderItems="_testTableHeader">
+        <InputSearch Width="50" IsLoading="_isLoading" ValueChanged="@((value) => SearchTest(value))" DebounceDelay="500" />
+        <TableComponent IsLoading="_isLoading" HeaderItems="_testTableHeader">
             <TableContent>
-                <tbody>
-                    @foreach(var test in _tests)
-                    {
-                        <tr>
-                            <TableBodyRow>
-                                <div class="text-primary data-link" @onclick="@(() => ShowTestModal(test))">
-                                    @test.Name
-                                </div>
-                            </TableBodyRow>
-                        </tr>
-                    }
-                </tbody>
+                @foreach (var test in _tests)
+                {
+                    <tr>
+                        <TableBodyRow>
+                            <div class="text-primary data-link" @onclick="@(() => ShowTestModal(test))">
+                                @test.Name
+                            </div>
+                        </TableBodyRow>
+                    </tr>
+                }
             </TableContent>
-        </ListPageTable>
+        </TableComponent>
     </div>
 </div>

@@ -13,7 +13,7 @@ namespace HITSBlazor.Services.Markets
 
         public event Action<Market>? OnMarketsHasCreated;
         public event Action<Market>? OnMarketHasUpdated;
-        public event Action<Guid, MarketStatus>? OnMarketStatusHasUpdated;
+        public event Action<Market>? OnMarketStatusHasUpdated;
         public event Action<Market>? OnMarketHasDeleted;
 
         public async Task<ListDataResponse<Market>> GetMarketsAsync(
@@ -29,6 +29,9 @@ namespace HITSBlazor.Services.Markets
             orderBy: orderBy,
             byDescending: byDescending
         );
+
+        public async Task<List<Market>> GetAllActiveMarketsAsync()
+            => MockMarkets.GetAllActiveMarkets();
 
         public async Task<Market?> GetMarketByIdAsync(Guid marketId)
         {
@@ -73,9 +76,9 @@ namespace HITSBlazor.Services.Markets
             return true;
         }
 
-        public async Task UpdateMarketStatusAsync(Guid marketId, MarketStatus status)
+        public async Task UpdateMarketStatusAsync(Market market, MarketStatus status)
         {
-            var updatedmarket = MockMarkets.UpdateMarketStatus(marketId, status);
+            var updatedmarket = MockMarkets.UpdateMarketStatus(market.Id, status);
             if (!updatedmarket)
             {
                 string error = status switch
@@ -97,7 +100,7 @@ namespace HITSBlazor.Services.Markets
             };
 
             _globalNotificationService.ShowSuccess(success);
-            OnMarketStatusHasUpdated?.Invoke(marketId, status);
+            OnMarketStatusHasUpdated?.Invoke(market);
             return;
         }
 

@@ -341,10 +341,9 @@ namespace HITSBlazor.Services
                     nav.SubItems.Add(subItem1);
                 }
 
-                //TODOO: может сделать запрос иначе?
-                var activeMarket = await _marketService.GetMarketsAsync(1, selectedStatuses: [MarketStatus.Active]);
+                var activeMarket = await _marketService.GetAllActiveMarketsAsync();
                 int count = nav.SubItems.Count;
-                foreach (var market in activeMarket.List)
+                foreach (var market in activeMarket)
                 {
                     var subItem2 = new NavigationSubItem
                     {

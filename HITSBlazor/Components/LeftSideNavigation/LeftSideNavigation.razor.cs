@@ -1,10 +1,17 @@
-﻿using HITSBlazor.Models.Markets.Enums;
+﻿using ApexCharts;
+using HITSBlazor.Models.Markets.Entities;
+using HITSBlazor.Models.Markets.Enums;
+using HITSBlazor.Models.Projects.Entities;
+using HITSBlazor.Models.Projects.Enums;
 using HITSBlazor.Models.Users.Enums;
 using HITSBlazor.Services;
 using HITSBlazor.Services.Auth;
 using HITSBlazor.Services.Markets;
 using HITSBlazor.Services.Modal;
+using HITSBlazor.Services.Projects;
 using Microsoft.AspNetCore.Components;
+
+using Task = System.Threading.Tasks.Task;
 
 namespace HITSBlazor.Components.LeftSideNavigation
 {
@@ -21,6 +28,9 @@ namespace HITSBlazor.Components.LeftSideNavigation
 
         [Inject]
         private IMarketService MarketService { get; set; } = null!;
+
+        [Inject]
+        private IProjectService ProjectService { get; set; } = null!;
 
         private RoleType? CurrentRole { get; set; } = null;
 
@@ -40,6 +50,7 @@ namespace HITSBlazor.Components.LeftSideNavigation
             AuthService.OnActiveRoleChanged += RoleStateChanged;
             NavigationService.OnNavigationChanged += HandleNavigationChanged;
             MarketService.OnMarketStatusHasUpdated += MarketStatusHasChanged;
+            ProjectService.OnProjectStatusHasChanged += ProjectStatusHasChanged;
 
             _menuItems = NavigationService.MenuItems;
             UpdateActiveState();
@@ -71,22 +82,80 @@ namespace HITSBlazor.Components.LeftSideNavigation
             StateHasChanged();
         }
 
-        //TODOO: скрее всего, также и для проектов нужно будет
-        private void MarketStatusHasChanged(Guid marketId, MarketStatus marketStatus)
+        //TODOO: продумать, как обновлять значения в боковой панели
+        //делать запрос при добавлении?
+        private void MarketStatusHasChanged(Market market)
         {
-            if (marketStatus is not MarketStatus.Done) return;
-
             isLoading = true;
             StateHasChanged();
 
-            var navItem = NavigationService.MenuItems.FirstOrDefault(n => n.BaseUrl?.Equals("market", StringComparison.CurrentCultureIgnoreCase) ?? false);
-            if (navItem is not null)
+            var teamRoles = new HashSet<RoleType>
             {
-                var targetMarket = navItem.SubItems.FirstOrDefault(si => si.Url.Contains(marketId.ToString(), StringComparison.CurrentCultureIgnoreCase));
-                if (targetMarket is not null && navItem.SubItems.Remove(targetMarket))
+                RoleType.Initiator,
+                RoleType.TeamOwner,
+                RoleType.Member,
+                RoleType.ProjectOffice,
+                RoleType.Admin,
+                RoleType.Teacher,
+                RoleType.TeamLeader
+            };
+
+            if (market.Status is MarketStatus.Active)
+            {
+                var navItem = NavigationService.MenuItems.FirstOrDefault(n => n.BaseUrl?.Equals("market", StringComparison.CurrentCultureIgnoreCase) ?? false);
+                navItem?.SubItems.Add(new NavigationSubItem
                 {
-                    _menuItems = NavigationService.MenuItems;
-                    UpdateActiveState();
+                    Id = navItem.SubItems.Count,
+                    Icon = "bi-basket3",
+                    Title = market.Name,
+                    Url = $"/{market.Id}"
+                });
+            }
+            else
+            {
+                var navItem = NavigationService.MenuItems.FirstOrDefault(n => n.BaseUrl?.Equals("market", StringComparison.CurrentCultureIgnoreCase) ?? false);
+                if (navItem is not null)
+                {
+                    var targetMarket = navItem.SubItems.FirstOrDefault(si => si.Url.Contains(market.Id.ToString(), StringComparison.CurrentCultureIgnoreCase));
+                    if (targetMarket is not null && navItem.SubItems.Remove(targetMarket))
+                    {
+                        _menuItems = NavigationService.MenuItems;
+                        UpdateActiveState();
+                    }
+                }
+            }
+
+            isLoading = false;
+            StateHasChanged();
+        }
+
+        private void ProjectStatusHasChanged(Project project)
+        {
+            isLoading = true;
+            StateHasChanged();
+
+            if (project.Status is ProjectStatus.Active)
+            {
+                var navItem = NavigationService.MenuItems.FirstOrDefault(n => n.BaseUrl?.Equals("projects", StringComparison.CurrentCultureIgnoreCase) ?? false);
+                navItem?.SubItems.Add(new NavigationSubItem
+                {
+                    Id = navItem.SubItems.Count,
+                    Icon = "bi-kanban",
+                    Title = project.Name,
+                    Url = $"/{project.Id}"
+                });
+            }
+            else
+            {
+                var navItem = NavigationService.MenuItems.FirstOrDefault(n => n.BaseUrl?.Equals("projects", StringComparison.CurrentCultureIgnoreCase) ?? false);
+                if (navItem is not null)
+                {
+                    var targetMarket = navItem.SubItems.FirstOrDefault(si => si.Url.Contains(project.Id.ToString(), StringComparison.CurrentCultureIgnoreCase));
+                    if (targetMarket is not null && navItem.SubItems.Remove(targetMarket))
+                    {
+                        _menuItems = NavigationService.MenuItems;
+                        UpdateActiveState();
+                    }
                 }
             }
 
@@ -164,6 +233,7 @@ namespace HITSBlazor.Components.LeftSideNavigation
             AuthService.OnActiveRoleChanged -= RoleStateChanged;
             NavigationService.OnNavigationChanged -= HandleNavigationChanged;
             MarketService.OnMarketStatusHasUpdated -= MarketStatusHasChanged;
+            ProjectService.OnProjectStatusHasChanged -= ProjectStatusHasChanged;
         }
     }
 }

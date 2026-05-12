@@ -83,8 +83,11 @@ namespace HITSBlazor.Utils.Mocks.Markets
 
             query = query.Skip((page - 1) * pageSize).Take(pageSize);
 
-            return new ListDataResponse<Market> { Count = count, List = query.ToList() };
+            return new ListDataResponse<Market>(count, query.ToList());
         }
+
+        public static List<Market> GetAllActiveMarkets()
+            => _markets.Where(m => m.Status is MarketStatus.Active).ToList();
 
         public static Market? GetMarketById(Guid marketId) => _markets.FirstOrDefault(m => m.Id == marketId);
 

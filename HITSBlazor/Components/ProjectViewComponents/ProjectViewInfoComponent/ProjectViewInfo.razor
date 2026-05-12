@@ -1,7 +1,7 @@
 ﻿@namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewInfoComponent
 @using HITSBlazor.Components.ActionMenus.BaseActionMenu
 @using HITSBlazor.Components.Button
-@using HITSBlazor.Components.ListPageComponents.ListPageSearch
+@using HITSBlazor.Components.InputSearch
 @using HITSBlazor.Components.Modals.Components.RightSideModaCollapselInfo
 @using HITSBlazor.Components.Modals.Components.RightSideModalInfoItemComponent
 @using HITSBlazor.Components.Statuses.EnumStatus
@@ -12,16 +12,18 @@
 @using HITSBlazor.Components.Typography
 @using HITSBlazor.Models.Projects.Entities
 @using HITSBlazor.Models.Projects.Enums
+@using HITSBlazor.Pages
 @using HITSBlazor.Services.Modal
+@inherits ListPageDataLoader
 
 <div class="d-flex gap-3 mt-4">
     <div class="w-75">
-        <RightSideModaCollapselInfo IsLoading="IsLoading" Data="_projectInfoData" />
+        <RightSideModaCollapselInfo IsLoading="IsOnLoading" Data="_projectInfoData" />
         <div class="w-100 bg-white p-3">
-            <ListPageSearch IsLoading="IsLoading" ValueChanged="@((value) => SeacrhMember(value))" />
-            <TableComponent IsLoading="IsLoading" HeaderItems="_membersTableHeader" TableActionMenuIsEnable="true">
+            <InputSearch Width="50" IsLoading="IsOnLoading" ValueChanged="@((value) => SeacrhMember(value))" DebounceDelay="500" />
+            <TableComponent IsLoading="IsOnLoading" HeaderItems="_membersTableHeader" TableActionMenuIsEnable="true" @ref="_tableComponent">
                 <TableContent>
-                    @foreach (var member in CurrentProject?.Members ?? [])
+                    @foreach (var member in _projectMembers)
                     {
                         <tr>
                             <TableBodyRow>
@@ -35,11 +37,9 @@
                                 <EnumStatus Statustype="member.ProjectRole" />
                             </TableBodyRow>
                             <TableActionMenu ItemId="member.UserId"
-                                                StrategyPosition="Strategy.Fixed"
-                                                OnAction="@OnMemberAction"
-                                                ActionIds="@(new Dictionary<MenuAction, object> {
-                                                    [MenuAction.ViewProfile] = member.UserId
-                                                })" />
+                                             StrategyPosition="Strategy.Fixed"
+                                             OnAction="@OnMemberAction"
+                                             ActionIds="@GetActions(member)" />
                         </tr>
                     }
                 </TableContent>
@@ -52,43 +52,70 @@
         </div>
         <div class="d-flex flex-column gap-2 bg-white rounded-bottom p-3 border border-top-0">
             <div class="px-2">
-                <RightSideModalInfoItemComponent IsLoading="IsLoading"
+                <RightSideModalInfoItemComponent IsLoading="IsOnLoading"
                                                     Label="Инициатор" 
                                                     Icon="bi-person-circle"
                                                     Text="@CurrentProject?.Initiator.FullName"
                                                     TextColor="TextColor.Primary" />
             </div>
             <div class="px-2">
-                <RightSideModalInfoItemComponent IsLoading="IsLoading"
+                <RightSideModalInfoItemComponent IsLoading="IsOnLoading"
                                                     Label="Заказчик" 
                                                     Icon="bi-person-circle"
                                                     Text="@CurrentProject?.Customer"
                                                     TextColor="TextColor.Primary" />
             </div>
             <div class="px-2">
-                <RightSideModalInfoItemComponent IsLoading="IsLoading"
+                <RightSideModalInfoItemComponent IsLoading="IsOnLoading"
                                                     Label="Дата старта" 
                                                     Icon="bi-person-circle"
                                                     Text="@CurrentProject?.StartDate.ToString("dd.MM.yyyy")"
                                                     TextColor="TextColor.Primary" />
             </div>
             <div class="px-2">
-                <RightSideModalInfoItemComponent IsLoading="IsLoading"
+                <RightSideModalInfoItemComponent IsLoading="IsOnLoading"
                                                     Label="Дата окончания" 
                                                     Icon="bi-person-circle"
                                                     Text="@CurrentProject?.FinishDate.ToString("dd.MM.yyyy")"
                                                     TextColor="TextColor.Primary" />
             </div>
             <div class="d-flex flex-column gap-2 mt-2">
-
-                <Button IsLoading="IsLoading"
-                        Text="Перейти в идею" 
-                        Variant="ButtonVariant.Primary"
-                        OnButtonClick="() => ShowIdeaModal(CurrentProject?.IdeaId)" />
-                <Button IsLoading="IsLoading"
-                        Text="@(CurrentProject?.Status is ProjectStatus.Done ? "Информация о проекте" : "Завершить проект")" 
-                        Variant="ButtonVariant.Primary"
-                        OnButtonClick="ShowFinishProjectModal" />
+                @{
+                    var currentStatus = CurrentProject?.Status;
+                    var currentMemberRole = CurrentProjectMember.ProjectRole;
+                    <Button IsLoading="IsOnLoading"
+                            Text="Перейти в идею" 
+                            Variant="ButtonVariant.Primary"
+                            OnButtonClick="() => ShowIdeaModal(CurrentProject?.IdeaId)" />
+                    @if (currentStatus is not ProjectStatus.Deleted and ProjectStatus.Done && currentMemberRole is not ProjectMemberRole.Member)
+                    {
+                        if (currentStatus is ProjectStatus.Paused)
+                        {
+                            <Button IsLoading="IsOnLoading"
+                                    Text="Запустить проект" 
+                                    Variant="ButtonVariant.Success"
+                                    OnButtonClick="() => UpdateProjectStatus(ProjectStatus.Active)" />
+                        }
+                        else if (currentStatus is ProjectStatus.Active)
+                        {
+                            <Button IsLoading="IsOnLoading"
+                                    Text="Остановить проект" 
+                                    Variant="ButtonVariant.Warning"
+                                    OnButtonClick="() => UpdateProjectStatus(ProjectStatus.Paused)" />
+                        }
+                    }
+                    <Button IsLoading="IsOnLoading"
+                            Text="@(currentStatus is ProjectStatus.Done ? "Информация о проекте" : "Завершить проект")" 
+                            Variant="ButtonVariant.Primary"
+                            OnButtonClick="() => UpdateProjectStatus(ProjectStatus.Done)" />
+                    @if (currentStatus is not ProjectStatus.Deleted && currentMemberRole is ProjectMemberRole.Initiator)
+                    {
+                        <Button IsLoading="IsOnLoading"
+                                Text="Удалить проект" 
+                                Variant="ButtonVariant.Danger"
+                                OnButtonClick="() => UpdateProjectStatus(ProjectStatus.Deleted)" />                    
+                    }
+                }
             </div>
         </div>
     </div>

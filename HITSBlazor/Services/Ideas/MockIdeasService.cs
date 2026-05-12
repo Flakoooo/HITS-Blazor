@@ -40,7 +40,7 @@ namespace HITSBlazor.Services.Ideas
         {
             var activeRole = _authService.CurrentUser?.Role;
             if (activeRole is null || !_acceptableRoles.Contains((RoleType)activeRole)) 
-                return new ListDataResponse<Idea>();
+                return new ListDataResponse<Idea>(0, []);
 
             if (activeRole is RoleType.Initiator && _authService.CurrentUser is not null)
                 return MockIdeas.GetInitiatorIdeasByQueryParams(

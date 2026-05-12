@@ -2,7 +2,7 @@
 @using HITSBlazor.Components.ActionMenus.BaseActionMenu
 @using HITSBlazor.Components.Button
 @using HITSBlazor.Components.Collapse
-@using HITSBlazor.Components.ListPageComponents.ListPageSearch
+@using HITSBlazor.Components.InputSearch
 @using HITSBlazor.Components.Modals.Components
 @using HITSBlazor.Components.Modals.Components.ModalHeader
 @using HITSBlazor.Components.Modals.Components.RightSideModaCollapselInfo
@@ -111,7 +111,7 @@
                 <div class="team-modal-tables">
                     <div class="w-100 bg-white px-3 pb-3 pt-1">
                         <!-- TODO: реализовать поиск -->
-                        <ListPageSearch IsLoading="_isLoading" ValueChanged="@((value) => SearchData(value))" />
+                        <InputSearch Width="50" IsLoading="_isLoading" ValueChanged="@((value) => SearchData(value))" DebounceDelay="500" />
                         <div class="w-100 d-flex">
                             <div class="w-100">
                                 <table class="table table-hover mb-0">

@@ -148,7 +148,7 @@ namespace HITSBlazor.Utils.Mocks.Projects
 
             query = query.Skip((page - 1) * pageSize).Take(pageSize);
 
-            return new ListDataResponse<Project> { Count = count, List = query.ToList() };
+            return new ListDataResponse<Project>(count, query.ToList());
         }
 
         public static List<Project> GetActiveProjects(Guid id)
@@ -156,6 +156,31 @@ namespace HITSBlazor.Utils.Mocks.Projects
 
         public static Project? GetProjectById(Guid projectId)
             => _projects.FirstOrDefault(p => p.Id == projectId);
+
+        public static ListDataResponse<ProjectMember> GetProjectMembers(
+            Guid projectId,
+            int page,
+            int pageSize = 20,
+            string? searchText = null
+        )
+        {
+            var project = _projects.FirstOrDefault(p => p.Id == projectId);
+            if (project is null) return new ListDataResponse<ProjectMember>(0, []);
+
+            var query = project.Members.AsEnumerable();
+
+            if (!string.IsNullOrWhiteSpace(searchText))
+                query = query.Where(m => 
+                    m.FullName.Contains(searchText, StringComparison.CurrentCultureIgnoreCase) 
+                    || m.Email.Contains(searchText, StringComparison.CurrentCultureIgnoreCase)
+                );
+
+            int count = query.Count();
+
+            query = query.Skip((page - 1) * pageSize).Take(pageSize);
+
+            return new ListDataResponse<ProjectMember>(count, query.ToList());
+        }
 
         public static ProjectMember? GetCurrentProjectMember(Guid projectId, Guid userId)
             => _projects.FirstOrDefault(p => p.Id == projectId)?.Members.FirstOrDefault(m => m.UserId == userId);
@@ -214,15 +239,80 @@ namespace HITSBlazor.Utils.Mocks.Projects
             return true;
         }
 
-        public static bool FinishProject(Guid projectId, string report)
+        public static bool AddMemberInProject(Guid projectId, Guid memberId)
+        {
+            var user = MockUsers.GetUserById(memberId);
+            if (user is null) return false;
+
+            var project = _projects.FirstOrDefault(p => p.Id == projectId);
+            if (project is null) return false;
+
+            //TODOO: КАК НАЗНАЧАТЬ КОМАНДУ?
+            project.Members.Add(new ProjectMember
+            {
+                TeamId = project.Team.Id,
+                UserId = user.Id,
+                Email = user.Email,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                ProjectRole = ProjectMemberRole.Member,
+                StartDate = DateTime.UtcNow,
+                FinishDate = project.FinishDate
+            });
+
+            return true;
+        }
+
+        public static bool KickMemberFromProject(Guid projectId, Guid memberId)
         {
             var project = _projects.FirstOrDefault(p => p.Id == projectId);
             if (project is null) return false;
 
+            var member = project.Members.FirstOrDefault(pm => pm.UserId == memberId);
+            if (member is null) return false;
+            if (project.Members.Remove(member))
+            {
+                MockSprintMarks.DeleteMarkByMemberId(projectId, memberId);
+                MockAverageMarks.DeleteMarkByMemberId(memberId);
+                return true;
+            }
+
+            return false;
+        }
+
+        public static Project? UpdateProjectStatus(Guid projectId, ProjectStatus newStatus)
+        {
+            if (newStatus is ProjectStatus.Done or ProjectStatus.Deleted) return null;
+
+            var project = _projects.FirstOrDefault(p => p.Id == projectId);
+            if (project is null) return null;
+
+            project.Status = newStatus;
+
+            return project;
+        }
+
+        public static Project? FinishProject(Guid projectId, string report)
+        {
+            var project = _projects.FirstOrDefault(p => p.Id == projectId);
+            if (project is null) return null;
+
             project.Status = ProjectStatus.Done;
+            project.Report = report;
             MockTeams.GetTeamById(project.Team.Id)?.HasActiveProject = false;
 
-            return true;
+            return project;
+        }
+
+        public static Project? DeleteProject(Guid projectId)
+        {
+            var project = _projects.FirstOrDefault(p => p.Id == projectId);
+            if (project is null) return null;
+
+            project.Status = ProjectStatus.Deleted;
+            MockTeams.GetTeamById(project.Team.Id)?.HasActiveProject = false;
+
+            return project;
         }
     }
 }

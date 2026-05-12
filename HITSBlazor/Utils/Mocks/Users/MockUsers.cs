@@ -338,7 +338,7 @@ namespace HITSBlazor.Utils.Mocks.Users
 
             query = query.Skip((page - 1) * pageSize).Take(pageSize);
 
-            return new ListDataResponse<User> { Count = count, List = query.ToList() };
+            return new ListDataResponse<User>(count, query.ToList());
         }
 
         public static User? GetUserById(Guid id)

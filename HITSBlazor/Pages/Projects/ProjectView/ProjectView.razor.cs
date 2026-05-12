@@ -1,5 +1,6 @@
 ﻿using HITSBlazor.Components.ProjectViewComponents.ProjectViewActiveSprintTasks;
 using HITSBlazor.Models.Projects.Entities;
+using HITSBlazor.Models.Projects.Enums;
 using HITSBlazor.Services.DragAndDrop;
 using HITSBlazor.Services.Projects;
 using Microsoft.AspNetCore.Authorization;
@@ -34,6 +35,8 @@ namespace HITSBlazor.Pages.Projects.ProjectView
         protected override async SharpTask OnInitializedAsync()
         {
             _isLoading = true;
+
+            ProjectService.OnProjectStatusHasChanged += ProjectStatusHasChanged;
 
             ProjectService.OnSprintHasCreated += SprintHasCreated;
             ProjectService.OnSprintHasFinished += SprintHasFinished;
@@ -79,6 +82,14 @@ namespace HITSBlazor.Pages.Projects.ProjectView
             _activeCategory = category;
         }
 
+        private void ProjectStatusHasChanged(Project updatedProject)
+        {
+            if (_currentProject?.Id != updatedProject.Id) return;
+
+            _currentProject.Status = updatedProject.Status;
+            StateHasChanged();
+        }
+
         private void SprintHasCreated(Sprint newSprint)
         {
             _activeSprint = newSprint;
@@ -94,6 +105,8 @@ namespace HITSBlazor.Pages.Projects.ProjectView
 
         public void Dispose()
         {
+            ProjectService.OnProjectStatusHasChanged -= ProjectStatusHasChanged;
+
             ProjectService.OnSprintHasCreated -= SprintHasCreated;
             ProjectService.OnSprintHasFinished -= SprintHasFinished;
 

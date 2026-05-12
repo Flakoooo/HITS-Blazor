@@ -54,7 +54,7 @@ namespace HITSBlazor.Utils.Mocks.Common
 
             query = query.Skip((page - 1) * pageSize).Take(pageSize);
 
-            return new ListDataResponse<Tag> { Count = count, List = query.ToList() };
+            return new ListDataResponse<Tag>(count, query.ToList());
         }
 
         public static Tag? GetTagById(Guid id)

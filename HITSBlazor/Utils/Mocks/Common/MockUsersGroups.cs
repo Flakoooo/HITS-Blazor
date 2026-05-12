@@ -58,7 +58,7 @@ namespace HITSBlazor.Utils.Mocks.Common
 
             query = query.Skip((page - 1) * pageSize).Take(pageSize);
 
-            return new ListDataResponse<UsersGroup> { Count = count, List = query.ToList() };
+            return new ListDataResponse<UsersGroup>(count, query.ToList());
         }
 
         public static UsersGroup? GetGroupById(Guid id)

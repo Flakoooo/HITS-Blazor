@@ -564,7 +564,8 @@ namespace HITSBlazor.Utils.Mocks.Projects
                 task.Position = position++;
         }
 
-        public static List<Sprint> GetAllMockSprints() => _sprints;
+        public static List<Sprint> GetAllMockSprints(Guid? projectId = null) 
+            => _sprints.Where(s => s.ProjectId == projectId).ToList();
 
         public static ListDataResponse<Sprint> GetSprintsByProjectId(
             Guid projectId, 
@@ -582,7 +583,7 @@ namespace HITSBlazor.Utils.Mocks.Projects
 
             query = query.Skip((page - 1) * pageSize).Take(pageSize);
 
-            return new ListDataResponse<Sprint> { Count = count, List = query.ToList() };
+            return new ListDataResponse<Sprint>(count, query.ToList());
         }
 
         public static Sprint? GetActiveSprintByProjectId(Guid projectId)
@@ -796,7 +797,7 @@ namespace HITSBlazor.Utils.Mocks.Projects
 
             query = query.Skip((page - 1) * pageSize).Take(pageSize);
 
-            return new ListDataResponse<HITSTask> { Count = count, List = query.ToList() };
+            return new ListDataResponse<HITSTask>(count, query.ToList());
         }
 
         public static bool MemberHasTaskInProgress(Guid sprintId, Guid userId)

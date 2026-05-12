@@ -10,6 +10,8 @@ namespace HITSBlazor.Services.Projects
 {
     public interface IProjectService
     {
+        event Action<Project>? OnProjectStatusHasChanged;
+
         event Action<Sprint>? OnSprintHasCreated;
         event Action<Sprint>? OnSprintHasUpdated;
         event Action? OnSprintHasFinished;
@@ -28,9 +30,21 @@ namespace HITSBlazor.Services.Projects
         );
         Task<List<Project>> GetAllActiveProjectsAsync();
         Task<Project?> GetProjectByIdAsync(Guid projectId);
+        Task<ListDataResponse<ProjectMember>> GetProjectMembersAsync(
+            Guid projectId,
+            int page,
+            string? searchText
+        );
         Task<ProjectMember?> GetCurrentProjectMemberAsync(Guid projectId);
         Task<bool> CreateNewProjectAsync(IdeaMarket ideaMarket);
-        Task<bool> FinishProjectAsync(Guid projectId, string report);
+        //TODOO: найти применение
+        Task<bool> AddMemberInProjectAsync(Guid projectId, Guid userId);
+        //TODOO: найти применение
+        Task<bool> KickMemberFromProjectAsync(Guid projectId, Guid userId);
+        Task<bool> ActivateProjectAsync(Project project);
+        Task<bool> PauseProjectAsync(Project project);
+        Task<bool> FinishProjectAsync(Project project, string report);
+        Task<bool> DeletedProjectAsync(Project project);
 
         //ProjectMarks
         Task<List<AverageMark>> GetProjectMarksAsync(Guid projectId);

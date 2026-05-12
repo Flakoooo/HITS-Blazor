@@ -41,7 +41,7 @@ namespace HITSBlazor.Utils.Mocks.Common
 
             query = query.Skip((page - 1) * pageSize).Take(pageSize);
 
-            return new ListDataResponse<Company> { Count = count, List = query.ToList() };
+            return new ListDataResponse<Company>(count, query.ToList());
         }
 
         public static Company? GetCompanyById(Guid id)

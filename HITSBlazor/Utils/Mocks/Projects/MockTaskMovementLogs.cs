@@ -173,7 +173,7 @@ namespace HITSBlazor.Utils.Mocks.Projects
 
             query = query.Skip((page - 1) * pageSize).Take(pageSize);
 
-            return new ListDataResponse<TaskMovementLog> { Count = count, List = query.ToList() };
+            return new ListDataResponse<TaskMovementLog>(count, query.ToList());
         }
 
         public static bool CreateNewTaskLog(HITSTask task, User creator, User? executor = null)

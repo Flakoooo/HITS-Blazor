@@ -98,12 +98,12 @@ namespace HITSBlazor.Pages.Markets.MarketsList
             };
 
             if (market.Status is MarketStatus.New)
-                actions.Add(MenuAction.StartMarket, market.Id);
+                actions.Add(MenuAction.StartMarket, market);
 
             actions.Add(MenuAction.Edit, market);
 
             if (market.Status is MarketStatus.Active)
-                actions.Add(MenuAction.FinishMarket, market.Id);
+                actions.Add(MenuAction.FinishMarket, market);
 
             if (market.Status is MarketStatus.New or MarketStatus.Done)
                 actions.Add(MenuAction.Delete, market);
@@ -158,26 +158,6 @@ namespace HITSBlazor.Pages.Markets.MarketsList
                 {
                     await OpenMarket(marketId);
                 }
-                else if (context.Action is MenuAction.StartMarket)
-                {
-                    ModalService.ShowConfirmModal(
-                        "Вы действительно хотите запустить биржу? Активную биржу можно будет ТОЛЬКО завершить.",
-                        () => MarketService.UpdateMarketStatusAsync(marketId, MarketStatus.Active),
-                        questionTextColor: TextColor.Danger,
-                        confirmButtonVariant: ButtonVariant.Success,
-                        confirmButtonText: "Запустить биржу"
-                    );
-                }
-                else if (context.Action is MenuAction.FinishMarket)
-                {
-                    ModalService.ShowConfirmModal(
-                        "Вы действительно хотите завершить биржу? Идеи, не нашедшие команды, попадут обратно в список идей.",
-                        () => MarketService.UpdateMarketStatusAsync(marketId, MarketStatus.Done),
-                        questionTextColor: TextColor.Danger,
-                        confirmButtonVariant: ButtonVariant.Success,
-                        confirmButtonText: "Завершить биржу"
-                    );
-                }
             }
             else if (context.Item is Market market)
             {
@@ -192,6 +172,26 @@ namespace HITSBlazor.Pages.Markets.MarketsList
                         () => MarketService.DeleteMarketAsync(market),
                         confirmButtonVariant: ButtonVariant.Danger,
                         confirmButtonText: "Удалить"
+                    );
+                }
+                else if (context.Action is MenuAction.StartMarket)
+                {
+                    ModalService.ShowConfirmModal(
+                        "Вы действительно хотите запустить биржу? Активную биржу можно будет ТОЛЬКО завершить.",
+                        () => MarketService.UpdateMarketStatusAsync(market, MarketStatus.Active),
+                        questionTextColor: TextColor.Danger,
+                        confirmButtonVariant: ButtonVariant.Success,
+                        confirmButtonText: "Запустить биржу"
+                    );
+                }
+                else if (context.Action is MenuAction.FinishMarket)
+                {
+                    ModalService.ShowConfirmModal(
+                        "Вы действительно хотите завершить биржу? Идеи, не нашедшие команды, попадут обратно в список идей.",
+                        () => MarketService.UpdateMarketStatusAsync(market, MarketStatus.Done),
+                        questionTextColor: TextColor.Danger,
+                        confirmButtonVariant: ButtonVariant.Success,
+                        confirmButtonText: "Завершить биржу"
                     );
                 }
             }
@@ -215,12 +215,12 @@ namespace HITSBlazor.Pages.Markets.MarketsList
             StateHasChanged();
         }
 
-        private void MarketStatusHasUpdated(Guid marketId, MarketStatus newStatus)
+        private void MarketStatusHasUpdated(Market market)
         {
-            var marketForUpdate = _markets.FirstOrDefault(m => m.Id == marketId);
+            var marketForUpdate = _markets.FirstOrDefault(m => m.Id == market.Id);
             if (marketForUpdate is null) return;
 
-            marketForUpdate.Status = newStatus;
+            marketForUpdate.Status = market.Status;
             StateHasChanged();
         }
 

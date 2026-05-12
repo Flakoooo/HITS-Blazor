@@ -23,7 +23,7 @@ namespace HITSBlazor.Services.IdeaMarkets
         )
         {
             var currentUser = _authService.CurrentUser;
-            if (currentUser is null || currentUser.Role is null) return new ListDataResponse<IdeaMarket> { Count = 0, List = [] };
+            if (currentUser is null || currentUser.Role is null) return new ListDataResponse<IdeaMarket>(0, []);
 
             return MockIdeaMarkets.GetIdeaMarketsByQueryParams(
                 page,

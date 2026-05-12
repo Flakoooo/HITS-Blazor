@@ -8,7 +8,7 @@ namespace HITSBlazor.Services.Markets
     {
         event Action<Market>? OnMarketsHasCreated;
         event Action<Market>? OnMarketHasUpdated;
-        event Action<Guid, MarketStatus>? OnMarketStatusHasUpdated;
+        event Action<Market>? OnMarketStatusHasUpdated;
         event Action<Market>? OnMarketHasDeleted;
 
         Task<ListDataResponse<Market>> GetMarketsAsync(
@@ -18,13 +18,13 @@ namespace HITSBlazor.Services.Markets
             string? orderBy = null,
             bool? byDescending = null
         );
-
+        Task<List<Market>> GetAllActiveMarketsAsync();
         Task<Market?> GetMarketByIdAsync(Guid marketId);
         Task<bool> CreateNewMarketAsync(string name, DateTime startDate, DateTime finishDate);
         Task<bool> UpdateMarketAsync(
             Guid marketId, string name, DateTime startDate, DateTime finishDate, MarketStatus status
         );
-        Task UpdateMarketStatusAsync(Guid marketId, MarketStatus status);
+        Task UpdateMarketStatusAsync(Market market, MarketStatus status);
         Task DeleteMarketAsync(Market market);
     }
 }

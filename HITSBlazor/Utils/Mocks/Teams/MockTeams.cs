@@ -178,7 +178,7 @@ namespace HITSBlazor.Utils.Mocks.Teams
 
             query = query.Skip((page - 1) * pageSize).Take(pageSize);
 
-            return new ListDataResponse<Team> { Count = count, List = query.ToList() };
+            return new ListDataResponse<Team>(count, query.ToList());
         }
 
         public static List<Team> GetTeamsByOwnerIdOrLeaderId(Guid userId) 

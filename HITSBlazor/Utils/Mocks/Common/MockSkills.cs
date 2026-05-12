@@ -86,7 +86,7 @@ namespace HITSBlazor.Utils.Mocks.Common
 
             query = query.Skip((page - 1) * pageSize).Take(pageSize);
 
-            return new ListDataResponse<Skill> { Count = count, List = query.ToList() };
+            return new ListDataResponse<Skill>(count, query.ToList());
         }
 
         public static Skill? GetSkillById(Guid id)

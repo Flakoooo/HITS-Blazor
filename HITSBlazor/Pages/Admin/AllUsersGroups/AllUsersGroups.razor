@@ -5,8 +5,6 @@
 @using HITSBlazor.Components.Filters.ResetFilterButton
 @using HITSBlazor.Components.InputSearch
 @using HITSBlazor.Components.ListPageComponents.ListPageHeader
-@using HITSBlazor.Components.ListPageComponents.ListPageSearch
-@using HITSBlazor.Components.ListPageComponents.ListPageTable
 @using HITSBlazor.Components.Placeholders.TablePlaceholder
 @using HITSBlazor.Components.Statuses.EnumStatus
 @using HITSBlazor.Components.Tables.TableActionMenu
@@ -26,8 +24,7 @@
                         ShowCreateButton="true"
                         CreateButtonText="Создать группу" 
                         OnButtonClick="@(() => ShowUsersGroupModal())"/>
-        <ListPageSearch IsLoading="_isLoading" ValueChanged="@((value) => SearchUsersGroup(value))" />
-        <InputSearch IsLoading="_isLoading" ValueChanged="@((value) => SearchUsersGroup(value))" DebounceDelay="500" />
+        <InputSearch Width="50" IsLoading="_isLoading" ValueChanged="@((value) => SearchUsersGroup(value))" DebounceDelay="500" />
         <TableComponent IsLoading="_isLoading" TableActionMenuIsEnable="true" HeaderItems="UsersGroupsTableHeader" @ref="_tableComponent">
             <TableContent>
                 @foreach (var usersGroup in _usersGroups)

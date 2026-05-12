@@ -16,6 +16,8 @@ namespace HITSBlazor.Services.Projects
     {
         private readonly IAuthService _authService = authService;
 
+        public event Action<Project>? OnProjectStatusHasChanged;
+
         public event Action<Sprint>? OnSprintHasCreated;
         public event Action<Sprint>? OnSprintHasUpdated;
         public event Action? OnSprintHasFinished;
@@ -45,6 +47,12 @@ namespace HITSBlazor.Services.Projects
         public async Task<Project?> GetProjectByIdAsync(Guid projectId)
             => MockProjects.GetProjectById(projectId);
 
+        public async Task<ListDataResponse<ProjectMember>> GetProjectMembersAsync(
+            Guid projectId,
+            int page,
+            string? searchText
+        ) => MockProjects.GetProjectMembers(projectId, page, searchText: searchText);
+
         public async Task<ProjectMember?> GetCurrentProjectMemberAsync(Guid projectId)
         {
             var currentUser = _authService.CurrentUser;
@@ -55,8 +63,55 @@ namespace HITSBlazor.Services.Projects
 
         public async Task<bool> CreateNewProjectAsync(IdeaMarket ideaMarket) => MockProjects.CreateNewProject(ideaMarket);
 
-        public async Task<bool> FinishProjectAsync(Guid projectId, string report)
-            => MockProjects.FinishProject(projectId, report);
+        //TODOO: реализовать, но как?
+        //public async Task<bool> ChangeTeamInProjectAsync()
+        //{
+
+        //}
+
+        public async Task<bool> AddMemberInProjectAsync(Guid projectId, Guid userId)
+            => MockProjects.AddMemberInProject(projectId, userId);
+
+        public async Task<bool> KickMemberFromProjectAsync(Guid projectId, Guid userId)
+            => MockProjects.KickMemberFromProject(projectId, userId);
+
+        public async Task<bool> ActivateProjectAsync(Project project)
+        {
+            var updatedProject = MockProjects.UpdateProjectStatus(project.Id, ProjectStatus.Active);
+            if (updatedProject is null) return false;
+
+
+            OnProjectStatusHasChanged?.Invoke(updatedProject);
+            return true;
+        }
+
+        public async Task<bool> PauseProjectAsync(Project project)
+        {
+            var updatedProject = MockProjects.UpdateProjectStatus(project.Id, ProjectStatus.Paused);
+            if (updatedProject is null) return false;
+
+
+            OnProjectStatusHasChanged?.Invoke(updatedProject);
+            return true;
+        }
+
+        public async Task<bool> FinishProjectAsync(Project project, string report)
+        {
+            var updatedProject = MockProjects.FinishProject(project.Id, report);
+            if (updatedProject is null) return false;
+
+            OnProjectStatusHasChanged?.Invoke(updatedProject);
+            return true;
+        }
+
+        public async Task<bool> DeletedProjectAsync(Project project)
+        {
+            var updatedProject = MockProjects.DeleteProject(project.Id);
+            if (updatedProject is null) return false;
+
+            OnProjectStatusHasChanged?.Invoke(updatedProject);
+            return true;
+        }
 
         //ProjectMarks
         public async Task<List<AverageMark>> GetProjectMarksAsync(Guid projectId)

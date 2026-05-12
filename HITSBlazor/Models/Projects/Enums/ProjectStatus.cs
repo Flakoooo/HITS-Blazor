@@ -11,6 +11,14 @@ namespace HITSBlazor.Models.Projects.Enums
 
         [Description("Завершен")]
         [Style("bg-warning-subtle text-warning")]
-        Done
+        Done,
+
+        [Description("Остановлен")]
+        [Style("bg-warning-subtle text-warning")]
+        Paused,
+
+        [Description("Удалён")]
+        [Style("bg-danger-subtle text-danger")]
+        Deleted
     }
 }

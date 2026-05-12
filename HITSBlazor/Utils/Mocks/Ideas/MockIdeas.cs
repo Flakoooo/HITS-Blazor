@@ -310,7 +310,7 @@ namespace HITSBlazor.Utils.Mocks.Ideas
 
             query = query.Skip((page - 1) * pageSize).Take(pageSize);
 
-            return new ListDataResponse<Idea> { Count = count, List = query.ToList() };
+            return new ListDataResponse<Idea>(count, query.ToList());
         }
 
         public static ListDataResponse<Idea> GetInitiatorIdeasByQueryParams(
@@ -333,7 +333,7 @@ namespace HITSBlazor.Utils.Mocks.Ideas
 
             query = query.Skip((page - 1) * pageSize).Take(pageSize);
 
-            return new ListDataResponse<Idea> { Count = count, List = query.ToList() };
+            return new ListDataResponse<Idea>(count, query.ToList());
         }
 
         public static List<Idea> GetInitiatorIdeasForProfile(Guid initiatorId)

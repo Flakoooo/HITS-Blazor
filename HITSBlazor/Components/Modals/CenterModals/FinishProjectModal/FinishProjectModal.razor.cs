@@ -64,7 +64,7 @@ namespace HITSBlazor.Components.Modals.CenterModals.FinishProjectModal
                 return;
             }
 
-            if (await ProjectService.FinishProjectAsync(CurrentProject.Id, Report))
+            if (await ProjectService.FinishProjectAsync(CurrentProject, Report))
                 await ModalService.Close(ModalType.Center);
         }
     }

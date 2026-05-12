@@ -90,5 +90,12 @@ namespace HITSBlazor.Utils.Mocks.Projects
 
             return true;
         }
+
+        public static bool DeleteMarkByMemberId(Guid memberId)
+        {
+            var mark = _averageMarks.FirstOrDefault(am => am.UserId == memberId);
+            if (mark is null) return false;
+            return _averageMarks.Remove(mark);
+        }
     }
 }

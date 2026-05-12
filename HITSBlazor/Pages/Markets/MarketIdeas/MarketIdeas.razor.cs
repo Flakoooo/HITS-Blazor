@@ -119,7 +119,7 @@ namespace HITSBlazor.Pages.Markets.MarketIdeas
 
             ModalService.ShowConfirmModal(
                 "Вы действительно хотите завершить биржу? Идеи, не нашедшие команды, попадут обратно в список идей.",
-                () => MarketService.UpdateMarketStatusAsync(_currentMarket.Id, MarketStatus.Done),
+                () => MarketService.UpdateMarketStatusAsync(_currentMarket, MarketStatus.Done),
                 questionTextColor: TextColor.Danger,
                 confirmButtonVariant: ButtonVariant.Success,
                 confirmButtonText: "Завершить биржу"
@@ -172,9 +172,11 @@ namespace HITSBlazor.Pages.Markets.MarketIdeas
             }
         );
 
-        private async void MarketStatusHasChanged(Guid marketId, MarketStatus newStatus)
+        private async void MarketStatusHasChanged(Market market)
         {
-            if (_currentMarket?.Id == marketId && newStatus is MarketStatus.Done)
+            if (_currentMarket?.Id != market.Id) return;
+
+            if (market.Status is MarketStatus.Done)
                 await NavigationService.NavigateToAsync("market/list");
 
         }

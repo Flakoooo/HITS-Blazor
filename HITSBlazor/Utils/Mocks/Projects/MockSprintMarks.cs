@@ -79,5 +79,16 @@ namespace HITSBlazor.Utils.Mocks.Projects
 
             return true;
         }
+
+        public static bool DeleteMarkByMemberId(Guid projectId, Guid memberId)
+        {
+            foreach (var sprint in MockSprints.GetAllMockSprints(projectId))
+            {
+                var mark = _sprintMarks.FirstOrDefault(sm => sm.UserId == memberId && sm.SprintId == sprint.Id);
+                if (mark is null) continue;
+                _sprintMarks.Remove(mark);
+            }
+            return true;
+        }
     }
 }

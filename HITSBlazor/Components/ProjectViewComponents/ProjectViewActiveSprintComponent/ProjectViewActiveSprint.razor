@@ -4,6 +4,7 @@
 @using HITSBlazor.Components.ProjectViewComponents.ProjectViewActiveSprintTaskContent
 @using HITSBlazor.Components.ProjectViewComponents.ProjectViewActiveSprintTasks
 @using HITSBlazor.Components.Typography
+@using HITSBlazor.Models.Projects.Enums
 @using HITSBlazor.Models.Users.Enums
 @using HITSBlazor.Utils.EnumUIConverters
 
@@ -19,7 +20,7 @@
                 (до @ActiveSprint?.FinishDate.ToString("dd.MM.yyyy"))
             </Typography>
         </div>
-        @if (AuthService.CurrentUser?.Role is RoleType.TeamLeader or RoleType.Initiator or RoleType.Admin)
+        @if (AuthService.CurrentUser?.Role is RoleType.TeamLeader or RoleType.Initiator or RoleType.Admin && CurrentProject?.Status is ProjectStatus.Active)
         {
             <Button IsLoading="IsLoading"
                     Variant="ButtonVariant.Danger" 
