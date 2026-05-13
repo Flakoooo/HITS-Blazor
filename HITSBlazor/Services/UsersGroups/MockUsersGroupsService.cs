@@ -31,7 +31,13 @@ namespace HITSBlazor.Services.UsersGroups
             return usersGroup;
         }
 
-        public async Task<bool> CreateUsersGroup(string name, HashSet<User> members, IEnumerable<RoleType> roles)
+        public async Task<ListDataResponse<User>> GetUsersGroupMembersAsync(
+            Guid usersGroupId,
+            int page,
+            string? searchText
+        ) => MockUsersGroups.GetUsersGroupMembers(usersGroupId, page, searchText: searchText);
+
+        public async Task<bool> CreateUsersGroup(string name, IEnumerable<User> members, IEnumerable<RoleType> roles)
         {
             var usersGroup = MockUsersGroups.CreateUsersGroup(name, members.Select(u => u.Id).ToList(), roles.ToList());
             if (usersGroup is null)
@@ -45,9 +51,15 @@ namespace HITSBlazor.Services.UsersGroups
             return true;
         }
 
-        public async Task<bool> UpdateUsersGroup(Guid usersGroupId, string name, HashSet<User> members, IEnumerable<RoleType> roles)
+        public async Task<bool> UpdateUsersGroup(
+            Guid usersGroupId, 
+            string? name, 
+            IEnumerable<Guid>? newMembersIds,
+            IEnumerable<Guid>? removeMembersIds, 
+            IEnumerable<RoleType>? roles
+        )
         {
-            var usersGroup = MockUsersGroups.UpdateUsersGroup(usersGroupId, name, members.Select(u => u.Id).ToList(), roles.ToList());
+            var usersGroup = MockUsersGroups.UpdateUsersGroup(usersGroupId, name, newMembersIds, removeMembersIds?.ToHashSet(), roles);
             if (usersGroup is null)
             {
                 _globalNotificationService.ShowError("Не удалось обновить группу");

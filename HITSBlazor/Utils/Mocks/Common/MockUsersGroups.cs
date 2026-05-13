@@ -64,6 +64,30 @@ namespace HITSBlazor.Utils.Mocks.Common
         public static UsersGroup? GetGroupById(Guid id)
             => _usersGroups.FirstOrDefault(g => g.Id == id);
 
+        public static ListDataResponse<User> GetUsersGroupMembers(
+            Guid usersGroupId,
+            int page,
+            int pageSize = 20,
+            string? searchText = null
+        )
+        {
+            var usersGroup = _usersGroups.FirstOrDefault(ug => ug.Id == usersGroupId);
+            if (usersGroup is null) return new ListDataResponse<User>(0, []);
+
+            var query = usersGroup.Members.AsEnumerable();
+
+            if (!string.IsNullOrWhiteSpace(searchText))
+                query = query.Where(ug => ug.FullName.Contains(searchText, StringComparison.CurrentCultureIgnoreCase) 
+                    || ug.Email.Contains(searchText, StringComparison.CurrentCultureIgnoreCase)
+                );
+
+            int count = query.Count();
+
+            query = query.Skip((page - 1) * pageSize).Take(pageSize);
+
+            return new ListDataResponse<User>(count, query.ToList());
+        }
+
         public static List<User> GetRandomGroupUsersById(Guid id, int userCount)
         {
             var users = _usersGroups.FirstOrDefault(g => g.Id == id)!.Members;
@@ -72,7 +96,7 @@ namespace HITSBlazor.Utils.Mocks.Common
             while (usedIndexes.Count < userCount)
                 usedIndexes.Add(_random.Next(users.Count));
 
-            return [.. usedIndexes.Select(i => users[i])];
+            return usedIndexes.Select(i => users[i]).ToList();
         }
 
         public static UsersGroup? CreateUsersGroup(string name, List<Guid> membersIds, List<RoleType> roles)
@@ -96,21 +120,35 @@ namespace HITSBlazor.Utils.Mocks.Common
             return usersGroup;
         }
 
-        public static UsersGroup? UpdateUsersGroup(Guid usersGroupId, string name, List<Guid> membersIds, List<RoleType> roles)
+        public static UsersGroup? UpdateUsersGroup(
+            Guid usersGroupId, 
+            string? name = null, 
+            IEnumerable<Guid>? newMembersIds = null,
+            HashSet<Guid>? removeMembersIds = null,
+            IEnumerable<RoleType>? roles = null
+        )
         {
             var usersGroup = _usersGroups.FirstOrDefault(ug => ug.Id == usersGroupId);
             if (usersGroup is null) return usersGroup;
 
-            var members = new List<User>();
-            foreach (var memberId in membersIds)
+            if (name is not null) usersGroup.Name = name;
+
+            if (newMembersIds is not null)
             {
-                var member = MockUsers.GetUserById(memberId);
-                if (member is not null) members.Add(member);
+                foreach (var memberId in newMembersIds)
+                {
+                    var member = MockUsers.GetUserById(memberId);
+                    if (member is not null) usersGroup.Members.Add(member);
+                }
             }
 
-            usersGroup.Name = name;
-            usersGroup.Members = members;
-            usersGroup.Roles = [.. roles];
+            if (removeMembersIds is not null)
+            {
+                usersGroup.Members.RemoveAll(u => removeMembersIds.Contains(u.Id));
+            }
+
+            if (roles is not null)
+                usersGroup.Roles = roles.ToList();
 
             return usersGroup;
         }

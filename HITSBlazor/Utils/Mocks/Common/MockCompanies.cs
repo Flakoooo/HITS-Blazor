@@ -99,24 +99,38 @@ namespace HITSBlazor.Utils.Mocks.Common
             return company;
         }
 
-        public static Company? UpdateCompany(Guid companyId, string name, Guid ownerId, List<Guid> membersIds)
+        public static Company? UpdateCompany(
+            Guid companyId, 
+            string? name = null, 
+            Guid? ownerId = null,
+            IEnumerable<Guid>? newMembersIds = null,
+            HashSet<Guid>? removeMembersIds = null
+        )
         {
             var company = GetCompanyById(companyId);
             if (company is null) return null;
 
-            var owner = MockUsers.GetUserById(ownerId);
-            if (owner is null) return null;
+            if (name is not null) company.Name = name;
 
-            var members = new List<User>();
-            foreach (var memberId in membersIds)
+            if (ownerId.HasValue)
             {
-                var member = MockUsers.GetUserById(memberId);
-                if (member is not null) members.Add(member);
+                var owner = MockUsers.GetUserById(ownerId.Value);
+                if (owner is not null) company.Owner = owner;
             }
 
-            company.Name = name;
-            company.Owner = owner;
-            company.Members = members;
+            if (newMembersIds is not null)
+            {
+                foreach (var memberId in newMembersIds)
+                {
+                    var member = MockUsers.GetUserById(memberId);
+                    if (member is not null) company.Members.Add(member);
+                }
+            }
+
+            if (removeMembersIds is not null)
+            {
+                company.Members.RemoveAll(u => removeMembersIds.Contains(u.Id));
+            }
 
             return company;
         }

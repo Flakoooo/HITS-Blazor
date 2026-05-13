@@ -4,6 +4,7 @@
 @using HITSBlazor.Components.Inputs.Input
 @using HITSBlazor.Components.Modals.Components.CenterModalHeader
 @using HITSBlazor.Components.Placeholders.Placeholder
+@using HITSBlazor.Components.Typography
 @using HITSBlazor.Components.UsersColumn
 @using HITSBlazor.Models.Users.Enums
 @using HITSBlazor.Utils.Models
@@ -17,14 +18,22 @@
     <div class="d-flex justify-content-between gap-3">
         <UsersColumn IsLoading="_isLoading"
                      HeaderText="Пользователи:"
-                     SelectedUserChanged="SelectUser"
+                     SelectedUserChanged="AddUser"
                      DataLoaderMethod="async (page, searchText) => await UserService.GetUsersAsync(page, searchText: searchText)"
                      DebounceDelay="500"
-                     DisplayPredicate="(user) => !_groupUsers.Contains(user)" />
+                     DisplayPredicate="(user) => !GroupMembers.Contains(user) && !MembersForAdd.Contains(user)"
+                     DisplayTextColorPredicate="(user) => MembersForRemove.Contains(user) ? TextColor.Danger : null" />
         <UsersColumn IsLoading="_isLoading"
-                     HeaderText="@($"Пользователи в группе: {_groupUsers.Count}")"
-                     AllUsers="_groupUsers.ToList()"
-                     SelectedUserChanged="UnSelectUser" />
+                     HeaderText="Представители в группе:"
+                     SelectedUserChanged="RemoveUser"
+                     @bind-AllUsers="GroupMembers"
+                     AdditionalUsers="MembersForAdd"
+                     DataLoaderMethod="async (page, searchText) => UsersGroupId.HasValue
+                            ? await UsersGroupsService.GetUsersGroupMembersAsync(UsersGroupId.Value, page, searchText: searchText)
+                            : null"
+                     DebounceDelay="500"
+                     DisplayPredicate="(user) => !MembersForRemove.Contains(user)"
+                     DisplayTextColorPredicate="(user) => MembersForAdd.Contains(user) ? TextColor.Success : null" />
     </div>
     <CheckboxDropdown T="EnumViewModel<RoleType>"
                       IsLoading="_isLoading"

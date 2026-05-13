@@ -15,8 +15,19 @@ namespace HITSBlazor.Services.UsersGroups
             int page, string? searchText = null, IEnumerable<RoleType>? selectedRoles = null
         );
         Task<UsersGroup?> GetUsersGroupByIdAsync(Guid usersGroupId);
-        Task<bool> CreateUsersGroup(string name, HashSet<User> members, IEnumerable<RoleType> roles);
-        Task<bool> UpdateUsersGroup(Guid usersGroupId, string name, HashSet<User> members, IEnumerable<RoleType> roles);
+        Task<ListDataResponse<User>> GetUsersGroupMembersAsync(
+            Guid usersGroupId,
+            int page,
+            string? searchText = null
+        );
+        Task<bool> CreateUsersGroup(string name, IEnumerable<User> members, IEnumerable<RoleType> roles);
+        Task<bool> UpdateUsersGroup(
+            Guid usersGroupId, 
+            string? name = null,
+            IEnumerable<Guid>? newMembersIds = null,
+            IEnumerable<Guid>? removeMembersIds = null,
+            IEnumerable<RoleType>? roles = null
+        );
         Task<bool> DeleteUsersGroupsAsync(UsersGroup usersGroup);
     }
 }

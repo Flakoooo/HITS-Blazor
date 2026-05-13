@@ -32,7 +32,9 @@ namespace HITSBlazor.Components.Modals.CenterModals.UsersGroupModal
 
         private string UsersGroupName { get; set; } = string.Empty;
 
-        private HashSet<User> _groupUsers = [];
+        private List<User> GroupMembers { get; set; } = [];
+        private HashSet<User> MembersForAdd { get; set; } = [];
+        private HashSet<User> MembersForRemove { get; set; } = [];
 
         private List<EnumViewModel<RoleType>> AllRoles { get; set; } = [];
 
@@ -46,7 +48,6 @@ namespace HITSBlazor.Components.Modals.CenterModals.UsersGroupModal
             {
                 var usersGroup = await UsersGroupsService.GetUsersGroupByIdAsync(UsersGroupId.Value);
                 UsersGroupName = usersGroup?.Name ?? string.Empty;
-                _groupUsers = usersGroup?.Members.ToHashSet() ?? [];
 
                 foreach (var role in usersGroup?.Roles ?? [])
                     SelectedRoles.Add(new(role));
@@ -58,14 +59,28 @@ namespace HITSBlazor.Components.Modals.CenterModals.UsersGroupModal
             _isLoading = false;
         }
 
-        private void SelectUser(User user) => _groupUsers.Add(user);
+        private void AddUser(User user)
+        {
+            if (UsersGroupId.HasValue)
+                if (!MembersForRemove.Remove(user))
+                    MembersForAdd.Add(user);
 
-        private void UnSelectUser(User user) => _groupUsers.Remove(user);
+            GroupMembers.Add(user);
+        }
+
+        private void RemoveUser(User user)
+        {
+            if (UsersGroupId.HasValue)
+                if (!MembersForAdd.Remove(user))
+                    MembersForRemove.Add(user);
+
+            GroupMembers.Remove(user);
+        }
 
         private bool CheckValidValues()
         {
             if (string.IsNullOrWhiteSpace(UsersGroupName)) return false;
-            if (_groupUsers.Count == 0) return false;
+            if (GroupMembers.Count == 0) return false;
             if (SelectedRoles.Count == 0) return false;
 
             return true;
@@ -88,7 +103,8 @@ namespace HITSBlazor.Components.Modals.CenterModals.UsersGroupModal
                 result = await UsersGroupsService.UpdateUsersGroup(
                     UsersGroupId.Value,
                     UsersGroupName,
-                    _groupUsers,
+                    MembersForAdd.Select(u => u.Id),
+                    MembersForRemove.Select(u => u.Id),
                     SelectedRoles.Select(r => r.Value)
                 );
             }
@@ -96,7 +112,7 @@ namespace HITSBlazor.Components.Modals.CenterModals.UsersGroupModal
             {
                 result = await UsersGroupsService.CreateUsersGroup(
                     UsersGroupName,
-                    _groupUsers,
+                    GroupMembers,
                     SelectedRoles.Select(r => r.Value)
                 );
             }

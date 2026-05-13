@@ -53,9 +53,21 @@ namespace HITSBlazor.Services.Companies
             return true;
         }
 
-        public async Task<bool> UpdateCompanyAsync(Guid companyId, string name, User owner, IEnumerable<User> members)
+        public async Task<bool> UpdateCompanyAsync(
+            Guid companyId, 
+            string? name, 
+            User? owner,
+            IEnumerable<Guid>? newMembersIds,
+            IEnumerable<Guid>? removeMembersIds
+        )
         {
-            var company = MockCompanies.UpdateCompany(companyId, name, owner.Id, members.Select(u => u.Id).ToList());
+            var company = MockCompanies.UpdateCompany(
+                companyId, 
+                name, 
+                owner?.Id,
+                newMembersIds,
+                removeMembersIds?.ToHashSet()
+            );
             if (company is null)
             {
                 _globalNotificationService.ShowError("Не удалось обновить команду");

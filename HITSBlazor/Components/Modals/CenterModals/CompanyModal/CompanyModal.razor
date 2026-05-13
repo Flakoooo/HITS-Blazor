@@ -24,22 +24,27 @@
                    Label="Выберите руководителя компании:"
                    Placeholder="Руководитель компании"
                    @bind-Value="SelectedOwner"
-                   DataLoaderMethod="async (page, searchText) => await UserService.GetUsersAsync(page, searchText: searchText)" />
+                   DataLoaderMethod="async (page, searchText) => await UserService.GetUsersAsync(page, searchText: searchText)"
+                   DebounceDelay="500"/>
     <div class="d-flex justify-content-between gap-3">
         <UsersColumn IsLoading="_isLoading"
                      HeaderText="Пользователи:"
-                     SelectedUserChanged="SelectUser"
+                     SelectedUserChanged="AddUser"
                      DataLoaderMethod="async (page, searchText) => await UserService.GetUsersAsync(page, searchText: searchText)"
                      DebounceDelay="500" 
-                     DisplayPredicate="(user) => !CompanyMembers.Contains(user)" />
+                     DisplayPredicate="(user) => !CompanyMembers.Contains(user) && !MembersForAdd.Contains(user)"
+                     DisplayTextColorPredicate="(user) => MembersForRemove.Contains(user) ? TextColor.Danger : null" />
         <UsersColumn IsLoading="_isLoading"
                      HeaderText="Представители компании:"
-                     AllUsers="CompanyMembers"
-                     SelectedUserChanged="UnSelectUser"
+                     SelectedUserChanged="RemoveUser"
+                     @bind-AllUsers="CompanyMembers"
+                     AdditionalUsers="MembersForAdd"
                      DataLoaderMethod="async (page, searchText) => CompanyId.HasValue 
                         ? await CompanyService.GetCompanyMembersAsync(CompanyId.Value, page, searchText: searchText) 
                         : null"
-                     DebounceDelay="500" />
+                     DebounceDelay="500"
+                     DisplayPredicate="(user) => !MembersForRemove.Contains(user)"
+                     DisplayTextColorPredicate="(user) => MembersForAdd.Contains(user) ? TextColor.Success : null" />
     </div>
     <Button IsLoading="_isLoading"
             Variant="ButtonVariant.Primary"

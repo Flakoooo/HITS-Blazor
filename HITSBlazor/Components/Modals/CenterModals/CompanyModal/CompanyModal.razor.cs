@@ -31,6 +31,8 @@ namespace HITSBlazor.Components.Modals.CenterModals.CompanyModal
         private User? SelectedOwner { get; set; }
 
         private List<User> CompanyMembers { get; set; } = [];
+        private HashSet<User> MembersForAdd { get; set; } = [];
+        private HashSet<User> MembersForRemove { get; set; } = [];
 
         protected override async Task OnInitializedAsync()
         {
@@ -46,11 +48,23 @@ namespace HITSBlazor.Components.Modals.CenterModals.CompanyModal
             _isLoading = false;
         }
 
-        private void SelectUser(User user)
+        private void AddUser(User user)
         {
-            if (!CompanyMembers.Contains(user)) CompanyMembers.Add(user);
+            if (CompanyId.HasValue)
+                if (!MembersForRemove.Remove(user))
+                    MembersForAdd.Add(user);
+
+            CompanyMembers.Add(user);
         }
-        private void UnSelectUser(User user) => CompanyMembers.Remove(user);
+
+        private void RemoveUser(User user)
+        {
+            if (CompanyId.HasValue)
+                if (!MembersForAdd.Remove(user))
+                    MembersForRemove.Add(user);
+
+            CompanyMembers.Remove(user);
+        }
 
         private bool CheckValidValues()
         {
@@ -80,7 +94,8 @@ namespace HITSBlazor.Components.Modals.CenterModals.CompanyModal
                     CompanyId.Value,
                     CompanyName,
                     SelectedOwner,
-                    CompanyMembers
+                    MembersForAdd.Select(u => u.Id),
+                    MembersForRemove.Select(u => u.Id)
                 );
             }
             else
