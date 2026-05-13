@@ -1,5 +1,4 @@
-﻿using HITSBlazor.Components.Modals.RightSideModals.IdeaModal;
-using HITSBlazor.Models.Common.Entities;
+﻿using HITSBlazor.Models.Common.Entities;
 using HITSBlazor.Models.Common.Responses;
 using HITSBlazor.Models.Ideas.Entities;
 using HITSBlazor.Models.Ideas.Enums;
@@ -9,7 +8,6 @@ using HITSBlazor.Services.Auth;
 using HITSBlazor.Utils.EnumUIConverters;
 using HITSBlazor.Utils.Mocks.Common;
 using HITSBlazor.Utils.Mocks.Ideas;
-using HITSBlazor.Utils.Models;
 
 namespace HITSBlazor.Services.Ideas
 {
@@ -110,6 +108,9 @@ namespace HITSBlazor.Services.Ideas
             return true;
         }
 
+        public void IdeasStatusHasUpdatedEvent(Guid ideaId, IdeaStatusType ideaStatus)
+            => OnIdeasStatusHasChanged?.Invoke(ideaId, ideaStatus);
+
         public async Task<bool> UpdateIdeaStatusAsync(Guid ideaId, IdeaStatusType ideaStatus)
         {
             var updatedIdea = MockIdeas.UpdateIdeaStatus(ideaId, ideaStatus);
@@ -142,57 +143,6 @@ namespace HITSBlazor.Services.Ideas
 
         public async Task CreateOrUpdateIdeasSkills(Guid ideaId, List<Skill> skills)
             => MockIdeaSkills.CreateOrUpdateIdeasSkills(ideaId, skills);
-
-        //Ratings
-        public async Task<List<Rating>> GetIdeaRatingsAsync(Guid ideaId)
-            => MockRatings.GetIdeaRatingById(ideaId);
-
-        public async Task<bool> SendRatingAsync(RatingRequest request, bool isConfirmed, List<Rating>? ideasRatings)
-        {
-            if (isConfirmed && ideasRatings is null)
-            {
-                string errorText = "При подстверждении рейтинга необхдимо также указать значение \"ideasRatings\"";
-                throw new ArgumentNullException(errorText);
-            }
-
-
-            if (isConfirmed)
-            {
-                if (!MockRatings.UpdateOrConfirmRating(request, isConfirmed))
-                {
-                    _globalNotificationService.ShowError("Не удалось подтвердить рейтинг");
-                    return false;
-                }
-
-                var rating = ideasRatings!.FirstOrDefault(r => r.Id == request.Id);
-                if (rating is not null)
-                {
-                    rating.MarketValue = request.MarketValue;
-                    rating.Originality = request.Originality;
-                    rating.TechnicalRealizability = request.TechnicalRealizability;
-                    rating.Suitability = request.Suitability;
-                    rating.Budget = request.Budget;
-                    rating.IsConfirmed = true;
-
-                    if (ideasRatings!.Count == ideasRatings!.Count(r => r.IsConfirmed))
-                        OnIdeasStatusHasChanged?.Invoke(rating.IdeaId, IdeaStatusType.Confirmed);
-                }
-
-                _globalNotificationService.ShowSuccess("Рейтинг успешно подтвержден");
-            }
-            else
-            {
-                if (!MockRatings.UpdateOrConfirmRating(request))
-                {
-                    _globalNotificationService.ShowError("Не удалось сохранить рейтинг");
-                    return false;
-                }
-
-                _globalNotificationService.ShowSuccess("Рейтинг успешно сохранен");
-            }
-
-            return true;
-        }
 
         //Comments
         public async Task<List<Comment>> GetIdeasCommentsAsync(Guid ideaId)

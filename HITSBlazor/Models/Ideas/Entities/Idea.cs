@@ -17,16 +17,16 @@ namespace HITSBlazor.Models.Ideas.Entities
         public string Solution { get; set; } = string.Empty;
         public string Result { get; set; } = string.Empty;
         public IdeaStatusType Status { get; set; }
-        public int MaxTeamSize { get; set; }
-        public int MinTeamSize { get; set; }
+        public byte MaxTeamSize { get; set; }
+        public byte MinTeamSize { get; set; }
 
         public UsersGroup? ProjectOffice { get; set; }
         public UsersGroup? Experts { get; set; }
         public string Customer { get; set; } = string.Empty;
         public string ContactPerson { get; set; } = string.Empty;
 
-        public int Suitability { get; set; }
-        public int Budget { get; set; }
+        public byte Suitability { get; set; }
+        public byte Budget { get; set; }
         public double PreAssessment { get; set; }
         public double? Rating { get; set; }
 

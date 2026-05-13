@@ -26,13 +26,11 @@ namespace HITSBlazor.Services.Ideas
         Task<bool> UpdateIdeaStatusAsync(Guid ideaId, IdeaStatusType ideaStatus);
         Task<bool> DeleteIdeaAsync(Idea idea);
 
+        void IdeasStatusHasUpdatedEvent(Guid ideaId, IdeaStatusType ideaStatus);
+
         //Skills
         Task<List<Skill>> GetAllIdeaSkillsAsync(Guid ideaId);
         Task CreateOrUpdateIdeasSkills(Guid ideaId, List<Skill> skills);
-
-        //Ratings
-        Task<List<Rating>> GetIdeaRatingsAsync(Guid ideaId);
-        Task<bool> SendRatingAsync(RatingRequest request, bool isConfirmed = false, List<Rating>? ideasRatings = null);
 
         //Comments
         Task<List<Comment>> GetIdeasCommentsAsync(Guid ideaId);

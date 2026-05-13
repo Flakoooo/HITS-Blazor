@@ -1,6 +1,7 @@
 ﻿@namespace HITSBlazor.Components.Inputs.Number
 @using HITSBlazor.Components.Placeholders.Placeholder
 @using HITSBlazor.Components.Typography
+@typeparam T where T : struct, IComparable, IConvertible, IComparable<T>, IEquatable<T>
 
 <div class="w-100">
     @if (IsLoading)

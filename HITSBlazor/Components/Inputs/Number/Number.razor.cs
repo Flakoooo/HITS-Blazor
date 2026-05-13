@@ -2,25 +2,25 @@
 
 namespace HITSBlazor.Components.Inputs.Number
 {
-    public partial class Number
+    public partial class Number<T> where T : struct, IComparable, IConvertible, IComparable<T>, IEquatable<T>
     {
         [Parameter]
         public bool IsLoading { get; set; } = false;
 
         [Parameter]
-        public int? MinValue { get; set; }
+        public T? MinValue { get; set; }
 
         [Parameter]
-        public int? MaxValue { get; set; }
+        public T? MaxValue { get; set; }
 
         [Parameter]
         public string Placeholder { get; set; } = string.Empty;
 
         [Parameter]
-        public int? Value { get; set; }
+        public T? Value { get; set; }
 
         [Parameter]
-        public EventCallback<int?> ValueChanged { get; set; }
+        public EventCallback<T?> ValueChanged { get; set; }
 
         [Parameter]
         public bool NeedValidation { get; set; } = false;
@@ -35,22 +35,34 @@ namespace HITSBlazor.Components.Inputs.Number
 
         protected override void OnInitialized()
         {
-            if (Value < MinValue || Value > MaxValue)
-                Value = null;
+            if (typeof(T).IsValueType && Value.HasValue)
+            {
+                if (MinValue.HasValue && Comparer<T>.Default.Compare(Value.Value, MinValue.Value) < 0)
+                    Value = null;
+                else if (MaxValue.HasValue && Comparer<T>.Default.Compare(Value.Value, MaxValue.Value) > 0)
+                    Value = null;
+            }
         }
 
         protected override void OnParametersSet()
         {
-            _showError = NeedValidation && (!Value.HasValue || Value.Value > MaxValue || Value.Value < MinValue);
+            _showError = NeedValidation && (!Value.HasValue ||
+                (MinValue.HasValue && Comparer<T>.Default.Compare(Value.Value, MinValue.Value) < 0) ||
+                (MaxValue.HasValue && Comparer<T>.Default.Compare(Value.Value, MaxValue.Value) > 0));
 
             ErrorMessage = $"Значение должно быть от {MinValue} до {MaxValue}";
             StateHasChanged();
         }
 
-        private async Task OnInputChanged(int? value)
+        private async Task OnInputChanged(T? value)
         {
-            if (value < MinValue) value = MinValue.Value;
-            else if (value > MaxValue) value = MaxValue.Value;
+            if (value.HasValue)
+            {
+                if (MinValue.HasValue && Comparer<T>.Default.Compare(value.Value, MinValue.Value) < 0)
+                    value = MinValue.Value;
+                else if (MaxValue.HasValue && Comparer<T>.Default.Compare(value.Value, MaxValue.Value) > 0)
+                    value = MaxValue.Value;
+            }
 
             if (ValueChanged.HasDelegate)
                 await ValueChanged.InvokeAsync(value);

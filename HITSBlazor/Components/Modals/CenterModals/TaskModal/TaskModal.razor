@@ -59,7 +59,7 @@
                 Трудоёмкость*
             </Typography>
         }
-        <Number IsLoading="_isLoading" Placeholder="Часы" @bind-Value="Hours" MinValue="0" />
+        <Number T="int" IsLoading="_isLoading" Placeholder="Часы" @bind-Value="Hours" MinValue="0" />
     </div>
     @if (CurrentTask is null)
     {

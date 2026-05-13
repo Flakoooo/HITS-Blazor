@@ -277,8 +277,8 @@ namespace HITSBlazor.Utils.Mocks.Ideas
                     MockUsersGroups.GetRandomGroupUsersById(MockUsersGroups.ProjectOfficeId, 1)
                 );
 
-                idea.Budget = _random.Next(1, 6);
-                idea.Suitability = _random.Next(1, 6);
+                idea.Budget = (byte)_random.Next(1, 6);
+                idea.Suitability = (byte)_random.Next(1, 6);
 
                 idea.PreAssessment = Formulas.CalculcateRating(
                     [idea.Budget, idea.Suitability]

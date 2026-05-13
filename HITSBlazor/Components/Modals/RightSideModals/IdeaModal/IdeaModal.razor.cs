@@ -9,6 +9,7 @@ using HITSBlazor.Services;
 using HITSBlazor.Services.Auth;
 using HITSBlazor.Services.Ideas;
 using HITSBlazor.Services.Modal;
+using HITSBlazor.Services.Ratings;
 using HITSBlazor.Utils.Models;
 using Microsoft.AspNetCore.Components;
 
@@ -24,6 +25,9 @@ namespace HITSBlazor.Components.Modals.RightSideModals.IdeaModal
 
         [Inject]
         private IIdeasService IdeasService { get; set; } = null!;
+
+        [Inject]
+        private IRatingService RatingService { get; set; } = null!;
 
         [Inject]
         private ModalService ModalService { get; set; } = null!;
@@ -57,7 +61,7 @@ namespace HITSBlazor.Components.Modals.RightSideModals.IdeaModal
             get => _expertRating?.MarketValue.ToString() ?? string.Empty;
             set 
             {
-                if (int.TryParse(value, out int intValue) && _expertRating?.MarketValue != intValue)
+                if (byte.TryParse(value, out byte intValue) && _expertRating?.MarketValue != intValue)
                 {
                     _expertRating?.MarketValue = intValue;
                     UpdateRatingScore();
@@ -70,7 +74,7 @@ namespace HITSBlazor.Components.Modals.RightSideModals.IdeaModal
             get => _expertRating?.Originality.ToString() ?? string.Empty;
             set
             {
-                if (int.TryParse(value, out int intValue) && _expertRating?.Originality != intValue)
+                if (byte.TryParse(value, out byte intValue) && _expertRating?.Originality != intValue)
                 {
                     _expertRating?.Originality = intValue;
                     UpdateRatingScore();
@@ -83,7 +87,7 @@ namespace HITSBlazor.Components.Modals.RightSideModals.IdeaModal
             get => _expertRating?.TechnicalRealizability.ToString() ?? string.Empty;
             set
             {
-                if (int.TryParse(value, out int intValue) && _expertRating?.TechnicalRealizability != intValue)
+                if (byte.TryParse(value, out byte intValue) && _expertRating?.TechnicalRealizability != intValue)
                 {
                     _expertRating?.TechnicalRealizability = intValue;
                     UpdateRatingScore();
@@ -96,7 +100,7 @@ namespace HITSBlazor.Components.Modals.RightSideModals.IdeaModal
             get => _expertRating?.Suitability.ToString() ?? string.Empty;
             set
             {
-                if (int.TryParse(value, out int intValue) && _expertRating?.Suitability != intValue)
+                if (byte.TryParse(value, out byte intValue) && _expertRating?.Suitability != intValue)
                 {
                     _expertRating?.Suitability = intValue;
                     UpdateRatingScore();
@@ -109,7 +113,7 @@ namespace HITSBlazor.Components.Modals.RightSideModals.IdeaModal
             get => _expertRating?.Budget.ToString() ?? string.Empty;
             set
             {
-                if (int.TryParse(value, out int intValue) && _expertRating?.Budget != intValue)
+                if (byte.TryParse(value, out byte intValue) && _expertRating?.Budget != intValue)
                 {
                     _expertRating?.Budget = intValue;
                     UpdateRatingScore();
@@ -138,7 +142,7 @@ namespace HITSBlazor.Components.Modals.RightSideModals.IdeaModal
                 new() { Title = "Стек технологий",                              Data = IdeaSkills                  }
             ];
 
-            IdeaRatings = await IdeasService.GetIdeaRatingsAsync(IdeaId);
+            IdeaRatings = await RatingService.GetIdeaRatingsAsync(IdeaId);
             IdeaComments = await IdeasService.GetIdeasCommentsAsync(IdeaId);
 
             if (CheckIdeaRatingAccess())
@@ -204,7 +208,7 @@ namespace HITSBlazor.Components.Modals.RightSideModals.IdeaModal
             {
                 _submitted = true;
             }
-            else if (await IdeasService.SendRatingAsync(_expertRating, true, IdeaRatings))
+            else if (await RatingService.SendRatingAsync(_expertRating, true, IdeaRatings))
             {
                 isRatingConfirmed = true;
             }
@@ -216,7 +220,7 @@ namespace HITSBlazor.Components.Modals.RightSideModals.IdeaModal
         {
             isRatingSaving = true;
 
-            if (_expertRating is not null && await IdeasService.SendRatingAsync(_expertRating))
+            if (_expertRating is not null && await RatingService.SendRatingAsync(_expertRating))
                 isRatingSaved = true;
 
             isRatingSaving = false;
@@ -256,27 +260,33 @@ namespace HITSBlazor.Components.Modals.RightSideModals.IdeaModal
             return false;
         }
 
+        private bool IsValidValues()
+        {
+            if (CurrentIdea is null) return false;
+
+            if (string.IsNullOrWhiteSpace(CurrentIdea.Name)) return false;
+            if (string.IsNullOrWhiteSpace(CurrentIdea.Problem)) return false;
+            if (string.IsNullOrWhiteSpace(CurrentIdea.Description)) return false;
+            if (string.IsNullOrWhiteSpace(CurrentIdea.Solution)) return false;
+            if (string.IsNullOrWhiteSpace(CurrentIdea.Result)) return false;
+
+            if (CurrentIdea.MaxTeamSize is < 2 or > 30) return false;
+            if (CurrentIdea.MinTeamSize is < 2 or > 30) return false;
+
+            if (CurrentIdea.Suitability is < 1 or > 5) return false;
+            if (CurrentIdea.Budget is < 1 or > 5) return false;
+
+            return true;
+        }
+
         //TODO: сделать подробную валидацию
         private async Task UpdateIdeaStatus(IdeaStatusType ideaStatus)
         {
             if (CurrentIdea is null) return;
 
-            if (ideaStatus == IdeaStatusType.OnConfirmation)
+            if (ideaStatus == IdeaStatusType.OnApproval)
             {
-                bool isValid = true;
-                if (string.IsNullOrWhiteSpace(CurrentIdea.Name)) isValid = false;
-                if (string.IsNullOrWhiteSpace(CurrentIdea.Problem)) isValid = false;
-                if (string.IsNullOrWhiteSpace(CurrentIdea.Description)) isValid = false;
-                if (string.IsNullOrWhiteSpace(CurrentIdea.Solution)) isValid = false;
-                if (string.IsNullOrWhiteSpace(CurrentIdea.Result)) isValid = false;
-
-                if (CurrentIdea.MaxTeamSize is < 2 or > 30) isValid = false;
-                if (CurrentIdea.MinTeamSize is < 2 or > 30) isValid = false;
-
-                if (CurrentIdea.Suitability is < 1 or > 5) isValid = false;
-                if (CurrentIdea.Budget is < 1 or > 5) isValid = false;
-
-                if (!isValid)
+                if (!IsValidValues())
                 {
                     GlobalNotificationService.ShowError("Идея заполнена не полностью, заполните недостающие поля");
                     return;

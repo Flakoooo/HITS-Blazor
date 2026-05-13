@@ -80,7 +80,7 @@ namespace HITSBlazor.Pages.Ideas.IdeasCreate
                 : string.Empty; 
             set 
             {
-                if (int.TryParse(value, out int intValue) && IdeasCreateModel.Suitability != intValue)
+                if (byte.TryParse(value, out byte intValue) && IdeasCreateModel.Suitability != intValue)
                 {
                     IdeasCreateModel.Suitability = intValue;
                     UpdatePreAssessmentScore();
@@ -95,7 +95,7 @@ namespace HITSBlazor.Pages.Ideas.IdeasCreate
                 : string.Empty;
             set
             {
-                if (int.TryParse(value, out int intValue) && IdeasCreateModel.Budget != intValue)
+                if (byte.TryParse(value, out byte intValue) && IdeasCreateModel.Budget != intValue)
                 {
                     IdeasCreateModel.Budget = intValue;
                     UpdatePreAssessmentScore();

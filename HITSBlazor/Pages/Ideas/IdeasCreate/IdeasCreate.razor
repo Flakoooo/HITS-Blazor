@@ -79,13 +79,15 @@
                         </div>
                     }
                     <div class="mt-2 d-flex gap-3">
-                        <Number IsLoading="_isLoading"
+                        <Number T="byte"
+                                IsLoading="_isLoading"
                                 MinValue="2" 
                                 MaxValue="30" 
                                 NeedValidation="_submitted"
                                 Placeholder="Минимальное количество: 2" 
                                 @bind-Value="IdeasCreateModel.MinTeamSize" />
-                        <Number IsLoading="_isLoading"
+                        <Number T="byte"
+                                IsLoading="_isLoading"
                                 MinValue="2"
                                 MaxValue="30"
                                 NeedValidation="_submitted"

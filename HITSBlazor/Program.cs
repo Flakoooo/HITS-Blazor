@@ -12,6 +12,7 @@ using HITSBlazor.Services.Modal;
 using HITSBlazor.Services.Notifications;
 using HITSBlazor.Services.Profiles;
 using HITSBlazor.Services.Projects;
+using HITSBlazor.Services.Ratings;
 using HITSBlazor.Services.Skills;
 using HITSBlazor.Services.Tags;
 using HITSBlazor.Services.Teams;
@@ -112,6 +113,9 @@ namespace HITSBlazor
 
             //Ideas
             builder.Services.AddScoped<IIdeasService, MockIdeasService>();
+
+            //Ratings
+            builder.Services.AddScoped<IRatingService, MockRatingService>();
 
             //Teams
             builder.Services.AddScoped<ITeamService, MockTeamService>();

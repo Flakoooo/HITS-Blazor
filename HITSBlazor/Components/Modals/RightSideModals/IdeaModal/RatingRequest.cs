@@ -3,10 +3,10 @@
     public class RatingRequest
     {
         public Guid? Id { get; set; }
-        public int? MarketValue { get; set; }
-        public int? Originality { get; set; }
-        public int? TechnicalRealizability { get; set; }
-        public int? Suitability { get; set; }
-        public int? Budget { get; set; }
+        public byte? MarketValue { get; set; }
+        public byte? Originality { get; set; }
+        public byte? TechnicalRealizability { get; set; }
+        public byte? Suitability { get; set; }
+        public byte? Budget { get; set; }
     }
 }

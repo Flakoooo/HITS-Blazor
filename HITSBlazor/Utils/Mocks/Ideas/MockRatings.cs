@@ -14,7 +14,7 @@ namespace HITSBlazor.Utils.Mocks.Ideas
         public static Guid Idea3Id { get; } = Guid.NewGuid();
 
         private static readonly Random _random = new();
-        private static int CreateExpertOptionValue() => _random.Next(1, 6);
+        private static byte CreateExpertOptionValue() => (byte)_random.Next(1, 6);
 
         public static List<Rating> GetIdeaRatingById(Guid ideaId)
             => [.. _ratings.Where(r => r.IdeaId == ideaId)];

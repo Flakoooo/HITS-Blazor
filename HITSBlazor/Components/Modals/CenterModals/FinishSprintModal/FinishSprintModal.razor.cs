@@ -32,7 +32,7 @@ namespace HITSBlazor.Components.Modals.CenterModals.FinishSprintModal
 
         private bool _isLoading = true;
 
-        private Dictionary<Guid, int?> _projectMembersScores = [];
+        private Dictionary<Guid, byte?> _projectMembersScores = [];
 
         private string Report { get; set; } = string.Empty;
 
@@ -42,7 +42,7 @@ namespace HITSBlazor.Components.Modals.CenterModals.FinishSprintModal
         {
             _isLoading = true;
 
-            _projectMembersScores = ProjectMembers.ToDictionary(m => m.UserId, m => (int?)null);
+            _projectMembersScores = ProjectMembers.ToDictionary(m => m.UserId, m => (byte?)null);
 
             _isLoading = false;
         }
