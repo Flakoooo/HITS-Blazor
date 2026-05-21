@@ -11,8 +11,8 @@ namespace HITSBlazor.Models.Projects.Entities
         public string FirstName { get; set; } = string.Empty;
         public string LastName { get; set; } = string.Empty;
         public ProjectMemberRole ProjectRole { get; set; }
-        public DateTime StartDate { get; set; }
-        public DateTime FinishDate { get; set; }
+        public DateOnly StartDate { get; set; }
+        public DateOnly FinishDate { get; set; }
 
 
         public string FullName => $"{FirstName} {LastName}";

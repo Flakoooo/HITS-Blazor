@@ -5,6 +5,7 @@ using HITSBlazor.Components.Tables.TableHeader;
 using HITSBlazor.Components.Typography;
 using HITSBlazor.Models.Common.Entities;
 using HITSBlazor.Models.Common.Enums;
+using HITSBlazor.Models.Teams.Requests;
 using HITSBlazor.Models.Users.Entities;
 using HITSBlazor.Models.Users.Enums;
 using HITSBlazor.Services.Auth;
@@ -41,6 +42,8 @@ namespace HITSBlazor.Pages.Teams.TeamsCreate
         public string TeamId { get; set; } = string.Empty;
 
         private bool _isLoading = true;
+
+        private Dictionary<string, string> _errors = [];
 
         private Guid? TeamGuid { get; set; }
         private string TeamName { get; set; } = string.Empty;
@@ -230,6 +233,45 @@ namespace HITSBlazor.Pages.Teams.TeamsCreate
                     TeamMembers.Remove(user);
                 }
             }
+        }
+
+        private async Task CreateTeam()
+        {
+            _errors.Clear();
+
+            if (string.IsNullOrWhiteSpace(TeamName))
+                _errors.Add("name", "Поле не может быть пустым");
+
+            if (string.IsNullOrWhiteSpace(TeamDescription))
+                _errors.Add("description", "Поле не может быть пустым");
+
+            if (!_teamIsClosed.HasValue)
+                _errors.Add("closed", "Тип команды не выбран");
+
+            if (SelectedOwner is null)
+                _errors.Add("owner", "Владелец команды не выбран");
+
+            if (SelectedLeader is null)
+                _errors.Add("leader", "Лидер команды не выбран");
+
+            if (_errors.Count > 0) return;
+
+            var request = new CreateTeamRequest
+            {
+                Name = TeamName,
+                Description = TeamDescription,
+                IsClosed = _teamIsClosed!.Value,
+                OwnerId = SelectedOwner!.Id,
+                LeaderId = SelectedLeader!.Id,
+                InvitedMembers = MembersForInviting.Select(m => m.Id).ToList(),
+                WantedSkills = 
+                [
+                    .. SelectedLanguageSkills.Select(s => s.Id),
+                    .. SelectedFrameworkSkills.Select(s => s.Id),
+                    .. SelectedDatabaseSkills.Select(s => s.Id),
+                    .. SelectedDevopsSkills.Select(s => s.Id)
+                ]
+            };
         }
 
         private void ShowInviteUsersModal()

@@ -45,7 +45,7 @@ namespace HITSBlazor.Services.Markets
             return market;
         }
 
-        public async Task<bool> CreateNewMarketAsync(string name, DateTime startDate, DateTime finishDate)
+        public async Task<bool> CreateNewMarketAsync(string name, DateOnly startDate, DateOnly finishDate)
         {
             var market = MockMarkets.CreateMarket(name, startDate, finishDate);
             if (market is null)
@@ -61,7 +61,7 @@ namespace HITSBlazor.Services.Markets
 
         
         public async Task<bool> UpdateMarketAsync(
-            Guid marketId, string name, DateTime startDate, DateTime finishDate, MarketStatus status
+            Guid marketId, string name, DateOnly startDate, DateOnly finishDate, MarketStatus status
         )
         {
             var market = MockMarkets.UpdateMarket(marketId, name, startDate, finishDate, status);

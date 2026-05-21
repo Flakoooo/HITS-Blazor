@@ -45,12 +45,6 @@ namespace HITSBlazor.Components.Inputs.Input
         public EventCallback<string> ValueChanged { get; set; }
 
         [Parameter]
-        public bool NeedValidation { get; set; } = false;
-
-        [Parameter]
-        public Func<string, ValidationEvaluation>? CustomValidation { get; set; }
-
-        [Parameter]
         public string? ErrorMessage { get; set; } = "Поле не заполнено";
 
         [Parameter]
@@ -77,20 +71,7 @@ namespace HITSBlazor.Components.Inputs.Input
 
         protected override void OnParametersSet()
         {
-            if (NeedValidation)
-            {
-                if (CustomValidation is not null)
-                {
-                    var result = CustomValidation(Value);
-                    ErrorMessage = result.Message;
-                    _showError = !result.IsValid;
-                }
-                else
-                {
-                    _showError = string.IsNullOrWhiteSpace(Value);
-                }
-            }
-            else _showError = false;
+            _showError = !string.IsNullOrWhiteSpace(ErrorMessage);
 
             StateHasChanged();
         }

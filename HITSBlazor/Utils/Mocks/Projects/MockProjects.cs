@@ -54,8 +54,8 @@ namespace HITSBlazor.Utils.Mocks.Projects
                             Email = alex.Email,
                             FirstName = alex.FirstName,
                             LastName = alex.LastName,
-                            StartDate = new DateTime(2023, 10, 25, 11, 2, 17, DateTimeKind.Utc),
-                            FinishDate = new DateTime(2023, 10, 25, 11, 2, 17, DateTimeKind.Utc),
+                            StartDate = DateOnly.FromDateTime(new DateTime(2023, 10, 25, 11, 2, 17, DateTimeKind.Utc)),
+                            FinishDate = DateOnly.FromDateTime(new DateTime(2023, 10, 25, 11, 2, 17, DateTimeKind.Utc)),
                             ProjectRole = ProjectMemberRole.Initiator
                         },
                         new ProjectMember
@@ -65,8 +65,8 @@ namespace HITSBlazor.Utils.Mocks.Projects
                             Email = kirill.Email,
                             FirstName = kirill.FirstName,
                             LastName = kirill.LastName,
-                            StartDate = new DateTime(2023, 10, 25, 11, 2, 17, DateTimeKind.Utc),
-                            FinishDate = new DateTime(2023, 10, 25, 11, 2, 17, DateTimeKind.Utc),
+                            StartDate = DateOnly.FromDateTime(new DateTime(2023, 10, 25, 11, 2, 17, DateTimeKind.Utc)),
+                            FinishDate = DateOnly.FromDateTime(new DateTime(2023, 10, 25, 11, 2, 17, DateTimeKind.Utc)),
                             ProjectRole = ProjectMemberRole.TeamLeader
                         },
                         new ProjectMember
@@ -76,13 +76,13 @@ namespace HITSBlazor.Utils.Mocks.Projects
                             Email = denis.Email,
                             FirstName = denis.FirstName,
                             LastName = denis.LastName,
-                            StartDate = new DateTime(2023, 10, 25, 11, 2, 17, DateTimeKind.Utc),
-                            FinishDate = new DateTime(2023, 10, 25, 11, 2, 17, DateTimeKind.Utc),
+                            StartDate = DateOnly.FromDateTime(new DateTime(2023, 10, 25, 11, 2, 17, DateTimeKind.Utc)),
+                            FinishDate = DateOnly.FromDateTime(new DateTime(2023, 10, 25, 11, 2, 17, DateTimeKind.Utc)),
                             ProjectRole = ProjectMemberRole.Member
                         }
                     ],
-                    StartDate = new DateTime(2023, 10, 25, 11, 2, 17, DateTimeKind.Utc),
-                    FinishDate = new DateTime(2024, 10, 25, 11, 2, 17, DateTimeKind.Utc),
+                    StartDate = DateOnly.FromDateTime(new DateTime(2023, 10, 25, 11, 2, 17, DateTimeKind.Utc)),
+                    FinishDate = DateOnly.FromDateTime(new DateTime(2024, 10, 25, 11, 2, 17, DateTimeKind.Utc)),
                     Status = ProjectStatus.Active
                 },
                 new Project
@@ -103,8 +103,8 @@ namespace HITSBlazor.Utils.Mocks.Projects
                             Email = admin.Email,
                             FirstName = admin.FirstName,
                             LastName = admin.LastName,
-                            StartDate = new DateTime(2023, 10, 25, 11, 2, 17, DateTimeKind.Utc),
-                            FinishDate = new DateTime(2023, 10, 25, 11, 2, 17, DateTimeKind.Utc),
+                            StartDate = DateOnly.FromDateTime(new DateTime(2023, 10, 25, 11, 2, 17, DateTimeKind.Utc)),
+                            FinishDate = DateOnly.FromDateTime(new DateTime(2023, 10, 25, 11, 2, 17, DateTimeKind.Utc)),
                             ProjectRole = ProjectMemberRole.Initiator
                         },
                         new ProjectMember
@@ -114,14 +114,14 @@ namespace HITSBlazor.Utils.Mocks.Projects
                             Email = timur.Email,
                             FirstName = timur.FirstName,
                             LastName = timur.LastName,
-                            StartDate = new DateTime(2023, 10, 25, 11, 2, 17, DateTimeKind.Utc),
-                            FinishDate = new DateTime(2023, 10, 25, 11, 2, 17, DateTimeKind.Utc),
+                            StartDate = DateOnly.FromDateTime(new DateTime(2023, 10, 25, 11, 2, 17, DateTimeKind.Utc)),
+                            FinishDate = DateOnly.FromDateTime(new DateTime(2023, 10, 25, 11, 2, 17, DateTimeKind.Utc)),
                             ProjectRole = ProjectMemberRole.TeamLeader
                         }
                     ],
                     Report = "репорт",
-                    StartDate = new DateTime(2023, 10, 25, 11, 2, 17, DateTimeKind.Utc),
-                    FinishDate = new DateTime(2024, 1, 18, 11, 2, 17, DateTimeKind.Utc),
+                    StartDate = DateOnly.FromDateTime(new DateTime(2023, 10, 25, 11, 2, 17, DateTimeKind.Utc)),
+                    FinishDate = DateOnly.FromDateTime(new DateTime(2024, 1, 18, 11, 2, 17, DateTimeKind.Utc)),
                     Status = ProjectStatus.Done
                 }
             ];
@@ -201,7 +201,7 @@ namespace HITSBlazor.Utils.Mocks.Projects
                 Customer = ideaMarket.Customer,
                 Initiator = ideaMarket.Initiator,
                 Team = ideaMarket.Team,
-                StartDate = DateTime.UtcNow,
+                StartDate = DateOnly.FromDateTime(DateTime.Now),
                 FinishDate = market.FinishDate,
                 Status = ProjectStatus.Active
             };
@@ -256,7 +256,7 @@ namespace HITSBlazor.Utils.Mocks.Projects
                 FirstName = user.FirstName,
                 LastName = user.LastName,
                 ProjectRole = ProjectMemberRole.Member,
-                StartDate = DateTime.UtcNow,
+                StartDate = DateOnly.FromDateTime(DateTime.Now),
                 FinishDate = project.FinishDate
             });
 

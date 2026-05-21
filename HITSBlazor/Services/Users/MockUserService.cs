@@ -18,13 +18,15 @@ namespace HITSBlazor.Services.Users
             string? searchText,
             string? orderBy,
             bool? byDescending,
-            HashSet<RoleType>? selectedRoles
+            IEnumerable<RoleType>? selectedRoles,
+            IEnumerable<Guid>? ignoredIds
         ) => MockUsers.GetAllUsers(
             page,
             searchText: searchText,
             orderBy: orderBy,
             byDescending: byDescending,
-            selectedRoles: selectedRoles
+            selectedRoles: selectedRoles?.ToHashSet(),
+            ignoredIds: ignoredIds?.ToHashSet()
         );
 
         public async Task<bool> UpdateUser(UpdateUserRequest request)

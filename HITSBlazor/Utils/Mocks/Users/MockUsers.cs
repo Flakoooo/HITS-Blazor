@@ -313,10 +313,14 @@ namespace HITSBlazor.Utils.Mocks.Users
             string? searchText = null,
             string? orderBy = null,
             bool? byDescending = null,
-            HashSet<RoleType>? selectedRoles = null
+            HashSet<RoleType>? selectedRoles = null,
+            HashSet<Guid>? ignoredIds = null
         )
         {
-            var query = _users.AsEnumerable();
+            var query = _users.AsQueryable();
+
+            if (ignoredIds?.Count > 0)
+                query = query.Where(u => !ignoredIds.Contains(u.Id));
 
             if (selectedRoles?.Count > 0)
                 query = query.Where(u => u.Roles.Any(selectedRoles.Contains));
@@ -345,10 +349,10 @@ namespace HITSBlazor.Utils.Mocks.Users
             => _users.FirstOrDefault(u => u.Id == id);
 
         public static List<string> GetUserEmails() 
-            => [.. _users.Select(u => u.Email)];
+            => _users.Select(u => u.Email).ToList();
 
         public static List<User> GetUsersByRole(RoleType role) 
-            => [.. _users.Where(u => u.Roles.Contains(role))];
+            => _users.Where(u => u.Roles.Contains(role)).ToList();
 
         public static User? UpdateUser(UpdateUserRequest updatedUser)
         {

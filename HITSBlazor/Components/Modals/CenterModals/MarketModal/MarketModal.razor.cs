@@ -24,7 +24,8 @@ namespace HITSBlazor.Components.Modals.CenterModals.MarketModal
 
         private bool _isLoading = true;
         private bool _submitting = false;
-        private bool _submitted = false;
+
+        private Dictionary<string, string> _errors = [];
 
         private string MarketName { get; set; } = string.Empty;
         private string MarketStartDate { get; set; } = string.Empty;
@@ -53,28 +54,30 @@ namespace HITSBlazor.Components.Modals.CenterModals.MarketModal
             ).UtcDateTime;
         }
 
-        private ValidationEvaluation ValidFinishDate(string finishDate)
-            => MarketValidation.FinishDateValidation(finishDate, MarketStartDate);
-
         private async Task SendMarket()
         {
+            _errors.Clear();
+
             _submitting = true;
-            _submitted = false;
 
-            bool isValid = true;
+            DateOnly? startDate = null;
+            DateOnly? finishDate = null;
 
-            DateTime? startDate = ConvertStringToDate(MarketStartDate);
-            DateTime? finishDate = ConvertStringToDate(MarketFinishDate);
+            if (string.IsNullOrWhiteSpace(MarketName))
+                _errors.Add("name", "Поле не может быть пустым");
 
-            if (string.IsNullOrWhiteSpace(MarketName)) isValid = false;
-            else if (!startDate.HasValue || !MarketValidation.StartDateValidation(startDate.Value).IsValid) isValid = false;
-            else if (!finishDate.HasValue || !MarketValidation.FinishDateValidation(finishDate.Value, startDate.Value).IsValid) isValid = false;
+            var validationStartDateResult = DateValidation.StartDateValidation(MarketStartDate, ref startDate);
+            if (!validationStartDateResult.IsValid)
+                _errors.Add("startDate", validationStartDateResult.Message);
 
-            if (!isValid)
+            var validationFinishDateResult = DateValidation.FinishDateValidation(MarketFinishDate, MarketStartDate, ref finishDate);
+            if (!validationFinishDateResult.IsValid)
+                _errors.Add("finishDate", validationFinishDateResult.Message);
+
+            if (_errors.Count > 0)
             {
                 NotificationService.ShowError("Заполнены не все поля");
                 _submitting = false;
-                _submitted = true;
                 return;
             }
 
@@ -103,7 +106,6 @@ namespace HITSBlazor.Components.Modals.CenterModals.MarketModal
             if (result)
                 await ModalService.Close(ModalType.Center);
 
-            _submitted = true;
             _submitting = false;
         }
     }

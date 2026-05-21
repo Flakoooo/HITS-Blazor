@@ -27,12 +27,12 @@
             <Input IsLoading="_isLoading"
                    Label="Название команды*" 
                    Placeholder="Введите название команды" 
-                   NeedValidation="true" 
+                   ErrorMessage="@_errors.GetValueOrDefault("name")"
                    @bind-Value="TeamName" />
             <TextArea IsLoading="_isLoading"
                       Label="Описание команды*" 
                       Placeholder="Введите описание команды" 
-                      NeedValidation="true" 
+                      ErrorMessage="@_errors.GetValueOrDefault("description")"
                       @bind-Value="TeamDescription" />
             <div class="w-100">
                 <Typography FontSize="2" TextColor="TextColor.Primary">

@@ -20,32 +20,32 @@ namespace HITSBlazor.Utils.Mocks.Markets
             {
                 Id = Summer2023Id,
                 Name = "Летняя биржа 2023",
-                StartDate = new DateTime(2023, 6, 1, 0, 0, 0, DateTimeKind.Utc),
-                FinishDate = new DateTime(2023, 8, 31, 0, 0, 0, DateTimeKind.Utc),
+                StartDate = DateOnly.FromDateTime(new DateTime(2023, 6, 1, 0, 0, 0, DateTimeKind.Utc)),
+                FinishDate = DateOnly.FromDateTime(new DateTime(2023, 8, 31, 0, 0, 0, DateTimeKind.Utc)),
                 Status = MarketStatus.Done
             },
             new Market
             {
                 Id = Autumn2023Id,
                 Name = "Осенняя биржа 2023",
-                StartDate = new DateTime(2023, 9, 1, 0, 0, 0, DateTimeKind.Utc),
-                FinishDate = new DateTime(2023, 11, 30, 0, 0, 0, DateTimeKind.Utc),
+                StartDate = DateOnly.FromDateTime(new DateTime(2023, 9, 1, 0, 0, 0, DateTimeKind.Utc)),
+                FinishDate = DateOnly.FromDateTime(new DateTime(2023, 11, 30, 0, 0, 0, DateTimeKind.Utc)),
                 Status = MarketStatus.Active
             },
             new Market
             {
                 Id = Winter2024Id,
                 Name = "Зимняя биржа 2024",
-                StartDate = new DateTime(2023, 12, 1, 0, 0, 0, DateTimeKind.Utc),
-                FinishDate = new DateTime(2024, 2, 28, 0, 0, 0, DateTimeKind.Utc),
+                StartDate = DateOnly.FromDateTime(new DateTime(2023, 12, 1, 0, 0, 0, DateTimeKind.Utc)),
+                FinishDate = DateOnly.FromDateTime(new DateTime(2024, 2, 28, 0, 0, 0, DateTimeKind.Utc)),
                 Status = MarketStatus.New
             },
             new Market
             {
                 Id = Spring2024Id,
                 Name = "Весенняя биржа 2024",
-                StartDate = new DateTime(2024, 3, 1, 0, 0, 0, DateTimeKind.Utc),
-                FinishDate = new DateTime(2024, 5, 31, 0, 0, 0, DateTimeKind.Utc),
+                StartDate = DateOnly.FromDateTime(new DateTime(2024, 3, 1, 0, 0, 0, DateTimeKind.Utc)),
+                FinishDate = DateOnly.FromDateTime(new DateTime(2024, 5, 31, 0, 0, 0, DateTimeKind.Utc)),
                 Status = MarketStatus.New
             }
         ];
@@ -91,7 +91,7 @@ namespace HITSBlazor.Utils.Mocks.Markets
 
         public static Market? GetMarketById(Guid marketId) => _markets.FirstOrDefault(m => m.Id == marketId);
 
-        public static Market? CreateMarket(string name, DateTime startDate, DateTime finishDate, MarketStatus status = MarketStatus.New)
+        public static Market? CreateMarket(string name, DateOnly startDate, DateOnly finishDate, MarketStatus status = MarketStatus.New)
         {
             var market = new Market
             {
@@ -106,7 +106,7 @@ namespace HITSBlazor.Utils.Mocks.Markets
             return market;
         }
 
-        public static Market? UpdateMarket(Guid marketId, string name, DateTime startDate, DateTime finishDate, MarketStatus status)
+        public static Market? UpdateMarket(Guid marketId, string name, DateOnly startDate, DateOnly finishDate, MarketStatus status)
         {
             var marketForUpdate = _markets.FirstOrDefault(m => m.Id == marketId);
             if (marketForUpdate is null) return null;

@@ -2,6 +2,7 @@
 using HITSBlazor.Components.Tables.TableComponent;
 using HITSBlazor.Components.Tables.TableHeader;
 using HITSBlazor.Models.Users.Entities;
+using HITSBlazor.Services.Auth;
 using HITSBlazor.Services.Modal;
 using HITSBlazor.Services.Teams;
 using HITSBlazor.Services.Users;
@@ -11,6 +12,9 @@ namespace HITSBlazor.Components.Modals.CenterModals.AddTeamMembersModal
 {
     public partial class AddTeamMembersModal
     {
+        [Inject]
+        private IAuthService AuthService { get; set; } = null!;
+
         [Inject]
         private ITeamService TeamService { get; set; } = null!;
 
@@ -62,11 +66,15 @@ namespace HITSBlazor.Components.Modals.CenterModals.AddTeamMembersModal
 
         private async Task LoadUsersAsync(bool append = false)
         {
+            var currentUser = AuthService.CurrentUser;
+            if (currentUser is null) return;
+
             await LoadDataAsync(
                 _users,
                 () => UserService.GetUsersAsync(
                     _currentPage,
-                    searchText: SeacrhText
+                    searchText: SeacrhText,
+                    ignoredIds: [currentUser.Id]
                 ),
                 append: append
             );

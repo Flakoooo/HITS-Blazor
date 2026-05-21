@@ -15,7 +15,8 @@ namespace HITSBlazor.Services.Users
             string? searchText = null,
             string? orderBy = null,
             bool? byDescending = null,
-            HashSet<RoleType>? selectedRoles = null
+            IEnumerable<RoleType>? selectedRoles = null,
+            IEnumerable<Guid>? ignoredIds = null
         );
 
         Task<bool> UpdateUser(UpdateUserRequest request);
