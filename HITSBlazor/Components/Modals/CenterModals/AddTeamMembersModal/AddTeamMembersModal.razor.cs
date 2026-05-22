@@ -24,6 +24,9 @@ namespace HITSBlazor.Components.Modals.CenterModals.AddTeamMembersModal
         [Inject]
         private ModalService ModalService { get; set; } = null!;
 
+        [Parameter]
+        public HashSet<Guid> IgnoredUsers { get; set; } = [];
+
         private bool _isLoading = true;
 
         private TableComponent? _tableComponent;
@@ -74,7 +77,7 @@ namespace HITSBlazor.Components.Modals.CenterModals.AddTeamMembersModal
                 () => UserService.GetUsersAsync(
                     _currentPage,
                     searchText: SeacrhText,
-                    ignoredIds: [currentUser.Id]
+                    ignoredIds: [currentUser.Id, .. IgnoredUsers]
                 ),
                 append: append
             );

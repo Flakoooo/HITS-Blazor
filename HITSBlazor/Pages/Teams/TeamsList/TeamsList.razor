@@ -19,7 +19,7 @@
 @using HITSBlazor.Utils.Models
 @inherits ListPageDataLoader
 
-<div class="bg-white teams-list h-auto overflow-y-scroll" @ref="_tableContainer">
+<div class="bg-white teams-list h-auto">
     <div class="w-100 p-3">
         <ListPageHeader IsLoading="_isLoading"
                         HeaderText="@($"Список команд: {_totalCount}")" 
@@ -27,7 +27,7 @@
                         CreateButtonText="Создать команду" 
                         OnButtonClick="@(() => NavigationService.NavigateToAsync("teams/create"))" />
         <InputSearch Width="50" IsLoading="_isLoading" ValueChanged="@((value) => SearchTeam(value))" />
-        <TableComponent IsLoading="_isLoading" IsDataLoading="_isLoadingMore" HeaderItems="_teamTableHeader" TableActionMenuIsEnable="true" OrderMethod="SortTeam">
+        <TableComponent IsLoading="_isLoading" IsDataLoading="_isLoadingMore" HeaderItems="_teamTableHeader" TableActionMenuIsEnable="true" OrderMethod="SortTeam" @ref="_tableComponent">
             <TableContent>
                 @foreach (var team in _teams)
                 {
@@ -50,12 +50,8 @@
                             @team.CreatedAt.ToString("dd.MM.yyyy")
                         </TableBodyRow>
                         <TableActionMenu ItemId="@team.Id"
-                                            OnAction="OnTeamAction"
-                                            ActionIds="@(new Dictionary<MenuAction, object> { 
-                                            [MenuAction.View] = team.Id,
-                                            [MenuAction.Edit] = team.Id,
-                                            [MenuAction.Delete] = team
-                                            })" />
+                                         OnAction="OnTeamAction"
+                                         ActionIds="GetTableActions(team)" />
                     </tr>
                 }
             </TableContent>

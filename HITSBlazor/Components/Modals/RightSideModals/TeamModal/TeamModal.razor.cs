@@ -1,15 +1,11 @@
 ﻿using HITSBlazor.Components.ActionMenus.BaseActionMenu;
-using HITSBlazor.Components.Modals.Components;
+using HITSBlazor.Components.Button;
 using HITSBlazor.Components.Modals.Components.RightSideModaCollapselInfo;
 using HITSBlazor.Components.Modals.Components.RightSideModalInfo;
-using HITSBlazor.Components.Modals.RightSideModals.IdeaMarketModal;
-using HITSBlazor.Components.Modals.RightSideModals.IdeaModal;
 using HITSBlazor.Components.Tables.TableHeader;
 using HITSBlazor.Components.Typography;
-using HITSBlazor.Models.Common.Entities;
-using HITSBlazor.Models.Ideas.Entities;
 using HITSBlazor.Models.Teams.Entities;
-using HITSBlazor.Services.IdeaMarkets;
+using HITSBlazor.Services;
 using HITSBlazor.Services.Modal;
 using HITSBlazor.Services.Teams;
 using Microsoft.AspNetCore.Components;
@@ -23,6 +19,9 @@ namespace HITSBlazor.Components.Modals.RightSideModals.TeamModal
 
         [Inject]
         private ModalService ModalService { get; set; } = null!;
+
+        [Inject]
+        private NavigationService NavigationService { get; set; } = null!;
 
         [Parameter]
         public Guid TeamId { get; set; }
@@ -222,5 +221,27 @@ namespace HITSBlazor.Components.Modals.RightSideModals.TeamModal
                 }
             }
         }
+
+        private async Task NavigateToCreateTeam()
+        {
+            await ModalService.CloseAll(ModalType.RightSide);
+            await NavigationService.NavigateToAsync($"/teams/create/{_currentTeam?.Id}");
+        }
+
+        private void DeleteTeam()
+        {
+            if (_currentTeam is null) return;
+
+            ModalService.ShowConfirmModal(
+                $"Вы действительно хотите удалить {_currentTeam.Name}?",
+                () => TeamService.DeleteTeamAsync(_currentTeam),
+                confirmButtonVariant: ButtonVariant.Danger,
+                confirmButtonText: "Удалить"
+            );
+        }
+
+        private void ShowInviteUsersModal() => ModalService.ShowInviteUsersModal(
+            _currentTeam?.Members.Select(m => m.UserId).ToHashSet() ?? []
+        );
     }
 }

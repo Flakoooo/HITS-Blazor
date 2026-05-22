@@ -50,7 +50,7 @@
             }
 
             <div @ref="_tableContainer" class="list-group w-100 dropdown-list"
-                 style="top: 42px; right: auto; z-index: 6; max-height: 173px; overflow-y: scroll; position: absolute; bottom: auto; left: auto; @(_isOpen && _values.Any() ? string.Empty : "display: none;")"
+                 style="top: 42px; right: auto; z-index: 106; max-height: 173px; overflow-y: scroll; position: absolute; bottom: auto; left: auto; @(_isOpen && _values.Any() ? string.Empty : "display: none;")"
                  @onclick:stopPropagation>
 
                 @foreach (var value in _values)

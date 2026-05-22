@@ -44,11 +44,12 @@ namespace HITSBlazor.Components.Inputs.RadioDropdown
         private bool _isOpen = false;
 
         private List<T> _values = [];
-        private readonly string _radioGroupName = typeof(T).Name;
+        private string _radioGroupName = typeof(T).Name;
         private string _searchText = string.Empty;
 
         protected override async Task OnInitializedAsync()
         {
+            _radioGroupName = $"{_radioGroupName}{Label}";
             if (DataLoaderMethod is not null && DebounceDelay > 0)
             {
                 _searchDebounce = new DebounceHelper(DebounceDelay, async () =>
@@ -149,8 +150,10 @@ namespace HITSBlazor.Components.Inputs.RadioDropdown
 
         private bool IsItemSelected(T value)
         {
+            Console.WriteLine($"{Label} Value is null {Value is null} {DateTime.Now}");
             if (Value is null) return false;
-            
+
+            Console.WriteLine($"{Label} Value.Equals(value) {Value.Equals(value)} {DateTime.Now}");
             return Value.Equals(value);
         }
 

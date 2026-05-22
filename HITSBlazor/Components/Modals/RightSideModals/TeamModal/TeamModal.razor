@@ -13,6 +13,7 @@
 @using HITSBlazor.Components.Statuses.EnumStatus
 @using HITSBlazor.Components.Tables.TableActionMenu
 @using HITSBlazor.Components.Tables.TableBodyRow
+@using HITSBlazor.Components.Tables.TableComponent
 @using HITSBlazor.Components.Tables.TableHeader
 @using HITSBlazor.Components.Typography
 @using HITSBlazor.Models.Common.Entities
@@ -112,6 +113,38 @@
                     <div class="w-100 bg-white px-3 pb-3 pt-1">
                         <!-- TODO: реализовать поиск -->
                         <InputSearch Width="50" IsLoading="_isLoading" ValueChanged="@((value) => SearchData(value))" DebounceDelay="500" />
+                        <TableComponent IsLoading="_isLoading" IsDataLoading="_isLoadingMore" HeaderItems="MembersTableHeader" TableActionMenuIsEnable="true">
+                            <TableContent>
+                                @foreach (var member in _currentTeam.Members)
+                                {
+                                    <tr>
+                                        <TableBodyRow>
+                                            @{
+                                                var displayInfo = GetRoleDisplayInfo(member.Id);
+                                                <div class="data-link @(displayInfo.TextColor.HasValue ? $"text-{displayInfo.TextColor.Value.ToString().ToLower()}" : string.Empty)">
+                                                    @member.Email @displayInfo.DisplayText
+                                                </div>
+                                            }
+                                        </TableBodyRow>
+                                        <TableBodyRow>
+                                            @member.FirstName
+                                        </TableBodyRow>
+                                        <TableBodyRow>
+                                            @member.LastName
+                                        </TableBodyRow>
+                                        <TableActionMenu ItemId="member.Id"
+                                                            StrategyPosition="Strategy.Fixed"
+                                                            OnAction="@HandleTableMenuClick"
+                                                            ActionIds="@(new Dictionary<MenuAction, object> {
+                                                            [MenuAction.ViewProfile] = member.UserId,
+                                                            [MenuAction.SetLeader] = member.UserId,
+                                                            [MenuAction.UnsetLeader] = member.UserId,
+                                                            [MenuAction.RemoveTeamMember] = member.UserId
+                                                            })" />
+                                    </tr>
+                                }
+                            </TableContent>
+                        </TableComponent>
                         <div class="w-100 d-flex">
                             <div class="w-100">
                                 <table class="table table-hover mb-0">
@@ -276,12 +309,16 @@
                     </div>
                 </div>
             </div>
-            <!-- TODO: реализовать нажатие кнопок -->
             <div class="rounded-3 bg-white p-3 d-flex flex-wrap gap-3">
-                <Button Variant="ButtonVariant.Light" Text="Редактировать" />
-                <Button Variant="ButtonVariant.Danger" Text="Удалить команду" />
-                @* TODO: октрывать модальное окно, которое в создании команды *@
-                <Button Variant="ButtonVariant.Primary" Text="Пригласить пользователя" />
+                <Button Variant="ButtonVariant.Light" 
+                        Text="Редактировать" 
+                        OnButtonClick="NavigateToCreateTeam" />
+                <Button Variant="ButtonVariant.Danger" 
+                        Text="Удалить команду" 
+                        OnButtonClick="DeleteTeam" />
+                <Button Variant="ButtonVariant.Primary" 
+                        Text="Пригласить пользователя"
+                        OnButtonClick="ShowInviteUsersModal"/>
             </div>
         </div>
         <RightSideModalInfo Skills1="_currentTeam.Skills" 

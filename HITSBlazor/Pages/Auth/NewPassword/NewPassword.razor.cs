@@ -8,8 +8,8 @@ namespace HITSBlazor.Pages.Auth.NewPassword
     [Route("/new-password")]
     public partial class NewPassword
     {
-        private NewPasswordModel newPasswordModel = new();
-        private bool isLoading;
+        private NewPasswordModel _newPasswordModel = new();
+        private bool _submitting;
 
         [Parameter]
         [SupplyParameterFromQuery(Name = "verification-code")]
@@ -21,26 +21,38 @@ namespace HITSBlazor.Pages.Auth.NewPassword
         [Inject]
         private IAuthService AuthService { get; set; } = null!;
 
+        private readonly Dictionary<string, string> _errors = [];
+
         protected override void OnInitialized()
         {
             if (!string.IsNullOrWhiteSpace(VerificationCode) 
                 && Guid.TryParse(VerificationCode, out Guid guid)
-            ) newPasswordModel.Id = guid;
+            ) _newPasswordModel.Id = guid;
         }
 
+        //TODOO: обновить валидацию при добавлении API
         private async Task HandleResetPassword()
         {
-            if (isLoading) return;
+            if (_submitting) return;
+            _errors.Clear();
 
-            isLoading = true;
+            _submitting = true;
 
-            if (await AuthService.ResetPasswordAsync(newPasswordModel))
+            if (string.IsNullOrWhiteSpace(_newPasswordModel.Code))
+                _errors.Add("code", "Пожалуйста, укажите код");
+
+            if (string.IsNullOrWhiteSpace(_newPasswordModel.Password))
+                _errors.Add("password", "Пожалуйста, укажите новый пароль");
+
+            if (_errors.Count > 0) return;
+
+            if (await AuthService.ResetPasswordAsync(_newPasswordModel))
             {
-                newPasswordModel = new NewPasswordModel();
+                _newPasswordModel = new NewPasswordModel();
                 Navigation.NavigateTo("/login");
             }
 
-            isLoading = false;
+            _submitting = false;
         }
     }
 }

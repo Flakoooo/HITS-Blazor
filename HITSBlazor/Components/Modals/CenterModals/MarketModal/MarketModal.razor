@@ -4,9 +4,9 @@
 @using HITSBlazor.Components.Modals.Components.CenterModalHeader
 @using HITSBlazor.Utils.Validation
 
-<div @onclick:stopPropagation="true" class="market-modal p-3 bg-white rounded">
+<div @onclick:stopPropagation="true" class="center-modal market-modal p-3 bg-white rounded">
     <CenterModalHeader IsLoading="_isLoading" 
-                       HeaderText="@(Market is not null ? "Редактирование биржи" : "Создание биржи")" />
+                       HeaderText="@(MarketId.HasValue ? "Редактирование биржи" : "Создание биржи")" />
     <Input IsLoading="_isLoading"
            Label="Название"
            Placeholder="Введите название биржи"
@@ -25,7 +25,7 @@
     <Button IsLoading="_isLoading"
             Variant="ButtonVariant.Primary"
             InProgress="_submitting"
-            Text="@(Market is not null ? "Сохранить изменения" : "Добавить")"
-            LoadingText="@(Market is not null ? "Сохранение" : "Добавление")"
+            Text="@(MarketId.HasValue ? "Сохранить изменения" : "Добавить")"
+            LoadingText="@(MarketId.HasValue ? "Сохранение" : "Добавление")"
             OnButtonClick="SendMarket" />
 </div>

@@ -1,5 +1,4 @@
-﻿using HITSBlazor.Utils.Validation;
-using Microsoft.AspNetCore.Components;
+﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 
 namespace HITSBlazor.Components.Inputs.TextArea
@@ -28,7 +27,7 @@ namespace HITSBlazor.Components.Inputs.TextArea
         public EventCallback<string> OnEnterMethod { get; set; }
 
         [Parameter]
-        public string? ErrorMessage { get; set; } = "Поле не заполнено";
+        public string? ErrorMessage { get; set; }
 
         [Parameter]
         public string Style { get; set; } = string.Empty;

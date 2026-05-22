@@ -1,4 +1,5 @@
-﻿using HITSBlazor.Components.ActionMenus.BaseActionMenu;
+﻿using ApexCharts;
+using HITSBlazor.Components.ActionMenus.BaseActionMenu;
 using HITSBlazor.Components.Button;
 using HITSBlazor.Components.Modals.CenterModals.MarketModal;
 using HITSBlazor.Components.Tables.TableComponent;
@@ -100,7 +101,7 @@ namespace HITSBlazor.Pages.Markets.MarketsList
             if (market.Status is MarketStatus.New)
                 actions.Add(MenuAction.StartMarket, market);
 
-            actions.Add(MenuAction.Edit, market);
+            actions.Add(MenuAction.Edit, market.Id);
 
             if (market.Status is MarketStatus.Active)
                 actions.Add(MenuAction.FinishMarket, market);
@@ -143,10 +144,10 @@ namespace HITSBlazor.Pages.Markets.MarketsList
         private async Task OpenMarket(Guid marketId)
             => await NavigationService.NavigateToAsync($"/market/{marketId}");
 
-        private void ShowMarketModal(Market? market = null) => ModalService.Show<MarketModal>(
+        private void ShowMarketModal(Guid? marketId = null) => ModalService.Show<MarketModal>(
             ModalType.Center,
-            parameters: market is not null
-            ? new Dictionary<string, object> { [nameof(MarketModal.Market)] = market }
+            parameters: marketId.HasValue
+            ? new Dictionary<string, object> { [nameof(MarketModal.MarketId)] = marketId.Value }
             : null
         );
 
@@ -158,14 +159,14 @@ namespace HITSBlazor.Pages.Markets.MarketsList
                 {
                     await OpenMarket(marketId);
                 }
+                else if (context.Action is MenuAction.Edit)
+                {
+                    ShowMarketModal(marketId);
+                }
             }
             else if (context.Item is Market market)
             {
-                if (context.Action is MenuAction.Edit)
-                {
-                    ShowMarketModal(market);
-                }
-                else if (context.Action is MenuAction.Delete)
+                if (context.Action is MenuAction.Delete)
                 {
                     ModalService.ShowConfirmModal(
                         $"Вы действительно хотите удалить \"{market.Name}\"?",

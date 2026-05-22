@@ -12,11 +12,6 @@
     transition: all .15s ease-out;
 }
 
-.invitation-modal-table {
-    max-height: 400px;
-    overflow-y: scroll;
-}
-
 .invitation-modal-selected-users {
     width: fit-content;
     display: flex;

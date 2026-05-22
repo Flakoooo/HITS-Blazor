@@ -14,53 +14,51 @@
 @using HITSBlazor.Services.Modal
 @inherits ListPageDataLoader
 
-<div @onclick:stopPropagation="true" class="invitation-modal p-3 bg-white rounded">
+<div @onclick:stopPropagation="true" class="center-modal invitation-modal p-3 bg-white rounded">
     <CenterModalHeader IsLoading="_isLoading" HeaderText="Выберите пользователей для приглашения" />
-    <div class="invitation-modal-table">
-        <div class="w-100">
-            <InputSearch IsLoading="_isLoading" Width="50" Value="@SeacrhText" ValueChanged="(value) => SearchUser(value)" DebounceDelay="500" />
-            <TableComponent IsLoading="_isLoading" HeaderItems="_tableHeader" TableActionMenuIsEnable="true" @ref="_tableComponent">
-                <TableContent>
-                    @foreach (var user in _users)
-                    {
-                        <tr>
-                            <TableBodyRow>
-                                <div class="data-link" @onclick="() => ModalService.ShowProfileModal(user.Id)">
-                                    @user.Email
-                                </div>
-                            </TableBodyRow>
-                            <TableBodyRow>@user.FirstName</TableBodyRow>
-                            <TableBodyRow>@user.LastName</TableBodyRow>
-                            <TableActionMenu ItemId="user.Id"
-                                             OnAction="OnTeamAction"
-                                             ActionIds="GetActions(user)" />
-                        </tr>
-                    }
-                </TableContent>
-                <FilterContent>
-                    <SkillFilter OnFilterChanged="FiltersHasUpdated"
-                                 @bind-SeacrhSkillText="SearchSkillText"
-                                 @bind-SelectedSkillIds="SelectedSkillIds" />
-                    <ResetFilterButton ResetMethod="ResetFilters" />
-                </FilterContent>
-            </TableComponent>
-        </div>
+    <div class="w-100" style="max-height: 400px;">
+        <InputSearch IsLoading="_isLoading" Width="50" Value="@SeacrhText" ValueChanged="(value) => SearchUser(value)" DebounceDelay="500" />
+        <TableComponent IsLoading="_isLoading" MaxHeight="346px" HeaderItems="_tableHeader" TableActionMenuIsEnable="true" @ref="_tableComponent">
+            <TableContent>
+                @foreach (var user in _users)
+                {
+                    <tr>
+                        <TableBodyRow>
+                            <div class="data-link" @onclick="() => ModalService.ShowProfileModal(user.Id)">
+                                @user.Email
+                            </div>
+                        </TableBodyRow>
+                        <TableBodyRow>@user.FirstName</TableBodyRow>
+                        <TableBodyRow>@user.LastName</TableBodyRow>
+                        <TableActionMenu ItemId="user.Id"
+                                         OnAction="OnTeamAction"
+                                         ActionIds="GetActions(user)" />
+                    </tr>
+                }
+            </TableContent>
+            <FilterContent>
+                <SkillFilter OnFilterChanged="FiltersHasUpdated"
+                             @bind-SeacrhSkillText="SearchSkillText"
+                             @bind-SelectedSkillIds="SelectedSkillIds" />
+                <ResetFilterButton ResetMethod="ResetFilters" />
+            </FilterContent>
+        </TableComponent>
     </div>
     <div class="w-100 p-2 border rounded">
         @if (_selectedUsers.Count > 0)
         {
-            @foreach (var user in _selectedUsers)
-            {
-                <div class="d-flex gap-2 flex-wrap">
+            <div class="d-flex gap-2 flex-wrap">
+                @foreach (var user in _selectedUsers)
+                {
                     <div class="invitation-modal-selected-users p-1 rounded-3 bg-primary bg-opacity-25">
                         <Typography FontSize="6">
                             @user.FullName
                         </Typography>
-                        <i class="bi bi-x-lg" style="cursor: pointer;" 
+                        <i class="bi bi-x-lg" style="cursor: pointer;"
                            @onclick="() => _selectedUsers.Remove(user)"></i>
                     </div>
-                </div>
-            }
+                }
+            </div>
         }
         else
         {

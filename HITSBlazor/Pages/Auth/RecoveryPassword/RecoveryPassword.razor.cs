@@ -1,6 +1,7 @@
 ﻿using HITSBlazor.Services.Auth;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace HITSBlazor.Pages.Auth.RecoveryPassword
 {
@@ -8,8 +9,10 @@ namespace HITSBlazor.Pages.Auth.RecoveryPassword
     [Route("/recovery-password")]
     public partial class RecoveryPassword
     {
-        private RecoveryModel recoveryModel = new();
-        private bool isLoading;
+        private RecoveryModel _recoveryModel = new();
+        private bool _submitting;
+
+        private readonly Dictionary<string, string> _errors = [];
 
         [Inject]
         private NavigationManager Navigation { get; set; } = null!;
@@ -19,18 +22,24 @@ namespace HITSBlazor.Pages.Auth.RecoveryPassword
 
         private async Task HandleRecovery()
         {
-            if (isLoading) return;
+            if (_submitting) return;
+            _errors.Clear();
 
-            isLoading = true;
+            _submitting = true;
 
-            Guid? result = await AuthService.RequestPasswordRecoveryAsync(recoveryModel);
-            if (result is not null)
+            if (string.IsNullOrWhiteSpace(_recoveryModel.Email))
+                _errors.Add("email", "Пожалуйста, укажите вашу почту");
+
+            if (_errors.Count > 0) return;
+
+            var result = await AuthService.RequestPasswordRecoveryAsync(_recoveryModel);
+            if (result.HasValue)
             {
-                recoveryModel = new RecoveryModel();
-                Navigation.NavigateTo($"/new-password?verification-code={result}");
+                _recoveryModel = new RecoveryModel();
+                Navigation.NavigateTo($"/new-password?verification-code={result.Value}");
             }
 
-            isLoading = false;
+            _submitting = false;
         }
     }
 }

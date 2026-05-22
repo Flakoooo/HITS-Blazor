@@ -1,5 +1,6 @@
 ﻿using HITSBlazor.Components.ActionMenus.BaseActionMenu;
 using HITSBlazor.Components.Button;
+using HITSBlazor.Components.Tables.TableComponent;
 using HITSBlazor.Components.Tables.TableHeader;
 using HITSBlazor.Models.Teams.Entities;
 using HITSBlazor.Models.Users.Enums;
@@ -32,6 +33,8 @@ namespace HITSBlazor.Pages.Teams.TeamsList
 
         [Parameter]
         public string TeamId { get; set; } = string.Empty;
+
+        private TableComponent? _tableComponent;
 
         private static readonly List<TableHeaderItem> _teamTableHeader =
         [
@@ -78,11 +81,20 @@ namespace HITSBlazor.Pages.Teams.TeamsList
         {
             _isLoading = true;
 
+            TeamService.OnTeamHasDeleted += TeamHasDeleted;
+            ModalService.OnRightSideModalsUpdated += TeamModalHasClosed;
+
             await LoadTeamsAsync();
 
             _isLoading = false;
 
             MarkAsInitialized();
+        }
+
+        protected override async Task AdditionalAfterRenderMethod()
+        {
+            if (_tableComponent != null)
+                _tableContainer = _tableComponent.ScrollContainer;
         }
 
         protected override void OnParametersSet()
@@ -93,7 +105,7 @@ namespace HITSBlazor.Pages.Teams.TeamsList
 
         protected override int GetCurrentItemsCount() => _teams.Count;
 
-        protected override async Task OnLoadMoreItemsAsync() => await LoadTeamsAsync(append: true);
+        protected override async Task OnLoadMoreItemsAsync() => await LoadTeamsAsync(true);
 
         private async Task LoadTeamsAsync(bool append = false)
         {
@@ -152,6 +164,23 @@ namespace HITSBlazor.Pages.Teams.TeamsList
             await LoadTeamsAsync();
         }
 
+        private Dictionary<MenuAction, object> GetTableActions(Team team)
+        {
+            var actions = new Dictionary<MenuAction, object>
+            {
+                [MenuAction.View] = team.Id
+            };
+
+            var currentUser = AuthService.CurrentUser;
+            if (currentUser is not null && (currentUser.Role is RoleType.Admin || team.Owner.Id == currentUser.Id || team.Leader?.Id == currentUser.Id))
+            {
+                actions.Add(MenuAction.Edit, team.Id);
+                actions.Add(MenuAction.Delete, team);
+            }
+
+            return actions;
+        }
+
         private async Task OnTeamAction(TableActionContext context)
         {
             if (context.Item is Guid teamId)
@@ -161,21 +190,42 @@ namespace HITSBlazor.Pages.Teams.TeamsList
                 else if (context.Action is MenuAction.Edit)
                     await NavigationService.NavigateToAsync($"/teams/create/{teamId}");
             }
-            else if (context.Action is MenuAction.Delete)
+            else if (context.Item is Team team)
             {
-                if (context.Item is not Team team) return;
+                if (context.Action is MenuAction.Delete)
+                {
+                    ModalService.ShowConfirmModal(
+                        $"Вы действительно хотите удалить {team.Name}?",
+                        () => TeamService.DeleteTeamAsync(team),
+                        confirmButtonVariant: ButtonVariant.Danger,
+                        confirmButtonText: "Удалить"
+                    );
+                }
+            }
+        }
 
-                ModalService.ShowConfirmModal(
-                    $"Вы действительно хотите удалить {team.Name}?",
-                    () => TeamService.DeleteTeamAsync(team),
-                    confirmButtonVariant: ButtonVariant.Danger,
-                    confirmButtonText: "Удалить"
-                );
+        private async void TeamModalHasClosed()
+        {
+            if (AuthService.CurrentUser?.Role is RoleType.Admin && ModalService.SideModals.Count == 0)
+                await NavigationService.NavigateToAsync($"/teams/list");
+
+            StateHasChanged();
+        }
+
+        private void TeamHasDeleted(Team team)
+        {
+            if (_teams.Remove(team))
+            {
+                --_totalCount;
+                StateHasChanged();
             }
         }
 
         protected override async ValueTask DisposeAsyncCore()
         {
+            TeamService.OnTeamHasDeleted -= TeamHasDeleted;
+            ModalService.OnRightSideModalsUpdated -= TeamModalHasClosed;
+
             await ValueTask.CompletedTask;
         }
     }

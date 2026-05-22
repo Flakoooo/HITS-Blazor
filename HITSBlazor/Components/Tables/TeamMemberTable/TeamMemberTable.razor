@@ -1,0 +1,33 @@
+﻿@using HITSBlazor.Components.ActionMenus.BaseActionMenu
+@using HITSBlazor.Components.Tables.TableActionMenu
+@using HITSBlazor.Components.Tables.TableBodyRow
+@using HITSBlazor.Components.Tables.TableComponent
+@using HITSBlazor.Pages
+
+<TableComponent IsLoading="_isLoading" HeaderItems="MembersTableHeader" TableActionMenuIsEnable="true">
+    <TableContent>
+        @foreach (var member in CurrentTeam.Members)
+        {
+            <tr>
+                <TableBodyRow>
+                    @{
+                        var displayInfo = GetRoleDisplayInfo(member.Id);
+                        <div class="data-link @(displayInfo.TextColor.HasValue ? $"text-{displayInfo.TextColor.Value.ToString().ToLower()}" : string.Empty)">
+                            @member.Email @displayInfo.DisplayText
+                        </div>
+                    }
+                </TableBodyRow>
+                <TableBodyRow>
+                    @member.FirstName
+                </TableBodyRow>
+                <TableBodyRow>
+                    @member.LastName
+                </TableBodyRow>
+                <TableActionMenu ItemId="member.Id"
+                                 StrategyPosition="Strategy.Fixed"
+                                 OnAction="@HandleTableMenuClick"
+                                 ActionIds="GetActions(member)" />
+            </tr>
+        }
+    </TableContent>
+</TableComponent>

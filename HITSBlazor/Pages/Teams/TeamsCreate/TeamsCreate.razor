@@ -22,7 +22,7 @@
     <div class="team-form w-100 h-100 bg-white p-3 overflow-auto">
         <div class="team-form-content w-75">
             <Typography FontSize="2" TextColor="TextColor.Primary">
-                @(TeamGuid.HasValue ? "Редактирование" : "Создание") команды
+                @(_teamForUpdate is not null ? "Редактирование" : "Создание") команды
             </Typography>
             <Input IsLoading="_isLoading"
                    Label="Название команды*" 
@@ -75,17 +75,8 @@
                              @bind-SelectedFrameworkSkills="SelectedFrameworkSkills"
                              @bind-SelectedDatabaseSkills="SelectedDatabaseSkills"
                              @bind-SelectedDevopsSkills="SelectedDevopsSkills" />
-            @* TODO: выбор владельца думаю оставить при редактировании, чтобы можно было передавать команды *@
-            @* TODO: также думаю сделать так, чтобы изначально лидером был владелец, смысл оставлять пустой поле тимлида? *@
-
-            @* TODO: при создании команды владелец и лидер это тот, кто создает команду*@
-            @* TODO: создатель может приглашать пользователей, нужно доработать это, чтобы указать, кого приглашают на роль тим-лида *@
-            @* TODO: при редактировании команд, владелец может менять всё, лидер не может менять владельца, но может передать лидера *@
-            @* TODO: если передать владельца, то текущий создатель теряет возможность управлять этой командой *@
-            @* TODO: также, стоит сделать автовыдачу ролей Владелец команды и Лидер команды, изначально любой может создать команду, при создании получают соответствующие рроли *@
-            @* TODO: думаю сделать также и для создания идей, что можно получить роль инициатора *@
             <div class="team w-100">
-                @if (!TeamGuid.HasValue)
+                @if (_teamForUpdate is null)
                 {
                     <div class="w-100 d-flex justify-content-center">
                         <Typography FontSize="6" TextColor="TextColor.Danger">
@@ -118,7 +109,7 @@
                                 OnButtonClick="() => ShowInviteUsersModal()" />
                     </div>
                     <div style="max-height: 500px; overflow-y: auto; overflow-x: visible; position: relative;">
-                        <TableComponent IsLoading="_isLoading" HeaderItems="MembersTableHeader" TableActionMenuIsEnable="TeamGuid.HasValue">
+                        <TableComponent IsLoading="_isLoading" HeaderItems="MembersTableHeader" TableActionMenuIsEnable="_teamForUpdate is not null">
                             <TableContent>
                                 @foreach (var member in TeamMembers.OrderBy(u => u.Id != SelectedLeader?.Id || u.Id != SelectedOwner?.Id))
                                 {
@@ -133,7 +124,7 @@
                                         </TableBodyRow>
                                         <TableBodyRow>@member.FirstName</TableBodyRow>
                                         <TableBodyRow>@member.LastName</TableBodyRow>
-                                        @if (TeamGuid.HasValue)
+                                        @if (_teamForUpdate is not null)
                                         {
                                             <TableActionMenu ItemId="member.Id"
                                                              StrategyPosition="Strategy.Fixed"
@@ -152,13 +143,14 @@
                                         </TableBodyRow>
                                         <TableBodyRow>@member.FirstName</TableBodyRow>
                                         <TableBodyRow>@member.LastName</TableBodyRow>
-                                        @if (TeamGuid.HasValue)
-                                        {
-                                            <TableActionMenu ItemId="member.Id"
-                                                             StrategyPosition="Strategy.Fixed"
-                                                             OnAction="@HandleTableMenuClick"
-                                                             ActionIds="GetActonMenus(member)" />
-                                        }
+                                        <TableActionMenu ItemId="member.Id"
+                                                         StrategyPosition="Strategy.Fixed"
+                                                         OnAction="@HandleTableMenuClick"
+                                                         ActionIds="new Dictionary<MenuAction, object>
+                                                         {
+                                                             [MenuAction.ViewProfile] = member.Id,
+                                                             [MenuAction.TeamRequestCancel] = member
+                                                         }" />
                                     </tr>
                                 }
                             </TableContent>
@@ -221,7 +213,7 @@
             }
             @if (string.IsNullOrWhiteSpace(TeamId))
             {
-                <Button Variant="ButtonVariant.Success" Text="Создать команду" />                
+                <Button Variant="ButtonVariant.Success" Text="Создать команду" OnButtonClick="CreateTeam" />
             }
             else
             {

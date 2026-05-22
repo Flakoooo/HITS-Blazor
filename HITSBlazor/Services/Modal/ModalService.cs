@@ -1,4 +1,5 @@
 ﻿using HITSBlazor.Components.Button;
+using HITSBlazor.Components.Modals.CenterModals.AddTeamMembersModal;
 using HITSBlazor.Components.Modals.CenterModals.ConfirmModal;
 using HITSBlazor.Components.Modals.CenterModals.SelectActiveRoleModal;
 using HITSBlazor.Components.Modals.CenterModals.TaskModal;
@@ -6,6 +7,7 @@ using HITSBlazor.Components.Modals.RightSideModals.IdeaModal;
 using HITSBlazor.Components.Modals.RightSideModals.ProfileModal;
 using HITSBlazor.Components.Modals.RightSideModals.TeamModal;
 using HITSBlazor.Components.Typography;
+using HITSBlazor.Models.Teams.Entities;
 using Microsoft.AspNetCore.Components;
 
 namespace HITSBlazor.Services.Modal
@@ -145,7 +147,7 @@ namespace HITSBlazor.Services.Modal
 
         public void ShowConfirmModal(
             string questionText,
-            Func<System.Threading.Tasks.Task> confirmMethod,
+            Func<Task> confirmMethod,
             int? questionTextFontSize = null,
             TextColor? questionTextColor = null,
             string? questionTextCustomClass = null,
@@ -198,6 +200,14 @@ namespace HITSBlazor.Services.Modal
         public void ShowTeamModal(Guid teamId) => Show<TeamModal>(
             type: ModalType.RightSide,
             parameters: new Dictionary<string, object> { [nameof(TeamModal.TeamId)] = teamId }
+        );
+
+        public void ShowInviteUsersModal(HashSet<Guid> ignoredUsers) => Show<AddTeamMembersModal>(
+            ModalType.Center,
+            parameters: new Dictionary<string, object>
+            {
+                [nameof(AddTeamMembersModal.IgnoredUsers)] = ignoredUsers
+            }
         );
 
         public void ShowTaskModal(Guid projectId, Models.Projects.Entities.Task? task = null)

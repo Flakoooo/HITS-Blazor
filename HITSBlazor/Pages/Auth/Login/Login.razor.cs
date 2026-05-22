@@ -2,6 +2,7 @@
 using HITSBlazor.Services.Auth;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace HITSBlazor.Pages.Auth.Login
 {
@@ -9,8 +10,8 @@ namespace HITSBlazor.Pages.Auth.Login
     [Route("/login")]
     public partial class Login
     {
-        private LoginModel loginModel = new();
-        private bool isLoading;
+        private LoginModel _loginModel = new();
+        private bool _submitting;
 
         [Inject]
         private IAuthService AuthService { get; set; } = null!;
@@ -18,31 +19,43 @@ namespace HITSBlazor.Pages.Auth.Login
         [Inject]
         private NavigationService Navigation { get; set; } = null!;
 
+        private readonly Dictionary<string, string> _errors = [];
+
         protected async override Task OnInitializedAsync()
         {
-            //TODO: УБРАТЬ ПОСЛЕ РАЗРАБОТКИ
+            //TODOO: УБРАТЬ ПОСЛЕ РАЗРАБОТКИ
 #if DEBUG
-            loginModel.Email = "kirill.vlasov.05@inbox.ru";
-            loginModel.Password = "12345678";
+            _loginModel.Email = "kirill.vlasov.05@inbox.ru";
+            _loginModel.Password = "12345678";
 #else
             loginModel.Email = "lexunok@gmail.com";
             loginModel.Password = "lexunok2505";
 #endif
         }
 
+        //TODOO: обновить валидацию при добавлении API
         private async Task HandleLogin()
         {
-            if (isLoading) return;
+            if (_submitting) return;
+            _errors.Clear();
 
-            isLoading = true;
+            _submitting = true;
 
-            if (await AuthService.LoginAsync(loginModel))
+            if (string.IsNullOrWhiteSpace(_loginModel.Email))
+                _errors.Add("login", "Пожалуйста, заполните логин");
+
+            if (string.IsNullOrWhiteSpace(_loginModel.Password))
+                _errors.Add("password", "Заполните пароль");
+
+            if (_errors.Count > 0) return;
+
+            if (await AuthService.LoginAsync(_loginModel))
             {
-                loginModel = new LoginModel();
+                _loginModel = new LoginModel();
                 await Navigation.NavigateToAsync("redirect");
             }
 
-            isLoading = false;
+            _submitting = false;
         }
     }
 }

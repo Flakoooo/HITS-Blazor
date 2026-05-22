@@ -59,19 +59,6 @@
     animation: slideOutRight 0.3s ease-out;
 }
 
-.center-modal {
-    width: 400px;
-    display: flex;
-    flex-direction: column;
-    flex-wrap: nowrap;
-    gap: 12px;
-    align-self: center;
-    align-items: stretch;
-    justify-self: center;
-    justify-content: stretch;
-    transition: all .15s ease-out;
-}
-
 .modal-layout-enter-active .center-modal {
     transform: scale(1);
     animation: scaleIn 0.15s ease-out;

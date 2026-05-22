@@ -45,7 +45,7 @@ namespace HITSBlazor.Components.Inputs.Input
         public EventCallback<string> ValueChanged { get; set; }
 
         [Parameter]
-        public string? ErrorMessage { get; set; } = "Поле не заполнено";
+        public string? ErrorMessage { get; set; }
 
         [Parameter]
         public int DebounceDelay { get; set; } = 0;

@@ -17,7 +17,7 @@
 
 <div class="w-100 d-flex">
     <div class="w-100">
-        <div class="table-responsive" style="max-height: @($"{MaxHeight}vh"); overflow-y: auto;" @ref="_tableScrollContainer">
+        <div class="table-responsive" style="max-height: @MaxHeight; overflow-y: auto;" @ref="_tableScrollContainer">
             <table class="table table-hover mb-0">
                 @if (HeaderItems.Count > 0)
                 {
@@ -76,40 +76,3 @@
         </FilterContainer>
     }
 </div>
-
-@code {
-    [Parameter]
-    public bool IsLoading { get; set; } = false;
-
-    [Parameter]
-    public bool IsDataLoading { get; set; } = false;
-
-    [Parameter]
-    public ICollection<TableHeaderItem> HeaderItems { get; set; } = [];
-
-    [Parameter]
-    public Func<string?, bool?, Task>? OrderMethod { get; set; }
-
-    [Parameter]
-    public bool TableActionMenuIsEnable { get; set; } = false;
-
-    [Parameter]
-    public RenderFragment? TableContent { get; set; }
-
-    [Parameter]
-    public RenderFragment? FilterContent { get; set; }
-
-    [Parameter]
-    public int MaxHeight { get; set; } = 75;
-
-    public ElementReference ScrollContainer => _tableScrollContainer;
-
-    private ElementReference _tableScrollContainer;
-
-    private async Task ExecuteOrder(string? value1, bool? value2)
-    {
-        if (OrderMethod is null) return;
-
-        await OrderMethod(value1, value2);
-    }
-}

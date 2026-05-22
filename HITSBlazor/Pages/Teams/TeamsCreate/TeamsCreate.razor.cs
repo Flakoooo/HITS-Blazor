@@ -1,13 +1,17 @@
 ﻿using ApexCharts;
 using HITSBlazor.Components.ActionMenus.BaseActionMenu;
 using HITSBlazor.Components.Modals.CenterModals.AddTeamMembersModal;
+using HITSBlazor.Components.Modals.RightSideModals.ProfileModal;
 using HITSBlazor.Components.Tables.TableHeader;
 using HITSBlazor.Components.Typography;
 using HITSBlazor.Models.Common.Entities;
 using HITSBlazor.Models.Common.Enums;
+using HITSBlazor.Models.Teams.Entities;
 using HITSBlazor.Models.Teams.Requests;
 using HITSBlazor.Models.Users.Entities;
 using HITSBlazor.Models.Users.Enums;
+using HITSBlazor.Pages.Admin.InviteUsers;
+using HITSBlazor.Services;
 using HITSBlazor.Services.Auth;
 using HITSBlazor.Services.Modal;
 using HITSBlazor.Services.Skills;
@@ -38,14 +42,18 @@ namespace HITSBlazor.Pages.Teams.TeamsCreate
         [Inject]
         private ModalService ModalService { get; set; } = null!;
 
+        [Inject]
+        private NavigationService NavigationService { get; set; } = null!;
+
         [Parameter]
         public string TeamId { get; set; } = string.Empty;
 
         private bool _isLoading = true;
 
-        private Dictionary<string, string> _errors = [];
+        private readonly Dictionary<string, string> _errors = [];
 
-        private Guid? TeamGuid { get; set; }
+        private Team? _teamForUpdate;
+
         private string TeamName { get; set; } = string.Empty;
         private string TeamDescription { get; set; } = string.Empty;
         private bool? _teamIsClosed;
@@ -53,6 +61,7 @@ namespace HITSBlazor.Pages.Teams.TeamsCreate
         private User? SelectedLeader { get; set; }
         private List<User> TeamMembers { get; set; } = [];
         private List<User> MembersForInviting { get; set; } = [];
+        private HashSet<Guid> MembersForKicking { get; set; } = [];
         private HashSet<Skill> MembersForInvitingSkills { get; set; } = [];
 
         private HashSet<Skill> SelectedLanguageSkills { get; set; } = [];
@@ -89,7 +98,8 @@ namespace HITSBlazor.Pages.Teams.TeamsCreate
                 var team = await TeamsService.GetTeamByIdAsync(guid);
                 if (team is not null)
                 {
-                    TeamGuid = team.Id;
+                    _teamForUpdate = team;
+
                     TeamName = team.Name;
                     TeamDescription = team.Description;
                     _teamIsClosed = team.Closed;
@@ -126,6 +136,7 @@ namespace HITSBlazor.Pages.Teams.TeamsCreate
                     TeamSkills = team.Skills.ToHashSet();
 
                     _isLoading = false;
+                    StateHasChanged();
                 }
             }
             else
@@ -149,7 +160,7 @@ namespace HITSBlazor.Pages.Teams.TeamsCreate
             var currentUser = AuthService.CurrentUser;
             if (currentUser is null) return false;
 
-            if (TeamGuid.HasValue && (currentUser.Id == SelectedOwner?.Id || currentUser.Role is RoleType.Admin))
+            if (_teamForUpdate is not null && (currentUser.Id == SelectedOwner?.Id || currentUser.Role is RoleType.Admin))
                 return true;
 
             return false;
@@ -160,7 +171,7 @@ namespace HITSBlazor.Pages.Teams.TeamsCreate
             var currentUser = AuthService.CurrentUser;
             if (currentUser is null) return false;
 
-            if (TeamGuid.HasValue && (currentUser.Id == SelectedOwner?.Id || currentUser.Id == SelectedLeader?.Id || currentUser.Role is RoleType.Admin))
+            if (_teamForUpdate is not null && (currentUser.Id == SelectedOwner?.Id || currentUser.Id == SelectedLeader?.Id || currentUser.Role is RoleType.Admin))
                 return true;
 
             return false;
@@ -184,6 +195,10 @@ namespace HITSBlazor.Pages.Teams.TeamsCreate
             {
                 return (TextColor.Primary, "(Тим-лид)");
             }
+            else if (MembersForKicking.Contains(memberId))
+            {
+                return (TextColor.Danger, "(Будет исключен)");
+            }
             else
             {
                 return (null, string.Empty);
@@ -192,20 +207,30 @@ namespace HITSBlazor.Pages.Teams.TeamsCreate
 
         private Dictionary<MenuAction, object> GetActonMenus(User user)
         {
-            var actions = new Dictionary<MenuAction, object>
+            var actions = new Dictionary<MenuAction, object>();
+            if (_teamForUpdate is not null)
             {
-                [MenuAction.ViewProfile] = user.Id
-            };
+                actions.Add(MenuAction.ViewProfile, user.Id);
 
-            if (TeamGuid.HasValue)
-            {
-                if (user.Id == SelectedLeader?.Id && user.Id != SelectedOwner?.Id)
-                    actions.Add(MenuAction.UnsetLeader, user.Id);
-                else if (user.Id != SelectedOwner?.Id)
-                    actions.Add(MenuAction.SetLeader, user);
+                var currentUser = AuthService.CurrentUser;
+                if (currentUser is not null
+                    && (currentUser.Role is RoleType.Admin || _teamForUpdate.Owner.Id == currentUser.Id || _teamForUpdate.Leader?.Id == currentUser.Id))
+                {
+                    if (MembersForKicking.Contains(user.Id))
+                    {
+                        actions.Add(MenuAction.TeamMemberRestore, user.Id);
+                    }
+                    else
+                    {
+                        if (user.Id == SelectedLeader?.Id && user.Id != SelectedOwner?.Id)
+                            actions.Add(MenuAction.UnsetLeader, user.Id);
+                        else if (user.Id != SelectedOwner?.Id)
+                            actions.Add(MenuAction.SetLeader, user);
 
-                if (user.Id != SelectedOwner?.Id)
-                    actions.Add(MenuAction.RemoveTeamMember, user);
+                        if (user.Id != SelectedOwner?.Id && !MembersForKicking.Contains(user.Id))
+                            actions.Add(MenuAction.RemoveTeamMember, user.Id);
+                    }
+                }
             }
 
             return actions;
@@ -215,11 +240,44 @@ namespace HITSBlazor.Pages.Teams.TeamsCreate
         {
             if (context.Action is MenuAction.UnsetLeader)
             {
-                SelectedLeader = SelectedOwner;
+                if (_teamForUpdate is not null)
+                {
+                    SelectedLeader = new User
+                    {
+                        Id = _teamForUpdate.Owner.UserId,
+                        Email = _teamForUpdate.Owner.Email,
+                        FirstName = _teamForUpdate.Owner.FirstName,
+                        LastName = _teamForUpdate.Owner.LastName
+                    };
+                }
             }
-            else if (context.Action is MenuAction.ViewProfile && context.Item is Guid userId)
+            else if (context.Item is Guid userId)
             {
-                ModalService.ShowProfileModal(userId);
+                if (context.Action is MenuAction.ViewProfile)
+                {
+                    ModalService.ShowProfileModal(userId);
+                }
+                else if (context.Action is MenuAction.RemoveTeamMember)
+                {
+                    MembersForKicking.Add(userId);
+                    if (_teamForUpdate is not null && userId == SelectedLeader?.Id)
+                    {
+                        SelectedLeader = new User
+                        {
+                            Id = _teamForUpdate.Owner.UserId,
+                            Email = _teamForUpdate.Owner.Email,
+                            FirstName = _teamForUpdate.Owner.FirstName,
+                            LastName = _teamForUpdate.Owner.LastName
+                        };
+                    }
+
+                    StateHasChanged();
+                }
+                else if (context.Action is MenuAction.TeamMemberRestore)
+                {
+                    MembersForKicking.Remove(userId);
+                    StateHasChanged();
+                }
             }
             else if (context.Item is User user)
             {
@@ -228,9 +286,9 @@ namespace HITSBlazor.Pages.Teams.TeamsCreate
                     SelectedLeader = user;
                     StateHasChanged();
                 }
-                else if (context.Action is MenuAction.RemoveTeamMember)
+                else if (context.Action is MenuAction.TeamRequestCancel)
                 {
-                    TeamMembers.Remove(user);
+                    MembersForInviting.Remove(user);
                 }
             }
         }
@@ -262,7 +320,6 @@ namespace HITSBlazor.Pages.Teams.TeamsCreate
                 Description = TeamDescription,
                 IsClosed = _teamIsClosed!.Value,
                 OwnerId = SelectedOwner!.Id,
-                LeaderId = SelectedLeader!.Id,
                 InvitedMembers = MembersForInviting.Select(m => m.Id).ToList(),
                 WantedSkills = 
                 [
@@ -272,16 +329,19 @@ namespace HITSBlazor.Pages.Teams.TeamsCreate
                     .. SelectedDevopsSkills.Select(s => s.Id)
                 ]
             };
+
+            if (await TeamsService.CreateTeamAsync(request))
+                await NavigationService.NavigateToAsync("/teams/list");
+
         }
 
-        private void ShowInviteUsersModal()
-        {
-            ModalService.Show<AddTeamMembersModal>(ModalType.Center);
-        }
+        private void ShowInviteUsersModal() => ModalService.ShowInviteUsersModal(
+            MembersForInviting.Concat(TeamMembers).Select(u => u.Id).Distinct().ToHashSet()
+        );
 
         private async void SetTeamInvitationMembers(ICollection<User> users)
         {
-            MembersForInviting = users.ToList();
+            MembersForInviting = MembersForInviting.Concat(users).DistinctBy(u => u.Id).ToList();
             MembersForInvitingSkills.Clear();
 
             foreach (var member in MembersForInviting)
@@ -290,6 +350,8 @@ namespace HITSBlazor.Pages.Teams.TeamsCreate
                 foreach (var skill in userSkills)
                     MembersForInvitingSkills.Add(skill);
             }
+
+            StateHasChanged();
         }
 
         private static ApexChartOptions<Skill> GetRadarChartOptions() => new()

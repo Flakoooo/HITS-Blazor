@@ -17,16 +17,18 @@
             </Typography>
             <Input IconStyle="&#64;" 
                    Placeholder="Введите логин" 
-                   @bind-Value="loginModel.Email" />
+                   @bind-Value="_loginModel.Email"
+                   ErrorMessage="@_errors.GetValueOrDefault("login")" />
             <Input InputType="InputType.Password" 
                    IconStyle="bi-key" 
                    Placeholder="Введите пароль" 
-                   @bind-Value="loginModel.Password" />
+                   @bind-Value="_loginModel.Password"
+                   ErrorMessage="@_errors.GetValueOrDefault("password")" />
             <a href="/recovery-password" class="text-center">
                 Забыли пароль?
             </a>
             <Button Variant="ButtonVariant.Primary" 
-                    InProgress="isLoading" 
+                    InProgress="_submitting" 
                     Text="Войти" 
                     LoadingText="Вход"
                     OnButtonClick="HandleLogin" />

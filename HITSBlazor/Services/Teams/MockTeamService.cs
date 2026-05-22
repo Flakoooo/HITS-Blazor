@@ -2,6 +2,7 @@
 using HITSBlazor.Models.Markets.Entities;
 using HITSBlazor.Models.Teams.Entities;
 using HITSBlazor.Models.Teams.Enums;
+using HITSBlazor.Models.Teams.Requests;
 using HITSBlazor.Models.Users.Entities;
 using HITSBlazor.Utils.Mocks.Teams;
 
@@ -13,7 +14,9 @@ namespace HITSBlazor.Services.Teams
 
         public event Action<ICollection<User>>? OnInviteMembersCollected;
         public event Func<Task>? OnRequestsStatusCreated;
-        public event Action<Guid, TeamRequestStatus>? OnRequestsStatusUpdated;     
+        public event Action<Guid, TeamRequestStatus>? OnRequestsStatusUpdated;
+
+        public event Action<Team>? OnTeamHasDeleted;
 
         public void InvokeInvitationEvent(ICollection<User> users) => OnInviteMembersCollected?.Invoke(users);
 
@@ -44,17 +47,51 @@ namespace HITSBlazor.Services.Teams
         public async Task<Team?> GetTeamByIdAsync(Guid teamId) 
             => MockTeams.GetTeamById(teamId);
 
-        //TODO: сделать удаление команды в UI (через событие)
-        public async Task<bool> DeleteTeamAsync(Team team)
+        public async Task<bool> CreateTeamAsync(CreateTeamRequest request)
+        {
+            var result = MockTeams.CreateTeam(request);
+            if (result)
+                _globalNotificationService.ShowSuccess($"Команда {request.Name} успешно создана!");
+            else
+                _globalNotificationService.ShowError($"Не удалось создать команду {request.Name}");
+
+            return result;
+        }
+
+        public async Task<bool> UpdateTeamAsync(UpdateTeamRequest request)
+        {
+            var result = MockTeams.UpdateTeam(request);
+            if (result)
+                _globalNotificationService.ShowSuccess($"Команда {request.Name} успешно изменена!");
+            else
+                _globalNotificationService.ShowError($"Не удалось изменить команду {request.Name}");
+
+            return result;
+        }
+
+        public async Task<bool> UpdateTeamLeader(Guid teamId, Guid? leaderId)
+        {
+            return MockTeams.UpdateTeamLeader(teamId, leaderId);
+        }
+        
+        //событие на удаление, так как будет модалка подтверждения
+        public async Task KickMember(TeamMember member)
+        {
+            MockTeams.KickMember(member);
+        }
+
+        public async Task DeleteTeamAsync(Team team)
         {
             if (!MockTeams.DeleteTeam(team))
             {
                 _globalNotificationService.ShowError("Не удалось удалить команду");
-                return false;
+                return;
             }
 
-            return true;
+            OnTeamHasDeleted?.Invoke(team);
         }
+
+        //заявки приглашения и тд
 
         public async Task<List<TeamInvitation>> GetTeamInvitationsAsync(Guid teamId)
             => MockTeamInvitations.GetTeamInvitationsByTeamId(teamId);

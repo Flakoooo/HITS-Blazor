@@ -17,6 +17,7 @@ namespace HITSBlazor.Utils.EnumUIConverters
             MenuAction.ViewProject => new EnumUIResult("Перейти в проект", string.Empty),
             MenuAction.TeamCreateSelectMember => new EnumUIResult("Выбрать", "text-success"),
             MenuAction.TeamRequestAccept => new EnumUIResult("Принять", "text-success"),
+            MenuAction.TeamMemberRestore => new EnumUIResult("Вернуть обратно", "text-success"),
             MenuAction.StartMarket => new EnumUIResult("Запустить", "text-success"),
             MenuAction.SetLeader => new EnumUIResult("Назначить лидером", "text-primary"),
             MenuAction.GoToMarket => new EnumUIResult("Перейти на биржу", "text-primary"),

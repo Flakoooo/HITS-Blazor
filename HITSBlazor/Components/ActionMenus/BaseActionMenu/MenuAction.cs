@@ -50,6 +50,10 @@ namespace HITSBlazor.Components.ActionMenus.BaseActionMenu
         [Style("text-success")]
         TeamRequestAccept,
 
+        [Description("Вернуть обратно")]
+        [Style("text-success")]
+        TeamMemberRestore,
+
         [Description("Запустить")]
         [Style("text-success")]
         StartMarket,

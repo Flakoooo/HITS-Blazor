@@ -1,8 +1,8 @@
 ﻿using HITSBlazor.Models.Common.Entities;
 using HITSBlazor.Models.Common.Responses;
-using HITSBlazor.Models.Ideas.Entities;
 using HITSBlazor.Models.Teams.Entities;
 using HITSBlazor.Models.Teams.Enums;
+using HITSBlazor.Models.Teams.Requests;
 using HITSBlazor.Models.Users.Entities;
 using HITSBlazor.Utils.Mocks.Common;
 using HITSBlazor.Utils.Mocks.Users;
@@ -142,7 +142,7 @@ namespace HITSBlazor.Utils.Mocks.Teams
             bool? byDescending = null
         )
         {
-            var query = _teams.AsEnumerable();
+            var query = _teams.AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(searchText))
                 query = query.Where(t => t.Name.Contains(searchText, StringComparison.CurrentCultureIgnoreCase));
@@ -182,7 +182,177 @@ namespace HITSBlazor.Utils.Mocks.Teams
         }
 
         public static List<Team> GetTeamsByOwnerIdOrLeaderId(Guid userId) 
-            => [.. _teams.Where(t => t.Owner.UserId == userId || t.Leader?.UserId == userId)];
+            => _teams.Where(t => t.Owner.UserId == userId || t.Leader?.UserId == userId).ToList();
+
+        public static bool CreateTeam(CreateTeamRequest request)
+        {
+            var owner = MockUsers.GetUserById(request.OwnerId);
+            if (owner is null) return false;
+
+            var newTeam = new Team
+            {
+                Id = Guid.NewGuid(),
+                CreatedAt = DateTime.Now,
+                Name = request.Name,
+                Description = request.Description,
+                Closed = request.IsClosed,
+                WantedSkills = request.WantedSkills.Select(id => MockSkills.GetSkillById(id)!).ToList(),
+            };
+
+            var teamOwner = new TeamMember
+            {
+                Id = Guid.NewGuid(),
+                TeamId = newTeam.Id,
+                UserId = owner.Id,
+                Email = owner.Email,
+                FirstName = owner.FirstName,
+                LastName = owner.LastName,
+                Skills = MockUsersSkills.GetUserSkillsById(owner.Id)
+            };
+
+            newTeam.Owner = teamOwner;
+            newTeam.Leader = teamOwner;
+            newTeam.Members.Add(teamOwner);
+
+            //избегая приглашение
+            foreach (var memberId in request.InvitedMembers)
+            {
+                var newMember = MockUsers.GetUserById(memberId);
+                if (newMember is null) continue;
+
+                var teamMember = new TeamMember
+                {
+                    Id = Guid.NewGuid(),
+                    TeamId = newTeam.Id,
+                    UserId = newMember.Id,
+                    Email = newMember.Email,
+                    FirstName = newMember.FirstName,
+                    LastName = newMember.LastName,
+                    Skills = MockUsersSkills.GetUserSkillsById(newMember.Id)
+                };
+
+                newTeam.Members.Add(teamMember);
+            }
+
+            newTeam.Skills = newTeam.Members.SelectMany(m => m.Skills).DistinctBy(m => m.Id).ToList();
+
+            return true;
+        }
+
+        public static bool UpdateTeam(UpdateTeamRequest request)
+        {
+            var teamForUpdate = _teams.FirstOrDefault(t => t.Id == request.Id);
+            if (teamForUpdate is null) return false;
+
+            teamForUpdate.Name = request.Name;
+            teamForUpdate.Description = request.Description;
+            teamForUpdate.Closed = request.IsClosed;
+            teamForUpdate.WantedSkills = request.WantedSkills.Select(id => MockSkills.GetSkillById(id)!).ToList();
+
+            if (request.NewOwnerId.HasValue)
+            {
+                var owner = MockUsers.GetUserById(request.NewOwnerId.Value);
+                if (owner is not null)
+                {
+                    teamForUpdate.Owner = new TeamMember
+                    {
+                        Id = Guid.NewGuid(),
+                        TeamId = request.Id,
+                        UserId = owner.Id,
+                        Email = owner.Email,
+                        FirstName = owner.FirstName,
+                        LastName = owner.LastName,
+                        Skills = MockUsersSkills.GetUserSkillsById(owner.Id)
+                    };
+                }
+            }
+
+            if (request.NewLeaderId.HasValue)
+            {
+                var leader = MockUsers.GetUserById(request.NewLeaderId.Value);
+                if (leader is not null)
+                {
+                    teamForUpdate.Owner = new TeamMember
+                    {
+                        Id = Guid.NewGuid(),
+                        TeamId = request.Id,
+                        UserId = leader.Id,
+                        Email = leader.Email,
+                        FirstName = leader.FirstName,
+                        LastName = leader.LastName,
+                        Skills = MockUsersSkills.GetUserSkillsById(leader.Id)
+                    };
+                }
+            }
+
+            teamForUpdate.Members.RemoveAll(tm => request.KickedMembers.ToHashSet().Contains(tm.UserId));
+
+            //избегая приглашение
+            foreach (var memberId in request.InvitedMembers)
+            {
+                var newMember = MockUsers.GetUserById(memberId);
+                if (newMember is null) continue;
+
+                var teamMember = new TeamMember
+                {
+                    Id = Guid.NewGuid(),
+                    TeamId = request.Id,
+                    UserId = newMember.Id,
+                    Email = newMember.Email,
+                    FirstName = newMember.FirstName,
+                    LastName = newMember.LastName,
+                    Skills = MockUsersSkills.GetUserSkillsById(newMember.Id)
+                };
+
+                teamForUpdate.Members.Add(teamMember);
+            }
+
+            return true;
+        }
+
+        public static bool UpdateTeamLeader(Guid teamId, Guid? leaderId = null)
+        {
+            var team = _teams.FirstOrDefault(t => t.Id == teamId);
+            if (team is null) return false;
+
+            if (leaderId.HasValue)
+            {
+                var user = MockUsers.GetUserById(leaderId.Value);
+                if (user is null) return false;
+
+                var existMember = team.Members.FirstOrDefault(m => m.UserId == leaderId);
+                if (existMember is null)
+                {
+                    team.Leader = new TeamMember
+                    {
+                        Id = Guid.NewGuid(),
+                        UserId = user.Id,
+                        TeamId = team.Id,
+                        FirstName = user.FirstName,
+                        LastName = user.LastName,
+                        Skills = MockUsersSkills.GetUserSkillsById(user.Id)
+                    };
+                }
+                else
+                {
+                    team.Leader = existMember;
+                }
+            }
+            else
+            {
+                team.Leader = team.Owner;
+            }
+
+            return true;
+        }
+
+        public static bool KickMember(TeamMember member)
+        {
+            var team = _teams.FirstOrDefault(t => t.Id == member.TeamId);
+            if (team is null) return false;
+
+            return team.Members.Remove(member);
+        }
 
         public static bool DeleteTeam(Team team) => _teams.Remove(team);
     }

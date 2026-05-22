@@ -6,7 +6,6 @@
         public string Description { get; set; } = string.Empty;
         public bool IsClosed { get; set; } = false;
         public Guid OwnerId { get; set; }
-        public Guid? LeaderId { get; set; }
         public List<Guid> InvitedMembers { get; set; } = [];
         public List<Guid> WantedSkills { get; set; } = [];
     }

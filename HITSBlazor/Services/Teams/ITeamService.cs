@@ -2,6 +2,7 @@
 using HITSBlazor.Models.Markets.Entities;
 using HITSBlazor.Models.Teams.Entities;
 using HITSBlazor.Models.Teams.Enums;
+using HITSBlazor.Models.Teams.Requests;
 using HITSBlazor.Models.Users.Entities;
 
 namespace HITSBlazor.Services.Teams
@@ -11,6 +12,8 @@ namespace HITSBlazor.Services.Teams
         event Action<ICollection<User>>? OnInviteMembersCollected;
         event Func<Task>? OnRequestsStatusCreated;
         event Action<Guid, TeamRequestStatus>? OnRequestsStatusUpdated;
+
+        event Action<Team>? OnTeamHasDeleted;
 
         void InvokeInvitationEvent(ICollection<User> users);
 
@@ -25,7 +28,10 @@ namespace HITSBlazor.Services.Teams
         );
         Task<List<Team>> GetTeamsByOwnerOrLeaderId(Guid userId);
         Task<Team?> GetTeamByIdAsync(Guid teamId);
-        Task<bool> DeleteTeamAsync(Team team);
+        Task<bool> CreateTeamAsync(CreateTeamRequest request);
+        Task<bool> UpdateTeamAsync(UpdateTeamRequest request);
+        Task<bool> UpdateTeamLeader(Guid teamId, Guid? leaderId = null);
+        Task DeleteTeamAsync(Team team);
 
 
         Task<List<TeamInvitation>> GetTeamInvitationsAsync(Guid teamId);

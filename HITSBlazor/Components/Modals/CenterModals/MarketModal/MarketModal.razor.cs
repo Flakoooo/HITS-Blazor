@@ -1,10 +1,9 @@
-﻿using HITSBlazor.Models.Markets.Entities;
+﻿using HITSBlazor.Models.Markets.Enums;
 using HITSBlazor.Services;
 using HITSBlazor.Services.Markets;
 using HITSBlazor.Services.Modal;
 using HITSBlazor.Utils.Validation;
 using Microsoft.AspNetCore.Components;
-using System.Globalization;
 
 namespace HITSBlazor.Components.Modals.CenterModals.MarketModal
 {
@@ -20,7 +19,7 @@ namespace HITSBlazor.Components.Modals.CenterModals.MarketModal
         private IMarketService MarketService { get; set; } = null!;
 
         [Parameter]
-        public Market? Market { get; set; }
+        public Guid? MarketId { get; set; }
 
         private bool _isLoading = true;
         private bool _submitting = false;
@@ -31,27 +30,24 @@ namespace HITSBlazor.Components.Modals.CenterModals.MarketModal
         private string MarketStartDate { get; set; } = string.Empty;
         private string MarketFinishDate { get; set; } = string.Empty;
 
+        private MarketStatus? _currentMarketStatus = null;
+
         protected override async Task OnInitializedAsync()
         {
             _isLoading = true;
 
-            if (Market is not null)
+            if (MarketId.HasValue)
             {
-                MarketName = Market.Name;
-                MarketStartDate = Market.StartDate.ToString("yyyy-MM-dd");
-                MarketFinishDate = Market.FinishDate.ToString("yyyy-MM-dd");
+                var market = await MarketService.GetMarketByIdAsync(MarketId.Value);
+                if (market is null) return;
+
+                MarketName = market.Name;
+                MarketStartDate = market.StartDate.ToString("yyyy-MM-dd");
+                MarketFinishDate = market.FinishDate.ToString("yyyy-MM-dd");
+                _currentMarketStatus = market.Status;
             }
 
             _isLoading = false;
-        }
-
-        private static DateTime? ConvertStringToDate(string date)
-        {
-            if (string.IsNullOrWhiteSpace(date)) return null;
-
-            return DateTimeOffset.Parse(
-                date, CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal
-            ).UtcDateTime;
         }
 
         private async Task SendMarket()
@@ -60,16 +56,15 @@ namespace HITSBlazor.Components.Modals.CenterModals.MarketModal
 
             _submitting = true;
 
-            DateOnly? startDate = null;
-            DateOnly? finishDate = null;
-
             if (string.IsNullOrWhiteSpace(MarketName))
                 _errors.Add("name", "Поле не может быть пустым");
 
+            DateOnly? startDate = null;
             var validationStartDateResult = DateValidation.StartDateValidation(MarketStartDate, ref startDate);
             if (!validationStartDateResult.IsValid)
                 _errors.Add("startDate", validationStartDateResult.Message);
 
+            DateOnly? finishDate = null;
             var validationFinishDateResult = DateValidation.FinishDateValidation(MarketFinishDate, MarketStartDate, ref finishDate);
             if (!validationFinishDateResult.IsValid)
                 _errors.Add("finishDate", validationFinishDateResult.Message);
@@ -82,15 +77,15 @@ namespace HITSBlazor.Components.Modals.CenterModals.MarketModal
             }
 
             bool result;
-            if (Market is not null)
+            if (MarketId.HasValue)
             {
 #pragma warning disable CS8629 // Nullable value type may be null.
                 result = await MarketService.UpdateMarketAsync(
-                    Market.Id, 
+                    MarketId.Value, 
                     MarketName, 
                     startDate.Value, 
-                    finishDate.Value, 
-                    Market.Status
+                    finishDate.Value,
+                    _currentMarketStatus.Value
                 );
             }
             else
