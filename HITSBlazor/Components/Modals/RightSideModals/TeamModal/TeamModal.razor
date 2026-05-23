@@ -11,14 +11,19 @@
 @using HITSBlazor.Components.Placeholders.Placeholder
 @using HITSBlazor.Components.Skills
 @using HITSBlazor.Components.Statuses.EnumStatus
+@using HITSBlazor.Components.Tables.InvitationTeamToIdeaTable
 @using HITSBlazor.Components.Tables.TableActionMenu
 @using HITSBlazor.Components.Tables.TableBodyRow
 @using HITSBlazor.Components.Tables.TableComponent
 @using HITSBlazor.Components.Tables.TableHeader
+@using HITSBlazor.Components.Tables.TeamInvitationTable
+@using HITSBlazor.Components.Tables.TeamMemberTable
+@using HITSBlazor.Components.Tables.TeamRequestsToTeamTable
 @using HITSBlazor.Components.Typography
 @using HITSBlazor.Models.Common.Entities
 @using HITSBlazor.Models.Common.Enums
 @using HITSBlazor.Models.Teams.Enums
+@using HITSBlazor.Models.Users.Enums
 @using HITSBlazor.Utils.EnumStyles
 @using HITSBlazor.Utils.Models
 
@@ -111,215 +116,62 @@
                 </div>
                 <div class="team-modal-tables">
                     <div class="w-100 bg-white px-3 pb-3 pt-1">
-                        <!-- TODO: реализовать поиск -->
-                        <InputSearch Width="50" IsLoading="_isLoading" ValueChanged="@((value) => SearchData(value))" DebounceDelay="500" />
-                        <TableComponent IsLoading="_isLoading" IsDataLoading="_isLoadingMore" HeaderItems="MembersTableHeader" TableActionMenuIsEnable="true">
-                            <TableContent>
-                                @foreach (var member in _currentTeam.Members)
-                                {
-                                    <tr>
-                                        <TableBodyRow>
-                                            @{
-                                                var displayInfo = GetRoleDisplayInfo(member.Id);
-                                                <div class="data-link @(displayInfo.TextColor.HasValue ? $"text-{displayInfo.TextColor.Value.ToString().ToLower()}" : string.Empty)">
-                                                    @member.Email @displayInfo.DisplayText
-                                                </div>
-                                            }
-                                        </TableBodyRow>
-                                        <TableBodyRow>
-                                            @member.FirstName
-                                        </TableBodyRow>
-                                        <TableBodyRow>
-                                            @member.LastName
-                                        </TableBodyRow>
-                                        <TableActionMenu ItemId="member.Id"
-                                                            StrategyPosition="Strategy.Fixed"
-                                                            OnAction="@HandleTableMenuClick"
-                                                            ActionIds="@(new Dictionary<MenuAction, object> {
-                                                            [MenuAction.ViewProfile] = member.UserId,
-                                                            [MenuAction.SetLeader] = member.UserId,
-                                                            [MenuAction.UnsetLeader] = member.UserId,
-                                                            [MenuAction.RemoveTeamMember] = member.UserId
-                                                            })" />
-                                    </tr>
-                                }
-                            </TableContent>
-                        </TableComponent>
-                        <div class="w-100 d-flex">
-                            <div class="w-100">
-                                <table class="table table-hover mb-0">
-                                    @switch (_activeTableCategory)
-                                    {
-                                        case TeamTableCategory.Members:
-                                            <TableHeader TableActionMenuIsEnable="true" Items="MembersTableHeader" />
-                                            break;
-                                        case TeamTableCategory.Invitations:
-                                        case TeamTableCategory.RequestsToTeam:
-                                            <TableHeader TableActionMenuIsEnable="true" Items="NewMembersTableHeader" />
-                                            break;
-                                        case TeamTableCategory.RequestsTeamToIdeas:
-                                            <TableHeader TableActionMenuIsEnable="true" Items="RequestsToIdeasTableHeader" />
-                                            break;
-                                        case TeamTableCategory.InvitationsTeamToIdeas:
-                                            <TableHeader TableActionMenuIsEnable="true" Items="InvitationsToIdeasTableHeader" />
-                                            break;
-                                    }
-                                    <tbody>
-                                        @if (_activeTableCategory == TeamTableCategory.Members)
-                                        {
-                                            @foreach (var member in _currentTeam.Members)
-                                            {
-                                                <tr>
-                                                    <TableBodyRow>
-                                                        @{
-                                                            var displayInfo = GetRoleDisplayInfo(member.Id);
-                                                            <div class="data-link @(displayInfo.TextColor.HasValue ? $"text-{displayInfo.TextColor.Value.ToString().ToLower()}" : string.Empty)">
-                                                                @member.Email @displayInfo.DisplayText
-                                                            </div>
-                                                        }
-                                                    </TableBodyRow>
-                                                    <TableBodyRow>
-                                                        @member.FirstName
-                                                    </TableBodyRow>
-                                                    <TableBodyRow>
-                                                        @member.LastName
-                                                    </TableBodyRow>
-                                                    <TableActionMenu ItemId="member.Id"
-                                                                     StrategyPosition="Strategy.Fixed"
-                                                                     OnAction="@HandleTableMenuClick"
-                                                                     ActionIds="@(new Dictionary<MenuAction, object> {
-                                                                        [MenuAction.ViewProfile] = member.UserId,
-                                                                        [MenuAction.SetLeader] = member.UserId,
-                                                                        [MenuAction.UnsetLeader] = member.UserId,
-                                                                        [MenuAction.RemoveTeamMember] = member.UserId
-                                                                     })" />
-                                                </tr>
-                                            }
-                                        }
-                                        else if (_activeTableCategory == TeamTableCategory.Invitations)
-                                        {
-                                            @foreach (var invitation in _teamInvitations)
-                                            {
-                                                <tr>
-                                                    <TableBodyRow IsCentered="true">
-                                                        <EnumStatus Statustype="invitation.Status" />
-                                                    </TableBodyRow>
-                                                    <TableBodyRow IsCentered="true">
-                                                        <div class="data-link">
-                                                            @invitation.Email
-                                                        </div>
-                                                    </TableBodyRow>
-                                                    <TableBodyRow IsCentered="true">
-                                                        @invitation.FirstName
-                                                    </TableBodyRow>
-                                                    <TableBodyRow IsCentered="true">
-                                                        @invitation.LastName
-                                                    </TableBodyRow>
-                                                    <TableActionMenu ItemId="invitation.Id"
-                                                                     StrategyPosition="Strategy.Fixed"
-                                                                     OnAction="@HandleTableMenuClick"
-                                                                     ActionIds="@(new Dictionary<MenuAction, object> { 
-                                                                        [MenuAction.ViewProfile] = invitation.UserId 
-                                                                     })" />
-                                                </tr>
-                                            }
-                                        }
-                                        else if (_activeTableCategory == TeamTableCategory.RequestsToTeam)
-                                        {
-                                            @foreach (var request in _requestsToTeam)
-                                            {
-                                                <tr>
-                                                    <TableBodyRow IsCentered="true">
-                                                        <EnumStatus Statustype="request.Status" />
-                                                    </TableBodyRow>
-                                                    <TableBodyRow IsCentered="true">
-                                                        <div class="data-link">
-                                                            @request.Email
-                                                        </div>
-                                                    </TableBodyRow>
-                                                    <TableBodyRow IsCentered="true">
-                                                        @request.FirstName
-                                                    </TableBodyRow>
-                                                    <TableBodyRow IsCentered="true">
-                                                        @request.LastName
-                                                    </TableBodyRow>
-                                                    <TableActionMenu ItemId="request.Id"
-                                                                     StrategyPosition="Strategy.Fixed"
-                                                                     OnAction="@HandleTableMenuClick"
-                                                                     ActionIds="@(new Dictionary<MenuAction, object> {
-                                                                        [MenuAction.ViewProfile] = request.UserId,
-                                                                        [MenuAction.TeamRequestAccept] = request.Id,
-                                                                        [MenuAction.TeamRequestCancel] = request.Id
-                                                                     })" />
-                                                </tr>
-                                            }
-                                        }
-                                        else if (_activeTableCategory == TeamTableCategory.RequestsTeamToIdeas)
-                                        {
-                                            @foreach (var request in _requestsTeamToIdeas)
-                                            {
-                                                <tr>
-                                                    <TableBodyRow>
-                                                        <div class="data-link">
-                                                            @request.Name
-                                                        </div>
-                                                    </TableBodyRow>
-                                                    <TableBodyRow IsCentered="true">
-                                                        <EnumStatus Statustype="request.Status" />
-                                                    </TableBodyRow>
-                                                    <TableActionMenu ItemId="request.Id"
-                                                                     StrategyPosition="Strategy.Fixed"
-                                                                     OnAction="@HandleTableMenuClick"
-                                                                     ActionIds="@(new Dictionary<MenuAction, object> {
-                                                                        [MenuAction.ViewIdeaMarket] = request.IdeaMarketId,
-                                                                        [MenuAction.ViewLetter] = request.Letter
-                                                                     })" />
-                                                </tr>
-                                            }
-                                        }
-                                        else if (_activeTableCategory == TeamTableCategory.InvitationsTeamToIdeas)
-                                        {
-                                            @foreach (var invitation in _invitationsTeamToIdeas)
-                                            {
-                                                <tr>
-                                                    <TableBodyRow IsCentered="true">
-                                                        <EnumStatus Statustype="invitation.Status" />
-                                                    </TableBodyRow>
-                                                    <TableBodyRow>
-                                                        <div class="data-link">
-                                                            @invitation.IdeaName
-                                                        </div>
-                                                    </TableBodyRow>
-                                                    <TableBodyRow IsCentered="true">
-                                                        <Skills SkillList="invitation.Skills" />
-                                                    </TableBodyRow>
-                                                    <TableActionMenu ItemId="invitation.Id"
-                                                                     StrategyPosition="Strategy.Fixed"
-                                                                     OnAction="@HandleTableMenuClick"
-                                                                     ActionIds="@(new Dictionary<MenuAction, object> {
-                                                                        [MenuAction.ViewIdea] = invitation.IdeaId
-                                                                     })" />
-                                                </tr>
-                                            }
-                                        }
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
+                        @if (_activeTableCategory is TeamTableCategory.Members)
+                        {
+                            <TeamMemberTable CurrentTeam="_currentTeam" />
+                        }
+                        else if (_activeTableCategory is TeamTableCategory.Invitations)
+                        {
+                            <TeamInvitationTable CurrentTeam="_currentTeam" />
+                        }
+                        else if (_activeTableCategory is TeamTableCategory.RequestsToTeam)
+                        {
+                            <TeamRequestsToTeamTable CurrentTeam="_currentTeam" />
+                        }
+                        else if (_activeTableCategory is TeamTableCategory.RequestsTeamToIdeas)
+                        {
+                            <TeamRequestsToTeamTable CurrentTeam="_currentTeam" />
+                        }
+                        else if (_activeTableCategory is TeamTableCategory.InvitationsTeamToIdeas)
+                        {
+                            <InvitationTeamToIdeaTable CurrentTeam="_currentTeam" />
+                        }
                     </div>
                 </div>
             </div>
-            <div class="rounded-3 bg-white p-3 d-flex flex-wrap gap-3">
-                <Button Variant="ButtonVariant.Light" 
-                        Text="Редактировать" 
-                        OnButtonClick="NavigateToCreateTeam" />
-                <Button Variant="ButtonVariant.Danger" 
-                        Text="Удалить команду" 
-                        OnButtonClick="DeleteTeam" />
-                <Button Variant="ButtonVariant.Primary" 
-                        Text="Пригласить пользователя"
-                        OnButtonClick="ShowInviteUsersModal"/>
-            </div>
+            @{
+                var currentUser = AuthService.CurrentUser;
+                @if (currentUser is not null)
+                {
+                    var isAdmin = currentUser.Role is RoleType.Admin;
+                    var isOwner = currentUser.Id == _currentTeam.Owner.Id;
+                    var isLeader = currentUser.Id == _currentTeam.Leader?.Id;
+                    <div class="rounded-3 bg-white p-3 d-flex flex-wrap gap-3">
+                        @if (isAdmin || isOwner || isLeader)
+                        {
+                            <Button Variant="ButtonVariant.Light"
+                                    Text="Редактировать"
+                                    OnButtonClick="NavigateToCreateTeam" />
+                            @if (!isLeader)
+                            {
+                                <Button Variant="ButtonVariant.Danger"
+                                        Text="Удалить команду"
+                                        OnButtonClick="DeleteTeam" />
+                            }
+                            <Button Variant="ButtonVariant.Primary"
+                                    Text="Пригласить пользователя"
+                                    OnButtonClick="ShowInviteUsersModal" />
+                        }
+                        else
+                        {
+                            @* TODOO: реализовать *@
+                            <Button Variant="ButtonVariant.Success"
+                                    Text="Подать заявку в команду"
+                                    OnButtonClick="ShowInviteUsersModal" />
+                        }
+                    </div>
+                }
+            }
         </div>
         <RightSideModalInfo Skills1="_currentTeam.Skills" 
                             Skills1Label="Желаемые компетенции"     

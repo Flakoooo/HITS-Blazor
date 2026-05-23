@@ -1,4 +1,6 @@
-﻿using HITSBlazor.Models.Teams.Entities;
+﻿using HITSBlazor.Models.Common.Responses;
+using HITSBlazor.Models.Markets.Entities;
+using HITSBlazor.Models.Teams.Entities;
 using HITSBlazor.Models.Teams.Enums;
 using HITSBlazor.Utils.Mocks.Markets;
 
@@ -53,10 +55,40 @@ namespace HITSBlazor.Utils.Mocks.Teams
                 invitation.Status = TeamRequestStatus.Annulled;
         }
 
-        public static List<InvitationTeamToIdea> GetInvitationsTeamToIdeas(Guid teamId)
-            => [.. _invitationTeamToIdeas.Where(itti => itti.TeamId == teamId)];
+        public static ListDataResponse<InvitationTeamToIdea> GetInvitationsTeamToIdeas(
+            int page,
+            int pageSize = 20,
+            Guid? teamId = null,
+            Guid? ideaId = null,
+            string? searchText = null
+        )
+        {
+            IQueryable<InvitationTeamToIdea> query;
 
-        public static List<InvitationTeamToIdea> GetInvitationTeamsToIdea(Guid ideaId)
-            => [.. _invitationTeamToIdeas.Where(itti => itti.IdeaId == ideaId)];
+            query = (teamId, ideaId) switch
+            {
+                (null, null) => _invitationTeamToIdeas.AsQueryable(),
+                (null, _) => _invitationTeamToIdeas.Where(itti => itti.IdeaId == ideaId).AsQueryable(),
+                (_, null) => _invitationTeamToIdeas.Where(itti => itti.TeamId == teamId).AsQueryable(),
+                (_, _) => _invitationTeamToIdeas.Where(itti => itti.TeamId == teamId && itti.IdeaId == ideaId).AsQueryable()
+            };
+
+            if (!string.IsNullOrWhiteSpace(searchText))
+            {
+                query = (teamId, ideaId) switch
+                {
+                    (null, _) => query.Where(itti => itti.IdeaName.Contains(searchText, StringComparison.CurrentCultureIgnoreCase)),
+                    (_, null) => query.Where(itti => itti.TeamName.Contains(searchText, StringComparison.CurrentCultureIgnoreCase)),
+                    (_, _) => query.Where(itti => itti.IdeaName.Contains(searchText, StringComparison.CurrentCultureIgnoreCase) 
+                        || itti.IdeaName.Contains(searchText, StringComparison.CurrentCultureIgnoreCase))
+                };
+            }
+
+            int count = query.Count();
+
+            query = query.Skip((page - 1) * pageSize).Take(pageSize);
+
+            return new ListDataResponse<InvitationTeamToIdea>(count, query.ToList());
+        }
     }
 }

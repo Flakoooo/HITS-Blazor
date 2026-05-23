@@ -1,18 +1,22 @@
 ﻿@using HITSBlazor.Components.ActionMenus.BaseActionMenu
+@using HITSBlazor.Components.InputSearch
 @using HITSBlazor.Components.Tables.TableActionMenu
 @using HITSBlazor.Components.Tables.TableBodyRow
 @using HITSBlazor.Components.Tables.TableComponent
 @using HITSBlazor.Pages
+@inherits ListPageDataLoader
 
-<TableComponent IsLoading="_isLoading" HeaderItems="MembersTableHeader" TableActionMenuIsEnable="true">
+<InputSearch Width="50" IsLoading="_isLoading" ValueChanged="@((value) => SearchData(value))" DebounceDelay="500" />
+<TableComponent IsLoading="_isLoading" HeaderItems="MembersTableHeader" TableActionMenuIsEnable="true" @ref="_tableComponent">
     <TableContent>
-        @foreach (var member in CurrentTeam.Members)
+        @foreach (var member in _teamMembers.OrderBy(u => u.Id != CurrentTeam.Owner?.Id || u.Id != CurrentTeam.Leader?.Id))
         {
             <tr>
                 <TableBodyRow>
                     @{
                         var displayInfo = GetRoleDisplayInfo(member.Id);
-                        <div class="data-link @(displayInfo.TextColor.HasValue ? $"text-{displayInfo.TextColor.Value.ToString().ToLower()}" : string.Empty)">
+                        <div @onclick="() => ShowUserProfile(member.UserId)"
+                             class="data-link @(displayInfo.TextColor.HasValue ? $"text-{displayInfo.TextColor.Value.ToString().ToLower()}" : string.Empty)">
                             @member.Email @displayInfo.DisplayText
                         </div>
                     }

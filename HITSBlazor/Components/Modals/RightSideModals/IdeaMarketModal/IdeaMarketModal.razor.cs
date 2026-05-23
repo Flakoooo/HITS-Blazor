@@ -17,6 +17,7 @@ using HITSBlazor.Services.Teams;
 using HITSBlazor.Utils.EnumUIConverters;
 using HITSBlazor.Utils.Models;
 using Microsoft.AspNetCore.Components;
+using System.Diagnostics.Metrics;
 
 namespace HITSBlazor.Components.Modals.RightSideModals.IdeaMarketModal
 {
@@ -198,23 +199,22 @@ namespace HITSBlazor.Components.Modals.RightSideModals.IdeaMarketModal
         {
             if (context.Action == MenuAction.ViewTeamProfile)
             {
-                ShowTeamModal((Guid)context.Item);
+                if (context.Item is Guid teamId)
+                {
+                    ShowTeamModal(teamId);
+                }
             }
             if (context.Action == MenuAction.ViewLetter)
             {
-                if (_currentIdeaMarket is not null && AuthService.CurrentUser is not null)
+                if (context.Item is string letter)
                 {
-                    //TODO: сделать назначение команды
-                    bool buttonAllowed = _currentIdeaMarket.Status is not IdeaMarketStatusType.RecruitmentIsClosed
-                        && (AuthService.CurrentUser.Id == _currentIdeaMarket.Initiator.Id || AuthService.CurrentUser.Role is RoleType.Admin);
-                    ModalService.Show<LetterModal>(
-                        ModalType.Center,
-                        parameters: new Dictionary<string, object>
-                        {
-                            [nameof(LetterModal.Letter)] = context.Item,
-                            [nameof(LetterModal.AcceptedButtonAllowed)] = buttonAllowed,
-                            //[nameof(LetterModal.OnAcceptedButtonClick)] = 
-                        });
+                    if (_currentIdeaMarket is not null && AuthService.CurrentUser is not null)
+                    {
+                        //TODOO: сделать назначение команды
+                        bool buttonAllowed = _currentIdeaMarket.Status is not IdeaMarketStatusType.RecruitmentIsClosed
+                            && (AuthService.CurrentUser.Id == _currentIdeaMarket.Initiator.Id || AuthService.CurrentUser.Role is RoleType.Admin);
+                        ModalService.ShowLetterModal(buttonAllowed, letter: letter);
+                    }
                 }
             }
         }

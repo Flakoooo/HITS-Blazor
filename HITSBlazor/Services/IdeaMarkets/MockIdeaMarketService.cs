@@ -39,29 +39,17 @@ namespace HITSBlazor.Services.IdeaMarkets
         public async Task<IdeaMarket?> GetIdeaMarketAsync(Guid guid) 
             => MockIdeaMarkets.GetIdeaMarketById(guid);
 
-        public async Task<List<RequestTeamToIdea>> GetRequestsTeamToIdeaAsync(Guid ideaMarketId, string? searchText)
-        {
-            var requests = MockRequestTeamToIdeas.GetRequestsByIdeaMarketId(ideaMarketId);
+        public async Task<ListDataResponse<RequestTeamToIdea>> GetRequestsTeamToIdeaAsync(
+            int page, Guid ideaMarketId, string? searchText
+        ) => MockRequestTeamToIdeas.GetRequestsTeamToIdeas(
+            page, ideaMarketId: ideaMarketId, searchText: searchText
+        );
 
-            var query = requests.AsEnumerable();
-
-            if (!string.IsNullOrWhiteSpace(searchText))
-                query = query.Where(r => r.Name.Contains(searchText, StringComparison.CurrentCultureIgnoreCase));
-
-            return [.. query];
-        }
-
-        public async Task<List<InvitationTeamToIdea>> GetInvitationTeamsToIdeaAsync(Guid ideaId, string? searchText)
-        {
-            var invitations = MockInvitationTeamToIdeas.GetInvitationTeamsToIdea(ideaId);
-
-            var query = invitations.AsEnumerable();
-
-            if (!string.IsNullOrWhiteSpace(searchText))
-                query = query.Where(r => r.TeamName.Contains(searchText, StringComparison.CurrentCultureIgnoreCase));
-
-            return [.. query];
-        }
+        public async Task<ListDataResponse<InvitationTeamToIdea>> GetInvitationTeamsToIdeaAsync(
+            int page, Guid ideaId, string? searchText
+        ) => MockInvitationTeamToIdeas.GetInvitationsTeamToIdeas(
+            page, ideaId: ideaId, searchText: searchText
+        );
 
         public async Task<bool> SendIdeasOnMarket(ICollection<Idea> ideas, Market market)
             => MockIdeaMarkets.SendIdeasOnMarket(ideas, market) > 0;

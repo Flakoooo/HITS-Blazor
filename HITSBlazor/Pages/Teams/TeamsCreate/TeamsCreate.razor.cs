@@ -236,6 +236,8 @@ namespace HITSBlazor.Pages.Teams.TeamsCreate
             return actions;
         }
 
+        private void ShowUserProfile(Guid userId) => ModalService.ShowProfileModal(userId);
+
         private void HandleTableMenuClick(TableActionContext context)
         {
             if (context.Action is MenuAction.UnsetLeader)
@@ -255,7 +257,7 @@ namespace HITSBlazor.Pages.Teams.TeamsCreate
             {
                 if (context.Action is MenuAction.ViewProfile)
                 {
-                    ModalService.ShowProfileModal(userId);
+                    ShowUserProfile(userId);
                 }
                 else if (context.Action is MenuAction.RemoveTeamMember)
                 {

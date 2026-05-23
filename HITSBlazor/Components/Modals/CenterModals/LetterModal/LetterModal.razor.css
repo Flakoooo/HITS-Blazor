@@ -1,0 +1,12 @@
+﻿.letter-modal {
+    width: 400px;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: flex-start;
+    justify-content: flex-start;
+    gap: 8px;
+    align-self: center;
+    justify-self: center;
+    transition: all .15s ease-out;
+}

@@ -1,5 +1,5 @@
 ﻿using HITSBlazor.Components.ActionMenus.BaseActionMenu;
-using HITSBlazor.Components.Modals.RightSideModals.TeamModal;
+using HITSBlazor.Components.Button;
 using HITSBlazor.Components.Tables.TableHeader;
 using HITSBlazor.Components.Typography;
 using HITSBlazor.Models.Teams.Entities;
@@ -26,7 +26,11 @@ namespace HITSBlazor.Components.Tables.TeamMemberTable
         [Parameter]
         public required Team CurrentTeam { get; set; }
 
-        private bool _isLoading = false;
+        private bool _isLoading = true;
+        private TableComponent.TableComponent? _tableComponent;
+
+        private string _searchText = string.Empty;
+        private readonly List<TeamMember> _teamMembers = [];
 
         private static List<TableHeaderItem> MembersTableHeader { get; } =
         [
@@ -34,6 +38,46 @@ namespace HITSBlazor.Components.Tables.TeamMemberTable
             new() { Text = "Имя", ColumnClass = "col-3" },
             new() { Text = "Фамилия", ColumnClass = "col-3" }
         ];
+
+        protected override async Task OnInitializedAsync()
+        {
+            _isLoading = true;
+
+            await LoadTeamMembersAsync();
+
+            _isLoading = false;
+            MarkAsInitialized();
+        }
+
+        protected override async Task AdditionalAfterRenderMethod()
+        {
+            if (_tableComponent != null)
+                _tableContainer = _tableComponent.ScrollContainer;
+        }
+
+        protected override async Task OnLoadMoreItemsAsync() => await LoadTeamMembersAsync(true);
+
+        protected override int GetCurrentItemsCount() => _teamMembers.Count;
+
+        private async Task LoadTeamMembersAsync(bool append = false)
+        {
+            await LoadDataAsync(
+                _teamMembers,
+                () => TeamService.GetTeamMembersAsync(
+                    _currentPage,
+                    teamId: CurrentTeam.Id,
+                    searchText: _searchText
+                ),
+                append
+            );
+        }
+
+        private async Task SearchData(string value)
+        {
+            _searchText = value;
+            ResetPagination();
+            await LoadTeamMembersAsync();
+        }
 
         private (TextColor? TextColor, string DisplayText) GetRoleDisplayInfo(Guid memberId)
         {
@@ -73,12 +117,14 @@ namespace HITSBlazor.Components.Tables.TeamMemberTable
                         actions.Add(MenuAction.SetLeader, member);
 
                     if (member.UserId != CurrentTeam.Owner.Id)
-                        actions.Add(MenuAction.RemoveTeamMember, member.UserId);
+                        actions.Add(MenuAction.RemoveTeamMember, member);
                 }
             }
 
             return actions;
         }
+
+        private void ShowUserProfile(Guid userId) => ModalService.ShowProfileModal(userId);
 
         private void HandleTableMenuClick(TableActionContext context)
         {
@@ -86,7 +132,7 @@ namespace HITSBlazor.Components.Tables.TeamMemberTable
             {
                 if (context.Action is MenuAction.ViewProfile)
                 {
-                    ModalService.ShowProfileModal(userId);
+                    ShowUserProfile(userId);
                 }
                 else if (context.Action is MenuAction.SetLeader)
                 {
@@ -97,10 +143,17 @@ namespace HITSBlazor.Components.Tables.TeamMemberTable
                     TeamService.UpdateTeamLeader(CurrentTeam.Id, null);
                 }
             }
-
-            else if (context.Action == MenuAction.RemoveTeamMember)
+            else if (context.Item is TeamMember member)
             {
-                Console.WriteLine($"Исключение {context.Item}");
+                if (context.Action is MenuAction.RemoveTeamMember)
+                {
+                    ModalService.ShowConfirmModal(
+                        $"Вы действительно хотите исключить {member.FullName}?",
+                        () => TeamService.KickMemberAsync(member),
+                        confirmButtonVariant: ButtonVariant.Danger,
+                        confirmButtonText: "Удалить"
+                    );
+                }
             }
         }
     }

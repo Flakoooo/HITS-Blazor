@@ -1,5 +1,4 @@
 ﻿using HITSBlazor.Components.Button;
-using HITSBlazor.Components.Collapse;
 using HITSBlazor.Models.Common.Entities;
 using HITSBlazor.Models.Markets.Entities;
 using HITSBlazor.Models.Teams.Entities;
@@ -10,7 +9,6 @@ using HITSBlazor.Services.IdeaMarkets;
 using HITSBlazor.Services.Modal;
 using HITSBlazor.Services.Teams;
 using Microsoft.AspNetCore.Components;
-using System.Threading.Tasks;
 
 namespace HITSBlazor.Components.Forms.RequestTeamToIdeaForm
 {
@@ -66,7 +64,6 @@ namespace HITSBlazor.Components.Forms.RequestTeamToIdeaForm
             if (AuthService.CurrentUser is not null)
             {
                 _teams = await TeamService.GetTeamsByOwnerOrLeaderId(AuthService.CurrentUser.Id);
-                var requestsTeamToIdea = await IdeaMarketService.GetRequestsTeamToIdeaAsync(IdeaMarket.Id);
 
                 _cachedRequests = (await IdeaMarketService.GetRequestsTeamToIdeaAsync(IdeaMarket.Id))
                     .Where(r => _teams.Select(t => t.Id).Contains(r.TeamId))

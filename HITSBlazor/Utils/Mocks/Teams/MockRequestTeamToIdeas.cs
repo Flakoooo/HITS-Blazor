@@ -1,4 +1,5 @@
-﻿using HITSBlazor.Models.Markets.Entities;
+﻿using HITSBlazor.Models.Common.Responses;
+using HITSBlazor.Models.Markets.Entities;
 using HITSBlazor.Models.Quests.Entities;
 using HITSBlazor.Models.Teams.Entities;
 using HITSBlazor.Models.Teams.Enums;
@@ -128,11 +129,51 @@ namespace HITSBlazor.Utils.Mocks.Teams
             ];
         }
 
-        public static List<RequestTeamToIdea> GetRequestsByIdeaMarketId(Guid ideaMarketId)
-            => [.. _requestTeamToIdeas.Where(rtti => rtti.IdeaMarketId == ideaMarketId)];
+        public static ListDataResponse<RequestTeamToIdea> GetRequestsTeamToIdeas(
+            int page,
+            int pageSize = 20,
+            Guid? teamId = null,
+            Guid? ideaMarketId = null,
+            string? searchText = null
+        )
+        {
+            IQueryable<RequestTeamToIdea> query;
 
-        public static List<RequestTeamToIdea> GetRequestsTeamToIdeas(Guid teamId)
-            => [.. _requestTeamToIdeas.Where(rtti => rtti.TeamId == teamId)];
+            query = (teamId, ideaMarketId) switch
+            {
+                (null, null) => _requestTeamToIdeas.AsQueryable(),
+                (null, _) => _requestTeamToIdeas.Where(rtti => rtti.IdeaMarketId == ideaMarketId).AsQueryable(),
+                (_, null) => _requestTeamToIdeas.Where(rtti => rtti.TeamId == teamId).AsQueryable(),
+                (_, _) => _requestTeamToIdeas.Where(rtti => rtti.TeamId == teamId && rtti.IdeaMarketId == ideaMarketId).AsQueryable()
+            };
+
+            if (!string.IsNullOrWhiteSpace(searchText))
+                query = query.Where(rtti => rtti.Name.Contains(searchText, StringComparison.CurrentCultureIgnoreCase));
+
+            int count = query.Count();
+
+            query = query.Skip((page - 1) * pageSize).Take(pageSize);
+
+            if (teamId.HasValue)
+            {
+                var list = query.ToList().Select(rtti =>
+                {
+                    rtti.Name = (teamId, ideaMarketId) switch
+                    {
+                        (null, _) => MockTeams.GetTeamById(rtti.TeamId)?.Name,
+                        (_, null) => MockIdeaMarkets.GetIdeaMarketById(rtti.IdeaMarketId)?.Name,
+                        (_, _) => "ОШИБКА"
+                    } ?? "ОШИБКА";
+                    return rtti;
+                }).ToList();
+
+                return new ListDataResponse<RequestTeamToIdea>(count, list);
+            }
+            else
+            {
+                return new ListDataResponse<RequestTeamToIdea>(count, query.ToList());
+            }
+        }
 
         public static RequestTeamToIdea CreateNewRequest(IdeaMarket ideaMarket, Team team, string letter)
         {

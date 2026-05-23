@@ -17,8 +17,12 @@ namespace HITSBlazor.Services.IdeaMarkets
         );
 
         Task<IdeaMarket?> GetIdeaMarketAsync(Guid guid);
-        Task<List<RequestTeamToIdea>> GetRequestsTeamToIdeaAsync(Guid ideaMarketId, string? searchText = null);
-        Task<List<InvitationTeamToIdea>> GetInvitationTeamsToIdeaAsync(Guid ideaId, string? searchText = null);
+        Task<ListDataResponse<RequestTeamToIdea>> GetRequestsTeamToIdeaAsync(
+            int page, Guid ideaMarketId, string? searchText = null
+        );
+        Task<ListDataResponse<InvitationTeamToIdea>> GetInvitationTeamsToIdeaAsync(
+            int page, Guid ideaId, string? searchText = null
+        );
 
         Task<bool> SendIdeasOnMarket(ICollection<Idea> ideas, Market market);
 

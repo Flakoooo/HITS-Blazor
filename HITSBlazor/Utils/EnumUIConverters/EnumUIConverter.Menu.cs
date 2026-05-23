@@ -10,12 +10,13 @@ namespace HITSBlazor.Utils.EnumUIConverters
             MenuAction.Edit => new EnumUIResult("Редактировать", string.Empty),
             MenuAction.ViewProfile => new EnumUIResult("Перейти на профиль", string.Empty),
             MenuAction.ViewIdea => new EnumUIResult("Открыть идею", string.Empty),
-            MenuAction.ViewIdeaMarket => new EnumUIResult("Открыть идею", string.Empty), //TODO: может убрать?
+            MenuAction.ViewIdeaMarket => new EnumUIResult("Открыть идею", string.Empty), //TODOO: может убрать?
             MenuAction.ViewLetter => new EnumUIResult("Просмотреть письмо", string.Empty),
             MenuAction.Confirm => new EnumUIResult("Утвердить", string.Empty),
             MenuAction.ViewTeamProfile => new EnumUIResult("Профиль команды", string.Empty),
             MenuAction.ViewProject => new EnumUIResult("Перейти в проект", string.Empty),
             MenuAction.TeamCreateSelectMember => new EnumUIResult("Выбрать", "text-success"),
+            MenuAction.TeamRequestWithdraw => new EnumUIResult("Отозвать", "text-success"),
             MenuAction.TeamRequestAccept => new EnumUIResult("Принять", "text-success"),
             MenuAction.TeamMemberRestore => new EnumUIResult("Вернуть обратно", "text-success"),
             MenuAction.StartMarket => new EnumUIResult("Запустить", "text-success"),

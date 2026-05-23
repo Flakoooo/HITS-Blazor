@@ -1,0 +1,37 @@
+﻿@using HITSBlazor.Components.ActionMenus.BaseActionMenu
+@using HITSBlazor.Components.InputSearch
+@using HITSBlazor.Components.Statuses.EnumStatus
+@using HITSBlazor.Components.Tables.TableActionMenu
+@using HITSBlazor.Components.Tables.TableBodyRow
+@using HITSBlazor.Components.Tables.TableComponent
+@using HITSBlazor.Pages
+@inherits ListPageDataLoader
+
+<InputSearch Width="50" IsLoading="_isLoading" ValueChanged="@((value) => SearchData(value))" DebounceDelay="500" />
+<TableComponent IsLoading="_isLoading" HeaderItems="NewMembersTableHeader" TableActionMenuIsEnable="true" @ref="_tableComponent">
+    <TableContent>
+        @foreach (var invitation in _teamInvitations)
+        {
+            <tr>
+                <TableBodyRow IsCentered="true">
+                    <EnumStatus Statustype="invitation.Status" />
+                </TableBodyRow>
+                <TableBodyRow IsCentered="true">
+                    <div class="data-link" @onclick="() => ShowUserProfile(invitation.UserId)">
+                        @invitation.Email
+                    </div>
+                </TableBodyRow>
+                <TableBodyRow IsCentered="true">
+                    @invitation.FirstName
+                </TableBodyRow>
+                <TableBodyRow IsCentered="true">
+                    @invitation.LastName
+                </TableBodyRow>
+                <TableActionMenu ItemId="invitation.Id"
+                                 StrategyPosition="Strategy.Fixed"
+                                 OnAction="@HandleTableMenuClick"
+                                 ActionIds="GetActions(invitation)" />
+            </tr>
+        }
+    </TableContent>
+</TableComponent>

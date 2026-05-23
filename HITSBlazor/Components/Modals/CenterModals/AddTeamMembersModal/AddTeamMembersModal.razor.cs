@@ -27,6 +27,9 @@ namespace HITSBlazor.Components.Modals.CenterModals.AddTeamMembersModal
         [Parameter]
         public HashSet<Guid> IgnoredUsers { get; set; } = [];
 
+        [Parameter]
+        public Guid? TeamId { get; set; }
+
         private bool _isLoading = true;
 
         private TableComponent? _tableComponent;
@@ -106,7 +109,11 @@ namespace HITSBlazor.Components.Modals.CenterModals.AddTeamMembersModal
 
         private async Task ConfirmUsers()
         {
-            TeamService.InvokeInvitationEvent(_selectedUsers);
+            if (TeamId.HasValue)
+                await TeamService.CreateNewTeamInvitationsAsync(TeamId.Value, _selectedUsers.Select(u => u.Id));
+            else
+                TeamService.InvokeInvitationEvent(_selectedUsers);
+
             await ModalService.Close(ModalType.Center);
         }
 

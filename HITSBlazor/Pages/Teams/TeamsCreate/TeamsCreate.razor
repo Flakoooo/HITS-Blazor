@@ -117,7 +117,8 @@
                                         <TableBodyRow>
                                             @{
                                                 var displayInfo = GetRoleDisplayInfo(member.Id);
-                                                <div class="data-link @(displayInfo.TextColor.HasValue ? $"text-{displayInfo.TextColor.Value.ToString().ToLower()}" : string.Empty)">
+                                                <div @onclick="() => ShowUserProfile(member.Id)"
+                                                     class="data-link @(displayInfo.TextColor.HasValue ? $"text-{displayInfo.TextColor.Value.ToString().ToLower()}" : string.Empty)">
                                                     @member.Email @displayInfo.DisplayText
                                                 </div>
                                             }
@@ -137,7 +138,7 @@
                                 {
                                     <tr>
                                         <TableBodyRow>
-                                            <div class="data-link text-success">
+                                            <div class="data-link text-success" @onclick="() => ShowUserProfile(member.Id)">
                                                 @member.Email (Приглашен)
                                             </div>
                                         </TableBodyRow>

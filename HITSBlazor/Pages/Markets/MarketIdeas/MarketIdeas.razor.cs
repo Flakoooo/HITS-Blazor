@@ -156,13 +156,7 @@ namespace HITSBlazor.Pages.Markets.MarketIdeas
                 ideaMarket.Status = IdeaMarketStatusType.Project;
         }
 
-        private void ShowIdeaMarketModal(Guid ideaMarketId) => ModalService.Show<IdeaMarketModal>(
-            ModalType.RightSide,
-            parameters: new Dictionary<string, object>
-            {
-                [nameof(IdeaMarketModal.IdeaMarketId)] = ideaMarketId
-            }
-        );
+        private void ShowIdeaMarketModal(Guid ideaMarketId) => ModalService.ShowIdeaMarketModal(ideaMarketId);
 
         private void ShowCreateTeamRequestModal(IdeaMarket ideaMarket) => ModalService.Show<RequestToIdeaModal>(
             ModalType.RightSide,

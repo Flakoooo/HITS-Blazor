@@ -184,6 +184,38 @@ namespace HITSBlazor.Utils.Mocks.Teams
         public static List<Team> GetTeamsByOwnerIdOrLeaderId(Guid userId) 
             => _teams.Where(t => t.Owner.UserId == userId || t.Leader?.UserId == userId).ToList();
 
+        public static ListDataResponse<TeamMember> GetTeamMembers(
+            int page,
+            int pageSize = 20,
+            Guid? teamId = null,
+            string? searchText = null
+        )
+        {
+            IQueryable<TeamMember> query;
+            if (teamId.HasValue)
+            {
+                var team = _teams.FirstOrDefault(t => t.Id == teamId.Value);
+                if (team is null) return new ListDataResponse<TeamMember>(0, []);
+
+                query = team.Members.AsQueryable();
+            }
+            else
+            {
+                query = _teams.SelectMany(t => t.Members).AsQueryable();
+            }
+
+            if (!string.IsNullOrWhiteSpace(searchText))
+                query = query.Where(tm => tm.FullName.Contains(searchText, StringComparison.CurrentCultureIgnoreCase)
+                    || tm.Email.Contains(searchText, StringComparison.CurrentCultureIgnoreCase)
+                );
+
+            int count = query.Count();
+
+            query = query.Skip((page - 1) * pageSize).Take(pageSize);
+
+            return new ListDataResponse<TeamMember>(count, query.ToList());
+        }
+
         public static bool CreateTeam(CreateTeamRequest request)
         {
             var owner = MockUsers.GetUserById(request.OwnerId);
@@ -214,27 +246,11 @@ namespace HITSBlazor.Utils.Mocks.Teams
             newTeam.Leader = teamOwner;
             newTeam.Members.Add(teamOwner);
 
-            //избегая приглашение
-            foreach (var memberId in request.InvitedMembers)
-            {
-                var newMember = MockUsers.GetUserById(memberId);
-                if (newMember is null) continue;
-
-                var teamMember = new TeamMember
-                {
-                    Id = Guid.NewGuid(),
-                    TeamId = newTeam.Id,
-                    UserId = newMember.Id,
-                    Email = newMember.Email,
-                    FirstName = newMember.FirstName,
-                    LastName = newMember.LastName,
-                    Skills = MockUsersSkills.GetUserSkillsById(newMember.Id)
-                };
-
-                newTeam.Members.Add(teamMember);
-            }
+            MockTeamInvitations.CreateNewInvitations(newTeam.Id, request.InvitedMembers);
 
             newTeam.Skills = newTeam.Members.SelectMany(m => m.Skills).DistinctBy(m => m.Id).ToList();
+
+            _teams.Add(newTeam);
 
             return true;
         }
@@ -287,25 +303,7 @@ namespace HITSBlazor.Utils.Mocks.Teams
 
             teamForUpdate.Members.RemoveAll(tm => request.KickedMembers.ToHashSet().Contains(tm.UserId));
 
-            //избегая приглашение
-            foreach (var memberId in request.InvitedMembers)
-            {
-                var newMember = MockUsers.GetUserById(memberId);
-                if (newMember is null) continue;
-
-                var teamMember = new TeamMember
-                {
-                    Id = Guid.NewGuid(),
-                    TeamId = request.Id,
-                    UserId = newMember.Id,
-                    Email = newMember.Email,
-                    FirstName = newMember.FirstName,
-                    LastName = newMember.LastName,
-                    Skills = MockUsersSkills.GetUserSkillsById(newMember.Id)
-                };
-
-                teamForUpdate.Members.Add(teamMember);
-            }
+            MockTeamInvitations.CreateNewInvitations(teamForUpdate.Id, request.InvitedMembers);
 
             return true;
         }

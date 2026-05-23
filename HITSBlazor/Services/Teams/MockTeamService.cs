@@ -4,19 +4,32 @@ using HITSBlazor.Models.Teams.Entities;
 using HITSBlazor.Models.Teams.Enums;
 using HITSBlazor.Models.Teams.Requests;
 using HITSBlazor.Models.Users.Entities;
+using HITSBlazor.Services.Auth;
 using HITSBlazor.Utils.Mocks.Teams;
 
 namespace HITSBlazor.Services.Teams
 {
-    public class MockTeamService(GlobalNotificationService globalNotificationService) : ITeamService
+    public class MockTeamService(
+        IAuthService authService, 
+        GlobalNotificationService globalNotificationService
+    ) : ITeamService
     {
+        private readonly IAuthService _authService = authService;
         private readonly GlobalNotificationService _globalNotificationService = globalNotificationService;
 
         public event Action<ICollection<User>>? OnInviteMembersCollected;
-        public event Func<Task>? OnRequestsStatusCreated;
-        public event Action<Guid, TeamRequestStatus>? OnRequestsStatusUpdated;
 
         public event Action<Team>? OnTeamHasDeleted;
+        public event Action<TeamMember>? OnTeamMemberHasKicked;
+
+        public event Func<bool, Task>? OnNewTeamApplicationsHasCreated;
+
+        public event Action<Guid, TeamRequestStatus>? OnTeamInvitationStatusHasChanged;
+
+        public event Action<Guid, TeamRequestStatus>? OnRequestToTeamStatusHasChanged;
+
+        public event Func<Task>? OnRequestsStatusCreated;
+        public event Action<Guid, TeamRequestStatus>? OnRequestsStatusUpdated;
 
         public void InvokeInvitationEvent(ICollection<User> users) => OnInviteMembersCollected?.Invoke(users);
 
@@ -47,6 +60,12 @@ namespace HITSBlazor.Services.Teams
         public async Task<Team?> GetTeamByIdAsync(Guid teamId) 
             => MockTeams.GetTeamById(teamId);
 
+        public async Task<ListDataResponse<TeamMember>> GetTeamMembersAsync(
+            int page,
+            Guid? teamId,
+            string? searchText
+        ) => MockTeams.GetTeamMembers(page, teamId: teamId, searchText: searchText);
+
         public async Task<bool> CreateTeamAsync(CreateTeamRequest request)
         {
             var result = MockTeams.CreateTeam(request);
@@ -74,10 +93,15 @@ namespace HITSBlazor.Services.Teams
             return MockTeams.UpdateTeamLeader(teamId, leaderId);
         }
         
-        //событие на удаление, так как будет модалка подтверждения
-        public async Task KickMember(TeamMember member)
+        public async Task KickMemberAsync(TeamMember member)
         {
-            MockTeams.KickMember(member);
+            if (!MockTeams.KickMember(member))
+            {
+                _globalNotificationService.ShowError("Не удалось исключить участника");
+                return;
+            }
+
+            OnTeamMemberHasKicked?.Invoke(member);
         }
 
         public async Task DeleteTeamAsync(Team team)
@@ -91,19 +115,128 @@ namespace HITSBlazor.Services.Teams
             OnTeamHasDeleted?.Invoke(team);
         }
 
-        //заявки приглашения и тд
+        //приглашения в команду участников
+        public async Task<ListDataResponse<TeamInvitation>> GetTeamInvitationsAsync(
+            int page,
+            Guid? teamId,
+            string? searchText,
+            IEnumerable<TeamRequestStatus>? selectedStatuses
+        ) => MockTeamInvitations.GetTeamInvitations(
+            page, 
+            teamId: teamId, 
+            searchText: searchText, 
+            selectedStatuses: selectedStatuses?.ToHashSet()
+        );
 
-        public async Task<List<TeamInvitation>> GetTeamInvitationsAsync(Guid teamId)
-            => MockTeamInvitations.GetTeamInvitationsByTeamId(teamId);
+        public async Task CreateNewTeamInvitationsAsync(Guid teamId, IEnumerable<Guid> inviteMemberIds)
+        {
+            MockTeamInvitations.CreateNewInvitations(teamId, inviteMemberIds);
 
-        public async Task<List<RequestToTeam>> GetTeamRequestsToTeamAsync(Guid teamId)
-            => MockRequestsToTeam.GetRequestToTeamsByTeamId(teamId);
+            _globalNotificationService.ShowSuccess("Приглашения отправлены!");
+            OnNewTeamApplicationsHasCreated?.Invoke(false);
+        }
 
-        public async Task<List<RequestTeamToIdea>> GetRequestsTeamToIdeasAsync(Guid teamId)
-            => MockRequestTeamToIdeas.GetRequestsTeamToIdeas(teamId);
+        public async Task UpdateTeamInvitationStatusAsync(Guid teamInvitationId, TeamRequestStatus newStatus)
+        {
+            if (!MockTeamInvitations.UpdateTeamInvitationStatus(teamInvitationId, newStatus))
+            {
+                var errorText = newStatus switch
+                {
+                    TeamRequestStatus.Withdrawn => "Не удалось отозвать приглашение",
+                    TeamRequestStatus.Accepted => "Не удалось одобрить приглашение",
+                    TeamRequestStatus.Canceled => "Ну удалось отклонить приглашение",
+                    _ => "Не удалось сменить статус приглашения"
+                };
 
-        public async Task<List<InvitationTeamToIdea>> GetInvitationsTeamToIdeasAsync(Guid teamId)
-            => MockInvitationTeamToIdeas.GetInvitationsTeamToIdeas(teamId);
+                _globalNotificationService.ShowError(errorText);
+                return;
+            }
+
+            var successText = newStatus switch
+            {
+                TeamRequestStatus.Withdrawn => "Приглашение отозвано",
+                TeamRequestStatus.Accepted => "Приглашение одобрено",
+                TeamRequestStatus.Canceled => "Приглашение отклонено",
+                _ => "Статус приглашения успешно изменен!"
+            };
+
+            _globalNotificationService.ShowSuccess(successText);
+            OnTeamInvitationStatusHasChanged?.Invoke(teamInvitationId, newStatus);
+
+            return;
+        }
+
+        //заявки в команду участников
+        public async Task<ListDataResponse<RequestToTeam>> GetTeamRequestsToTeamAsync(
+            int page,
+            Guid? teamId,
+            string? searchText,
+            IEnumerable<TeamRequestStatus>? selectedStatuses
+        ) => MockRequestsToTeam.GetRequestToTeams(
+            page,
+            teamId: teamId,
+            searchText: searchText,
+            selectedStatuses: selectedStatuses?.ToHashSet()
+        );
+
+        public async Task<bool> CreateNewRequestToTeam(Guid teamId)
+        {
+            var currentUser = _authService.CurrentUser;
+            if (currentUser is null) return false;
+
+            if (!MockRequestsToTeam.CreateNewRequest(teamId, currentUser.Id))
+            {
+                _globalNotificationService.ShowSuccess("Не удалось отправить заявку");
+                return false;
+            }
+
+            _globalNotificationService.ShowSuccess("Заявка успешно отправлена!");
+            return true;
+        }
+
+        public async Task UpdateRequestToTeamStatusAsync(Guid requestToTeamId, TeamRequestStatus newStatus)
+        {
+            if (!MockRequestsToTeam.UpdateRequestStatus(requestToTeamId, newStatus))
+            {
+                var errorText = newStatus switch
+                {
+                    TeamRequestStatus.Withdrawn => "Не удалось отозвать заявку",
+                    TeamRequestStatus.Accepted => "Не удалось одобрить заявку",
+                    TeamRequestStatus.Canceled => "Ну удалось отклонить заявку",
+                    _ => "Не удалось сменить статус приглашения"
+                };
+
+                _globalNotificationService.ShowError(errorText);
+                return;
+            }
+
+            var successText = newStatus switch
+            {
+                TeamRequestStatus.Withdrawn => "Заявка отозвана",
+                TeamRequestStatus.Accepted => "Заявка одобрена",
+                TeamRequestStatus.Canceled => "Заявка отклонена",
+                _ => "Статус заявки успешно изменен!"
+            };
+
+            _globalNotificationService.ShowSuccess(successText);
+            OnRequestToTeamStatusHasChanged?.Invoke(requestToTeamId, newStatus);
+
+            return;
+        }
+
+        //заявки команды в идею
+        public async Task<ListDataResponse<RequestTeamToIdea>> GetRequestsTeamToIdeasAsync(
+            int page, Guid teamId, string? searchText
+        ) => MockRequestTeamToIdeas.GetRequestsTeamToIdeas(
+            page, teamId: teamId, searchText: searchText
+        );
+
+        //приглашения команды в идею
+        public async Task<ListDataResponse<InvitationTeamToIdea>> GetInvitationsTeamToIdeasAsync(
+            int page, Guid teamId, string? searchText
+        ) => MockInvitationTeamToIdeas.GetInvitationsTeamToIdeas(
+            page, teamId: teamId, searchText: searchText
+        );
 
         public async Task<RequestTeamToIdea> CreateRequestTeamToIdeaAsync(IdeaMarket ideaMarket, Team team, string letter)
         {

@@ -1,0 +1,35 @@
+﻿@using HITSBlazor.Components.ActionMenus.BaseActionMenu
+@using HITSBlazor.Components.InputSearch
+@using HITSBlazor.Components.Skills
+@using HITSBlazor.Components.Statuses.EnumStatus
+@using HITSBlazor.Components.Tables.TableActionMenu
+@using HITSBlazor.Components.Tables.TableBodyRow
+@using HITSBlazor.Components.Tables.TableComponent
+@using HITSBlazor.Pages
+@inherits ListPageDataLoader
+
+<InputSearch Width="50" IsLoading="_isLoading" ValueChanged="@((value) => SearchData(value))" DebounceDelay="500" />
+<TableComponent IsLoading="_isLoading" HeaderItems="InvitationsToIdeasTableHeader" TableActionMenuIsEnable="true" @ref="_tableComponent">
+    <TableContent>
+        @foreach (var invitation in _invitationsTeamToIdeas)
+        {
+            <tr>
+                <TableBodyRow IsCentered="true">
+                    <EnumStatus Statustype="invitation.Status" />
+                </TableBodyRow>
+                <TableBodyRow>
+                    <div class="data-link" @onclick="() => ShowIdea(invitation.IdeaId)">
+                        @invitation.IdeaName
+                    </div>
+                </TableBodyRow>
+                <TableBodyRow IsCentered="true">
+                    <Skills SkillList="invitation.Skills" />
+                </TableBodyRow>
+                <TableActionMenu ItemId="invitation.Id"
+                                 StrategyPosition="Strategy.Fixed"
+                                 OnAction="@HandleTableMenuClick"
+                                 ActionIds="GetActions(invitation)" />
+            </tr>
+        }
+    </TableContent>
+</TableComponent>

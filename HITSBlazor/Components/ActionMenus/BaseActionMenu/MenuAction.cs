@@ -76,6 +76,10 @@ namespace HITSBlazor.Components.ActionMenus.BaseActionMenu
         [Style("text-danger")]
         TeamCreateRemoveMember,
 
+        [Description("Отозвать")]
+        [Style("text-danger")]
+        TeamRequestWithdraw,
+
         [Description("Отклонить")]
         [Style("text-danger")]
         TeamRequestCancel,

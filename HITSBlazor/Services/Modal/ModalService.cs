@@ -1,14 +1,18 @@
 ﻿using HITSBlazor.Components.Button;
 using HITSBlazor.Components.Modals.CenterModals.AddTeamMembersModal;
 using HITSBlazor.Components.Modals.CenterModals.ConfirmModal;
+using HITSBlazor.Components.Modals.CenterModals.LetterModal;
 using HITSBlazor.Components.Modals.CenterModals.SelectActiveRoleModal;
 using HITSBlazor.Components.Modals.CenterModals.TaskModal;
+using HITSBlazor.Components.Modals.RightSideModals.IdeaMarketModal;
 using HITSBlazor.Components.Modals.RightSideModals.IdeaModal;
 using HITSBlazor.Components.Modals.RightSideModals.ProfileModal;
 using HITSBlazor.Components.Modals.RightSideModals.TeamModal;
 using HITSBlazor.Components.Typography;
-using HITSBlazor.Models.Teams.Entities;
+using HITSBlazor.Models.Projects.Entities;
 using Microsoft.AspNetCore.Components;
+
+using SharpTask = System.Threading.Tasks.Task;
 
 namespace HITSBlazor.Services.Modal
 {
@@ -70,7 +74,7 @@ namespace HITSBlazor.Services.Modal
             }
         }
 
-        public async Task Close(ModalType type)
+        public async SharpTask Close(ModalType type)
         {
             switch (type)
             {
@@ -79,7 +83,7 @@ namespace HITSBlazor.Services.Modal
 
                     CenterModals.Last().State = ModalState.Leave;
                     OnCenterModalsUpdated?.Invoke();
-                    await Task.Delay(100);
+                    await SharpTask.Delay(100);
 
                     CenterModals.Remove(CenterModals.Last());
                     OnCenterModalsUpdated?.Invoke();
@@ -90,7 +94,7 @@ namespace HITSBlazor.Services.Modal
 
                     SideModals.Peek().State = ModalState.Leave;
                     OnRightSideModalsUpdated?.Invoke();
-                    await Task.Delay(100);
+                    await SharpTask.Delay(100);
 
                     SideModals.Pop();
                     OnRightSideModalsUpdated?.Invoke();
@@ -104,7 +108,7 @@ namespace HITSBlazor.Services.Modal
             OnAllModalsUpdated?.Invoke();
         }
 
-        public async Task CloseAll(ModalType type)
+        public async SharpTask CloseAll(ModalType type)
         {
             switch (type)
             {
@@ -114,7 +118,7 @@ namespace HITSBlazor.Services.Modal
 
                     OnCenterModalsUpdated?.Invoke();
 
-                    await System.Threading.Tasks.Task.Delay(100);
+                    await SharpTask.Delay(100);
 
                     CenterModals.Clear();
                     OnCenterModalsUpdated?.Invoke();
@@ -126,7 +130,7 @@ namespace HITSBlazor.Services.Modal
 
                     OnRightSideModalsUpdated?.Invoke();
 
-                    await System.Threading.Tasks.Task.Delay(100);
+                    await SharpTask.Delay(100);
 
                     SideModals.Clear();
                     OnRightSideModalsUpdated?.Invoke();
@@ -147,7 +151,7 @@ namespace HITSBlazor.Services.Modal
 
         public void ShowConfirmModal(
             string questionText,
-            Func<Task> confirmMethod,
+            Func<SharpTask> confirmMethod,
             int? questionTextFontSize = null,
             TextColor? questionTextColor = null,
             string? questionTextCustomClass = null,
@@ -202,13 +206,45 @@ namespace HITSBlazor.Services.Modal
             parameters: new Dictionary<string, object> { [nameof(TeamModal.TeamId)] = teamId }
         );
 
-        public void ShowInviteUsersModal(HashSet<Guid> ignoredUsers) => Show<AddTeamMembersModal>(
-            ModalType.Center,
-            parameters: new Dictionary<string, object>
+        public void ShowInviteUsersModal(HashSet<Guid> ignoredUsers, Guid? teamId = null)
+        {
+            var parameters = new Dictionary<string, object>
             {
                 [nameof(AddTeamMembersModal.IgnoredUsers)] = ignoredUsers
-            }
-        );
+            };
+
+            if (teamId.HasValue)
+                parameters.Add(nameof(AddTeamMembersModal.TeamId), teamId.Value);
+
+            Show<AddTeamMembersModal>(ModalType.Center, parameters: parameters);
+        }
+
+        public void ShowIdeaMarketModal(Guid ideaMarketId)
+        {
+            Show<IdeaMarketModal>(
+                ModalType.RightSide,
+                parameters: new Dictionary<string, object>
+                {
+                    [nameof(IdeaMarketModal.IdeaMarketId)] = ideaMarketId
+                }
+            );
+        }
+
+        public void ShowLetterModal(bool isButtonAllowed, string? letter = null, Func<SharpTask>? confirmMethod = null)
+        {
+            var parameters = new Dictionary<string, object>
+            {
+                [nameof(LetterModal.AcceptedButtonAllowed)] = isButtonAllowed
+            };
+
+            if (!string.IsNullOrWhiteSpace(letter))
+                parameters.Add(nameof(LetterModal.Letter), letter);
+
+            if (confirmMethod is not null)
+                parameters.Add(nameof(LetterModal.OnAcceptedButtonClick), confirmMethod);
+
+            Show<LetterModal>(ModalType.Center, parameters: parameters);
+        }
 
         public void ShowTaskModal(Guid projectId, Models.Projects.Entities.Task? task = null)
         {
