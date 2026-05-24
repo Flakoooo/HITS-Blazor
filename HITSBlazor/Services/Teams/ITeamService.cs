@@ -22,7 +22,7 @@ namespace HITSBlazor.Services.Teams
         event Action<Guid, TeamRequestStatus>? OnRequestToTeamStatusHasChanged;
 
         event Func<bool, Task>? OnNewRequestsTeamInIdeaCreated;
-        event Action<Guid, TeamRequestStatus>? OnRequestTeamInIdeaStatusUpdated;
+        event Func<Guid, TeamRequestStatus, Task>? OnRequestTeamInIdeaStatusUpdated;
 
         event Func<bool, Task>? OnNewInvitationTeamInIdeaCreated;
         event Func<Guid, TeamRequestStatus, Task>? OnInvitationTeamInIdeaStatusUpdated;
@@ -75,7 +75,14 @@ namespace HITSBlazor.Services.Teams
 
         //заявки команды в идею
         Task<ListDataResponse<RequestTeamToIdea>> GetRequestsTeamToIdeasAsync(
-            int page, Guid teamId, string? searchText = null
+            int page,
+            Guid? teamId = null,
+            Guid? ideaMarketId = null,
+            string? searchText = null
+        );
+        Task<List<RequestTeamToIdea>> GetTeamRequestsForCurretnIdeaMarketAndTeamsAsync(
+            Guid ideaMarketId,
+            IEnumerable<Guid> currentTeamIds
         );
         Task<RequestTeamToIdea> CreateRequestTeamToIdeaAsync(IdeaMarket ideaMarket, Team team, string letter);
 
@@ -83,7 +90,10 @@ namespace HITSBlazor.Services.Teams
 
         //приглашения команды в идею
         Task<ListDataResponse<InvitationTeamToIdea>> GetInvitationsTeamToIdeasAsync(
-            int page, Guid teamId, string? searchText = null
+            int page,
+            Guid? teamId = null,
+            Guid? ideaMarketId = null,
+            string? searchText = null
         );
         Task<bool> UpdateInvitationTeamToIdeaStatusAsync(Guid invitationId, TeamRequestStatus newStatus);
     }

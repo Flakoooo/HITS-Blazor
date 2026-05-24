@@ -2,6 +2,7 @@
 using HITSBlazor.Models.Users.Entities;
 using HITSBlazor.Models.Users.Enums;
 using HITSBlazor.Models.Users.Requests;
+using HITSBlazor.Utils.Mocks.Teams;
 
 namespace HITSBlazor.Utils.Mocks.Users
 {
@@ -313,6 +314,7 @@ namespace HITSBlazor.Utils.Mocks.Users
             string? searchText = null,
             string? orderBy = null,
             bool? byDescending = null,
+            bool? inTeam = null,
             HashSet<RoleType>? selectedRoles = null,
             HashSet<Guid>? ignoredIds = null
         )
@@ -324,6 +326,14 @@ namespace HITSBlazor.Utils.Mocks.Users
 
             if (selectedRoles?.Count > 0)
                 query = query.Where(u => u.Roles.Any(selectedRoles.Contains));
+
+            if (inTeam.HasValue)
+            {
+                var usersInTeams = MockTeams.GetUserIdsInTeams();
+                query = inTeam.Value 
+                    ? query.Where(u => usersInTeams.Contains(u.Id)) 
+                    : query.Where(u => !usersInTeams.Contains(u.Id));
+            }
 
             if (!string.IsNullOrWhiteSpace(searchText))
                 query = query.Where(u => u.FullName.Contains(searchText, StringComparison.CurrentCultureIgnoreCase));

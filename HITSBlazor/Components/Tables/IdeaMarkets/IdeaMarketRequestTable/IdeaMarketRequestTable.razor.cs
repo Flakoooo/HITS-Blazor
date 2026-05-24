@@ -2,17 +2,23 @@
 using HITSBlazor.Components.Tables.TableHeader;
 using HITSBlazor.Models.Markets.Entities;
 using HITSBlazor.Models.Teams.Entities;
+using HITSBlazor.Models.Teams.Enums;
+using HITSBlazor.Models.Users.Enums;
 using HITSBlazor.Services.Auth;
-using HITSBlazor.Services.IdeaMarkets;
 using HITSBlazor.Services.Modal;
+using HITSBlazor.Services.Teams;
 using Microsoft.AspNetCore.Components;
+using static HITSBlazor.Utils.Mocks.Common.MockInvitation;
 
 namespace HITSBlazor.Components.Tables.IdeaMarkets.IdeaMarketRequestTable
 {
     public partial class IdeaMarketRequestTable
     {
         [Inject]
-        private IIdeaMarketService IdeaMarketService { get; set; } = null!;
+        private IAuthService AuthService { get; set; } = null!;
+
+        [Inject]
+        private ITeamService TeamService { get; set; } = null!;
 
         [Inject]
         private ModalService ModalService { get; set; } = null!;
@@ -39,6 +45,8 @@ namespace HITSBlazor.Components.Tables.IdeaMarkets.IdeaMarketRequestTable
         {
             _isLoading = true;
 
+            TeamService.OnRequestTeamInIdeaStatusUpdated += RequestStatusHasUpdated;
+
             await LoadRequestsAsync();
 
             _isLoading = false;
@@ -59,7 +67,7 @@ namespace HITSBlazor.Components.Tables.IdeaMarkets.IdeaMarketRequestTable
         {
             await LoadDataAsync(
                 _requestsTeamsToIdea,
-                () => IdeaMarketService.GetRequestsTeamToIdeaAsync(
+                () => TeamService.GetRequestsTeamToIdeasAsync(
                     _currentPage,
                     ideaMarketId: CurrentIdeaMarket.Id,
                     searchText: _searchText
@@ -75,13 +83,26 @@ namespace HITSBlazor.Components.Tables.IdeaMarkets.IdeaMarketRequestTable
             await LoadRequestsAsync();
         }
 
-        private static Dictionary<MenuAction, object> GetActions(RequestTeamToIdea request)
+        private Dictionary<MenuAction, object> GetActions(RequestTeamToIdea request)
         {
             var actions = new Dictionary<MenuAction, object>
             {
                 [MenuAction.ViewTeamProfile] = request.TeamId,
                 [MenuAction.ViewLetter] = request.Letter
             };
+
+            if (request.Status is TeamRequestStatus.New)
+            {
+                var currentUser = AuthService.CurrentUser;
+                if (currentUser is not null)
+                {
+                    if (currentUser.Role is RoleType.Admin || currentUser.Id == CurrentIdeaMarket.Initiator.Id)
+                    {
+                        actions.Add(MenuAction.TeamRequestAccept, request.Id);
+                        actions.Add(MenuAction.TeamRequestCancel, request.Id);
+                    }
+                }
+            }
 
             return actions;
         }
@@ -90,11 +111,19 @@ namespace HITSBlazor.Components.Tables.IdeaMarkets.IdeaMarketRequestTable
 
         private void HandleTableMenuClick(TableActionContext context)
         {
-            if (context.Item is Guid teamId)
+            if (context.Item is Guid id)
             {
                 if (context.Action is MenuAction.ViewIdeaMarket)
                 {
-                    ShowTeam(teamId);
+                    ShowTeam(id);
+                }
+                else if (context.Action is MenuAction.TeamRequestAccept)
+                {
+                    TeamService.UpdateRequestTeamToIdeaStatusAsync(id, TeamRequestStatus.Accepted);
+                }
+                else if (context.Action is MenuAction.TeamRequestCancel)
+                {
+                    TeamService.UpdateRequestTeamToIdeaStatusAsync(id, TeamRequestStatus.Canceled);
                 }
             }
             else if (context.Item is string letter)
@@ -104,6 +133,29 @@ namespace HITSBlazor.Components.Tables.IdeaMarkets.IdeaMarketRequestTable
                     ModalService.ShowLetterModal(false, letter: letter);
                 }
             }
+        }
+
+        private async Task RequestStatusHasUpdated(Guid requestId, TeamRequestStatus newStatus)
+        {
+            var requestForUpdate = _requestsTeamsToIdea.FirstOrDefault(rtti => rtti.Id == requestId);
+            if (requestForUpdate is null) return;
+
+            if (newStatus is TeamRequestStatus.Accepted)
+            {
+                await LoadRequestsAsync();
+            }
+            else
+            {
+                requestForUpdate.Status = newStatus;
+                StateHasChanged();
+            }
+        }
+
+        protected override async ValueTask DisposeAsyncCore()
+        {
+            TeamService.OnRequestTeamInIdeaStatusUpdated -= RequestStatusHasUpdated;
+
+            await ValueTask.CompletedTask;
         }
     }
 }

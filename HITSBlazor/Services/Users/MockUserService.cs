@@ -18,6 +18,7 @@ namespace HITSBlazor.Services.Users
             string? searchText,
             string? orderBy,
             bool? byDescending,
+            bool? inTeam,
             IEnumerable<RoleType>? selectedRoles,
             IEnumerable<Guid>? ignoredIds
         ) => MockUsers.GetAllUsers(
@@ -25,6 +26,7 @@ namespace HITSBlazor.Services.Users
             searchText: searchText,
             orderBy: orderBy,
             byDescending: byDescending,
+            inTeam: inTeam,
             selectedRoles: selectedRoles?.ToHashSet(),
             ignoredIds: ignoredIds?.ToHashSet()
         );

@@ -125,7 +125,7 @@ namespace HITSBlazor.Components.Tables.Teams.RequestTeamToIdeaTable
             }
         }
 
-        private void RequestStatusHasChanged(Guid requestId, TeamRequestStatus newStatus)
+        private async Task RequestStatusHasChanged(Guid requestId, TeamRequestStatus newStatus)
         {
             var invitationForUpdate = _requestsTeamToIdeas.FirstOrDefault(ti => ti.Id == requestId);
             if (invitationForUpdate is null) return;

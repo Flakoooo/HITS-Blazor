@@ -5,7 +5,6 @@ using HITSBlazor.Models.Teams.Entities;
 using HITSBlazor.Models.Teams.Enums;
 using HITSBlazor.Services;
 using HITSBlazor.Services.Auth;
-using HITSBlazor.Services.IdeaMarkets;
 using HITSBlazor.Services.Modal;
 using HITSBlazor.Services.Teams;
 using Microsoft.AspNetCore.Components;
@@ -26,9 +25,6 @@ namespace HITSBlazor.Components.Forms.RequestTeamToIdeaForm
         [Inject]
         private ITeamService TeamService { get; set; } = null!;
 
-        [Inject]
-        private IIdeaMarketService IdeaMarketService { get; set; } = null!;
-
         [Parameter]
         public required IdeaMarket IdeaMarket { get; set; }
 
@@ -42,8 +38,9 @@ namespace HITSBlazor.Components.Forms.RequestTeamToIdeaForm
         public EventCallback<List<Skill>> SelectedSkillsChanged { get; set; }
 
         private bool _isLoading = true;
-        private bool _sumbitted = false;
         private bool _sumbitting = false;
+
+        private Dictionary<string, string> _errors = [];
 
         private Func<Task>? _queuedCollapseMethod;
 
@@ -97,7 +94,7 @@ namespace HITSBlazor.Components.Forms.RequestTeamToIdeaForm
         private async Task LoadMoreCachedRequest()
         {
             var idsForLoad = _teams.Select(t => t.Id).Where(id => !_cachedRequests.ContainsKey(id));
-            _cachedRequests = (await IdeaMarketService.GetTeamRequestsForCurretnIdeaMarketAndTeamsAsync(IdeaMarket.Id, idsForLoad))
+            _cachedRequests = (await TeamService.GetTeamRequestsForCurretnIdeaMarketAndTeamsAsync(IdeaMarket.Id, idsForLoad))
                     .ToDictionary(r => r.TeamId, r => r);
         }
 
@@ -131,30 +128,29 @@ namespace HITSBlazor.Components.Forms.RequestTeamToIdeaForm
 
         private async Task SendNewRequest(Team team)
         {
+            if (_sumbitting) return;
+
             _sumbitting = true;
-            _sumbitted = false;
+            _errors.Clear();
 
-            var isValid = true;
-            if (string.IsNullOrWhiteSpace(LetterText)) isValid = false;
+            if (string.IsNullOrWhiteSpace(LetterText))
+                _errors.Add("letter", "Поле не может быть пустым");
 
-            if (isValid)
+            if (_errors.Count > 0) return;
+
+            var newRequest = await TeamService.CreateRequestTeamToIdeaAsync(IdeaMarket, team, LetterText);
+            _cachedRequests.Add(team.Id, newRequest);
+            if (_queuedCollapseMethod is not null)
             {
-                var newRequest = await TeamService.CreateRequestTeamToIdeaAsync(IdeaMarket, team, LetterText);
-                _cachedRequests.Add(team.Id, newRequest);
-                if (_queuedCollapseMethod is not null)
-                {
-                    await _queuedCollapseMethod();
-                    _queuedCollapseMethod = null;
-                }
-
-                StateHasChanged();
+                await _queuedCollapseMethod();
+                _queuedCollapseMethod = null;
             }
 
-            _sumbitted = true;
             _sumbitting = false;
+            StateHasChanged();
         }
 
-        private void EventedRequestUpdate(Guid requestId, TeamRequestStatus newStatus)
+        private async Task EventedRequestUpdate(Guid requestId, TeamRequestStatus newStatus)
         {
             foreach (var request in _cachedRequests)
                 if (request.Value.Id == requestId)

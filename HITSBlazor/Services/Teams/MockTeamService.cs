@@ -30,7 +30,7 @@ namespace HITSBlazor.Services.Teams
         public event Action<Guid, TeamRequestStatus>? OnRequestToTeamStatusHasChanged;
 
         public event Func<bool, Task>? OnNewRequestsTeamInIdeaCreated;
-        public event Action<Guid, TeamRequestStatus>? OnRequestTeamInIdeaStatusUpdated;
+        public event Func<Guid, TeamRequestStatus, Task>? OnRequestTeamInIdeaStatusUpdated;
 
         public event Func<bool, Task>? OnNewInvitationTeamInIdeaCreated;
         public event Func<Guid, TeamRequestStatus, Task>? OnInvitationTeamInIdeaStatusUpdated;
@@ -247,10 +247,18 @@ namespace HITSBlazor.Services.Teams
         //заявки команды в идею
         public async Task<ListDataResponse<RequestTeamToIdea>> GetRequestsTeamToIdeasAsync(
             int page, 
-            Guid teamId, 
+            Guid? teamId, 
+            Guid? ideaMarketId,
             string? searchText
         ) => MockRequestTeamToIdeas.GetRequestsTeamToIdeas(
-            page, teamId: teamId, searchText: searchText
+            page, teamId: teamId, ideaMarketId: ideaMarketId, searchText: searchText
+        );
+
+        public async Task<List<RequestTeamToIdea>> GetTeamRequestsForCurretnIdeaMarketAndTeamsAsync(
+            Guid ideaMarketId,
+            IEnumerable<Guid> currentTeamIds
+        ) => MockRequestTeamToIdeas.GetTeamRequestForCurrentTeamsAndIdeaMarket(
+            ideaMarketId, currentTeamIds.ToHashSet()
         );
 
         public async Task<RequestTeamToIdea> CreateRequestTeamToIdeaAsync(IdeaMarket ideaMarket, Team team, string letter)
@@ -295,9 +303,12 @@ namespace HITSBlazor.Services.Teams
 
         //приглашения команды в идею
         public async Task<ListDataResponse<InvitationTeamToIdea>> GetInvitationsTeamToIdeasAsync(
-            int page, Guid teamId, string? searchText
+            int page,
+            Guid? teamId,
+            Guid? ideaMarketId,
+            string? searchText
         ) => MockInvitationTeamToIdeas.GetInvitationsTeamToIdeas(
-            page, teamId: teamId, searchText: searchText
+            page, teamId: teamId, ideaMarketId: ideaMarketId, searchText: searchText
         );
 
         public async Task<bool> UpdateInvitationTeamToIdeaStatusAsync(Guid invitationId, TeamRequestStatus newStatus)

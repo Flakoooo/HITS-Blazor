@@ -94,6 +94,7 @@ namespace HITSBlazor.Pages.Admin.AllUsers
                 searchText: SeacrhText,
                 orderBy: _orderBy,
                 byDescending: _byDescending,
+                inTeam: InTeam?.Value,
                 selectedRoles: [.. SelectedUserRoles.Select(s => s.Value)]
             ),
             append: append
@@ -158,21 +159,21 @@ namespace HITSBlazor.Pages.Admin.AllUsers
 
         private async Task OnUserAction(TableActionContext context)
         {
-            if (context.Action == MenuAction.ViewProfile)
+            if (context.Action is MenuAction.ViewProfile)
             {
                 if (context.Item is Guid guid)
                     ShowUserProfile(guid);
             }
             else if (context.Item is User user)
             {
-                if (context.Action == MenuAction.Edit)
+                if (context.Action is MenuAction.Edit)
                 {
                     ModalService.Show<UpdateUserModal>(
                         ModalType.Center,
                         parameters: new Dictionary<string, object> { [nameof(UpdateUserModal.UserForUpdate)] = user }
                     );
                 }
-                else if (context.Action == MenuAction.Delete)
+                else if (context.Action is MenuAction.Delete)
                 {
                     ModalService.ShowConfirmModal(
                         $"Вы действительно хотите удалить {user.FullName}?",

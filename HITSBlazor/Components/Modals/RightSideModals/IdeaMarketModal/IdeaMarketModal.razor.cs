@@ -2,6 +2,9 @@
 using HITSBlazor.Components.Modals.Components.RightSideModalInfo;
 using HITSBlazor.Models.Common.Entities;
 using HITSBlazor.Models.Markets.Entities;
+using HITSBlazor.Models.Markets.Enums;
+using HITSBlazor.Models.Teams.Enums;
+using HITSBlazor.Services;
 using HITSBlazor.Services.Auth;
 using HITSBlazor.Services.IdeaMarkets;
 using HITSBlazor.Services.Markets;
@@ -12,7 +15,7 @@ using Microsoft.AspNetCore.Components;
 
 namespace HITSBlazor.Components.Modals.RightSideModals.IdeaMarketModal
 {
-    public partial class IdeaMarketModal
+    public partial class IdeaMarketModal : IDisposable
     {
         [Inject]
         private IAuthService AuthService { get; set; } = null!;
@@ -21,10 +24,16 @@ namespace HITSBlazor.Components.Modals.RightSideModals.IdeaMarketModal
         private IIdeaMarketService IdeaMarketService { get; set; } = null!;
 
         [Inject]
+        private ITeamService TeamService { get; set; } = null!;
+
+        [Inject]
         private IMarketService MarketService { get; set; } = null!;
 
         [Inject]
         private ModalService ModalService { get; set; } = null!;
+
+        [Inject]
+        private NavigationService NavigationService { get; set; } = null!;
 
         [Parameter]
         public Guid IdeaMarketId { get; set; }
@@ -77,9 +86,18 @@ namespace HITSBlazor.Components.Modals.RightSideModals.IdeaMarketModal
 
         protected override async Task OnInitializedAsync()
         {
+            await LoadIdeaMarket();
+        }
+
+        private async Task LoadIdeaMarket()
+        {
             _isLoading = true;
+            StateHasChanged();
+
             _currentIdeaMarket = await IdeaMarketService.GetIdeaMarketAsync(IdeaMarketId);
             if (_currentIdeaMarket is null) return;
+
+            TeamService.OnRequestTeamInIdeaStatusUpdated += RequestHasAccepted;
 
             _ideaData = GetIdeaData();
 
@@ -123,6 +141,24 @@ namespace HITSBlazor.Components.Modals.RightSideModals.IdeaMarketModal
             _activeTableCategory = category;
         }
 
-        private void ShowTeamModal(Guid teamId) => ModalService.ShowTeamModal(teamId);
+        private async Task InviteTeams()
+        {
+            await ModalService.CloseAll(ModalType.RightSide);
+            await NavigationService.NavigateToAsync("/teams/list");
+        }
+
+        private async Task RequestHasAccepted(Guid requestId, TeamRequestStatus newStatus)
+        {
+            if (_currentIdeaMarket is not null && newStatus is TeamRequestStatus.Accepted)
+            {
+                await LoadIdeaMarket();
+                StateHasChanged();
+            }
+        }
+
+        public void Dispose()
+        {
+            TeamService.OnRequestTeamInIdeaStatusUpdated -= RequestHasAccepted;
+        }
     }
 }

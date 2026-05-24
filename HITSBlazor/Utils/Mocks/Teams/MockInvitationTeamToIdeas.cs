@@ -59,23 +59,23 @@ namespace HITSBlazor.Utils.Mocks.Teams
             int page,
             int pageSize = 20,
             Guid? teamId = null,
-            Guid? ideaId = null,
+            Guid? ideaMarketId = null,
             string? searchText = null
         )
         {
             IQueryable<InvitationTeamToIdea> query;
 
-            query = (teamId, ideaId) switch
+            query = (teamId, ideaMarketId) switch
             {
                 (null, null) => _invitationTeamToIdeas.AsQueryable(),
-                (null, _) => _invitationTeamToIdeas.Where(itti => itti.IdeaId == ideaId).AsQueryable(),
+                (null, _) => _invitationTeamToIdeas.Where(itti => itti.IdeaId == ideaMarketId).AsQueryable(),
                 (_, null) => _invitationTeamToIdeas.Where(itti => itti.TeamId == teamId).AsQueryable(),
-                (_, _) => _invitationTeamToIdeas.Where(itti => itti.TeamId == teamId && itti.IdeaId == ideaId).AsQueryable()
+                (_, _) => _invitationTeamToIdeas.Where(itti => itti.TeamId == teamId && itti.IdeaId == ideaMarketId).AsQueryable()
             };
 
             if (!string.IsNullOrWhiteSpace(searchText))
             {
-                query = (teamId, ideaId) switch
+                query = (teamId, ideaMarketId) switch
                 {
                     (null, _) => query.Where(itti => itti.IdeaName.Contains(searchText, StringComparison.CurrentCultureIgnoreCase)),
                     (_, null) => query.Where(itti => itti.TeamName.Contains(searchText, StringComparison.CurrentCultureIgnoreCase)),

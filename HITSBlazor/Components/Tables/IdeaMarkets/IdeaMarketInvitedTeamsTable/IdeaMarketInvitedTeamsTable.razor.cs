@@ -2,8 +2,11 @@
 using HITSBlazor.Components.Tables.TableHeader;
 using HITSBlazor.Models.Markets.Entities;
 using HITSBlazor.Models.Teams.Entities;
-using HITSBlazor.Services.IdeaMarkets;
+using HITSBlazor.Models.Teams.Enums;
+using HITSBlazor.Models.Users.Enums;
+using HITSBlazor.Services.Auth;
 using HITSBlazor.Services.Modal;
+using HITSBlazor.Services.Teams;
 using Microsoft.AspNetCore.Components;
 
 namespace HITSBlazor.Components.Tables.IdeaMarkets.IdeaMarketInvitedTeamsTable
@@ -11,7 +14,10 @@ namespace HITSBlazor.Components.Tables.IdeaMarkets.IdeaMarketInvitedTeamsTable
     public partial class IdeaMarketInvitedTeamsTable
     {
         [Inject]
-        private IIdeaMarketService IdeaMarketService { get; set; } = null!;
+        private IAuthService AuthService { get; set; } = null!;
+
+        [Inject]
+        private ITeamService TeamService { get; set; } = null!;
 
         [Inject]
         private ModalService ModalService { get; set; } = null!;
@@ -38,7 +44,9 @@ namespace HITSBlazor.Components.Tables.IdeaMarkets.IdeaMarketInvitedTeamsTable
         {
             _isLoading = true;
 
-            await LoadRequestsAsync();
+            TeamService.OnInvitationTeamInIdeaStatusUpdated += InvitationStatusHasChanged;
+
+            await LoadInvitationsAsync();
 
             _isLoading = false;
             MarkAsInitialized();
@@ -50,17 +58,17 @@ namespace HITSBlazor.Components.Tables.IdeaMarkets.IdeaMarketInvitedTeamsTable
                 _tableContainer = _tableComponent.ScrollContainer;
         }
 
-        protected override async Task OnLoadMoreItemsAsync() => await LoadRequestsAsync(true);
+        protected override async Task OnLoadMoreItemsAsync() => await LoadInvitationsAsync(true);
 
         protected override int GetCurrentItemsCount() => _invitationsTeamsToIdea.Count;
 
-        private async Task LoadRequestsAsync(bool append = false)
+        private async Task LoadInvitationsAsync(bool append = false)
         {
             await LoadDataAsync(
                 _invitationsTeamsToIdea,
-                () => IdeaMarketService.GetInvitationTeamsToIdeaAsync(
+                () => TeamService.GetInvitationsTeamToIdeasAsync(
                     _currentPage,
-                    ideaId: CurrentIdeaMarket.IdeaId,
+                    ideaMarketId: CurrentIdeaMarket.Id,
                     searchText: _searchText
                 ),
                 append
@@ -71,15 +79,27 @@ namespace HITSBlazor.Components.Tables.IdeaMarkets.IdeaMarketInvitedTeamsTable
         {
             _searchText = value;
             ResetPagination();
-            await LoadRequestsAsync();
+            await LoadInvitationsAsync();
         }
 
-        private static Dictionary<MenuAction, object> GetActions(InvitationTeamToIdea invitation)
+        private Dictionary<MenuAction, object> GetActions(InvitationTeamToIdea invitation)
         {
             var actions = new Dictionary<MenuAction, object>
             {
                 [MenuAction.ViewTeamProfile] = invitation.TeamId
             };
+
+            if (invitation.Status is TeamRequestStatus.New)
+            {
+                var currentUser = AuthService.CurrentUser;
+                if (currentUser is not null)
+                {
+                    if (currentUser.Role is RoleType.Admin || currentUser.Id == CurrentIdeaMarket.Initiator.Id)
+                    {
+                        actions.Add(MenuAction.TeamRequestWithdraw, invitation.Id);
+                    }
+                }
+            }
 
             return actions;
         }
@@ -88,13 +108,33 @@ namespace HITSBlazor.Components.Tables.IdeaMarkets.IdeaMarketInvitedTeamsTable
 
         private void HandleTableMenuClick(TableActionContext context)
         {
-            if (context.Item is Guid teamId)
+            if (context.Item is Guid id)
             {
                 if (context.Action is MenuAction.ViewIdeaMarket)
                 {
-                    ShowTeam(teamId);
+                    ShowTeam(id);
+                }
+                else if (context.Action is MenuAction.TeamRequestWithdraw)
+                {
+                    TeamService.UpdateInvitationTeamToIdeaStatusAsync(id, TeamRequestStatus.Withdrawn);
                 }
             }
+        }
+
+        private async Task InvitationStatusHasChanged(Guid invitationId, TeamRequestStatus newStatus)
+        {
+            var invitationForUpdate = _invitationsTeamsToIdea.FirstOrDefault(itti => itti.Id == invitationId);
+            if (invitationForUpdate is null) return;
+
+            invitationForUpdate.Status = newStatus;
+            StateHasChanged();
+        }
+
+        protected override async ValueTask DisposeAsyncCore()
+        {
+            TeamService.OnInvitationTeamInIdeaStatusUpdated -= InvitationStatusHasChanged;
+
+            await ValueTask.CompletedTask;
         }
     }
 }

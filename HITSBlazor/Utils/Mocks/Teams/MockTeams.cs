@@ -146,7 +146,7 @@ namespace HITSBlazor.Utils.Mocks.Teams
             var query = _teams.AsQueryable();
 
             if (userId.HasValue)
-                query = query.Where(t => t.Owner.Id == userId || (t.Leader != null && t.Leader.Id == userId));
+                query = query.Where(t => t.Owner.UserId == userId || (t.Leader != null && t.Leader.UserId == userId));
 
             if (privacy.HasValue)
                 query = query.Where(t => t.Closed == privacy);
@@ -185,9 +185,6 @@ namespace HITSBlazor.Utils.Mocks.Teams
             return new ListDataResponse<Team>(count, query.ToList());
         }
 
-        public static List<Team> GetTeamsByOwnerIdOrLeaderId(Guid userId) 
-            => _teams.Where(t => t.Owner.UserId == userId || t.Leader?.UserId == userId).ToList();
-
         public static ListDataResponse<TeamMember> GetTeamMembers(
             int page,
             int pageSize = 20,
@@ -219,6 +216,9 @@ namespace HITSBlazor.Utils.Mocks.Teams
 
             return new ListDataResponse<TeamMember>(count, query.ToList());
         }
+
+        public static HashSet<Guid> GetUserIdsInTeams()
+            => _teams.SelectMany(t => t.Members).Select(t => t.UserId).ToHashSet();
 
         public static bool CreateTeam(CreateTeamRequest request)
         {

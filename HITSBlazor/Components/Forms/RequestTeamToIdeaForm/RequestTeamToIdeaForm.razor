@@ -11,7 +11,7 @@
 @using HITSBlazor.Utils.Models
 @inherits ListPageDataLoader
 
-@if (_teams.Count == 0)
+@if (_totalCount == 0)
 {
     <div class="d-flex bg-white rounded p-2 w-100 px-3 align-items-center justify-content-between">
         @if (_isLoading)
@@ -63,6 +63,8 @@ else
                                                 Variant="GetStatusButtonVariant(request?.Status)"
                                                 InProgress="request?.Status is TeamRequestStatus.Annulled or TeamRequestStatus.Canceled"
                                                 OnButtonClick="async () => {
+                                                    if (_sumbitting) return;
+
                                                     _queuedCollapseMethod = collapse.ExpandedStatus ? null : () => collapse.Toggle();
                                                     await collapse.Toggle();
                                                     LetterText = string.Empty;
@@ -114,9 +116,12 @@ else
                                     <TextArea Label="Мотивационное письмо"
                                               HintText="@_hintText"
                                               @bind-Value="LetterText"
+                                              ErrorMessage="@_errors.GetValueOrDefault("letter")"
                                               Style="resize: none; height: 200px;" />
                                     <Button Variant="ButtonVariant.Success" 
                                             Text="Подать заявку"
+                                            LoadingText="Отправка"
+                                            InProgress="_sumbitting"
                                             OnButtonClick="() => SendNewRequest(team)" />
                                 </div>
                             </ExpandedContent>

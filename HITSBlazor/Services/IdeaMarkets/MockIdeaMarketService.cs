@@ -39,25 +39,6 @@ namespace HITSBlazor.Services.IdeaMarkets
         public async Task<IdeaMarket?> GetIdeaMarketAsync(Guid guid) 
             => MockIdeaMarkets.GetIdeaMarketById(guid);
 
-        public async Task<ListDataResponse<RequestTeamToIdea>> GetRequestsTeamToIdeaAsync(
-            int page, Guid ideaMarketId, string? searchText
-        ) => MockRequestTeamToIdeas.GetRequestsTeamToIdeas(
-            page, ideaMarketId: ideaMarketId, searchText: searchText
-        );
-
-        public async Task<List<RequestTeamToIdea>> GetTeamRequestsForCurretnIdeaMarketAndTeamsAsync(
-            Guid ideaMarketId,
-            IEnumerable<Guid> currentTeamIds
-        ) => MockRequestTeamToIdeas.GetTeamRequestForCurrentTeamsAndIdeaMarket(
-            ideaMarketId, currentTeamIds.ToHashSet()
-        );
-
-        public async Task<ListDataResponse<InvitationTeamToIdea>> GetInvitationTeamsToIdeaAsync(
-            int page, Guid ideaId, string? searchText
-        ) => MockInvitationTeamToIdeas.GetInvitationsTeamToIdeas(
-            page, ideaId: ideaId, searchText: searchText
-        );
-
         public async Task<bool> SendIdeasOnMarket(ICollection<Idea> ideas, Market market)
             => MockIdeaMarkets.SendIdeasOnMarket(ideas, market) > 0;
 
