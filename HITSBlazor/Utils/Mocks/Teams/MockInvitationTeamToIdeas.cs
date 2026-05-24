@@ -65,13 +65,13 @@ namespace HITSBlazor.Utils.Mocks.Teams
         {
             IQueryable<InvitationTeamToIdea> query;
 
-            query = (teamId, ideaMarketId) switch
+            query = ((teamId, ideaMarketId) switch
             {
-                (null, null) => _invitationTeamToIdeas.AsQueryable(),
-                (null, _) => _invitationTeamToIdeas.Where(itti => itti.IdeaId == ideaMarketId).AsQueryable(),
-                (_, null) => _invitationTeamToIdeas.Where(itti => itti.TeamId == teamId).AsQueryable(),
-                (_, _) => _invitationTeamToIdeas.Where(itti => itti.TeamId == teamId && itti.IdeaId == ideaMarketId).AsQueryable()
-            };
+                (null, null) => _invitationTeamToIdeas,
+                (null, _) => _invitationTeamToIdeas.Where(itti => itti.IdeaId == ideaMarketId),
+                (_, null) => _invitationTeamToIdeas.Where(itti => itti.TeamId == teamId),
+                (_, _) => _invitationTeamToIdeas.Where(itti => itti.TeamId == teamId && itti.IdeaId == ideaMarketId)
+            }).AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(searchText))
             {
@@ -89,6 +89,35 @@ namespace HITSBlazor.Utils.Mocks.Teams
             query = query.Skip((page - 1) * pageSize).Take(pageSize);
 
             return new ListDataResponse<InvitationTeamToIdea>(count, query.ToList());
+        }
+
+        public static List<InvitationTeamToIdea> GetTeamInvitationsForCurrentIdeaMarketsAndTeam(
+            Guid teamId,
+            HashSet<Guid> ideaMarketIds
+        ) => _invitationTeamToIdeas.Where(rtti => rtti.TeamId == teamId && ideaMarketIds.Contains(rtti.IdeaId)).ToList();
+
+        public static InvitationTeamToIdea? CreateNewInvitation(Guid teamId, Guid ideaMarketId)
+        {
+            var team = MockTeams.GetTeamById(teamId);
+            var ideaMarket = MockIdeaMarkets.GetIdeaMarketById(ideaMarketId);
+
+            if (team is null || ideaMarket is null) return null;
+
+            var newInvitation = new InvitationTeamToIdea
+            {
+                Id = Guid.NewGuid(),
+                IdeaId = ideaMarket.Id,
+                IdeaName = ideaMarket.Name,
+                Status = TeamRequestStatus.New,
+                TeamId = team.Id,
+                InitiatorId = ideaMarket.Initiator.Id,
+                TeamName = team.Name,
+                TeamMembersCount = team.MembersCount,
+                Skills = ideaMarket.Stack
+            };
+
+            _invitationTeamToIdeas.Add(newInvitation);
+            return newInvitation;
         }
 
         public static bool UpdateStatus(Guid invitationId, TeamRequestStatus newStatus)

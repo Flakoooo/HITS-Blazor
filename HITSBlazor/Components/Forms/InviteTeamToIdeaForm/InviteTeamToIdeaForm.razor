@@ -1,0 +1,105 @@
+﻿@namespace HITSBlazor.Components.Forms.InviteTeamToIdeaForm
+@using HITSBlazor.Components.Button
+@using HITSBlazor.Components.Collapse
+@using HITSBlazor.Components.Inputs.TextArea
+@using HITSBlazor.Components.Placeholders.Placeholder
+@using HITSBlazor.Components.Skills
+@using HITSBlazor.Components.Typography
+@using HITSBlazor.Models.Common.Enums
+@using HITSBlazor.Models.Markets.Enums
+@using HITSBlazor.Models.Teams.Enums
+@using HITSBlazor.Pages
+@using HITSBlazor.Utils.Models
+@inherits ListPageDataLoader
+
+@if (_totalCount == 0)
+{
+    <div class="d-flex bg-white rounded p-2 w-100 px-3 align-items-center justify-content-between">
+        @if (_isLoading)
+        {
+            <Placeholder Width="w-25" />
+            <Placeholder Width="w-25" Height="PlaceholderHeight.Smaller" />
+        }
+        else
+        {
+            <Typography FontSize="6" TextColor="TextColor.Danger">
+                У вас нет идей на бирже
+            </Typography>
+        }
+    </div>
+}
+else
+{
+    <div class="w-100 d-flex flex-column bg-white rounded-3">
+        @if (_isLoading)
+        {
+            <Placeholder Width="w-25" />
+        }
+        <Typography FontSize="6" CustomClass="py-2 px-3 border-bottom">
+            Ваши идеи на бирже
+        </Typography>
+        <div class="d-flex flex-column gap-2 p-3" @ref="_tableContainer">
+            @foreach (var ideaMarket in _ideaMarkets)
+            {
+                <div class="team-request-collapse w-100">
+                    <div class="border rounded-3 py-1 px-2 w-100">
+                        <Collapse>
+                            <MainContent Context="collapse">
+                                <div class="team-request-collapse-button">
+                                    <Button Variant="ButtonVariant.Link" 
+                                            Text="@ideaMarket.Name" 
+                                            OnButtonClick="() => ModalService.ShowIdeaMarketModal(ideaMarket.Id)" />
+                                    @if (ideaMarket.Team is not null || ideaMarket.Status is IdeaMarketStatusType.Project )
+                                    {
+                                        <Button Variant="ButtonVariant.Secondary" 
+                                                Text="Ваша идея уже имеет команду или активный проект" 
+                                                InProgress="true" />
+                                    }
+                                    else if (!_cachedInvites.TryGetValue(ideaMarket.Id, out var invitation) || invitation.Status is not TeamRequestStatus.New)
+                                    {
+                                        <Button Text="@GetStatusButtonText(invitation?.Status)"
+                                                Variant="GetStatusButtonVariant(invitation?.Status)"
+                                                InProgress="invitation?.Status is TeamRequestStatus.Annulled or TeamRequestStatus.Canceled"
+                                                OnButtonClick="async () => {
+                                                    if (_sumbitting) return;
+
+                                                    _queuedCollapseMethod = collapse.ExpandedStatus ? null : () => collapse.Toggle();
+                                                    await collapse.Toggle();
+                                                }" />
+                                    }
+                                    else
+                                    {
+                                        <Button Variant="ButtonVariant.Danger" 
+                                                Text="Отозвать приглашение"
+                                                OnButtonClick="() => WithdrawnInvitation(ideaMarket)" />
+                                    }
+                                </div>
+                            </MainContent>
+                            <ExpandedContent>
+                                <div class="team-request-collapse-info py-1">
+                                    <div class="w-100 d-flex p-2">
+                                        <div class="w-100 border-start ps-3 pb-1">
+                                            <div class="d-flex gap-2 align-items-center text-primary pb-1">
+                                                <div>Требуемые компетенции:</div>
+                                            </div>
+                                            <div class="d-flex flex-wrap gap-2">
+                                                <div class="d-flex flex-wrap gap-1">
+                                                    <Skills SkillList="ideaMarket.Stack" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <Button Variant="ButtonVariant.Success" 
+                                            Text="Отправить приглашение"
+                                            LoadingText="Отправка"
+                                            InProgress="_sumbitting"
+                                            OnButtonClick="() => SendNewInvite(ideaMarket)" />
+                                </div>
+                            </ExpandedContent>
+                        </Collapse>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+}

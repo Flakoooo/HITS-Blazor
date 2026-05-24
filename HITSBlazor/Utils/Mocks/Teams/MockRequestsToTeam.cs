@@ -57,7 +57,11 @@ namespace HITSBlazor.Utils.Mocks.Teams
 
         public static bool CheckAllowSendRequestInTeam(Guid teamId, Guid userId)
         {
-            return MockTeams.GetTeamById(teamId)?.Members.FirstOrDefault(m => m.UserId == userId) is null 
+            var team = MockTeams.GetTeamById(teamId);
+            return team is not null
+                && team.Owner.UserId != userId 
+                && team.Leader?.UserId != userId 
+                && team.Members.FirstOrDefault(m => m.UserId == userId) is null 
                 && !_requestsToTeam.Any(rtt => rtt.TeamId == teamId 
                     && rtt.UserId == userId 
                     && rtt.Status is TeamRequestStatus.New or TeamRequestStatus.Canceled

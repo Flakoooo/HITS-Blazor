@@ -2,6 +2,7 @@
 @using HITSBlazor.Components.ActionMenus.BaseActionMenu
 @using HITSBlazor.Components.Button
 @using HITSBlazor.Components.Collapse
+@using HITSBlazor.Components.Forms.InviteTeamToIdeaForm
 @using HITSBlazor.Components.InputSearch
 @using HITSBlazor.Components.Modals.Components
 @using HITSBlazor.Components.Modals.Components.ModalHeader
@@ -147,29 +148,40 @@
                     var isAdmin = currentUser.Role is RoleType.Admin;
                     var isOwner = currentUser.Id == _currentTeam.Owner.Id;
                     var isLeader = currentUser.Id == _currentTeam.Leader?.Id;
-                    <div class="rounded-3 bg-white p-3 d-flex flex-wrap gap-3">
-                        @if (isAdmin || isOwner || isLeader)
-                        {
-                            <Button Variant="ButtonVariant.Light"
-                                    Text="Редактировать"
-                                    OnButtonClick="NavigateToCreateTeam" />
-                            @if (!isLeader)
+                    @if (isAdmin || isOwner || isLeader || _sendRequestAllowed)
+                    {
+                        <div class="rounded-3 bg-white p-3 d-flex flex-wrap gap-3">
+                            @if (isAdmin || isOwner || isLeader)
                             {
-                                <Button Variant="ButtonVariant.Danger"
-                                        Text="Удалить команду"
-                                        OnButtonClick="DeleteTeam" />
+                                <Button Variant="ButtonVariant.Light"
+                                        IsLoading="_isLoading"
+                                        Text="Редактировать"
+                                        OnButtonClick="NavigateToCreateTeam" />
+                                @if (!isLeader)
+                                {
+                                    <Button Variant="ButtonVariant.Danger"
+                                            IsLoading="_isLoading"
+                                            Text="Удалить команду"
+                                            OnButtonClick="DeleteTeam" />
+                                }
+                                <Button Variant="ButtonVariant.Primary"
+                                        IsLoading="_isLoading"
+                                        Text="Пригласить пользователей"
+                                        OnButtonClick="ShowInviteUsersModal" />
                             }
-                            <Button Variant="ButtonVariant.Primary"
-                                    Text="Пригласить пользователей"
-                                    OnButtonClick="ShowInviteUsersModal" />
-                        }
-                        else if (isAdmin || _sendRequestAllowed)
-                        {
-                            <Button Variant="ButtonVariant.Success"
-                                    Text="Подать заявку в команду"
-                                    OnButtonClick="SendRequestInTeam" />
-                        }
-                    </div>
+                            @if (isAdmin || _sendRequestAllowed)
+                            {
+                                <Button Variant="ButtonVariant.Success"
+                                        IsLoading="_isLoading"
+                                        Text="Подать заявку в команду"
+                                        OnButtonClick="SendRequestInTeam" />
+                            }
+                        </div>                        
+                    }
+                    @if (currentUser.Role is RoleType.Admin or RoleType.Initiator && !isOwner && !isLeader)
+                    {
+                        <InviteTeamToIdeaForm CurrentTeam="_currentTeam" />
+                    }
                 }
             }
         </div>

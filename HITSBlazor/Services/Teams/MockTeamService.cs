@@ -311,6 +311,22 @@ namespace HITSBlazor.Services.Teams
             page, teamId: teamId, ideaMarketId: ideaMarketId, searchText: searchText
         );
 
+        public async Task<List<InvitationTeamToIdea>> GetTeamInvitationForCurrentTeamAndIdeaMarketsAsync(
+            Guid teamId,
+            IEnumerable<Guid> currentIdeaMarketIds
+        ) => MockInvitationTeamToIdeas.GetTeamInvitationsForCurrentIdeaMarketsAndTeam(
+            teamId, currentIdeaMarketIds.ToHashSet()
+        );
+
+        public async Task<InvitationTeamToIdea?> CreateInvitationTeamToIdeaAsync(IdeaMarket ideaMarket, Team team)
+        {
+            var newInvitation = MockInvitationTeamToIdeas.CreateNewInvitation(team.Id, ideaMarket.Id);
+
+            OnNewInvitationTeamInIdeaCreated?.Invoke(false);
+
+            return newInvitation;
+        }
+
         public async Task<bool> UpdateInvitationTeamToIdeaStatusAsync(Guid invitationId, TeamRequestStatus newStatus)
         {
             var result = MockInvitationTeamToIdeas.UpdateStatus(invitationId, newStatus);

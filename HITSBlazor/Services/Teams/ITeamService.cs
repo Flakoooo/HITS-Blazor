@@ -95,6 +95,11 @@ namespace HITSBlazor.Services.Teams
             Guid? ideaMarketId = null,
             string? searchText = null
         );
+        Task<List<InvitationTeamToIdea>> GetTeamInvitationForCurrentTeamAndIdeaMarketsAsync(
+            Guid teamId,
+            IEnumerable<Guid> currentIdeaMarketIds
+        );
+        Task<InvitationTeamToIdea?> CreateInvitationTeamToIdeaAsync(IdeaMarket ideaMarket, Team team);
         Task<bool> UpdateInvitationTeamToIdeaStatusAsync(Guid invitationId, TeamRequestStatus newStatus);
     }
 }

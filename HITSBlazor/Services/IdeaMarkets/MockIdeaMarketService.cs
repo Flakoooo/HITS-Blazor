@@ -2,11 +2,9 @@
 using HITSBlazor.Models.Ideas.Entities;
 using HITSBlazor.Models.Markets.Entities;
 using HITSBlazor.Models.Markets.Enums;
-using HITSBlazor.Models.Teams.Entities;
 using HITSBlazor.Models.Users.Enums;
 using HITSBlazor.Services.Auth;
 using HITSBlazor.Utils.Mocks.Markets;
-using HITSBlazor.Utils.Mocks.Teams;
 
 namespace HITSBlazor.Services.IdeaMarkets
 {
@@ -23,7 +21,8 @@ namespace HITSBlazor.Services.IdeaMarkets
         )
         {
             var currentUser = _authService.CurrentUser;
-            if (currentUser is null || currentUser.Role is null) return new ListDataResponse<IdeaMarket>(0, []);
+            if (currentUser is null || currentUser.Role is null) 
+                return new ListDataResponse<IdeaMarket>(0, []);
 
             return MockIdeaMarkets.GetIdeaMarketsByQueryParams(
                 page,

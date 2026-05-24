@@ -247,21 +247,21 @@ namespace HITSBlazor.Utils.Mocks.Markets
             IdeaMarketStatusType? selectedStatus = null
         )
         {
-            IEnumerable<IdeaMarket> query;
-            if (currentUserRole == RoleType.Initiator)
+            IQueryable<IdeaMarket> query;
+            if (currentUserRole is RoleType.Initiator)
             {
                 query = GetIdeaMarkets(
                     userId,
                     marketId is not null
                     ? im => im.MarketId == marketId.Value && im.Initiator.Id == userId
                     : im => im.Initiator.Id == userId
-                );
+                ).AsQueryable();
             }
             else
             {
-                query = marketId is not null
+                query = (marketId is not null
                     ? _ideaMarkets.Where(im => im.MarketId == marketId.Value)
-                    : _ideaMarkets.AsEnumerable();
+                    : _ideaMarkets).AsQueryable();
             }
 
             if (!query.Any()) return new ListDataResponse<IdeaMarket>(0, []);

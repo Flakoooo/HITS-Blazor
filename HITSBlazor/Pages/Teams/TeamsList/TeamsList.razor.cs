@@ -144,7 +144,7 @@ namespace HITSBlazor.Pages.Teams.TeamsList
             if (AuthService.CurrentUser?.Role is RoleType.Admin)
                 await NavigationService.NavigateToAsync($"/teams/list/{teamId}");
             else
-                ModalService.ShowIdeaModal(teamId);
+                ModalService.ShowTeamModal(teamId);
         }
 
         private async Task ResetFilters()
