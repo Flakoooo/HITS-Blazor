@@ -5,8 +5,8 @@ namespace HITSBlazor.Services.Tests
 {
     public class MockTestService : ITestService
     {
-        public event Func<Task>? OnTestsStateChanged;
-        public event Action? OnTestsStateUpdated;
+        //public event Func<Task>? OnTestsStateChanged;
+        //public event Action? OnTestsStateUpdated;
 
         private List<Test> _cachedTests = [];
         private DateTime _lastRefreshTime;

@@ -22,9 +22,9 @@ namespace HITSBlazor.Pages.Admin.InviteUsers
         private bool _showRoles = false;
 
         private bool _fileLoading = false;
-        private bool _fileLoaded = false;
-        private bool _submitted = false;
         private bool _submitting = false;
+
+        private readonly Dictionary<string, string> _errors = [];
 
         private InviteUsersRequest InviteUsersRequest { get; set; } = new();
 
@@ -44,12 +44,10 @@ namespace HITSBlazor.Pages.Admin.InviteUsers
             try
             {
                 _fileLoading = true;
-                _fileLoaded = false;
 
                 var file = e.File;
                 if (file is null)
                 {
-                    _fileLoaded = false;
                     return;
                 }
 
@@ -68,7 +66,6 @@ namespace HITSBlazor.Pages.Admin.InviteUsers
                 if (rawEmails.Count == 0)
                 {
                     NotificationService.ShowError("Файл не содержит email'ов");
-                    _fileLoaded = false;
                     return;
                 }
 
@@ -102,7 +99,6 @@ namespace HITSBlazor.Pages.Admin.InviteUsers
                     NotificationService.ShowSuccess(message);
                 }
 
-                _fileLoaded = true;
                 StateHasChanged();
             }
             catch (Exception ex)
@@ -123,31 +119,28 @@ namespace HITSBlazor.Pages.Admin.InviteUsers
 
         private async Task SendInvitations()
         {
+            _errors.Clear();
             _submitting = true;
-            _submitted = false;
 
             if (SelectedRoles.Count == 0)
             {
                 NotificationService.ShowError("Выберите хотя бы одну роль");
-                _submitted = true;
                 _submitting = false;
                 return;
             }
 
-            bool isValid = true;
             foreach (var email in InviteUsersRequest.Emails)
             {
-                if (!UserValidation.EmailValidation(email).IsValid)
+                var result = UserValidation.EmailValidation(email);
+                if (!result.IsValid)
                 {
-                    isValid = false;
-                    break;
+                    _errors.Add(email, result.Message);
                 }
             }
 
-            if (!isValid)
+            if (_errors.Count > 0)
             {
                 NotificationService.ShowError("Имеются некорректные email");
-                _submitted = true;
                 _submitting = false;
                 return;
             }
@@ -155,7 +148,6 @@ namespace HITSBlazor.Pages.Admin.InviteUsers
             InviteUsersRequest.Roles = [.. SelectedRoles];
             await InvitationService.SendInvitations(InviteUsersRequest);
 
-            _submitted = true;
             _submitting = false;
         }
     }

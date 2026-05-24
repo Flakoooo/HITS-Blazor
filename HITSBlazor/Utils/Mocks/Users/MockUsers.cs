@@ -23,10 +23,7 @@ namespace HITSBlazor.Utils.Mocks.Users
         public static Guid MagaId { get; } = Guid.NewGuid();
         public static Guid AlexId { get; } = Guid.NewGuid();
 
-        private static List<string>? _cachedEmails;
         private static readonly List<User> _users = CreateUsers();
-
-        public static List<string> CachedUserEmails => _cachedEmails ??= GetUserEmails();
 
         private static List<User> CreateUsers() => [ 
             new User
@@ -357,9 +354,6 @@ namespace HITSBlazor.Utils.Mocks.Users
 
         public static User? GetUserById(Guid id)
             => _users.FirstOrDefault(u => u.Id == id);
-
-        public static List<string> GetUserEmails() 
-            => _users.Select(u => u.Email).ToList();
 
         public static List<User> GetUsersByRole(RoleType role) 
             => _users.Where(u => u.Roles.Contains(role)).ToList();

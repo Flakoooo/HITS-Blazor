@@ -13,8 +13,9 @@ namespace HITSBlazor.Components.Modals.CenterModals.UpdateEmailModal
         private IProfileService ProfileService { get; set; } = null!;
 
         private bool _isLoading = false;
-        private bool _submitted = false;
         private bool _isEmailRequestSended = false;
+
+        private readonly Dictionary<string, string> _errors = [];
 
         private Guid _verificationGuid;
         private string EmailValue { get; set; } = string.Empty;
@@ -23,17 +24,17 @@ namespace HITSBlazor.Components.Modals.CenterModals.UpdateEmailModal
         private async Task SendNewEmailRequest()
         {
             _isLoading = true;
-            _submitted = false;
+            _errors.Clear();
+
+            if (string.IsNullOrWhiteSpace(EmailValue))
+                _errors.Add("email", "Поле не может быть пустым");
+
+            if (_errors.Count > 0) return;
 
             _verificationGuid = await ProfileService.SendUpdateEmailRequestAsync(EmailValue);
             if (_verificationGuid != Guid.Empty)
             {
-                _submitted = false;
                 _isEmailRequestSended = true;
-            }
-            else
-            {
-                _submitted = true;
             }
 
             _isLoading = false;
@@ -42,15 +43,19 @@ namespace HITSBlazor.Components.Modals.CenterModals.UpdateEmailModal
         private async Task VirificateEmailRequest()
         {
             _isLoading = true;
+            _errors.Clear();
+
+            if (string.IsNullOrWhiteSpace(VerificationCode))
+                _errors.Add("code", "Поле не может быть пустым");
+
+            if (string.IsNullOrWhiteSpace(EmailValue))
+                _errors.Add("email", "Поле не может быть пустым");
+
+            if (_errors.Count > 0) return;
 
             if (await ProfileService.UpdateEmailConfirmAsync(_verificationGuid, VerificationCode))
             {
-                _submitted = false;
                 await ModalService.Close(ModalType.Center);
-            }
-            else
-            {
-                _submitted = true;
             }
 
             _isLoading = false;

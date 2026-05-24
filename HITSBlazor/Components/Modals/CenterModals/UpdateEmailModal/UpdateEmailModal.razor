@@ -13,12 +13,12 @@
     {
         <Input IconStyle="bi-fonts"
                Placeholder="Введите код аутентификации"
-               NeedValidation="_submitted"
+               ErrorMessage="@_errors.GetValueOrDefault("code")"
                MaxLength="6"
                @bind-Value="VerificationCode" />
         <Input IconStyle="&#64;"
                Placeholder="Введите ваш новый email"
-               NeedValidation="_submitted"
+               ErrorMessage="@_errors.GetValueOrDefault("email")"
                IsDisabled="true"
                @bind-Value="EmailValue" />
         <Button InProgress="_isLoading"
@@ -31,7 +31,7 @@
     {
         <Input IconStyle="&#64;"
                Placeholder="Введите ваш новый email"
-               NeedValidation="_submitted"
+               ErrorMessage="@_errors.GetValueOrDefault("email")"
                @bind-Value="EmailValue" />
         <Button InProgress="_isLoading"
                 Variant="ButtonVariant.Primary"

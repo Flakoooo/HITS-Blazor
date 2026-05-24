@@ -1,4 +1,5 @@
 ﻿using HITSBlazor.Components.ActionMenus.BaseActionMenu;
+using HITSBlazor.Components.Button;
 using HITSBlazor.Components.Tables.TableHeader;
 using HITSBlazor.Models.Teams.Entities;
 using HITSBlazor.Models.Teams.Enums;
@@ -115,11 +116,21 @@ namespace HITSBlazor.Components.Tables.Teams.InvitationTeamToIdeaTable
                 }
                 else if (context.Action is MenuAction.TeamRequestAccept)
                 {
-                    await TeamService.UpdateInvitationTeamToIdeaStatusAsync(id, TeamRequestStatus.Accepted);
+                    ModalService.ShowConfirmModal(
+                        $"Вы действительно хотите принять приглашение в идею?",
+                        () => TeamService.UpdateInvitationTeamToIdeaStatusAsync(id, TeamRequestStatus.Accepted),
+                        confirmButtonVariant: ButtonVariant.Success,
+                        confirmButtonText: "Принять"
+                    );
                 }
                 else if (context.Action is MenuAction.TeamRequestCancel)
                 {
-                    await TeamService.UpdateInvitationTeamToIdeaStatusAsync(id, TeamRequestStatus.Canceled);
+                    ModalService.ShowConfirmModal(
+                        $"Вы действительно хотите отказаться от приглашения в идею?",
+                        () => TeamService.UpdateInvitationTeamToIdeaStatusAsync(id, TeamRequestStatus.Canceled),
+                        confirmButtonVariant: ButtonVariant.Warning,
+                        confirmButtonText: "Отказаться"
+                    );
                 }
             }
         }

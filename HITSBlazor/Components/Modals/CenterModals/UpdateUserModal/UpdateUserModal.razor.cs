@@ -21,9 +21,10 @@ namespace HITSBlazor.Components.Modals.CenterModals.UpdateUserModal
 
         private UpdateUserRequest UpdateUserRequest { get; set; } = new();
 
-        private bool _submitted = false;
         private bool _submitting = false;
         private bool _showRoles = false;
+
+        private readonly Dictionary<string, string> _errors = [];
 
         protected override async Task OnInitializedAsync()
         {
@@ -42,27 +43,39 @@ namespace HITSBlazor.Components.Modals.CenterModals.UpdateUserModal
                 UserForUpdate.Roles.Add(role);
         }
 
-        //TODO: ПОДУМАТЬ НАД ВАЛИДАЦИЕЙ!!!!
         private async Task UpdateUser()
         {
             _submitting = true;
-            _submitted = false;
+            _errors.Clear();
 
-            bool isValid = true;
+            var emailResult = UserValidation.EmailValidation(UpdateUserRequest.Email);
+            if (!emailResult.IsValid)
+                _errors.Add("email", emailResult.Message);
 
-            if (!UserValidation.EmailValidation(UpdateUserRequest.Email).IsValid) isValid = false;
-            if (!UserValidation.FirstNameValidation(UpdateUserRequest.FirstName).IsValid) isValid = false;
-            if (!UserValidation.LastNameValidation(UpdateUserRequest.LastName).IsValid) isValid = false;
-            if (!UserValidation.TelephoneValidation(UpdateUserRequest.Telephone).IsValid) isValid = false;
-            if (!UserValidation.StudyGroupValidation(UpdateUserRequest.StudyGroup).IsValid) isValid = false;
+            var firstNameResult = UserValidation.FirstNameValidation(UpdateUserRequest.FirstName);
+            if (!firstNameResult.IsValid)
+                _errors.Add("firstName", firstNameResult.Message);
 
-            if (isValid && await UserService.UpdateUser(UpdateUserRequest))
+            var lastNameResult = UserValidation.LastNameValidation(UpdateUserRequest.LastName);
+            if (!firstNameResult.IsValid)
+                _errors.Add("lastName", lastNameResult.Message);
+
+            var telephoneResult = UserValidation.TelephoneValidation(UpdateUserRequest.Telephone);
+            if (!telephoneResult.IsValid)
+                _errors.Add("telephone", telephoneResult.Message);
+
+            var studyGroupResult = UserValidation.StudyGroupValidation(UpdateUserRequest.StudyGroup);
+            if (!telephoneResult.IsValid)
+                _errors.Add("studyGroup", studyGroupResult.Message);
+
+            if (_errors.Count > 0) return;
+
+            if (await UserService.UpdateUser(UpdateUserRequest))
             {
                 await ModalService.Close(ModalType.Center);
                 return;
             }
 
-            _submitted = true;
             _submitting = false;
         }
     }

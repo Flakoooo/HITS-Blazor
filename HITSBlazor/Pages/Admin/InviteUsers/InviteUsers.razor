@@ -24,8 +24,7 @@
                             <div class="add-users-form-inputs-field">
                                 <Input IconStyle="&#64;"
                                        Placeholder="Введите email"
-                                       NeedValidation="_submitted || _fileLoaded"
-                                       CustomValidation="UserValidation.EmailValidation"
+                                       ErrorMessage="@_errors.GetValueOrDefault(InviteUsersRequest.Emails[index])"
                                        @bind-Value="InviteUsersRequest.Emails[index]" />
                                 @if (InviteUsersRequest.Emails.Count > 1)
                                 {

@@ -91,7 +91,7 @@ namespace HITSBlazor.Components.Forms.InviteTeamToIdeaForm
 
         private void WithdrawnInvitation(IdeaMarket ideaMarket) => ModalService.ShowConfirmModal(
             $"Вы действительно хотите отозвать приглашение команды в идею {ideaMarket.Name}?",
-            () => TeamService.UpdateRequestTeamToIdeaStatusAsync(_cachedInvites[ideaMarket.Id].Id, TeamRequestStatus.Withdrawn),
+            () => TeamService.UpdateInvitationTeamToIdeaStatusAsync(_cachedInvites[ideaMarket.Id].Id, TeamRequestStatus.Withdrawn),
             confirmButtonVariant: ButtonVariant.Danger,
             confirmButtonText: "Отозвать приглашение"
         );

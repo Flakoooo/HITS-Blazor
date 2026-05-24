@@ -12,7 +12,6 @@ namespace HITSBlazor.Pages.Auth.Register
     {
         private RegisterModel _registerModel = new();
 
-        private bool _submitted = false;
         private bool _submitting = false;
 
         private string _phoneInput = "";
@@ -97,7 +96,6 @@ namespace HITSBlazor.Pages.Auth.Register
             if (_submitting) return;
 
             _submitting = true;
-            _submitted = false;
 
             if (Guid.TryParse(InvitationId, out Guid guid) && await AuthService.RegistrationAsync(_registerModel, guid))
             {
@@ -106,7 +104,6 @@ namespace HITSBlazor.Pages.Auth.Register
                 return;
             }
 
-            _submitted = true;
             _submitting = false;
         }
     }

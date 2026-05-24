@@ -1,4 +1,5 @@
 ﻿using HITSBlazor.Components.ActionMenus.BaseActionMenu;
+using HITSBlazor.Components.Button;
 using HITSBlazor.Components.Tables.TableHeader;
 using HITSBlazor.Models.Teams.Entities;
 using HITSBlazor.Models.Teams.Enums;
@@ -113,7 +114,12 @@ namespace HITSBlazor.Components.Tables.Teams.RequestTeamToIdeaTable
                 }
                 else if (context.Action is MenuAction.TeamRequestWithdraw)
                 {
-                    await TeamService.UpdateRequestTeamToIdeaStatusAsync(id, TeamRequestStatus.Withdrawn);
+                    ModalService.ShowConfirmModal(
+                        $"Вы действительно хотите отозвать заявку?",
+                        () => TeamService.UpdateRequestTeamToIdeaStatusAsync(id, TeamRequestStatus.Withdrawn),
+                        confirmButtonVariant: ButtonVariant.Danger,
+                        confirmButtonText: "Отозвать"
+                    );
                 }
             }
             else if (context.Item is string letter)
