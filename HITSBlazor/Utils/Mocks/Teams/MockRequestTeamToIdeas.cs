@@ -1,10 +1,10 @@
 ﻿using HITSBlazor.Models.Common.Responses;
 using HITSBlazor.Models.Markets.Entities;
-using HITSBlazor.Models.Quests.Entities;
+using HITSBlazor.Models.Markets.Enums;
 using HITSBlazor.Models.Teams.Entities;
 using HITSBlazor.Models.Teams.Enums;
-using HITSBlazor.Utils.Mocks.Ideas;
 using HITSBlazor.Utils.Mocks.Markets;
+using static HITSBlazor.Utils.Mocks.Common.MockInvitation;
 
 namespace HITSBlazor.Utils.Mocks.Teams
 {
@@ -214,8 +214,14 @@ namespace HITSBlazor.Utils.Mocks.Teams
             if (newStatus is TeamRequestStatus.Accepted)
             {
                 var acceptedTeam = MockTeams.GetTeamById(request.TeamId);
-                acceptedTeam?.IsAcceptedToIdea = true;
-                MockIdeaMarkets.GetIdeaMarketById(request.IdeaMarketId)?.Team = acceptedTeam;
+                var ideaMarket = MockIdeaMarkets.GetIdeaMarketById(request.IdeaMarketId);
+
+                if (acceptedTeam is null || ideaMarket is null) return false;
+
+                acceptedTeam.IsAcceptedToIdea = true;
+
+                ideaMarket.Team = acceptedTeam;
+                ideaMarket.Status = IdeaMarketStatusType.RecruitmentIsClosed;
 
                 AnnulledRequestByTeamId(request.TeamId);
                 MockInvitationTeamToIdeas.AnnulledInvitationByTeamId(request.TeamId);

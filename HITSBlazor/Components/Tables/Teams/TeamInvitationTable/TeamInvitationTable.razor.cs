@@ -13,7 +13,7 @@ namespace HITSBlazor.Components.Tables.Teams.TeamInvitationTable
     public partial class TeamInvitationTable
     {
         [Inject]
-        private AuthService AuthService { get; set; } = null!;
+        private IAuthService AuthService { get; set; } = null!;
 
         [Inject]
         private ITeamService TeamService { get; set; } = null!;
@@ -88,12 +88,12 @@ namespace HITSBlazor.Components.Tables.Teams.TeamInvitationTable
                 [MenuAction.ViewProfile] = invitation.UserId
             };
 
-            var currentUser = AuthService.CurrentUser;
-            if (currentUser is not null)
+            if (invitation.Status is TeamRequestStatus.New)
             {
-                if (invitation.Status is TeamRequestStatus.New)
+                var currentUser = AuthService.CurrentUser;
+                if (currentUser is not null)
                 {
-                    if (currentUser.Role is RoleType.Admin || currentUser.Id == CurrentTeam.Owner.Id || currentUser.Id == CurrentTeam.Leader?.Id)
+                    if (currentUser.Role is RoleType.Admin || currentUser.Id == CurrentTeam.Owner.UserId || currentUser.Id == CurrentTeam.Leader?.UserId)
                     {
                         actions.Add(MenuAction.TeamRequestWithdraw, invitation.Id);
                     }

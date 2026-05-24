@@ -29,11 +29,11 @@ namespace HITSBlazor.Services.Teams
         public event Func<bool, Task>? OnNewRequestInTeamHasCreated;
         public event Action<Guid, TeamRequestStatus>? OnRequestToTeamStatusHasChanged;
 
-        public event Func<Task>? OnRequestsStatusCreated;
-        public event Action<Guid, TeamRequestStatus>? OnRequestsStatusUpdated;
+        public event Func<bool, Task>? OnNewRequestsTeamInIdeaCreated;
+        public event Action<Guid, TeamRequestStatus>? OnRequestTeamInIdeaStatusUpdated;
 
-        public event Func<Task>? OnNewInvitationTeamInIdeaCreated;
-        public event Action<Guid, TeamRequestStatus>? OnInvitationTeamInIdeaStatusUpdated;
+        public event Func<bool, Task>? OnNewInvitationTeamInIdeaCreated;
+        public event Func<Guid, TeamRequestStatus, Task>? OnInvitationTeamInIdeaStatusUpdated;
 
         public void InvokeInvitationEvent(ICollection<User> users) => OnInviteMembersCollected?.Invoke(users);
 
@@ -257,7 +257,7 @@ namespace HITSBlazor.Services.Teams
         {
             var newRequest = MockRequestTeamToIdeas.CreateNewRequest(ideaMarket, team, letter);
 
-            OnRequestsStatusCreated?.Invoke();
+            OnNewRequestsTeamInIdeaCreated?.Invoke(false);
 
             return newRequest;
         }
@@ -288,7 +288,7 @@ namespace HITSBlazor.Services.Teams
             };
 
             _globalNotificationService.ShowSuccess(successText);
-            OnRequestsStatusUpdated?.Invoke(requestId, newStatus);
+            OnRequestTeamInIdeaStatusUpdated?.Invoke(requestId, newStatus);
 
             return true;
         }
@@ -326,7 +326,7 @@ namespace HITSBlazor.Services.Teams
             };
 
             _globalNotificationService.ShowSuccess(successText);
-            OnRequestsStatusUpdated?.Invoke(invitationId, newStatus);
+            OnInvitationTeamInIdeaStatusUpdated?.Invoke(invitationId, newStatus);
 
             return true;
         }

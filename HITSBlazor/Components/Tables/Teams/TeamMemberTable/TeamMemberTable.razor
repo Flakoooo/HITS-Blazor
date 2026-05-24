@@ -9,12 +9,12 @@
 <InputSearch Width="50" IsLoading="_isLoading" ValueChanged="@((value) => SearchData(value))" DebounceDelay="500" />
 <TableComponent IsLoading="_isLoading" HeaderItems="MembersTableHeader" TableActionMenuIsEnable="true" @ref="_tableComponent">
     <TableContent>
-        @foreach (var member in _teamMembers.OrderBy(u => u.Id != CurrentTeam.Owner?.Id || u.Id != CurrentTeam.Leader?.Id))
+        @foreach (var member in _teamMembers.OrderBy(tm => tm.UserId != CurrentTeam.Owner?.UserId || tm.Id != CurrentTeam.Leader?.UserId))
         {
             <tr>
                 <TableBodyRow>
                     @{
-                        var displayInfo = GetRoleDisplayInfo(member.Id);
+                        var displayInfo = GetRoleDisplayInfo(member.UserId);
                         <div @onclick="() => ShowUserProfile(member.UserId)"
                              class="data-link @(displayInfo.TextColor.HasValue ? $"text-{displayInfo.TextColor.Value.ToString().ToLower()}" : string.Empty)">
                             @member.Email @displayInfo.DisplayText

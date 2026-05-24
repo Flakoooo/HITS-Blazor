@@ -1,6 +1,8 @@
 ﻿using HITSBlazor.Components.ActionMenus.BaseActionMenu;
 using HITSBlazor.Components.Tables.TableHeader;
 using HITSBlazor.Models.Teams.Entities;
+using HITSBlazor.Models.Teams.Enums;
+using HITSBlazor.Models.Users.Enums;
 using HITSBlazor.Services.Auth;
 using HITSBlazor.Services.Modal;
 using HITSBlazor.Services.Teams;
@@ -11,7 +13,7 @@ namespace HITSBlazor.Components.Tables.Teams.InvitationTeamToIdeaTable
     public partial class InvitationTeamToIdeaTable
     {
         [Inject]
-        private AuthService AuthService { get; set; } = null!;
+        private IAuthService AuthService { get; set; } = null!;
 
         [Inject]
         private ITeamService TeamService { get; set; } = null!;
@@ -38,6 +40,9 @@ namespace HITSBlazor.Components.Tables.Teams.InvitationTeamToIdeaTable
         protected override async Task OnInitializedAsync()
         {
             _isLoading = true;
+
+            TeamService.OnNewInvitationTeamInIdeaCreated += LoadInvitationsAsync;
+            TeamService.OnInvitationTeamInIdeaStatusUpdated += InvitationStatusHasChanged;
 
             await LoadInvitationsAsync();
 
@@ -75,18 +80,30 @@ namespace HITSBlazor.Components.Tables.Teams.InvitationTeamToIdeaTable
             await LoadInvitationsAsync();
         }
 
-        private static Dictionary<MenuAction, object> GetActions(InvitationTeamToIdea invitation)
+        private Dictionary<MenuAction, object> GetActions(InvitationTeamToIdea invitation)
         {
             var actions = new Dictionary<MenuAction, object>
             {
-                [MenuAction.ViewIdea] = invitation.IdeaId,
-                [MenuAction.TeamRequestAccept] = invitation.Id,
+                [MenuAction.ViewIdea] = invitation.IdeaId
             };
+
+            if (invitation.Status is TeamRequestStatus.New)
+            {
+                var currentUser = AuthService.CurrentUser;
+                if (currentUser is not null)
+                {
+                    if (currentUser.Role is RoleType.Admin || currentUser.Id == CurrentTeam.Owner.UserId || currentUser.Id == CurrentTeam.Leader?.UserId)
+                    {
+                        actions.Add(MenuAction.TeamRequestAccept, invitation.Id);
+                        actions.Add(MenuAction.TeamRequestCancel, invitation.Id);
+                    }
+                }
+            }
 
             return actions;
         }
 
-        private void ShowIdea(Guid ideaId) => ModalService.ShowIdeaModal(ideaId);
+        private void ShowIdeaMarket(Guid ideaMarketId) => ModalService.ShowIdeaMarketModal(ideaMarketId);
 
         private async Task HandleTableMenuClick(TableActionContext context)
         {
@@ -94,13 +111,41 @@ namespace HITSBlazor.Components.Tables.Teams.InvitationTeamToIdeaTable
             {
                 if (context.Action is MenuAction.ViewIdeaMarket)
                 {
-                    ShowIdea(id);
+                    ShowIdeaMarket(id);
                 }
                 else if (context.Action is MenuAction.TeamRequestAccept)
                 {
-                    await TeamService.UpdateTea
+                    await TeamService.UpdateInvitationTeamToIdeaStatusAsync(id, TeamRequestStatus.Accepted);
+                }
+                else if (context.Action is MenuAction.TeamRequestCancel)
+                {
+                    await TeamService.UpdateInvitationTeamToIdeaStatusAsync(id, TeamRequestStatus.Canceled);
                 }
             }
+        }
+
+        private async Task InvitationStatusHasChanged(Guid invitationId, TeamRequestStatus newStatus)
+        {
+            if (newStatus is TeamRequestStatus.Accepted)
+            {
+                await LoadInvitationsAsync();
+            }
+            else if (newStatus is TeamRequestStatus.Canceled)
+            {
+                var invitationForUpdate = _invitationsTeamToIdeas.FirstOrDefault(ti => ti.Id == invitationId);
+                if (invitationForUpdate is null) return;
+
+                invitationForUpdate.Status = newStatus;
+            }
+            StateHasChanged();
+        }
+
+        protected override async ValueTask DisposeAsyncCore()
+        {
+            TeamService.OnNewInvitationTeamInIdeaCreated -= LoadInvitationsAsync;
+            TeamService.OnInvitationTeamInIdeaStatusUpdated -= InvitationStatusHasChanged;
+
+            await ValueTask.CompletedTask;
         }
     }
 }

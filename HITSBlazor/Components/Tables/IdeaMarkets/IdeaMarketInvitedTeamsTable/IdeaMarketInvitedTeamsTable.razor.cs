@@ -2,7 +2,6 @@
 using HITSBlazor.Components.Tables.TableHeader;
 using HITSBlazor.Models.Markets.Entities;
 using HITSBlazor.Models.Teams.Entities;
-using HITSBlazor.Services.Auth;
 using HITSBlazor.Services.IdeaMarkets;
 using HITSBlazor.Services.Modal;
 using Microsoft.AspNetCore.Components;

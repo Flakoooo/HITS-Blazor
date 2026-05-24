@@ -12,9 +12,6 @@ namespace HITSBlazor.Components.Tables.IdeaMarkets.IdeaMarketRequestTable
     public partial class IdeaMarketRequestTable
     {
         [Inject]
-        private AuthService AuthService { get; set; } = null!;
-
-        [Inject]
         private IIdeaMarketService IdeaMarketService { get; set; } = null!;
 
         [Inject]

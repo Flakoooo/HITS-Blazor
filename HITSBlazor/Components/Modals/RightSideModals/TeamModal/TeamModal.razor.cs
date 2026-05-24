@@ -2,6 +2,7 @@
 using HITSBlazor.Components.Modals.Components.RightSideModaCollapselInfo;
 using HITSBlazor.Components.Modals.Components.RightSideModalInfo;
 using HITSBlazor.Models.Teams.Entities;
+using HITSBlazor.Models.Teams.Enums;
 using HITSBlazor.Services;
 using HITSBlazor.Services.Auth;
 using HITSBlazor.Services.Modal;
@@ -71,6 +72,8 @@ namespace HITSBlazor.Components.Modals.RightSideModals.TeamModal
             if (_currentTeam is null) return;
 
             TeamService.OnTeamLeaderHasChanged += TeamLeaderHasChanged;
+            TeamService.OnRequestToTeamStatusHasChanged += TeamRequestsStatusChanged;
+            TeamService.OnTeamInvitationStatusHasChanged += TeamRequestsStatusChanged;
 
             _sendRequestAllowed = await TeamService.CurrentUserCanSendRequestInTeamAsync(_currentTeam.Id);
 
@@ -116,6 +119,23 @@ namespace HITSBlazor.Components.Modals.RightSideModals.TeamModal
             if (_currentTeam is not null && _currentTeam.Id == teamId)
             {
                 _currentTeam.Leader = newLeader;
+                var leaderInfoItem = _infoItems[1];
+                leaderInfoItem.Text = _currentTeam.Leader?.FullName ?? "-";
+                if (_currentTeam.Leader is not null)
+                {
+                    leaderInfoItem.IsLinkable = true;
+                    leaderInfoItem.LinkMethod = () => ModalService.ShowProfileModal(_currentTeam.Leader.UserId);
+                }
+                StateHasChanged();
+            }
+        }
+
+        private void TeamRequestsStatusChanged(Guid id, TeamRequestStatus newStatus)
+        {
+            if (_currentTeam is not null && newStatus is TeamRequestStatus.Accepted)
+            {
+                ++_currentTeam.MembersCount;
+                _infoItems[3].Text = _currentTeam.MembersCount.ToString();
                 StateHasChanged();
             }
         }
@@ -157,6 +177,8 @@ namespace HITSBlazor.Components.Modals.RightSideModals.TeamModal
         public void Dispose()
         {
             TeamService.OnTeamLeaderHasChanged -= TeamLeaderHasChanged;
+            TeamService.OnRequestToTeamStatusHasChanged -= TeamRequestsStatusChanged;
+            TeamService.OnTeamInvitationStatusHasChanged -= TeamRequestsStatusChanged;
         }
     }
 }

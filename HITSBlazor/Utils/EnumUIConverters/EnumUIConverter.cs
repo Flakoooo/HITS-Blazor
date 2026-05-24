@@ -7,6 +7,7 @@ using HITSBlazor.Models.Common.Enums;
 using HITSBlazor.Models.Ideas.Enums;
 using HITSBlazor.Models.Markets.Enums;
 using HITSBlazor.Models.Projects.Enums;
+using HITSBlazor.Models.Teams.Enums;
 using HITSBlazor.Models.Users.Enums;
 using HITSBlazor.Pages.Projects.ProjectView;
 using HITSTaskStatus = HITSBlazor.Models.Projects.Enums.TaskStatus;
@@ -21,6 +22,7 @@ namespace HITSBlazor.Utils.EnumUIConverters
             SkillType t => GetSkillTypeInfo(t),
             IdeaStatusType s => GetIdeasStatusInfo(s),
             MarketStatus s => GetMarketsStatusInfo(s),
+            TeamRequestStatus s => GetTeamRequestInfo(s),
             IdeaMarketStatusType s => GetMarketIdeaStatusInfo(s),
             ProjectStatus s => GetProjectStatusInfo(s),
             HITSTaskStatus s => GetTastStatusInfo(s),
@@ -41,6 +43,7 @@ namespace HITSBlazor.Utils.EnumUIConverters
             SkillType t => GetSkillTypeInfo(t),
             IdeaStatusType s => GetIdeasStatusInfo(s),
             MarketStatus s => GetMarketsStatusInfo(s),
+            TeamRequestStatus s => GetTeamRequestInfo(s),
             IdeaMarketStatusType s => GetMarketIdeaStatusInfo(s),
             ProjectStatus s => GetProjectStatusInfo(s),
             HITSTaskStatus s => GetTastStatusInfo(s),

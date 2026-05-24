@@ -14,7 +14,7 @@ namespace HITSBlazor.Components.Tables.Teams.TeamMemberTable
     public partial class TeamMemberTable
     {
         [Inject]
-        private AuthService AuthService { get; set; } = null!;
+        private IAuthService AuthService { get; set; } = null!;
 
         [Inject]
         private ITeamService TeamService { get; set; } = null!;
@@ -41,6 +41,8 @@ namespace HITSBlazor.Components.Tables.Teams.TeamMemberTable
         protected override async Task OnInitializedAsync()
         {
             _isLoading = true;
+
+            TeamService.OnTeamMemberHasKicked += TeamMemberHasKicked;
 
             await LoadTeamMembersAsync();
 
@@ -80,15 +82,15 @@ namespace HITSBlazor.Components.Tables.Teams.TeamMemberTable
 
         private (TextColor? TextColor, string DisplayText) GetRoleDisplayInfo(Guid memberId)
         {
-            if (memberId == CurrentTeam.Owner.Id)
+            if (memberId == CurrentTeam.Owner.UserId)
             {
                 string displayText = "(Владелец)";
-                if (memberId == CurrentTeam.Leader?.Id)
+                if (memberId == CurrentTeam.Leader?.UserId)
                     displayText = "(Владелец и Тим-лид)";
 
                 return (TextColor.Warning, displayText);
             }
-            else if (memberId == CurrentTeam.Leader?.Id)
+            else if (memberId == CurrentTeam.Leader?.UserId)
             {
                 return (TextColor.Primary, "(Тим-лид)");
             }
@@ -108,14 +110,14 @@ namespace HITSBlazor.Components.Tables.Teams.TeamMemberTable
             var currentUser = AuthService.CurrentUser;
             if (currentUser is not null)
             {
-                if (currentUser.Role is RoleType.Admin || currentUser.Id == CurrentTeam.Owner.Id || currentUser.Id == CurrentTeam.Leader?.Id)
+                if (currentUser.Role is RoleType.Admin || currentUser.Id == CurrentTeam.Owner.UserId || currentUser.Id == CurrentTeam.Leader?.UserId)
                 {
-                    if (member.UserId == CurrentTeam.Leader?.Id && member.UserId != CurrentTeam.Owner.Id)
+                    if (member.UserId == CurrentTeam.Leader?.UserId && member.UserId != CurrentTeam.Owner.UserId)
                         actions.Add(MenuAction.UnsetLeader, member.UserId);
-                    else if (member.UserId != CurrentTeam.Owner.Id)
+                    else if (member.UserId != CurrentTeam.Leader?.UserId)
                         actions.Add(MenuAction.SetLeader, member);
 
-                    if (member.UserId != CurrentTeam.Owner.Id)
+                    if (member.UserId != CurrentTeam.Owner.UserId)
                         actions.Add(MenuAction.RemoveTeamMember, member);
                 }
             }
@@ -166,6 +168,22 @@ namespace HITSBlazor.Components.Tables.Teams.TeamMemberTable
                     );
                 }
             }
+        }
+
+        private void TeamMemberHasKicked(TeamMember kickedMember)
+        {
+            if (_teamMembers.Remove(kickedMember))
+            {
+                --_totalCount;
+                StateHasChanged();
+            }
+        }
+
+        protected override async ValueTask DisposeAsyncCore()
+        {
+            TeamService.OnTeamMemberHasKicked -= TeamMemberHasKicked;
+
+            await ValueTask.CompletedTask;
         }
     }
 }

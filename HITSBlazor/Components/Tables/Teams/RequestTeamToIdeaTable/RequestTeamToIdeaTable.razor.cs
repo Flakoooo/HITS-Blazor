@@ -40,7 +40,7 @@ namespace HITSBlazor.Components.Tables.Teams.RequestTeamToIdeaTable
         {
             _isLoading = true;
 
-            TeamService.OnRequestsStatusUpdated += RequestStatusHasChanged;
+            TeamService.OnRequestTeamInIdeaStatusUpdated += RequestStatusHasChanged;
 
             await LoadRequestsAsync();
 
@@ -86,12 +86,15 @@ namespace HITSBlazor.Components.Tables.Teams.RequestTeamToIdeaTable
                 [MenuAction.ViewLetter] = request.Letter
             };
 
-            var currentUser = AuthService.CurrentUser;
-            if (currentUser is not null)
+            if (request.Status is TeamRequestStatus.New)
             {
-                if (currentUser.Role is RoleType.Admin || currentUser.Id == CurrentTeam.Owner.Id || currentUser.Id == CurrentTeam.Leader?.Id)
+                var currentUser = AuthService.CurrentUser;
+                if (currentUser is not null)
                 {
-                    actions.Add(MenuAction.TeamRequestWithdraw, request.Id);
+                    if (currentUser.Role is RoleType.Admin || currentUser.Id == CurrentTeam.Owner.UserId || currentUser.Id == CurrentTeam.Leader?.UserId)
+                    {
+                        actions.Add(MenuAction.TeamRequestWithdraw, request.Id);
+                    }
                 }
             }
 
@@ -133,7 +136,7 @@ namespace HITSBlazor.Components.Tables.Teams.RequestTeamToIdeaTable
 
         protected override async ValueTask DisposeAsyncCore()
         {
-            TeamService.OnRequestsStatusUpdated -= RequestStatusHasChanged;
+            TeamService.OnRequestTeamInIdeaStatusUpdated -= RequestStatusHasChanged;
 
             await ValueTask.CompletedTask;
         }

@@ -21,8 +21,11 @@ namespace HITSBlazor.Services.Teams
         event Func<bool, Task>? OnNewRequestInTeamHasCreated;
         event Action<Guid, TeamRequestStatus>? OnRequestToTeamStatusHasChanged;
 
-        event Func<Task>? OnRequestsStatusCreated;
-        event Action<Guid, TeamRequestStatus>? OnRequestsStatusUpdated;
+        event Func<bool, Task>? OnNewRequestsTeamInIdeaCreated;
+        event Action<Guid, TeamRequestStatus>? OnRequestTeamInIdeaStatusUpdated;
+
+        event Func<bool, Task>? OnNewInvitationTeamInIdeaCreated;
+        event Func<Guid, TeamRequestStatus, Task>? OnInvitationTeamInIdeaStatusUpdated;
 
         void InvokeInvitationEvent(ICollection<User> users);
 

@@ -47,7 +47,7 @@ namespace HITSBlazor.Components.Forms.RequestTeamToIdeaForm
 
         private Func<Task>? _queuedCollapseMethod;
 
-        private List<Team> _teams = [];
+        private readonly List<Team> _teams = [];
         private Dictionary<Guid, RequestTeamToIdea> _cachedRequests = [];
 
         private readonly string _hintText = "В письме необходимо пояснить, почему именно ваша команда должна быть принята для реализации данной идеи." +
@@ -63,7 +63,7 @@ namespace HITSBlazor.Components.Forms.RequestTeamToIdeaForm
 
             if (AuthService.CurrentUser is not null)
             {
-                TeamService.OnRequestsStatusUpdated += EventedRequestUpdate;
+                TeamService.OnRequestTeamInIdeaStatusUpdated += EventedRequestUpdate;
 
                 await LoadTeamsAsync();
                 await LoadMoreCachedRequest();
@@ -165,7 +165,7 @@ namespace HITSBlazor.Components.Forms.RequestTeamToIdeaForm
 
         protected override async ValueTask DisposeAsyncCore()
         {
-            TeamService.OnRequestsStatusUpdated -= EventedRequestUpdate;
+            TeamService.OnRequestTeamInIdeaStatusUpdated -= EventedRequestUpdate;
 
             await ValueTask.CompletedTask;
         }

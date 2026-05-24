@@ -1,7 +1,5 @@
 ﻿using ApexCharts;
 using HITSBlazor.Components.ActionMenus.BaseActionMenu;
-using HITSBlazor.Components.Modals.CenterModals.AddTeamMembersModal;
-using HITSBlazor.Components.Modals.RightSideModals.ProfileModal;
 using HITSBlazor.Components.Tables.TableHeader;
 using HITSBlazor.Components.Typography;
 using HITSBlazor.Models.Common.Entities;
@@ -10,7 +8,6 @@ using HITSBlazor.Models.Teams.Entities;
 using HITSBlazor.Models.Teams.Requests;
 using HITSBlazor.Models.Users.Entities;
 using HITSBlazor.Models.Users.Enums;
-using HITSBlazor.Pages.Admin.InviteUsers;
 using HITSBlazor.Services;
 using HITSBlazor.Services.Auth;
 using HITSBlazor.Services.Modal;
