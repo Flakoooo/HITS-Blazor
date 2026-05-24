@@ -1,0 +1,43 @@
+﻿@using HITSBlazor.Components.ActionMenus.BaseActionMenu
+@using HITSBlazor.Components.InputSearch
+@using HITSBlazor.Components.Skills
+@using HITSBlazor.Components.Statuses.EnumStatus
+@using HITSBlazor.Components.Tables.TableActionMenu
+@using HITSBlazor.Components.Tables.TableBodyRow
+@using HITSBlazor.Components.Tables.TableComponent
+@using HITSBlazor.Pages
+@inherits ListPageDataLoader
+
+<InputSearch Width="50" IsLoading="_isLoading" ValueChanged="@((value) => SearchData(value))" DebounceDelay="500" />
+<TableComponent IsLoading="_isLoading" HeaderItems="InvitedTeamsTableHeader" TableActionMenuIsEnable="true" @ref="_tableComponent">
+    <TableContent>
+        @foreach (var invitation in _invitationsTeamsToIdea)
+        {
+            <tr>
+                <td class="py-3 col">
+                    <div class="d-flex">
+                        <input type="checkbox" class="form-check-input mb-1" />
+                    </div>
+                </td>
+                <TableBodyRow>
+                    <div class="data-link" @onclick="() => ShowTeam(invitation.TeamId)">
+                        @invitation.TeamName
+                    </div>
+                </TableBodyRow>
+                <TableBodyRow>
+                    <EnumStatus Statustype="invitation.Status" />
+                </TableBodyRow>
+                <TableBodyRow IsCentered="true">
+                    @invitation.TeamMembersCount
+                </TableBodyRow>
+                <TableBodyRow IsCentered="true">
+                    <Skills SkillList="invitation.Skills" />
+                </TableBodyRow>
+                <TableActionMenu ItemId="invitation.TeamId"
+                                    StrategyPosition="Strategy.Fixed"
+                                    OnAction="@HandleTableMenuClick"
+                                    ActionIds="GetActions(invitation)" />
+            </tr>                                            
+        }
+    </TableContent>
+</TableComponent>

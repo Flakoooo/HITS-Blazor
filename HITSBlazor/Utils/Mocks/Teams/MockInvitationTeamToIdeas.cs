@@ -90,5 +90,24 @@ namespace HITSBlazor.Utils.Mocks.Teams
 
             return new ListDataResponse<InvitationTeamToIdea>(count, query.ToList());
         }
+
+        public static bool UpdateStatus(Guid invitationId, TeamRequestStatus newStatus)
+        {
+            var invitation = _invitationTeamToIdeas.FirstOrDefault(i => i.Id == invitationId);
+            if (invitation is null) return false;
+
+            if (newStatus is TeamRequestStatus.Accepted)
+            {
+                var acceptedTeam = MockTeams.GetTeamById(invitation.TeamId);
+                acceptedTeam?.IsAcceptedToIdea = true;
+                MockIdeaMarkets.GetActiveIdeaMarketByIdeaId(invitation.IdeaId)?.Team = acceptedTeam;
+                AnnulledInvitationByTeamId(invitation.TeamId);
+                MockRequestTeamToIdeas.AnnulledRequestByTeamId(invitation.TeamId);
+            }
+
+            invitation.Status = newStatus;
+
+            return true;
+        }
     }
 }

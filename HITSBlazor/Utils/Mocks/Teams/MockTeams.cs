@@ -134,6 +134,7 @@ namespace HITSBlazor.Utils.Mocks.Teams
         public static ListDataResponse<Team> GetAllTeamsByQueryParams(
             int page,
             int pageSize = 20,
+            Guid? userId = null,
             string? searchText = null,
             bool? privacy = null,
             bool? hasActiveProject = null,
@@ -144,8 +145,8 @@ namespace HITSBlazor.Utils.Mocks.Teams
         {
             var query = _teams.AsQueryable();
 
-            if (!string.IsNullOrWhiteSpace(searchText))
-                query = query.Where(t => t.Name.Contains(searchText, StringComparison.CurrentCultureIgnoreCase));
+            if (userId.HasValue)
+                query = query.Where(t => t.Owner.Id == userId || (t.Leader != null && t.Leader.Id == userId));
 
             if (privacy.HasValue)
                 query = query.Where(t => t.Closed == privacy);
@@ -155,6 +156,9 @@ namespace HITSBlazor.Utils.Mocks.Teams
 
             if (searchSkillIds?.Count > 0)
                 query = query.Where(t => t.Skills.Any(s => searchSkillIds.Contains(s.Id)));
+
+            if (!string.IsNullOrWhiteSpace(searchText))
+                query = query.Where(t => t.Name.Contains(searchText, StringComparison.CurrentCultureIgnoreCase));
 
             if (!string.IsNullOrWhiteSpace(orderBy) && byDescending.HasValue)
             {

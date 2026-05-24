@@ -175,6 +175,11 @@ namespace HITSBlazor.Utils.Mocks.Teams
             }
         }
 
+        public static List<RequestTeamToIdea> GetTeamRequestForCurrentTeamsAndIdeaMarket(
+            Guid ideaMarketId,
+            HashSet<Guid> teamIds
+        ) => _requestTeamToIdeas.Where(rtti => rtti.IdeaMarketId == ideaMarketId && teamIds.Contains(rtti.TeamId)).ToList();
+
         public static RequestTeamToIdea CreateNewRequest(IdeaMarket ideaMarket, Team team, string letter)
         {
             var request = new RequestTeamToIdea

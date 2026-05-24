@@ -3,14 +3,13 @@ using HITSBlazor.Components.Button;
 using HITSBlazor.Components.Tables.TableHeader;
 using HITSBlazor.Components.Typography;
 using HITSBlazor.Models.Teams.Entities;
-using HITSBlazor.Models.Users.Entities;
 using HITSBlazor.Models.Users.Enums;
 using HITSBlazor.Services.Auth;
 using HITSBlazor.Services.Modal;
 using HITSBlazor.Services.Teams;
 using Microsoft.AspNetCore.Components;
 
-namespace HITSBlazor.Components.Tables.TeamMemberTable
+namespace HITSBlazor.Components.Tables.Teams.TeamMemberTable
 {
     public partial class TeamMemberTable
     {
@@ -134,14 +133,6 @@ namespace HITSBlazor.Components.Tables.TeamMemberTable
                 {
                     ShowUserProfile(userId);
                 }
-                else if (context.Action is MenuAction.SetLeader)
-                {
-                    TeamService.UpdateTeamLeader(CurrentTeam.Id, userId);
-                }
-                else if (context.Action is MenuAction.UnsetLeader)
-                {
-                    TeamService.UpdateTeamLeader(CurrentTeam.Id, null);
-                }
             }
             else if (context.Item is TeamMember member)
             {
@@ -152,6 +143,26 @@ namespace HITSBlazor.Components.Tables.TeamMemberTable
                         () => TeamService.KickMemberAsync(member),
                         confirmButtonVariant: ButtonVariant.Danger,
                         confirmButtonText: "Удалить"
+                    );
+                }
+                else if (context.Action is MenuAction.SetLeader)
+                {
+                    //TODOO: добавить что ли склонение какое то имени
+                    ModalService.ShowConfirmModal(
+                        $"Вы действительно хотите назначить {member.FullName} новым Тим-лидером?",
+                        () => TeamService.UpdateTeamLeader(CurrentTeam, member),
+                        confirmButtonVariant: ButtonVariant.Warning,
+                        confirmButtonText: "Назначить"
+                    );
+                }
+                else if (context.Action is MenuAction.UnsetLeader)
+                {
+                    //TODOO: добавить что ли склонение какое то имени
+                    ModalService.ShowConfirmModal(
+                        $"Вы действительно хотите снять {member.FullName} с роли Тим-лидера? Роль Тим-лидера будет назначена владельцу команды",
+                        () => TeamService.UpdateTeamLeader(CurrentTeam, null),
+                        confirmButtonVariant: ButtonVariant.Warning,
+                        confirmButtonText: "Снять"
                     );
                 }
             }

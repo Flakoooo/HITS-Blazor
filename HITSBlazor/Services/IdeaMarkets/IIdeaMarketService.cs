@@ -20,6 +20,12 @@ namespace HITSBlazor.Services.IdeaMarkets
         Task<ListDataResponse<RequestTeamToIdea>> GetRequestsTeamToIdeaAsync(
             int page, Guid ideaMarketId, string? searchText = null
         );
+
+        Task<List<RequestTeamToIdea>> GetTeamRequestsForCurretnIdeaMarketAndTeamsAsync(
+            Guid ideaMarketId,
+            IEnumerable<Guid> currentTeamIds
+        );
+
         Task<ListDataResponse<InvitationTeamToIdea>> GetInvitationTeamsToIdeaAsync(
             int page, Guid ideaId, string? searchText = null
         );

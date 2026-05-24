@@ -1,6 +1,7 @@
 ﻿using HITSBlazor.Models.Common.Responses;
 using HITSBlazor.Models.Teams.Entities;
 using HITSBlazor.Models.Teams.Enums;
+using HITSBlazor.Utils.Mocks.Common;
 using HITSBlazor.Utils.Mocks.Users;
 
 namespace HITSBlazor.Utils.Mocks.Teams
@@ -54,6 +55,15 @@ namespace HITSBlazor.Utils.Mocks.Teams
             return new ListDataResponse<RequestToTeam>(count, query.ToList());
         }
 
+        public static bool CheckAllowSendRequestInTeam(Guid teamId, Guid userId)
+        {
+            return MockTeams.GetTeamById(teamId)?.Members.FirstOrDefault(m => m.UserId == userId) is null 
+                && !_requestsToTeam.Any(rtt => rtt.TeamId == teamId 
+                    && rtt.UserId == userId 
+                    && rtt.Status is TeamRequestStatus.New or TeamRequestStatus.Canceled
+                );
+        }
+
         public static bool CreateNewRequest(Guid teamId, Guid userId)
         {
             var currentUser = MockUsers.GetUserById(userId);
@@ -81,6 +91,24 @@ namespace HITSBlazor.Utils.Mocks.Teams
             if (requestForUpdate is null) return false;
 
             requestForUpdate.Status = newStatus;
+
+            if (newStatus is TeamRequestStatus.Accepted)
+            {
+                var newMember = MockUsers.GetUserById(requestForUpdate.UserId);
+                if (newMember is not null)
+                {
+                    MockTeams.GetTeamById(requestForUpdate.TeamId)?.Members.Add(new TeamMember
+                    {
+                        Id = Guid.NewGuid(),
+                        TeamId = requestForUpdate.TeamId,
+                        UserId = requestForUpdate.UserId,
+                        Email = newMember.Email,
+                        FirstName = newMember.FirstName,
+                        LastName = newMember.LastName,
+                        Skills = MockUsersSkills.GetUserSkillsById(requestForUpdate.UserId)
+                    });
+                }
+            }
 
             return true;
         }

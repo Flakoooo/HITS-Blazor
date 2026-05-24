@@ -285,6 +285,12 @@ namespace HITSBlazor.Utils.Mocks.Markets
         public static IdeaMarket? GetIdeaMarketById(Guid id) =>
             _ideaMarkets.FirstOrDefault(im => im.Id == id);
 
+        public static IdeaMarket? GetActiveIdeaMarketByIdeaId(Guid ideaId)
+        {
+            var activeMarketIds = MockMarkets.GetAllActiveMarkets().Select(m => m.Id).ToHashSet();
+            return _ideaMarkets.FirstOrDefault(im => im.IdeaId == ideaId && activeMarketIds.Contains(im.MarketId));
+        }
+
         public static int SendIdeasOnMarket(ICollection<Idea> ideas, Market market)
         {
             int count = 0;

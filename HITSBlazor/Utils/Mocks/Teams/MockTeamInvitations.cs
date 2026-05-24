@@ -2,6 +2,7 @@
 using HITSBlazor.Models.Teams.Entities;
 using HITSBlazor.Models.Teams.Enums;
 using HITSBlazor.Models.Users.Entities;
+using HITSBlazor.Utils.Mocks.Common;
 using HITSBlazor.Utils.Mocks.Users;
 
 namespace HITSBlazor.Utils.Mocks.Teams
@@ -92,6 +93,25 @@ namespace HITSBlazor.Utils.Mocks.Teams
             if (invitationForUpdate is null) return false;
 
             invitationForUpdate.Status = newStatus;
+
+            if (newStatus is TeamRequestStatus.Accepted)
+            {
+                var newMember = MockUsers.GetUserById(invitationForUpdate.UserId);
+                if (newMember is not null)
+                {
+                    MockTeams.GetTeamById(invitationForUpdate.TeamId)?.Members.Add(new TeamMember
+                    {
+                        Id = Guid.NewGuid(),
+                        TeamId = invitationForUpdate.TeamId,
+                        UserId = invitationForUpdate.UserId,
+                        Email = newMember.Email,
+                        FirstName = newMember.FirstName,
+                        LastName = newMember.LastName,
+                        Skills = MockUsersSkills.GetUserSkillsById(invitationForUpdate.UserId)
+                    });
+                }
+            }
+
             return true;
         }
     }

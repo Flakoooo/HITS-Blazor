@@ -12,7 +12,7 @@ using Microsoft.AspNetCore.Components;
 
 namespace HITSBlazor.Components.Forms.RequestTeamToIdeaForm
 {
-    public partial class RequestTeamToIdeaForm : IDisposable
+    public partial class RequestTeamToIdeaForm
     {
         [Inject]
         private IAuthService AuthService { get; set; } = null!;
@@ -63,16 +63,42 @@ namespace HITSBlazor.Components.Forms.RequestTeamToIdeaForm
 
             if (AuthService.CurrentUser is not null)
             {
-                _teams = await TeamService.GetTeamsByOwnerOrLeaderId(AuthService.CurrentUser.Id);
-
-                _cachedRequests = (await IdeaMarketService.GetRequestsTeamToIdeaAsync(IdeaMarket.Id))
-                    .Where(r => _teams.Select(t => t.Id).Contains(r.TeamId))
-                    .ToDictionary(r => r.TeamId, r => r);
-
                 TeamService.OnRequestsStatusUpdated += EventedRequestUpdate;
 
+                await LoadTeamsAsync();
+                await LoadMoreCachedRequest();
+
                 _isLoading = false;
+                MarkAsInitialized();
             }
+        }
+
+        protected override async Task OnLoadMoreItemsAsync() => await LoadTeamsAsync(true);
+
+        protected override int GetCurrentItemsCount() => _teams.Count;
+
+        private async Task LoadTeamsAsync(bool append = false)
+        {
+            var currentUser = AuthService.CurrentUser;
+            if (currentUser is null) return;
+
+            await LoadDataAsync(
+                _teams,
+                () => TeamService.GetTeamsAsync(
+                    _currentPage,
+                    userId: currentUser.Id
+                ),
+                append
+            );
+
+            await LoadMoreCachedRequest();
+        }
+
+        private async Task LoadMoreCachedRequest()
+        {
+            var idsForLoad = _teams.Select(t => t.Id).Where(id => !_cachedRequests.ContainsKey(id));
+            _cachedRequests = (await IdeaMarketService.GetTeamRequestsForCurretnIdeaMarketAndTeamsAsync(IdeaMarket.Id, idsForLoad))
+                    .ToDictionary(r => r.TeamId, r => r);
         }
 
         private static string GetStatusButtonText(TeamRequestStatus? status) => status switch
@@ -137,9 +163,11 @@ namespace HITSBlazor.Components.Forms.RequestTeamToIdeaForm
             StateHasChanged();
         }
 
-        public void Dispose()
+        protected override async ValueTask DisposeAsyncCore()
         {
             TeamService.OnRequestsStatusUpdated -= EventedRequestUpdate;
+
+            await ValueTask.CompletedTask;
         }
     }
 }

@@ -11,14 +11,15 @@
 @using HITSBlazor.Components.Placeholders.Placeholder
 @using HITSBlazor.Components.Skills
 @using HITSBlazor.Components.Statuses.EnumStatus
-@using HITSBlazor.Components.Tables.InvitationTeamToIdeaTable
+@using HITSBlazor.Components.Tables.Teams.InvitationTeamToIdeaTable
 @using HITSBlazor.Components.Tables.TableActionMenu
 @using HITSBlazor.Components.Tables.TableBodyRow
 @using HITSBlazor.Components.Tables.TableComponent
 @using HITSBlazor.Components.Tables.TableHeader
-@using HITSBlazor.Components.Tables.TeamInvitationTable
-@using HITSBlazor.Components.Tables.TeamMemberTable
-@using HITSBlazor.Components.Tables.TeamRequestsToTeamTable
+@using HITSBlazor.Components.Tables.Teams.RequestTeamToIdeaTable
+@using HITSBlazor.Components.Tables.Teams.TeamInvitationTable
+@using HITSBlazor.Components.Tables.Teams.TeamMemberTable
+@using HITSBlazor.Components.Tables.Teams.TeamRequestsToTeamTable
 @using HITSBlazor.Components.Typography
 @using HITSBlazor.Models.Common.Entities
 @using HITSBlazor.Models.Common.Enums
@@ -103,8 +104,8 @@
     else
     {
         <div class="team-modal-side w-75">
-            <RightSideModalHeader HeaderText="@_currentTeam.Name" />
-            <RightSideModaCollapselInfo Data="_teamData" />
+            <RightSideModalHeader IsLoading="_isLoading" HeaderText="@_currentTeam.Name" />
+            <RightSideModaCollapselInfo IsLoading="_isLoading" Data="_teamData" />
             <div class="bg-white rounded-3">
                 <div class="border-bottom px-3">
                     <NavigationTabs T="TeamTableCategory" 
@@ -130,7 +131,7 @@
                         }
                         else if (_activeTableCategory is TeamTableCategory.RequestsTeamToIdeas)
                         {
-                            <TeamRequestsToTeamTable CurrentTeam="_currentTeam" />
+                            <RequestTeamToIdeaTable CurrentTeam="_currentTeam" />
                         }
                         else if (_activeTableCategory is TeamTableCategory.InvitationsTeamToIdeas)
                         {
@@ -159,15 +160,14 @@
                                         OnButtonClick="DeleteTeam" />
                             }
                             <Button Variant="ButtonVariant.Primary"
-                                    Text="Пригласить пользователя"
+                                    Text="Пригласить пользователей"
                                     OnButtonClick="ShowInviteUsersModal" />
                         }
-                        else
+                        else if (isAdmin || _sendRequestAllowed)
                         {
-                            @* TODOO: реализовать *@
                             <Button Variant="ButtonVariant.Success"
                                     Text="Подать заявку в команду"
-                                    OnButtonClick="ShowInviteUsersModal" />
+                                    OnButtonClick="SendRequestInTeam" />
                         }
                     </div>
                 }

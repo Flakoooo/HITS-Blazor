@@ -45,6 +45,13 @@ namespace HITSBlazor.Services.IdeaMarkets
             page, ideaMarketId: ideaMarketId, searchText: searchText
         );
 
+        public async Task<List<RequestTeamToIdea>> GetTeamRequestsForCurretnIdeaMarketAndTeamsAsync(
+            Guid ideaMarketId,
+            IEnumerable<Guid> currentTeamIds
+        ) => MockRequestTeamToIdeas.GetTeamRequestForCurrentTeamsAndIdeaMarket(
+            ideaMarketId, currentTeamIds.ToHashSet()
+        );
+
         public async Task<ListDataResponse<InvitationTeamToIdea>> GetInvitationTeamsToIdeaAsync(
             int page, Guid ideaId, string? searchText
         ) => MockInvitationTeamToIdeas.GetInvitationsTeamToIdeas(

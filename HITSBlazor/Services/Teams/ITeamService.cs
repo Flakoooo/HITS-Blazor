@@ -11,13 +11,14 @@ namespace HITSBlazor.Services.Teams
     {
         event Action<ICollection<User>>? OnInviteMembersCollected;
 
-        event Action<Team>? OnTeamHasDeleted;
+        event Action<Guid, TeamMember?>? OnTeamLeaderHasChanged;
         event Action<TeamMember>? OnTeamMemberHasKicked;
+        event Action<Team>? OnTeamHasDeleted;
 
-        event Func<bool, Task>? OnNewTeamApplicationsHasCreated;
-
+        event Func<bool, Task>? OnNewTeamInvitationsHasCreated;
         event Action<Guid, TeamRequestStatus>? OnTeamInvitationStatusHasChanged;
 
+        event Func<bool, Task>? OnNewRequestInTeamHasCreated;
         event Action<Guid, TeamRequestStatus>? OnRequestToTeamStatusHasChanged;
 
         event Func<Task>? OnRequestsStatusCreated;
@@ -27,6 +28,7 @@ namespace HITSBlazor.Services.Teams
 
         Task<ListDataResponse<Team>> GetTeamsAsync(
             int page,
+            Guid? userId = null,
             string? searchText = null,
             bool? privacy = null,
             bool? hasActiveProject = null,
@@ -34,7 +36,6 @@ namespace HITSBlazor.Services.Teams
             string? orderBy = null,
             bool? byDescending = null
         );
-        Task<List<Team>> GetTeamsByOwnerOrLeaderId(Guid userId);
         Task<Team?> GetTeamByIdAsync(Guid teamId);
         Task<ListDataResponse<TeamMember>> GetTeamMembersAsync(
             int page,
@@ -43,7 +44,7 @@ namespace HITSBlazor.Services.Teams
         );
         Task<bool> CreateTeamAsync(CreateTeamRequest request);
         Task<bool> UpdateTeamAsync(UpdateTeamRequest request);
-        Task<bool> UpdateTeamLeader(Guid teamId, Guid? leaderId = null);
+        Task<bool> UpdateTeamLeader(Team team, TeamMember? newLeader);
         Task KickMemberAsync(TeamMember member);
         Task DeleteTeamAsync(Team team);
 
@@ -65,6 +66,7 @@ namespace HITSBlazor.Services.Teams
             string? searchText = null,
             IEnumerable<TeamRequestStatus>? selectedStatuses = null
         );
+        Task<bool> CurrentUserCanSendRequestInTeamAsync(Guid teamId);
         Task<bool> CreateNewRequestToTeam(Guid teamId);
         Task UpdateRequestToTeamStatusAsync(Guid requestToTeamId, TeamRequestStatus newStatus);
 
@@ -72,14 +74,14 @@ namespace HITSBlazor.Services.Teams
         Task<ListDataResponse<RequestTeamToIdea>> GetRequestsTeamToIdeasAsync(
             int page, Guid teamId, string? searchText = null
         );
+        Task<RequestTeamToIdea> CreateRequestTeamToIdeaAsync(IdeaMarket ideaMarket, Team team, string letter);
+
+        Task<bool> UpdateRequestTeamToIdeaStatusAsync(Guid requestId, TeamRequestStatus newStatus);
 
         //приглашения команды в идею
         Task<ListDataResponse<InvitationTeamToIdea>> GetInvitationsTeamToIdeasAsync(
             int page, Guid teamId, string? searchText = null
         );
-
-        Task<RequestTeamToIdea> CreateRequestTeamToIdeaAsync(IdeaMarket ideaMarket, Team team, string letter);
-
-        Task<bool> UpdateRequestTeamToIdeaStatusAsync(Guid requestId, TeamRequestStatus newStatus);
+        Task<bool> UpdateInvitationTeamToIdeaStatusAsync(Guid invitationId, TeamRequestStatus newStatus);
     }
 }

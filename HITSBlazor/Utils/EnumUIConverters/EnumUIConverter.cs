@@ -2,6 +2,7 @@
 using HITSBlazor.Components.GlobalNotification;
 using HITSBlazor.Components.Modals.CenterModals.EndedSprintModal;
 using HITSBlazor.Components.Modals.RightSideModals.ProfileModal;
+using HITSBlazor.Components.Modals.RightSideModals.TeamModal;
 using HITSBlazor.Models.Common.Enums;
 using HITSBlazor.Models.Ideas.Enums;
 using HITSBlazor.Models.Markets.Enums;
@@ -25,6 +26,7 @@ namespace HITSBlazor.Utils.EnumUIConverters
             HITSTaskStatus s => GetTastStatusInfo(s),
             ProjectMemberRole r => GetProjectMemberRoleInfo(r),
             SprintStatus s => GetSprintStatusInfo(s),
+            TeamTableCategory c => GetTeamCategoryInfo(c),
             ProfileModalCategory c => GetProfileCategoryInfo(c),
             ProjectViewCategory c => GetProjectCategoryInfo(c),
             EndedSprintModalStatCategory c => GetSprintModalStatCategoryInfo(c),
@@ -44,6 +46,7 @@ namespace HITSBlazor.Utils.EnumUIConverters
             HITSTaskStatus s => GetTastStatusInfo(s),
             ProjectMemberRole r => GetProjectMemberRoleInfo(r),
             SprintStatus s => GetSprintStatusInfo(s),
+            TeamTableCategory c => GetTeamCategoryInfo(c),
             ProfileModalCategory c => GetProfileCategoryInfo(c),
             ProjectViewCategory c => GetProjectCategoryInfo(c),
             EndedSprintModalStatCategory c => GetSprintModalStatCategoryInfo(c),

@@ -1,0 +1,46 @@
+﻿@using HITSBlazor.Components.ActionMenus.BaseActionMenu
+@using HITSBlazor.Components.InputSearch
+@using HITSBlazor.Components.Skills
+@using HITSBlazor.Components.Statuses.EnumStatus
+@using HITSBlazor.Components.Tables.TableActionMenu
+@using HITSBlazor.Components.Tables.TableBodyRow
+@using HITSBlazor.Components.Tables.TableComponent
+
+<TableComponent IsLoading="IsLoading" HeaderItems="AcceptedTeamTableHeader" TableActionMenuIsEnable="true">
+    <TableContent>
+        @if (CurrentTeam is not null)
+        {
+            <tr>
+                <TableBodyRow>
+                    <div class="data-link" @onclick="() => ShowTeamModal(CurrentTeam.Id)">
+                        @CurrentTeam.Name
+                    </div>
+                </TableBodyRow>
+                <TableBodyRow>
+                    @if (CurrentTeam.Leader is null)
+                    {
+                        <div>Отсутствует</div>
+                    }
+                    else
+                    {
+                        <div class="data-link text-warning" @onclick="() => ShowUserProfile(CurrentTeam.Leader.Id)">
+                            @CurrentTeam.Leader?.FullName
+                        </div>
+                    }
+                </TableBodyRow>
+                <TableBodyRow IsCentered="true">
+                    @CurrentTeam.MembersCount
+                </TableBodyRow>
+                <TableBodyRow IsCentered="true">
+                    <Skills SkillList="CurrentTeam.Skills" />
+                </TableBodyRow>
+                <TableActionMenu ItemId="CurrentTeam.Id"
+                                    StrategyPosition="Strategy.Fixed"
+                                    OnAction="@HandleTableMenuClick"
+                                    ActionIds="@(new Dictionary<MenuAction, object> { 
+                                        [MenuAction.ViewTeamProfile] = CurrentTeam.Id 
+                                    })" />
+            </tr>
+        }
+    </TableContent>
+</TableComponent>

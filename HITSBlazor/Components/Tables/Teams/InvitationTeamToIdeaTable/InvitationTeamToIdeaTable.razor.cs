@@ -6,7 +6,7 @@ using HITSBlazor.Services.Modal;
 using HITSBlazor.Services.Teams;
 using Microsoft.AspNetCore.Components;
 
-namespace HITSBlazor.Components.Tables.InvitationTeamToIdeaTable
+namespace HITSBlazor.Components.Tables.Teams.InvitationTeamToIdeaTable
 {
     public partial class InvitationTeamToIdeaTable
     {
@@ -39,7 +39,7 @@ namespace HITSBlazor.Components.Tables.InvitationTeamToIdeaTable
         {
             _isLoading = true;
 
-            await LoadTeamMembersAsync();
+            await LoadInvitationsAsync();
 
             _isLoading = false;
             MarkAsInitialized();
@@ -51,11 +51,11 @@ namespace HITSBlazor.Components.Tables.InvitationTeamToIdeaTable
                 _tableContainer = _tableComponent.ScrollContainer;
         }
 
-        protected override async Task OnLoadMoreItemsAsync() => await LoadTeamMembersAsync(true);
+        protected override async Task OnLoadMoreItemsAsync() => await LoadInvitationsAsync(true);
 
         protected override int GetCurrentItemsCount() => _invitationsTeamToIdeas.Count;
 
-        private async Task LoadTeamMembersAsync(bool append = false)
+        private async Task LoadInvitationsAsync(bool append = false)
         {
             await LoadDataAsync(
                 _invitationsTeamToIdeas,
@@ -72,14 +72,15 @@ namespace HITSBlazor.Components.Tables.InvitationTeamToIdeaTable
         {
             _searchText = value;
             ResetPagination();
-            await LoadTeamMembersAsync();
+            await LoadInvitationsAsync();
         }
 
         private static Dictionary<MenuAction, object> GetActions(InvitationTeamToIdea invitation)
         {
             var actions = new Dictionary<MenuAction, object>
             {
-                [MenuAction.ViewIdea] = invitation.IdeaId
+                [MenuAction.ViewIdea] = invitation.IdeaId,
+                [MenuAction.TeamRequestAccept] = invitation.Id,
             };
 
             return actions;
@@ -87,13 +88,17 @@ namespace HITSBlazor.Components.Tables.InvitationTeamToIdeaTable
 
         private void ShowIdea(Guid ideaId) => ModalService.ShowIdeaModal(ideaId);
 
-        private void HandleTableMenuClick(TableActionContext context)
+        private async Task HandleTableMenuClick(TableActionContext context)
         {
-            if (context.Item is Guid ideaId)
+            if (context.Item is Guid id)
             {
                 if (context.Action is MenuAction.ViewIdeaMarket)
                 {
-                    ShowIdea(ideaId);
+                    ShowIdea(id);
+                }
+                else if (context.Action is MenuAction.TeamRequestAccept)
+                {
+                    await TeamService.UpdateTea
                 }
             }
         }

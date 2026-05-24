@@ -10,6 +10,9 @@
 @using HITSBlazor.Components.Modals.Components.RightSideModalInfo
 @using HITSBlazor.Components.Skills
 @using HITSBlazor.Components.Statuses.EnumStatus
+@using HITSBlazor.Components.Tables.IdeaMarkets.AcceptedIdeaMarketTeamTable
+@using HITSBlazor.Components.Tables.IdeaMarkets.IdeaMarketInvitedTeamsTable
+@using HITSBlazor.Components.Tables.IdeaMarkets.IdeaMarketRequestTable
 @using HITSBlazor.Components.Tables.TableActionMenu
 @using HITSBlazor.Components.Tables.TableBodyRow
 @using HITSBlazor.Components.Tables.TableHeader
@@ -41,126 +44,18 @@
                 </ul>
                 <div class="idea-market-tables">
                     <div class="w-100 bg-white px-3 pb-3 pt-1">
-                        <InputSearch Width="50" IsLoading="_isLoading" ValueChanged="@((value) => SearchData(value))" DebounceDelay="500" />
-                        <div class="w-100 d-flex">
-                            <div class="w-100">
-                                <table class="table table-hover mb-0">
-                                    @switch (_activeTableCategory)
-                                    {
-                                        case IdeaMarketTableCategory.AcceptedTeam:
-                                            <TableHeader TableActionMenuIsEnable="true" Items="AcceptedTeamTableHeader" />
-                                            break;
-                                        case IdeaMarketTableCategory.Requests:
-                                            <TableHeader TableActionMenuIsEnable="true" Items="RequestsTableHeader" />
-                                            break;
-                                        case IdeaMarketTableCategory.InvitedTeams:
-                                            <TableHeader TableActionMenuIsEnable="true" Items="InvitedTeamsTableHeader" />
-                                            break;
-                                    }
-                                    <tbody>
-                                        @if (_activeTableCategory is IdeaMarketTableCategory.AcceptedTeam && _currentIdeaMarket?.Team is not null)
-                                        {
-                                            <tr>
-                                                <td class="py-3 col">
-                                                    <div class="d-flex">
-                                                        <input type="checkbox" class="form-check-input mb-1" />
-                                                    </div>
-                                                </td>
-                                                <TableBodyRow>
-                                                    <div class="data-link">
-                                                        @_currentIdeaMarket.Team.Name
-                                                    </div>
-                                                </TableBodyRow>
-                                                <TableBodyRow>
-                                                    <div class="data-link text-warning">
-                                                        @_currentIdeaMarket.Team.Leader?.FullName
-                                                    </div>
-                                                </TableBodyRow>
-                                                <TableBodyRow IsCentered="true">
-                                                    @_currentIdeaMarket.Team.MembersCount
-                                                </TableBodyRow>
-                                                <TableBodyRow IsCentered="true">
-                                                    <Skills SkillList="_currentIdeaMarket.Team.Skills" />
-                                                </TableBodyRow>
-                                                <TableActionMenu ItemId="_currentIdeaMarket.Id"
-                                                                 StrategyPosition="Strategy.Fixed"
-                                                                 OnAction="@HandleTableMenuClick"
-                                                                 ActionIds="@(new Dictionary<MenuAction, object> { 
-                                                                     [MenuAction.ViewTeamProfile] = _currentIdeaMarket.Team.Id 
-                                                                 })" />
-                                            </tr>
-                                        }
-                                        else if (_activeTableCategory is IdeaMarketTableCategory.Requests)
-                                        {
-                                            @foreach (var request in _requestsTeamsToIdea)
-                                            {
-                                                <tr>
-                                                    <td class="py-3 col">
-                                                        <div class="d-flex">
-                                                            <input type="checkbox" class="form-check-input mb-1" />
-                                                        </div>
-                                                    </td>
-                                                    <TableBodyRow>
-                                                        <div class="data-link">
-                                                            @request.Name
-                                                        </div>
-                                                    </TableBodyRow>
-                                                    <TableBodyRow>
-                                                        <EnumStatus Statustype="request.Status" />
-                                                    </TableBodyRow>
-                                                    <TableBodyRow IsCentered="true">
-                                                        @request.MembersCount
-                                                    </TableBodyRow>
-                                                    <TableBodyRow IsCentered="true">
-                                                        <Skills SkillList="request.Skills" />
-                                                    </TableBodyRow>
-                                                    <TableActionMenu ItemId="request.TeamId"
-                                                                     StrategyPosition="Strategy.Fixed"
-                                                                     OnAction="@HandleTableMenuClick"
-                                                                     ActionIds="@(new Dictionary<MenuAction, object> { 
-                                                                         [MenuAction.ViewTeamProfile] = request.TeamId,
-                                                                         [MenuAction.ViewLetter] = request.Letter
-                                                                     })" />
-                                                </tr>                                            
-                                            }
-                                        }
-                                        else if (_activeTableCategory is IdeaMarketTableCategory.InvitedTeams)
-                                        {
-                                            @foreach (var invitation in _invitationsTeamsToIdea)
-                                            {
-                                                <tr>
-                                                    <td class="py-3 col">
-                                                        <div class="d-flex">
-                                                            <input type="checkbox" class="form-check-input mb-1" />
-                                                        </div>
-                                                    </td>
-                                                    <TableBodyRow>
-                                                        <div class="data-link">
-                                                            @invitation.TeamName
-                                                        </div>
-                                                    </TableBodyRow>
-                                                    <TableBodyRow>
-                                                        <EnumStatus Statustype="invitation.Status" />
-                                                    </TableBodyRow>
-                                                    <TableBodyRow IsCentered="true">
-                                                        @invitation.TeamMembersCount
-                                                    </TableBodyRow>
-                                                    <TableBodyRow IsCentered="true">
-                                                        <Skills SkillList="invitation.Skills" />
-                                                    </TableBodyRow>
-                                                    <TableActionMenu ItemId="invitation.TeamId"
-                                                                     StrategyPosition="Strategy.Fixed"
-                                                                     OnAction="@HandleTableMenuClick"
-                                                                     ActionIds="@(new Dictionary<MenuAction, object> { 
-                                                                         [MenuAction.ViewTeamProfile] = invitation.TeamId
-                                                                     })" />
-                                                </tr>                                            
-                                            }
-                                        }
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
+                        @if (_activeTableCategory is IdeaMarketTableCategory.AcceptedTeam)
+                        {
+                            <AcceptedIdeaMarketTeamTable IsLoading="_isLoading" CurrentTeam="_currentIdeaMarket?.Team" />
+                        }
+                        else if (_activeTableCategory is IdeaMarketTableCategory.Requests)
+                        {
+                            <IdeaMarketRequestTable CurrentIdeaMarket="_currentIdeaMarket" />
+                        }
+                        else if (_activeTableCategory is IdeaMarketTableCategory.InvitedTeams)
+                        {
+                            <IdeaMarketInvitedTeamsTable CurrentIdeaMarket="_currentIdeaMarket" />
+                        }
                     </div>
                 </div>
                 @if (_activeTableCategory is IdeaMarketTableCategory.InvitedTeams)

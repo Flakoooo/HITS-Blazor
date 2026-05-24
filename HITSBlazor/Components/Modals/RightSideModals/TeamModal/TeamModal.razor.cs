@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Components;
 
 namespace HITSBlazor.Components.Modals.RightSideModals.TeamModal
 {
-    public partial class TeamModal
+    public partial class TeamModal : IDisposable
     {
         [Inject]
         private IAuthService AuthService { get; set; } = null!;
@@ -30,10 +30,9 @@ namespace HITSBlazor.Components.Modals.RightSideModals.TeamModal
         private bool _isLoading = true;
 
         private Team? _currentTeam;
+        private bool _sendRequestAllowed = false;
 
         private List<CollapseItem> _teamData = [];
-
-        private string _searchText = string.Empty;
 
         private TeamTableCategory _activeTableCategory  = TeamTableCategory.Members;
 
@@ -70,6 +69,10 @@ namespace HITSBlazor.Components.Modals.RightSideModals.TeamModal
 
             _currentTeam = await TeamService.GetTeamByIdAsync(TeamId);
             if (_currentTeam is null) return;
+
+            TeamService.OnTeamLeaderHasChanged += TeamLeaderHasChanged;
+
+            _sendRequestAllowed = await TeamService.CurrentUserCanSendRequestInTeamAsync(_currentTeam.Id);
 
             _teamData = GetTeamData();
 
@@ -108,6 +111,15 @@ namespace HITSBlazor.Components.Modals.RightSideModals.TeamModal
             await NavigationService.NavigateToAsync($"/teams/create/{_currentTeam?.Id}");
         }
 
+        private void TeamLeaderHasChanged(Guid teamId, TeamMember? newLeader)
+        {
+            if (_currentTeam is not null && _currentTeam.Id == teamId)
+            {
+                _currentTeam.Leader = newLeader;
+                StateHasChanged();
+            }
+        }
+
         private void DeleteTeam()
         {
             if (_currentTeam is null) return;
@@ -128,6 +140,23 @@ namespace HITSBlazor.Components.Modals.RightSideModals.TeamModal
                 _currentTeam.Members.Select(m => m.UserId).ToHashSet(),
                 _currentTeam.Id
             );
+        }
+
+        private void SendRequestInTeam()
+        {
+            if (_currentTeam is null) return;
+
+            ModalService.ShowConfirmModal(
+                $"Вы действительно хотите подать заявку в {_currentTeam.Name}?",
+                () => TeamService.CreateNewRequestToTeam(_currentTeam.Id),
+                confirmButtonVariant: ButtonVariant.Success,
+                confirmButtonText: "Подать"
+            );
+        }
+
+        public void Dispose()
+        {
+            TeamService.OnTeamLeaderHasChanged -= TeamLeaderHasChanged;
         }
     }
 }

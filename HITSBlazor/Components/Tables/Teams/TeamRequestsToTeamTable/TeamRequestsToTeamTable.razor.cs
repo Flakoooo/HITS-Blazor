@@ -1,6 +1,5 @@
 ﻿using HITSBlazor.Components.ActionMenus.BaseActionMenu;
 using HITSBlazor.Components.Tables.TableHeader;
-using HITSBlazor.Models.Quests.Entities;
 using HITSBlazor.Models.Teams.Entities;
 using HITSBlazor.Models.Teams.Enums;
 using HITSBlazor.Models.Users.Enums;
@@ -9,9 +8,9 @@ using HITSBlazor.Services.Modal;
 using HITSBlazor.Services.Teams;
 using Microsoft.AspNetCore.Components;
 
-namespace HITSBlazor.Components.Tables.TeamInvitationTable
+namespace HITSBlazor.Components.Tables.Teams.TeamRequestsToTeamTable
 {
-    public partial class TeamInvitationTable
+    public partial class TeamRequestsToTeamTable
     {
         [Inject]
         private AuthService AuthService { get; set; } = null!;
@@ -29,24 +28,24 @@ namespace HITSBlazor.Components.Tables.TeamInvitationTable
         private TableComponent.TableComponent? _tableComponent;
 
         private string _searchText = string.Empty;
-        private readonly List<TeamInvitation> _teamInvitations = [];
+        private readonly List<RequestToTeam> _requestsToTeam = [];
 
         private static List<TableHeaderItem> NewMembersTableHeader { get; } =
         [
-            new() { Text = "Статус", InCentered = true, ColumnClass = "col-1" },
-            new() { Text = "Почта", InCentered = true, ColumnClass = "col-3" },
-            new() { Text = "Имя", InCentered = true, ColumnClass = "col-3" },
-            new() { Text = "Фамилия", InCentered = true, ColumnClass = "col-3" }
+            new() { Text = "Статус",    InCentered = true, ColumnClass = "col-1" },
+            new() { Text = "Почта",     InCentered = true, ColumnClass = "col-3" },
+            new() { Text = "Имя",       InCentered = true, ColumnClass = "col-3" },
+            new() { Text = "Фамилия",   InCentered = true, ColumnClass = "col-3" }
         ];
 
         protected override async Task OnInitializedAsync()
         {
             _isLoading = true;
 
-            TeamService.OnNewTeamApplicationsHasCreated += LoadTeamMembersAsync;
-            TeamService.OnTeamInvitationStatusHasChanged += InvitationStatusHasChanged;
+            TeamService.OnNewRequestInTeamHasCreated += LoadRequestsAsync;
+            TeamService.OnRequestToTeamStatusHasChanged += RequestStatusHasChanged;
 
-            await LoadTeamMembersAsync();
+            await LoadRequestsAsync();
 
             _isLoading = false;
             MarkAsInitialized();
@@ -58,15 +57,15 @@ namespace HITSBlazor.Components.Tables.TeamInvitationTable
                 _tableContainer = _tableComponent.ScrollContainer;
         }
 
-        protected override async Task OnLoadMoreItemsAsync() => await LoadTeamMembersAsync(true);
+        protected override async Task OnLoadMoreItemsAsync() => await LoadRequestsAsync(true);
 
-        protected override int GetCurrentItemsCount() => _teamInvitations.Count;
+        protected override int GetCurrentItemsCount() => _requestsToTeam.Count;
 
-        private async Task LoadTeamMembersAsync(bool append = false)
+        private async Task LoadRequestsAsync(bool append = false)
         {
             await LoadDataAsync(
-                _teamInvitations,
-                () => TeamService.GetTeamInvitationsAsync(
+                _requestsToTeam,
+                () => TeamService.GetTeamRequestsToTeamAsync(
                     _currentPage,
                     teamId: CurrentTeam.Id,
                     searchText: _searchText
@@ -79,29 +78,29 @@ namespace HITSBlazor.Components.Tables.TeamInvitationTable
         {
             _searchText = value;
             ResetPagination();
-            await LoadTeamMembersAsync();
+            await LoadRequestsAsync();
         }
 
-        private Dictionary<MenuAction, object> GetActions(TeamInvitation invitation)
+        private Dictionary<MenuAction, object> GetActions(RequestToTeam request)
         {
             var actions = new Dictionary<MenuAction, object>
             {
-                [MenuAction.ViewProfile] = invitation.UserId
+                [MenuAction.ViewProfile] = request.UserId
             };
 
             var currentUser = AuthService.CurrentUser;
             if (currentUser is not null)
             {
-                if (invitation.Status is TeamRequestStatus.New)
+                if (request.Status is TeamRequestStatus.New)
                 {
                     if (currentUser.Role is RoleType.Admin || currentUser.Id == CurrentTeam.Owner.Id || currentUser.Id == CurrentTeam.Leader?.Id)
                     {
-                        actions.Add(MenuAction.TeamRequestWithdraw, invitation.Id);
+                        actions.Add(MenuAction.TeamRequestAccept, request.Id);
+                        actions.Add(MenuAction.TeamRequestCancel, request.Id);
                     }
-                    else if (currentUser.Role is RoleType.Admin || invitation.UserId == currentUser.Id)
+                    else if (currentUser.Role is RoleType.Admin || request.UserId == currentUser.Id)
                     {
-                        actions.Add(MenuAction.TeamRequestAccept, invitation.Id);
-                        actions.Add(MenuAction.TeamRequestCancel, invitation.Id);
+                        actions.Add(MenuAction.TeamRequestWithdraw, request.Id);
                     }
                 }
             }
@@ -119,24 +118,24 @@ namespace HITSBlazor.Components.Tables.TeamInvitationTable
                 {
                     ShowUserProfile(id);
                 }
-                else if (context.Action is MenuAction.TeamRequestWithdraw)
-                {
-                    TeamService.UpdateTeamInvitationStatusAsync(id, TeamRequestStatus.Withdrawn);
-                }
                 else if (context.Action is MenuAction.TeamRequestAccept)
                 {
-                    TeamService.UpdateTeamInvitationStatusAsync(id, TeamRequestStatus.Accepted);
+                    TeamService.UpdateRequestToTeamStatusAsync(id, TeamRequestStatus.Accepted);
                 }
                 else if (context.Action is MenuAction.TeamRequestCancel)
                 {
-                    TeamService.UpdateTeamInvitationStatusAsync(id, TeamRequestStatus.Canceled);
+                    TeamService.UpdateRequestToTeamStatusAsync(id, TeamRequestStatus.Canceled);
+                }
+                else if (context.Action is MenuAction.TeamRequestWithdraw)
+                {
+                    TeamService.UpdateRequestToTeamStatusAsync(id, TeamRequestStatus.Withdrawn);
                 }
             }
         }
 
-        private void InvitationStatusHasChanged(Guid invitationId, TeamRequestStatus newStatus)
+        private void RequestStatusHasChanged(Guid requestId, TeamRequestStatus newStatus)
         {
-            var invitationForUpdate = _teamInvitations.FirstOrDefault(ti => ti.Id == invitationId);
+            var invitationForUpdate = _requestsToTeam.FirstOrDefault(ti => ti.Id == requestId);
             if (invitationForUpdate is null) return;
 
             invitationForUpdate.Status = newStatus;
@@ -145,8 +144,8 @@ namespace HITSBlazor.Components.Tables.TeamInvitationTable
 
         protected override async ValueTask DisposeAsyncCore()
         {
-            TeamService.OnNewTeamApplicationsHasCreated -= LoadTeamMembersAsync;
-            TeamService.OnTeamInvitationStatusHasChanged -= InvitationStatusHasChanged;
+            TeamService.OnNewRequestInTeamHasCreated -= LoadRequestsAsync;
+            TeamService.OnRequestToTeamStatusHasChanged -= RequestStatusHasChanged;
 
             await ValueTask.CompletedTask;
         }

@@ -1,27 +1,18 @@
-﻿using HITSBlazor.Components.ActionMenus.BaseActionMenu;
-using HITSBlazor.Components.Modals.CenterModals.LetterModal;
-using HITSBlazor.Components.Modals.Components.RightSideModaCollapselInfo;
+﻿using HITSBlazor.Components.Modals.Components.RightSideModaCollapselInfo;
 using HITSBlazor.Components.Modals.Components.RightSideModalInfo;
-using HITSBlazor.Components.Tables.TableHeader;
 using HITSBlazor.Models.Common.Entities;
 using HITSBlazor.Models.Markets.Entities;
-using HITSBlazor.Models.Markets.Enums;
-using HITSBlazor.Models.Teams.Entities;
-using HITSBlazor.Models.Users.Enums;
-using HITSBlazor.Services;
 using HITSBlazor.Services.Auth;
 using HITSBlazor.Services.IdeaMarkets;
 using HITSBlazor.Services.Markets;
 using HITSBlazor.Services.Modal;
 using HITSBlazor.Services.Teams;
 using HITSBlazor.Utils.EnumUIConverters;
-using HITSBlazor.Utils.Models;
 using Microsoft.AspNetCore.Components;
-using System.Diagnostics.Metrics;
 
 namespace HITSBlazor.Components.Modals.RightSideModals.IdeaMarketModal
 {
-    public partial class IdeaMarketModal : IDisposable
+    public partial class IdeaMarketModal
     {
         [Inject]
         private IAuthService AuthService { get; set; } = null!;
@@ -31,9 +22,6 @@ namespace HITSBlazor.Components.Modals.RightSideModals.IdeaMarketModal
 
         [Inject]
         private IMarketService MarketService { get; set; } = null!;
-
-        [Inject]
-        private ITeamService TeamService { get; set; } = null!;
 
         [Inject]
         private ModalService ModalService { get; set; } = null!;
@@ -46,43 +34,11 @@ namespace HITSBlazor.Components.Modals.RightSideModals.IdeaMarketModal
         private Market? _currentMarket;
         private IdeaMarket? _currentIdeaMarket;
 
-        private string _searchText = string.Empty;
-
-        private List<RequestTeamToIdea> _requestsTeamsToIdea = [];
-        private List<InvitationTeamToIdea> _invitationsTeamsToIdea = [];
-
         private IdeaMarketTableCategory _activeTableCategory = IdeaMarketTableCategory.AcceptedTeam;
 
         private List<CollapseItem> _ideaData = [];
 
         private List<Skill> RequestTeamsSkills { get; set; } = [];
-
-        private static List<TableHeaderItem> AcceptedTeamTableHeader { get; } =
-        [
-            new() { Text = "" },
-            new() { Text = "Название", ColumnClass = "col-3" },
-            new() { Text = "Лидер", ColumnClass = "col-3" },
-            new() { Text = "Участники", InCentered = true, OrderBy = nameof(Team.MembersCount) },
-            new() { Text = "Компетенции", InCentered = true, ColumnClass = "col-4" }
-        ];
-
-        private static List<TableHeaderItem> RequestsTableHeader { get; } =
-        [
-            new() { Text = "" },
-            new() { Text = "Название", ColumnClass = "col-3" },
-            new() { Text = "Статус", ColumnClass = "col-3" },
-            new() { Text = "Участники", InCentered = true, OrderBy = nameof(Team.MembersCount) },
-            new() { Text = "Компетенции", InCentered = true, ColumnClass = "col-4" }
-        ];
-
-        private static List<TableHeaderItem> InvitedTeamsTableHeader { get; } =
-        [
-            new() { Text = "" },
-            new() { Text = "Название", ColumnClass = "col-3" },
-            new() { Text = "Статус", ColumnClass = "col-3" },
-            new() { Text = "Участники", InCentered = true, OrderBy = nameof(Team.MembersCount) },
-            new() { Text = "Компетенции", InCentered = true, ColumnClass = "col-4" }
-        ];
 
         private readonly List<RightSideModalInfoItem> _infoItems =
         [
@@ -127,9 +83,6 @@ namespace HITSBlazor.Components.Modals.RightSideModals.IdeaMarketModal
 
             _ideaData = GetIdeaData();
 
-            await LoadDataAsync();
-            TeamService.OnRequestsStatusCreated += LoadDataAsync;
-
             _infoItems[0].Text = _currentIdeaMarket.Customer;
 
             _infoItems[1].Text = _currentIdeaMarket.Initiator.FullName;
@@ -165,63 +118,11 @@ namespace HITSBlazor.Components.Modals.RightSideModals.IdeaMarketModal
         private string GetTableCategoryClass(IdeaMarketTableCategory category)
             => _activeTableCategory == category ? "active text-primary" : "text-secondary";
 
-        private async Task LoadDataAsync()
-        {
-            if (_currentIdeaMarket is null) return;
-
-            if (_activeTableCategory is IdeaMarketTableCategory.Requests)
-                _requestsTeamsToIdea = await IdeaMarketService.GetRequestsTeamToIdeaAsync(
-                    _currentIdeaMarket.Id,
-                    searchText: _searchText
-                );
-            else if (_activeTableCategory is IdeaMarketTableCategory.InvitedTeams)
-                _invitationsTeamsToIdea = await IdeaMarketService.GetInvitationTeamsToIdeaAsync(
-                    _currentIdeaMarket.IdeaId,
-                    searchText: _searchText
-                );
-        }
-
         private async Task ChangeCategory(IdeaMarketTableCategory category)
         {
             _activeTableCategory = category;
-            await LoadDataAsync();
         }
 
         private void ShowTeamModal(Guid teamId) => ModalService.ShowTeamModal(teamId);
-
-        private async Task SearchData(string value)
-        {
-            _searchText = value;
-            await LoadDataAsync();
-        }
-
-        private void HandleTableMenuClick(TableActionContext context)
-        {
-            if (context.Action == MenuAction.ViewTeamProfile)
-            {
-                if (context.Item is Guid teamId)
-                {
-                    ShowTeamModal(teamId);
-                }
-            }
-            if (context.Action == MenuAction.ViewLetter)
-            {
-                if (context.Item is string letter)
-                {
-                    if (_currentIdeaMarket is not null && AuthService.CurrentUser is not null)
-                    {
-                        //TODOO: сделать назначение команды
-                        bool buttonAllowed = _currentIdeaMarket.Status is not IdeaMarketStatusType.RecruitmentIsClosed
-                            && (AuthService.CurrentUser.Id == _currentIdeaMarket.Initiator.Id || AuthService.CurrentUser.Role is RoleType.Admin);
-                        ModalService.ShowLetterModal(buttonAllowed, letter: letter);
-                    }
-                }
-            }
-        }
-
-        public void Dispose()
-        {
-            TeamService.OnRequestsStatusCreated -= LoadDataAsync;
-        }
     }
 }
