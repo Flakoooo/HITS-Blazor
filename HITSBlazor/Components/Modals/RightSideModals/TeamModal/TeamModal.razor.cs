@@ -156,10 +156,7 @@ namespace HITSBlazor.Components.Modals.RightSideModals.TeamModal
         {
             if (_currentTeam is null) return;
 
-            ModalService.ShowInviteUsersModal(
-                _currentTeam.Members.Select(m => m.UserId).ToHashSet(),
-                _currentTeam.Id
-            );
+            ModalService.ShowInviteUsersModal([], _currentTeam.Id);
         }
 
         private void SendRequestInTeam()

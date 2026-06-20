@@ -80,6 +80,7 @@ namespace HITSBlazor.Components.Modals.CenterModals.AddTeamMembersModal
                 () => UserService.GetUsersAsync(
                     _currentPage,
                     searchText: SeacrhText,
+                    ignoredTeam: TeamId,
                     ignoredIds: [currentUser.Id, .. IgnoredUsers]
                 ),
                 append: append

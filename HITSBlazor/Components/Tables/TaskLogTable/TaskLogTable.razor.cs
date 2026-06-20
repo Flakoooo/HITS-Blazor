@@ -58,7 +58,7 @@ namespace HITSBlazor.Components.Tables.TaskLogTable
 
         protected override async ShrapTask OnLoadMoreItemsAsync()
         {
-            await LoadTasksLogsAsync(append: true);
+            await LoadTasksLogsAsync(true);
         }
 
         private async ShrapTask LoadTasksLogsAsync(bool append = false) => await LoadDataAsync(

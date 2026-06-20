@@ -21,7 +21,7 @@ namespace HITSBlazor.Components.Modals.CenterModals.FinishProjectModal
         private ModalService ModalService { get; set; } = null!;
 
         [Parameter]
-        public required ProjectMember CurrentProjectMember { get; set; }
+        public ProjectMember? CurrentProjectMember { get; set; }
 
         [Parameter]
         public required Project CurrentProject { get; set; }
@@ -35,7 +35,7 @@ namespace HITSBlazor.Components.Modals.CenterModals.FinishProjectModal
         private bool _hasActiveSprint = false;
 
         private bool IsDisabled => CurrentProject.Status is ProjectStatus.Done 
-            || CurrentProjectMember.ProjectRole is ProjectMemberRole.Member;
+            || CurrentProjectMember?.ProjectRole is ProjectMemberRole.Member;
 
         protected override async ShrapTask OnInitializedAsync()
         {

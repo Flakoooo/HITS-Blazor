@@ -312,6 +312,7 @@ namespace HITSBlazor.Utils.Mocks.Users
             string? orderBy = null,
             bool? byDescending = null,
             bool? inTeam = null,
+            Guid? ignoredTeam = null,
             HashSet<RoleType>? selectedRoles = null,
             HashSet<Guid>? ignoredIds = null
         )
@@ -324,12 +325,18 @@ namespace HITSBlazor.Utils.Mocks.Users
             if (selectedRoles?.Count > 0)
                 query = query.Where(u => u.Roles.Any(selectedRoles.Contains));
 
-            if (inTeam.HasValue)
+            if (inTeam.HasValue || ignoredTeam.HasValue)
             {
                 var usersInTeams = MockTeams.GetUserIdsInTeams();
-                query = inTeam.Value 
-                    ? query.Where(u => usersInTeams.Contains(u.Id)) 
+                if (inTeam.HasValue) query = inTeam.Value
+                    ? query.Where(u => usersInTeams.Contains(u.Id))
                     : query.Where(u => !usersInTeams.Contains(u.Id));
+
+                if (ignoredTeam.HasValue)
+                {
+                    var invitetdUsersId = MockTeamInvitations.GetInvitedUsersByTeamId(ignoredTeam.Value);
+                    query = query.Where(u => !usersInTeams.Contains(u.Id) || !invitetdUsersId.Contains(u.Id));
+                }
             }
 
             if (!string.IsNullOrWhiteSpace(searchText))

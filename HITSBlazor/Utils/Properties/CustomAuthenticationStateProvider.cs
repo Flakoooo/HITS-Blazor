@@ -20,7 +20,6 @@ namespace HITSBlazor.Utils.Properties
             var user = _authService.CurrentUser;
             if (_authService.IsAuthenticated && user is not null)
             {
-
                 var identity = new ClaimsIdentity(BuildClaims(user), "CookieAuth");
                 var principal = new ClaimsPrincipal(identity);
 
@@ -42,11 +41,9 @@ namespace HITSBlazor.Utils.Properties
                 new("StudyGroup", user.StudyGroup ?? string.Empty)
             };
 
-            // важное для проверки ролей в авторизации
             foreach (var role in user.Roles)
                 claims.Add(new Claim(ClaimTypes.Role, role.ToString()));
 
-            // просто для проверки активной роли, активная роль уже есть в Roles
             if (user.Role.HasValue)
                 claims.Add(new Claim("CurrentRole", user.Role.Value.ToString()));
 

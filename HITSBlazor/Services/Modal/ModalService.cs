@@ -9,7 +9,6 @@ using HITSBlazor.Components.Modals.RightSideModals.IdeaModal;
 using HITSBlazor.Components.Modals.RightSideModals.ProfileModal;
 using HITSBlazor.Components.Modals.RightSideModals.TeamModal;
 using HITSBlazor.Components.Typography;
-using HITSBlazor.Models.Projects.Entities;
 using Microsoft.AspNetCore.Components;
 
 using SharpTask = System.Threading.Tasks.Task;

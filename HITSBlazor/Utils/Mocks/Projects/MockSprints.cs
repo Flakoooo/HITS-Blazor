@@ -564,8 +564,13 @@ namespace HITSBlazor.Utils.Mocks.Projects
                 task.Position = position++;
         }
 
-        public static List<Sprint> GetAllMockSprints(Guid? projectId = null) 
-            => _sprints.Where(s => s.ProjectId == projectId).ToList();
+        public static List<Sprint> GetAllMockSprints(Guid? projectId = null)
+        {
+            if (projectId.HasValue)
+                return _sprints.Where(s => s.ProjectId == projectId).ToList();
+            else
+                return _sprints.ToList();
+        }
 
         public static ListDataResponse<Sprint> GetSprintsByProjectId(
             Guid projectId, 

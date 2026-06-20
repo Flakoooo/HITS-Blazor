@@ -59,6 +59,11 @@ namespace HITSBlazor.Utils.Mocks.Teams
             return new ListDataResponse<TeamInvitation>(count, query.ToList());
         }
 
+        public static HashSet<Guid> GetInvitedUsersByTeamId(Guid teamId)
+            => _teamInvitations.Where(ti => ti.TeamId == teamId && ti.Status is not TeamRequestStatus.Accepted and not TeamRequestStatus.Annulled)
+                               .Select(ti => ti.UserId)
+                               .ToHashSet();
+
         public static bool CreateNewInvitations(Guid teamId, IEnumerable<Guid> invitationMemberIds)
         {
             var newInvitations = new List<TeamInvitation>();

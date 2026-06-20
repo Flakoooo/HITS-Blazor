@@ -1,5 +1,7 @@
 ﻿using HITSBlazor.Utils;
 using System.Net;
+using System.Net.Mime;
+using System.Text.Json;
 
 namespace HITSBlazor.Services
 {
@@ -13,6 +15,7 @@ namespace HITSBlazor.Services
             _httpClient = httpClient;
             _logger = logger;
         }
+
         protected async Task<ServiceResponse<T>> ExecuteApiCallAsync<T>(
             Func<Task<HttpResponseMessage>> apiCall,
             Func<HttpResponseMessage, Task<ServiceResponse<T>>> successHandler,
@@ -92,17 +95,47 @@ namespace HITSBlazor.Services
             );
         }
 
-        protected virtual string GetErrorMessage(HttpStatusCode statusCode, string operationName)
+        protected static string AddQuery(string key, int value, bool append = true)
+            => $"{(append ? '&' : '?')}{key}={value}";
+
+        protected static string AddQuery(string key, string value, bool append = true)
+            => $"{(append ? '&' : '?')}{key}={Uri.EscapeDataString(value)}";
+
+        protected static string AddQuery(string key, bool value, bool append = true)
+            => $"{(append ? '&' : '?')}{key}={value.ToString().ToLower()}";
+
+        protected static string AddQuery(string key, Guid value, bool append = true)
+            => $"{(append ? '&' : '?')}{key}={value}";
+
+        protected static string AddQuery<T>(string key, IEnumerable<T> value, bool append = true)
         {
-            return statusCode switch
+            string query = string.Empty;
+            foreach (var item in value)
             {
-                HttpStatusCode.Unauthorized => "Неавторизованный доступ",
-                HttpStatusCode.Forbidden => "Доступ запрещен",
-                HttpStatusCode.NotFound => "Ресурс не найден",
-                HttpStatusCode.BadRequest => "Неверный запрос",
-                HttpStatusCode.InternalServerError => "Ошибка сервера",
-                _ => $"Ошибка: {statusCode}"
-            };
+                query += string.IsNullOrWhiteSpace(query) 
+                    ? $"{(append ? '&' : '?')}{key}={item}" 
+                    : $"&{key}={item}";
+            }
+
+            return query;
         }
+
+        protected static StringContent SerializeData<T>(T value)
+        {
+            var json = JsonSerializer.Serialize(value, Settings.UserJsonOptions);
+            var content = new StringContent(json, System.Text.Encoding.UTF8, MediaTypeNames.Application.Json);
+
+            return content;
+        }
+
+        protected virtual string GetErrorMessage(HttpStatusCode statusCode, string operationName) => statusCode switch
+        {
+            HttpStatusCode.Unauthorized => "Неавторизованный доступ",
+            HttpStatusCode.Forbidden => "Доступ запрещен",
+            HttpStatusCode.NotFound => "Ресурс не найден",
+            HttpStatusCode.BadRequest => "Неверный запрос",
+            HttpStatusCode.InternalServerError => "Ошибка сервера",
+            _ => $"Ошибка: {statusCode}"
+        };
     }
 }

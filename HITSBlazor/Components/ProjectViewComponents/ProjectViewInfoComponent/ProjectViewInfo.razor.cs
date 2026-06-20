@@ -34,7 +34,7 @@ namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewInfoComponent
         public Project? CurrentProject { get; set; }
 
         [Parameter]
-        public required ProjectMember CurrentProjectMember { get; set; }
+        public ProjectMember? CurrentProjectMember { get; set; }
 
         private bool _isLoading = true;
 
@@ -76,7 +76,7 @@ namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewInfoComponent
         protected override int GetCurrentItemsCount() => _projectMembers.Count;
 
         protected override async SharpTask OnLoadMoreItemsAsync()
-            => await LoadProjectMembersAsync(append: true);
+            => await LoadProjectMembersAsync(true);
 
         private async SharpTask LoadProjectMembersAsync(bool append = false)
         {
@@ -104,7 +104,7 @@ namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewInfoComponent
                 [MenuAction.ViewProfile] = member.UserId
             };
 
-            if (CurrentProjectMember.ProjectRole is ProjectMemberRole.Initiator or ProjectMemberRole.TeamLeader)
+            if (CurrentProjectMember?.ProjectRole is ProjectMemberRole.Initiator or ProjectMemberRole.TeamLeader)
             {
                 actions.Add(MenuAction.SetLeader, member);
                 actions.Add(MenuAction.RemoveTeamMember, member);
@@ -153,14 +153,15 @@ namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewInfoComponent
             }
             else if (newStatus is ProjectStatus.Done)
             {
-                ModalService.Show<FinishProjectModal>(
-                    ModalType.Center,
-                    parameters: new Dictionary<string, object>
-                    {
-                        [nameof(FinishProjectModal.CurrentProject)] = CurrentProject,
-                        [nameof(FinishProjectModal.CurrentProjectMember)] = CurrentProjectMember
-                    }
-                );
+                var parameters = new Dictionary<string, object>
+                {
+                    [nameof(FinishProjectModal.CurrentProject)] = CurrentProject
+                };
+
+                if (CurrentProjectMember is not null)
+                    parameters.Add(nameof(FinishProjectModal.CurrentProjectMember), CurrentProjectMember);
+
+                ModalService.Show<FinishProjectModal>(ModalType.Center, parameters: parameters);
             }
             else if (newStatus is ProjectStatus.Deleted)
             {

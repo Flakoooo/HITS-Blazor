@@ -1,6 +1,8 @@
 ﻿using HITSBlazor.Components.Modals.CenterModals.FinishProjectModal;
 using HITSBlazor.Components.Modals.CenterModals.FinishSprintModal;
 using HITSBlazor.Models.Projects.Entities;
+using HITSBlazor.Models.Projects.Enums;
+using HITSBlazor.Models.Users.Enums;
 using HITSBlazor.Services.Auth;
 using HITSBlazor.Services.Modal;
 using Microsoft.AspNetCore.Components;
@@ -29,16 +31,42 @@ namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewActiveSprintCom
 
         private void ShowFinishSprintModal()
         {
-            if (ActiveSprint is null || CurrentMember is null) return;
+            var parameters = new Dictionary<string, object>
+            {
+                [nameof(FinishSprintModal.ProjectMembers)] = CurrentProject?.Members ?? []
+            };
+
+            if (ActiveSprint is null) return;
+            parameters.Add(nameof(FinishSprintModal.SprintId), ActiveSprint.Id);
+
+            if (CurrentMember is null)
+            {
+                var currentUser = AuthService.CurrentUser;
+                if (currentUser is null) return;
+
+                if (currentUser.Role is RoleType.Admin)
+                {
+                    parameters.Add(nameof(FinishSprintModal.CurrentProjectMember), new ProjectMember
+                    {
+                        TeamId = null,
+                        UserId = currentUser.Id,
+                        Email = currentUser.Email,
+                        FirstName = currentUser.FirstName,
+                        LastName = currentUser.LastName,
+                        ProjectRole = ProjectMemberRole.TeamLeader,
+                        StartDate = DateOnly.MinValue,
+                        FinishDate = DateOnly.MaxValue
+                    });
+                }
+            }
+            else
+            {
+                parameters.Add(nameof(FinishSprintModal.CurrentProjectMember), CurrentMember);
+            }
 
             ModalService.Show<FinishSprintModal>(
                 ModalType.Center,
-                parameters: new Dictionary<string, object>
-                {
-                    [nameof(FinishSprintModal.ProjectMembers)] = CurrentProject?.Members ?? [],
-                    [nameof(FinishSprintModal.SprintId)] = ActiveSprint.Id,
-                    [nameof(FinishProjectModal.CurrentProjectMember)] = CurrentMember
-                }
+                parameters: parameters
             );
         }
     }

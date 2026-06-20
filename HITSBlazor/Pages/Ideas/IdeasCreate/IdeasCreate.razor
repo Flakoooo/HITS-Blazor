@@ -37,31 +37,31 @@
                 <Input IsLoading="_isLoading"
                        Label="Название идеи*"
                        HintText="@GetHintText(nameof(IdeasCreateModel.Name))"
-                       NeedValidation="_submitted"
+                       ErrorMessage="@_errors.GetValueOrDefault(nameof(IdeasCreateModel.Name))"
                        Placeholder="Введите название идеи"
                        @bind-Value="@IdeasCreateModel.Name" />
                 <TextArea IsLoading="_isLoading"
                           Label="Проблема*"
                           HintText="@GetHintText(nameof(IdeasCreateModel.Problem))"
-                          NeedValidation="_submitted"
+                          ErrorMessage="@_errors.GetValueOrDefault(nameof(IdeasCreateModel.Problem))"
                           Placeholder="Опишите проблему, которую решает ваша идея"
                           @bind-Value="@IdeasCreateModel.Problem" />
                 <TextArea IsLoading="_isLoading"
                           Label="Предлагаемое решение*"
                           HintText="@GetHintText(nameof(IdeasCreateModel.Solution))"
-                          NeedValidation="_submitted"
+                          ErrorMessage="@_errors.GetValueOrDefault(nameof(IdeasCreateModel.Solution))"
                           Placeholder="Опишите, что вы предлагаете для решения проблемы"
                           @bind-Value="@IdeasCreateModel.Solution" />
                 <TextArea IsLoading="_isLoading"
                           Label="Ожидаемый результат*"
                           HintText="@GetHintText(nameof(IdeasCreateModel.Result))"
-                          NeedValidation="_submitted"
+                          ErrorMessage="@_errors.GetValueOrDefault(nameof(IdeasCreateModel.Result))"
                           Placeholder="Опишите ожидаемый результат"
                           @bind-Value="@IdeasCreateModel.Result" />
                 <TextArea IsLoading="_isLoading"
                           Label="Описание необходимых ресурсов для реализации*"
                           HintText="@GetHintText(nameof(IdeasCreateModel.Description))"
-                          NeedValidation="_submitted"
+                          ErrorMessage="@_errors.GetValueOrDefault(nameof(IdeasCreateModel.Description))"
                           Placeholder="Укажите список требуемых для выполнения проекта ресурсов"
                           @bind-Value="@IdeasCreateModel.Description" />
                 <div>
@@ -83,14 +83,14 @@
                                 IsLoading="_isLoading"
                                 MinValue="2" 
                                 MaxValue="30" 
-                                NeedValidation="_submitted"
+                                ErrorMessage="@_errors.GetValueOrDefault(nameof(IdeasCreateModel.MinTeamSize))"
                                 Placeholder="Минимальное количество: 2" 
                                 @bind-Value="IdeasCreateModel.MinTeamSize" />
                         <Number T="byte"
                                 IsLoading="_isLoading"
                                 MinValue="2"
                                 MaxValue="30"
-                                NeedValidation="_submitted"
+                                ErrorMessage="@_errors.GetValueOrDefault(nameof(IdeasCreateModel.MaxTeamSize))"
                                 Placeholder="Максимальное количество: 30"
                                 @bind-Value="IdeasCreateModel.MaxTeamSize" />
                     </div>
@@ -106,7 +106,6 @@
                            IsLoading="_isLoading"
                            Label="Заказчик"
                            HintText="Выберите заказчика (компанию), к которой Вы принадлежите или от лица которой создаётся идея"
-                           Placeholder="Выберите заказчика"
                            @bind-Value="@SelectedCompany"
                            DataLoaderMethod="async (page, searchText) => await CompanyService.GetCompaniesAsync(page, searchText)"
                            DebounceDelay="500"/>
@@ -125,14 +124,14 @@
                     <Select IsLoading="_isLoading"
                             Label="Пригодность"
                             @bind-Value="@SuitabilityScore"
-                            NeedValidation="_submitted"
+                            ErrorMessage="@_errors.GetValueOrDefault(nameof(IdeasCreateModel.Suitability))"
                             Options="IdeasRatingCategories.SuitabilityOptions" />
                 </div>
                 <div class="col">
                     <Select IsLoading="_isLoading"
                             Label="Бюджет" 
                             @bind-Value="@BudgetScore" 
-                            NeedValidation="_submitted"
+                            ErrorMessage="@_errors.GetValueOrDefault(nameof(IdeasCreateModel.Budget))"
                             Options="IdeasRatingCategories.BudgetOptions" />
                 </div>
             </div>
@@ -145,10 +144,12 @@
             <div class="idea-form-submit-buttons">
                 @if (string.IsNullOrWhiteSpace(IdeaId))
                 {
-                    <Button IsLoading="_isLoading" Variant="ButtonVariant.Primary"
+                    <Button IsLoading="_isLoading" 
+                            Variant="ButtonVariant.Primary"
                             Text="Сохранить черновик"
                             OnButtonClick="@(() => CreateIdea(IdeaStatusType.New))" />
-                    <Button IsLoading="_isLoading" Variant="ButtonVariant.Success"
+                    <Button IsLoading="_isLoading" 
+                            Variant="ButtonVariant.Success"
                             Text="Отправить на согласование"
                             OnButtonClick="@(() => CreateIdea(IdeaStatusType.OnApproval))" />
                 }

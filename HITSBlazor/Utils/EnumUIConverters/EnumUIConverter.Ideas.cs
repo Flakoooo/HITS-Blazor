@@ -1,5 +1,4 @@
 ﻿using HITSBlazor.Models.Ideas.Enums;
-using Newtonsoft.Json.Linq;
 
 namespace HITSBlazor.Utils.EnumUIConverters
 {

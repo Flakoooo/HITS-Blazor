@@ -28,8 +28,8 @@ namespace HITSBlazor.Pages.Auth.Login
             _loginModel.Email = "kirill.vlasov.05@inbox.ru";
             _loginModel.Password = "12345678";
 #else
-            loginModel.Email = "lexunok@gmail.com";
-            loginModel.Password = "lexunok2505";
+            _loginModel.Email = "lexunok@gmail.com";
+            _loginModel.Password = "lexunok2505";
 #endif
         }
 

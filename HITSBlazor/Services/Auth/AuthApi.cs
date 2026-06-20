@@ -110,42 +110,39 @@ namespace HITSBlazor.Services.Auth
             operationName: REGISTRATION_OPERATION
         );
 
-        protected override string GetErrorMessage(HttpStatusCode statusCode, string operationName)
+        protected override string GetErrorMessage(HttpStatusCode statusCode, string operationName) => operationName switch
         {
-            return operationName switch
+            LOGIN_OPERATION => statusCode switch
             {
-                LOGIN_OPERATION => statusCode switch
-                {
-                    HttpStatusCode.Unauthorized => "Неверная почта или пароль",
-                    HttpStatusCode.UnprocessableEntity => "Некорректная почта или пароль",
-                    HttpStatusCode.InternalServerError => "Произошла ошибка сервера, попробуйте позже",
-                    _ => base.GetErrorMessage(statusCode, operationName)
-                },
-                LOGOUT_OPERATION => statusCode switch
-                {
-                    HttpStatusCode.Unauthorized => "Выход из аккаунта невозможен",
-                    _ => base.GetErrorMessage(statusCode, operationName)
-                },
-                REFRESH_TOKEN_OPERATION => statusCode switch
-                {
-                    HttpStatusCode.Unauthorized => "Не удалось обновить токен. Требуется повторный вход",
-                    _ => base.GetErrorMessage(statusCode, operationName)
-                },
-                REGISTRATION_OPERATION => statusCode switch
-                {
-                    HttpStatusCode.NotFound => "Не удалось найти приглашение",
-                    HttpStatusCode.BadRequest => "Данная почта не совпадает с приглашением или уже используется",
-                    HttpStatusCode.UnprocessableEntity => "Некорректный данные",
-                    HttpStatusCode.InternalServerError => "Произошла ошибка сервера, попробуйте позже",
-                    _ => base.GetErrorMessage(statusCode, operationName)
-                },
-                PASSWORD_VERIFICATION_OPERATION => statusCode switch 
-                {
-                    HttpStatusCode.NotFound => "Пользователь с такой почтой не найден",
-                    _ => base.GetErrorMessage(statusCode, operationName)
-                },
+                HttpStatusCode.Unauthorized => "Неверная почта или пароль",
+                HttpStatusCode.UnprocessableEntity => "Некорректная почта или пароль",
+                HttpStatusCode.InternalServerError => "Произошла ошибка сервера, попробуйте позже",
                 _ => base.GetErrorMessage(statusCode, operationName)
-            };
-        }
+            },
+            LOGOUT_OPERATION => statusCode switch
+            {
+                HttpStatusCode.Unauthorized => "Выход из аккаунта невозможен",
+                _ => base.GetErrorMessage(statusCode, operationName)
+            },
+            REFRESH_TOKEN_OPERATION => statusCode switch
+            {
+                HttpStatusCode.Unauthorized => "Не удалось обновить токен. Требуется повторный вход",
+                _ => base.GetErrorMessage(statusCode, operationName)
+            },
+            REGISTRATION_OPERATION => statusCode switch
+            {
+                HttpStatusCode.NotFound => "Не удалось найти приглашение",
+                HttpStatusCode.BadRequest => "Данная почта не совпадает с приглашением или уже используется",
+                HttpStatusCode.UnprocessableEntity => "Некорректный данные",
+                HttpStatusCode.InternalServerError => "Произошла ошибка сервера, попробуйте позже",
+                _ => base.GetErrorMessage(statusCode, operationName)
+            },
+            PASSWORD_VERIFICATION_OPERATION => statusCode switch
+            {
+                HttpStatusCode.NotFound => "Пользователь с такой почтой не найден",
+                _ => base.GetErrorMessage(statusCode, operationName)
+            },
+            _ => base.GetErrorMessage(statusCode, operationName)
+        };
     }
 }

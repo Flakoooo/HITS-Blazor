@@ -82,7 +82,7 @@
             <div class="d-flex flex-column gap-2 mt-2">
                 @{
                     var currentStatus = CurrentProject?.Status;
-                    var currentMemberRole = CurrentProjectMember.ProjectRole;
+                    var currentMemberRole = CurrentProjectMember?.ProjectRole;
                     <Button IsLoading="IsOnLoading"
                             Text="Перейти в идею" 
                             Variant="ButtonVariant.Primary"

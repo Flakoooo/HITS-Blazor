@@ -2,17 +2,20 @@
 
 namespace HITSBlazor.Utils
 {
-    public record class ServiceResponse<T>(
-        bool IsSuccess,
-        T? Response,
-        string? Error,
-        HttpStatusCode StatusCode = HttpStatusCode.BadRequest
-    )
+    public record class ServiceResponse<T>
     {
-        public bool IsSuccess { get; } = IsSuccess;
-        public T? Response { get; } = Response;
-        public string? Message { get; } = Error;
-        public HttpStatusCode StatusCode { get; } = StatusCode;
+        public bool IsSuccess { get; }
+        public T? Response { get; }
+        public string? Message { get; }
+        public HttpStatusCode StatusCode { get; }
+
+        private ServiceResponse(bool isSuccess, T? response, string? message, HttpStatusCode statusCode)
+        {
+            IsSuccess = isSuccess;
+            Response = response;
+            Message = message;
+            StatusCode = statusCode;
+        }
 
         public static ServiceResponse<T> Success(
             T? response, string? message = null, HttpStatusCode statusCode = HttpStatusCode.OK

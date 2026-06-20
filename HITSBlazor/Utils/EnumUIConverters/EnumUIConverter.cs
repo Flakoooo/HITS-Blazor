@@ -9,6 +9,7 @@ using HITSBlazor.Models.Markets.Enums;
 using HITSBlazor.Models.Projects.Enums;
 using HITSBlazor.Models.Teams.Enums;
 using HITSBlazor.Models.Users.Enums;
+using HITSBlazor.Pages.Markets.MarketIdeas;
 using HITSBlazor.Pages.Projects.ProjectView;
 using HITSTaskStatus = HITSBlazor.Models.Projects.Enums.TaskStatus;
 
@@ -29,6 +30,7 @@ namespace HITSBlazor.Utils.EnumUIConverters
             ProjectMemberRole r => GetProjectMemberRoleInfo(r),
             SprintStatus s => GetSprintStatusInfo(s),
             TeamTableCategory c => GetTeamCategoryInfo(c),
+            MarketIdeasCategory c => GetMarketIdeasCategoryInfo(c),
             ProfileModalCategory c => GetProfileCategoryInfo(c),
             ProjectViewCategory c => GetProjectCategoryInfo(c),
             EndedSprintModalStatCategory c => GetSprintModalStatCategoryInfo(c),
@@ -50,6 +52,7 @@ namespace HITSBlazor.Utils.EnumUIConverters
             ProjectMemberRole r => GetProjectMemberRoleInfo(r),
             SprintStatus s => GetSprintStatusInfo(s),
             TeamTableCategory c => GetTeamCategoryInfo(c),
+            MarketIdeasCategory c => GetMarketIdeasCategoryInfo(c),
             ProfileModalCategory c => GetProfileCategoryInfo(c),
             ProjectViewCategory c => GetProjectCategoryInfo(c),
             EndedSprintModalStatCategory c => GetSprintModalStatCategoryInfo(c),

@@ -16,6 +16,7 @@ namespace HITSBlazor.Services.Users
             string? orderBy = null,
             bool? byDescending = null,
             bool? inTeam = null,
+            Guid? ignoredTeam = null,
             IEnumerable<RoleType>? selectedRoles = null,
             IEnumerable<Guid>? ignoredIds = null
         );

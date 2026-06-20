@@ -30,8 +30,6 @@ using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 
 
 #if DEBUGAPI || RELEASE
-using HITSBlazor.Services.Users;
-using HITSBlazor.Services.Invitation;
 using HITSBlazor.Utils;
 using System.Net.Http.Headers;
 using System.Net.Mime;
@@ -93,11 +91,34 @@ namespace HITSBlazor
             //Users
             builder.Services.AddScoped<IUserService, MockUserService>();
 
+            builder.Services.AddScoped<
+                IUserService,
+#if DEBUG && !DEBUGAPI
+                MockUserService
+#else
+                UserService
+#endif
+            >();
+
             //Invitation
-            builder.Services.AddScoped<IInvitationService, MockInvitationService>();
+            builder.Services.AddScoped<
+                IInvitationService, 
+#if DEBUG && !DEBUGAPI
+                MockInvitationService
+#else
+                InvitationService
+#endif
+            >();
 
             //Skills
-            builder.Services.AddScoped<ISkillService, MockSkillService>();
+            builder.Services.AddScoped<
+                ISkillService, 
+#if DEBUG && !DEBUGAPI
+                MockSkillService
+#else
+                SkillService
+#endif
+            >();
 
             //Tag
             builder.Services.AddScoped<ITagService, MockTagService>();

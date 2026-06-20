@@ -63,7 +63,8 @@ namespace HITSBlazor.Pages.Ideas.IdeasCreate
 
         private IdeasCreateModel IdeasCreateModel { get; set; } = new();
         private bool _isLoading = true;
-        private bool _submitted = false;
+
+        private readonly Dictionary<string, string> _errors = [];
 
         private HashSet<Skill> SelectedLanguageSkills { get; set; } = [];
         private HashSet<Skill> SelectedFrameworkSkills { get; set; } = [];
@@ -161,23 +162,50 @@ namespace HITSBlazor.Pages.Ideas.IdeasCreate
 
         private bool CheckValidValues()
         {
-            if (string.IsNullOrWhiteSpace(IdeasCreateModel.Name)) return false;
-            if (string.IsNullOrWhiteSpace(IdeasCreateModel.Problem)) return false;
-            if (string.IsNullOrWhiteSpace(IdeasCreateModel.Description)) return false;
-            if (string.IsNullOrWhiteSpace(IdeasCreateModel.Solution)) return false;
-            if (string.IsNullOrWhiteSpace(IdeasCreateModel.Result)) return false;
+            _errors.Clear();
 
-            if (!IdeasCreateModel.MaxTeamSize.HasValue || IdeasCreateModel.MaxTeamSize.Value is > 30 or < 2) return false;
+            if (string.IsNullOrWhiteSpace(IdeasCreateModel.Name))
+                _errors[nameof(IdeasCreateModel.Name)] = "Имя не может быть пустым";
 
-            if (!IdeasCreateModel.MinTeamSize.HasValue || IdeasCreateModel.MinTeamSize.Value is > 30 or < 2) return false;
+            if (string.IsNullOrWhiteSpace(IdeasCreateModel.Problem))
+                _errors[nameof(IdeasCreateModel.Problem)] = "Проблема не может быть пустой";
 
-            if (SelectedCompany is null) return false;
-            if (SelectedContactPerson is null) return false;
+            if (string.IsNullOrWhiteSpace(IdeasCreateModel.Description))
+                _errors[nameof(IdeasCreateModel.Description)] = "Описание не может быть пустым";
 
-            if (IdeasCreateModel.Suitability is > 5 or < 1) return false;
-            if (IdeasCreateModel.Budget is > 5 or < 1) return false;
+            if (string.IsNullOrWhiteSpace(IdeasCreateModel.Solution))
+                _errors[nameof(IdeasCreateModel.Solution)] = "Решение не может быть пустым";
 
-            return true;
+            if (string.IsNullOrWhiteSpace(IdeasCreateModel.Result))
+                _errors[nameof(IdeasCreateModel.Result)] = "Результат не может быть пустым";
+
+            if (!IdeasCreateModel.MinTeamSize.HasValue)
+                _errors[nameof(IdeasCreateModel.MinTeamSize)] = "Минимальное количество участников не может быть пустым";
+            else if (IdeasCreateModel.MinTeamSize.Value is > 30 or < 2)
+                _errors[nameof(IdeasCreateModel.MinTeamSize)] = "Минимальное количество участников должно быть от 2 до 30 включительно";
+
+            if (!IdeasCreateModel.MaxTeamSize.HasValue)
+                _errors[nameof(IdeasCreateModel.MaxTeamSize)] = "Максимальное количество участников не может быть пустым";
+            else if (IdeasCreateModel.MaxTeamSize.Value is > 30 or < 2)
+                _errors[nameof(IdeasCreateModel.MaxTeamSize)] = "Максимальное количество участников должно быть от 2 до 30 включительно";
+            else if (IdeasCreateModel.MaxTeamSize < IdeasCreateModel.MinTeamSize)
+                _errors[nameof(IdeasCreateModel.MaxTeamSize)] = "Максимальное количество участников не может быть меньше минимального";
+
+            //TODOO: может сделать необязательным?
+            if (SelectedCompany is null)
+                _errors[nameof(SelectedCompany)] = "Необходимо выбрать компанию";
+
+            //TODOO: может сделать необязательным?
+            if (SelectedContactPerson is null)
+                _errors[nameof(SelectedContactPerson)] = "Необходимо выбрать контактное лицо";
+
+            if (IdeasCreateModel.Suitability is > 5 or < 1)
+                _errors[nameof(IdeasCreateModel.Suitability)] = "Необходимо выбрать пригодность";
+
+            if (IdeasCreateModel.Budget is > 5 or < 1)
+                _errors[nameof(IdeasCreateModel.Budget)] = "Необходимо выбрать бюджет";
+
+            return _errors.Count == 0;
         }
 
         private async Task CreateIdea(IdeaStatusType ideaStatusType)
@@ -185,7 +213,6 @@ namespace HITSBlazor.Pages.Ideas.IdeasCreate
             if (ideaStatusType is IdeaStatusType.OnApproval && !CheckValidValues())
             {
                 GlobalNotificationService.ShowError("Заполните все необходимые поля");
-                _submitted = true;
                 return;
             }
 
@@ -197,7 +224,6 @@ namespace HITSBlazor.Pages.Ideas.IdeasCreate
             IdeasCreateModel.ContactPerson = SelectedContactPerson?.FullName ?? "Отсутствует";
 
             var result = await IdeasService.CreateNewIdeaAsync(IdeasCreateModel);
-
             if (result is null) return;
 
             await IdeasService.CreateOrUpdateIdeasSkills(
@@ -210,7 +236,6 @@ namespace HITSBlazor.Pages.Ideas.IdeasCreate
                 ]
             );
             await Navigation.NavigateToAsync("ideas/list");
-            _submitted = true;
         }
 
         private async Task UpdateIdea()

@@ -2,7 +2,6 @@
 using HITSBlazor.Models.Projects.Entities;
 using HITSBlazor.Models.Projects.Enums;
 using HITSBlazor.Models.Users.Entities;
-using HITSBlazor.Pages;
 using HITSBlazor.Utils.Mocks.Users;
 
 using HITSTask = HITSBlazor.Models.Projects.Entities.Task;
