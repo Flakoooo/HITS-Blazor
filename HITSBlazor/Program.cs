@@ -72,14 +72,18 @@ namespace HITSBlazor
             builder.Services.AddScoped<NavigationService>();
             builder.Services.AddSingleton<DragDropService>();
 
-            // Auth
+            // Auth & User & Invitation
 #if DEBUG && !DEBUGAPI
             builder.Services.AddScoped<IAuthService, MockAuthService>();
+            builder.Services.AddScoped<IUserService, MockUserService>();
+            builder.Services.AddScoped<IInvitationService, MockInvitationService>();
 #else
             builder.Services.AddScoped<AuthApi>();
             builder.Services.AddScoped<UserApi>();
             builder.Services.AddScoped<InvitationApi>();
             builder.Services.AddScoped<IAuthService, AuthService>();
+            builder.Services.AddScoped<IUserService, UserService>();
+            builder.Services.AddScoped<IInvitationService, InvitationService>();
 #endif
             builder.Services.AddScoped<CustomAuthenticationStateProvider>();
             builder.Services.AddScoped<AuthenticationStateProvider>(sp =>
@@ -88,40 +92,21 @@ namespace HITSBlazor
             builder.Services.AddCascadingAuthenticationState();
             builder.Services.AddAuthorizationCore();
 
-            //Users
-            builder.Services.AddScoped<IUserService, MockUserService>();
-
-            builder.Services.AddScoped<
-                IUserService,
-#if DEBUG && !DEBUGAPI
-                MockUserService
-#else
-                UserService
-#endif
-            >();
-
-            //Invitation
-            builder.Services.AddScoped<
-                IInvitationService, 
-#if DEBUG && !DEBUGAPI
-                MockInvitationService
-#else
-                InvitationService
-#endif
-            >();
-
             //Skills
-            builder.Services.AddScoped<
-                ISkillService, 
 #if DEBUG && !DEBUGAPI
-                MockSkillService
+            builder.Services.AddScoped<ISkillService, MockSkillService>();
 #else
-                SkillService
+            builder.Services.AddScoped<SkillApi>();
+            builder.Services.AddScoped<ISkillService, SkillService>();
 #endif
-            >();
 
             //Tag
+#if DEBUG && !DEBUGAPI
             builder.Services.AddScoped<ITagService, MockTagService>();
+#else
+            builder.Services.AddScoped<TagApi>();
+            builder.Services.AddScoped<ITagService, TagService>();
+#endif
 
             //UserSkills
             builder.Services.AddScoped<IUserSkillService, MockUserSkillService>();

@@ -1,5 +1,6 @@
 ﻿using HITSBlazor.Models.Common.Entities;
 using HITSBlazor.Models.Common.Enums;
+using HITSBlazor.Models.Common.Requests;
 using HITSBlazor.Models.Common.Responses;
 using HITSBlazor.Services.Auth;
 using HITSBlazor.Utils.Mocks.Common;
@@ -15,7 +16,7 @@ namespace HITSBlazor.Services.Skills
         private readonly GlobalNotificationService _globalNotificationService = globalNotificationService;
 
         public event Action<Skill>? OnSkillHasCreated;
-        public event Action<Skill>? OnSkillHasUpdated;
+        public event Action<UpdateSkillRequest>? OnSkillHasUpdated;
         public event Action<Skill>? OnSkillHasDeleted;
 
         public async Task<ListDataResponse<Skill>> GetSkillsAsync(
@@ -38,36 +39,19 @@ namespace HITSBlazor.Services.Skills
             return newSkill;
         }
 
-        public async Task<bool> ConfirmSkillAsync(Guid skillId)
+        public async Task<bool> UpdateSkillAsync(UpdateSkillRequest request)
         {
             if (_authService.CurrentUser is null)
                 return false;
 
-            var result = MockSkills.ConfirmSkill(skillId, _authService.CurrentUser.Id);
-            if (result is null)
-            {
-                _globalNotificationService.ShowError("Не удалось утвердить компетенцию");
-                return false;
-            }
-
-            OnSkillHasUpdated?.Invoke(result);
-            _globalNotificationService.ShowSuccess("Компетенция успешно утверждена");
-            return true;
-        }
-
-        public async Task<bool> UpdateSkillAsync(Guid skillId, string name, SkillType type)
-        {
-            if (_authService.CurrentUser is null)
-                return false;
-
-            var updatedSkill = MockSkills.UpdateSkill(skillId, name, type, _authService.CurrentUser.Id);
+            var updatedSkill = MockSkills.UpdateSkill(request, _authService.CurrentUser.Id);
             if (updatedSkill is null)
             {
                 _globalNotificationService.ShowError("Не удалось изменить компетенцию");
                 return false;
             }
 
-            OnSkillHasUpdated?.Invoke(updatedSkill);
+            OnSkillHasUpdated?.Invoke(request);
             _globalNotificationService.ShowSuccess("Компетенция успешно изменена");
             return true;
         }

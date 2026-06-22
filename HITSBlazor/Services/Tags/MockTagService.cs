@@ -1,4 +1,5 @@
 ﻿using HITSBlazor.Models.Common.Entities;
+using HITSBlazor.Models.Common.Requests;
 using HITSBlazor.Models.Common.Responses;
 using HITSBlazor.Services.Auth;
 using HITSBlazor.Utils.Mocks.Common;
@@ -14,7 +15,7 @@ namespace HITSBlazor.Services.Tags
         private readonly GlobalNotificationService _globalNotificationService = globalNotificationService;
 
         public event Action<Tag>? OnTagHasCreated;
-        public event Action<Tag>? OnTagHasUpdated;
+        public event Action<Guid, UpdateTagRequest?, bool?>? OnTagHasUpdated;
         public event Action<Tag>? OnTagHasDeleted;
 
         public async Task<ListDataResponse<Tag>> GetTagsAsync(
@@ -43,23 +44,23 @@ namespace HITSBlazor.Services.Tags
                 return false;
             }
 
-            OnTagHasUpdated?.Invoke(result);
+            OnTagHasUpdated?.Invoke(tagId, null, true);
             _globalNotificationService.ShowSuccess("Тег успешно утвержден");
             return true;
         }
 
-        public async Task<bool> UpdateTagAsync(Guid tagId, string name, string color)
+        public async Task<bool> UpdateTagAsync(Guid tagId, UpdateTagRequest request)
         {
             if (_authService.CurrentUser is null) return false;
 
-            var updatedTag = MockTags.UpdateTag(tagId, name, color, _authService.CurrentUser.Id);
+            var updatedTag = MockTags.UpdateTag(tagId, request.Name, request.Color, _authService.CurrentUser.Id);
             if (updatedTag is null)
             {
                 _globalNotificationService.ShowError("Не удалось изменить тег");
                 return false;
             }
 
-            OnTagHasUpdated?.Invoke(updatedTag);
+            OnTagHasUpdated?.Invoke(tagId, request, null);
             _globalNotificationService.ShowSuccess("Тег успешно изменен");
             return true;
         }

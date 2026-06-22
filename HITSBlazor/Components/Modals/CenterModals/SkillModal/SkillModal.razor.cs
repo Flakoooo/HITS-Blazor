@@ -1,5 +1,6 @@
 ﻿using HITSBlazor.Models.Common.Entities;
 using HITSBlazor.Models.Common.Enums;
+using HITSBlazor.Models.Common.Requests;
 using HITSBlazor.Services;
 using HITSBlazor.Services.Modal;
 using HITSBlazor.Services.Skills;
@@ -79,11 +80,13 @@ namespace HITSBlazor.Components.Modals.CenterModals.SkillModal
 #pragma warning disable CS8629 // Nullable value type may be null.
             if (Skill is not null)
             {
-                result = await SkillService.UpdateSkillAsync(
-                    Skill.Id,
-                    SkillName,
-                    (SkillType)_skillType.Value
-                );
+                result = await SkillService.UpdateSkillAsync(new UpdateSkillRequest 
+                {
+                    Id = Skill.Id, 
+                    Name = SkillName, 
+                    Type = (SkillType)_skillType.Value, 
+                    Confirmed = Skill.Confirmed 
+                });
             }
             else
             {

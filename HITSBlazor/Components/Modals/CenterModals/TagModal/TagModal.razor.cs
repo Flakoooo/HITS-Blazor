@@ -1,4 +1,5 @@
 ﻿using HITSBlazor.Models.Common.Entities;
+using HITSBlazor.Models.Common.Requests;
 using HITSBlazor.Services;
 using HITSBlazor.Services.Modal;
 using HITSBlazor.Services.Tags;
@@ -61,8 +62,7 @@ namespace HITSBlazor.Components.Modals.CenterModals.TagModal
             bool result = Tag is not null 
                 ? await TagService.UpdateTagAsync(
                     Tag.Id,
-                    TagName,
-                    TagColor
+                    new UpdateTagRequest { Name = TagName, Color = TagColor }
                 )
                 : (await TagService.CreateNewTagAsync(
                     TagName,

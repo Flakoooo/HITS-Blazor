@@ -4,6 +4,7 @@ using HITSBlazor.Components.Modals.CenterModals.TagModal;
 using HITSBlazor.Components.Tables.TableComponent;
 using HITSBlazor.Components.Tables.TableHeader;
 using HITSBlazor.Models.Common.Entities;
+using HITSBlazor.Models.Common.Requests;
 using HITSBlazor.Services.Modal;
 using HITSBlazor.Services.Tags;
 using HITSBlazor.Utils.Models;
@@ -147,14 +148,23 @@ namespace HITSBlazor.Pages.Admin.AllTags
             StateHasChanged();
         }
 
-        private void TagHasUpdated(Tag updatedTag)
+        private void TagHasUpdated(Guid tagId, UpdateTagRequest? request, bool? confirmed)
         {
-            var tag = _tags.FirstOrDefault(t => t.Id == updatedTag.Id);
+            if (request is null && !confirmed.HasValue) return;
+
+            var tag = _tags.FirstOrDefault(t => t.Id == tagId);
             if (tag is null) return;
 
-            tag.Color = updatedTag.Color;
-            tag.Confirmed = updatedTag.Confirmed;
-            tag.UpdaterId = updatedTag.UpdaterId;
+            if (request is not null)
+            {
+                tag.Name = request.Name;
+                tag.Color = request.Color;
+            }
+            
+            if (confirmed.HasValue)
+            {
+                tag.Confirmed = confirmed.Value;
+            }
 
             StateHasChanged();
         }

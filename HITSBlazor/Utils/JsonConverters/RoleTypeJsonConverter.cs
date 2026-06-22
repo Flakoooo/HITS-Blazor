@@ -2,7 +2,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace HITSBlazor.Utils
+namespace HITSBlazor.Utils.JsonConverters
 {
     public class RoleTypeJsonConverter : JsonConverter<RoleType>
     {

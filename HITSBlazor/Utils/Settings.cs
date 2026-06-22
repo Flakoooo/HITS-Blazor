@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using HITSBlazor.Utils.JsonConverters;
+using System.Text.Json;
 
 namespace HITSBlazor.Utils
 {
@@ -13,12 +14,15 @@ namespace HITSBlazor.Utils
             WriteIndented = false
         };
         public static JsonSerializerOptions UserJsonOptions { get; }
+        public static JsonSerializerOptions SkillJsonOptions { get; }
 
         static Settings()
         {
             UserJsonOptions = BaseJsonOptions;
+            SkillJsonOptions = BaseJsonOptions;
 
             UserJsonOptions.Converters.Add(new RoleTypeJsonConverter());
+            SkillJsonOptions.Converters.Add(new SkillTypeJsonConverter());
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using HITSBlazor.Models.Common.Entities;
 using HITSBlazor.Models.Common.Enums;
+using HITSBlazor.Models.Common.Requests;
 using HITSBlazor.Models.Common.Responses;
 using System.Xml.Linq;
 
@@ -110,24 +111,14 @@ namespace HITSBlazor.Utils.Mocks.Common
             return newSkill;
         }
 
-        public static Skill? ConfirmSkill(Guid skillId, Guid updatorId)
+        public static Skill? UpdateSkill(UpdateSkillRequest request, Guid updatorId)
         {
-            var skillForUpdate = _skills.FirstOrDefault(s => s.Id == skillId);
+            var skillForUpdate = _skills.FirstOrDefault(s => s.Id == request.Id);
             if (skillForUpdate is null) return null;
 
-            skillForUpdate.Confirmed = true;
-            skillForUpdate.UpdaterId = updatorId;
-
-            return skillForUpdate;
-        }
-
-        public static Skill? UpdateSkill(Guid skillId, string name, SkillType type, Guid updatorId)
-        {
-            var skillForUpdate = _skills.FirstOrDefault(s => s.Id == skillId);
-            if (skillForUpdate is null) return null;
-
-            skillForUpdate.Name = name;
-            skillForUpdate.Type = type;
+            skillForUpdate.Name = request.Name;
+            skillForUpdate.Type = request.Type;
+            skillForUpdate.Confirmed = request.Confirmed;
             skillForUpdate.UpdaterId = updatorId;
 
             return skillForUpdate;

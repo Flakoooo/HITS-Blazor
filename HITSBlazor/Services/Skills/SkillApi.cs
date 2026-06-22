@@ -1,7 +1,6 @@
-﻿using ApexCharts;
-using HITSBlazor.Components.Skills;
-using HITSBlazor.Models.Common.Entities;
+﻿using HITSBlazor.Models.Common.Entities;
 using HITSBlazor.Models.Common.Enums;
+using HITSBlazor.Models.Common.Requests;
 using HITSBlazor.Models.Common.Responses;
 using HITSBlazor.Utils;
 using System.Net.Http.Json;
@@ -43,7 +42,7 @@ namespace HITSBlazor.Services.Skills
                 apiCall: () => _httpClient.GetAsync(path),
                 successHandler: async response => 
                 {
-                    var skills = await response.Content.ReadFromJsonAsync<ListDataResponse<Skill>>(Settings.BaseJsonOptions);
+                    var skills = await response.Content.ReadFromJsonAsync<ListDataResponse<Skill>>(Settings.SkillJsonOptions);
                     if (skills is null)
                     {
                         LogFail(GET_SKILLS_OPERATION, response.StatusCode, "Error when parse skills");
@@ -65,7 +64,7 @@ namespace HITSBlazor.Services.Skills
                 apiCall: () => _httpClient.PostAsync(_skillPath, content),
                 successHandler: async response =>
                 {
-                    var skill = await response.Content.ReadFromJsonAsync<Skill>(Settings.BaseJsonOptions);
+                    var skill = await response.Content.ReadFromJsonAsync<Skill>(Settings.SkillJsonOptions);
                     if (skill is null)
                     {
                         LogFail(CREATE_SKILL_OPERATION, response.StatusCode, "Error when create skill");
@@ -79,14 +78,9 @@ namespace HITSBlazor.Services.Skills
             );
         }
 
-        public async Task<ServiceResponse<string>> UpdateSkillAsync(Guid id, string name, SkillType type, bool confirmed)
+        public async Task<ServiceResponse<string>> UpdateSkillAsync(UpdateSkillRequest request)
         {
-            var content = SerializeData(new { 
-                Id = id,
-                Name = name,
-                Type = type,
-                Confirmed = confirmed
-            });
+            var content = SerializeData(request);
 
             return await ExecuteApiCallAsync(
                 apiCall: () => _httpClient.PutAsync(_skillPath, content),

@@ -5,6 +5,7 @@ using HITSBlazor.Components.Tables.TableComponent;
 using HITSBlazor.Components.Tables.TableHeader;
 using HITSBlazor.Models.Common.Entities;
 using HITSBlazor.Models.Common.Enums;
+using HITSBlazor.Models.Common.Requests;
 using HITSBlazor.Services.Modal;
 using HITSBlazor.Services.Skills;
 using HITSBlazor.Utils.Models;
@@ -107,7 +108,7 @@ namespace HITSBlazor.Pages.Admin.AllSkills
             var actions = new Dictionary<MenuAction, object>();
 
             if (skill.Confirmed) actions.Add(MenuAction.Edit, skill);
-            else actions.Add(MenuAction.Confirm, skill.Id);
+            else actions.Add(MenuAction.Confirm, skill);
 
             actions.Add(MenuAction.Delete, skill);
 
@@ -130,13 +131,17 @@ namespace HITSBlazor.Pages.Admin.AllSkills
 
         private async Task OnSkillAction(TableActionContext context)
         {
-            if (context.Action is MenuAction.Confirm && context.Item is Guid skillId)
+            if (context.Item is Skill skill)
             {
-                await SkillService.ConfirmSkillAsync(skillId);
-            }
-            else if (context.Item is Skill skill)
-            {
-                if (context.Action is MenuAction.Edit) 
+                if (context.Action is MenuAction.Confirm)
+                    await SkillService.UpdateSkillAsync(new UpdateSkillRequest 
+                    { 
+                        Id = skill.Id, 
+                        Name = skill.Name, 
+                        Type = skill.Type, 
+                        Confirmed = true 
+                    });
+                else if (context.Action is MenuAction.Edit) 
                     ShowSkillModal(skill);
                 else if (context.Action is MenuAction.Delete)
                     ModalService.ShowConfirmModal(
@@ -155,14 +160,13 @@ namespace HITSBlazor.Pages.Admin.AllSkills
             StateHasChanged();
         }
 
-        private void SkillHasUpdated(Skill updatedSkill)
+        private void SkillHasUpdated(UpdateSkillRequest request)
         {
-            var skill = _skills.FirstOrDefault(s => s.Id == updatedSkill.Id);
+            var skill = _skills.FirstOrDefault(s => s.Id == request.Id);
             if (skill is null) return;
 
-            skill.Name = updatedSkill.Name;
-            skill.Confirmed = updatedSkill.Confirmed;
-            skill.UpdaterId = updatedSkill.UpdaterId;
+            skill.Name = request.Name;
+            skill.Confirmed = request.Confirmed;
 
             StateHasChanged();
         }

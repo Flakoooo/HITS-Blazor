@@ -13,6 +13,7 @@ namespace HITSBlazor.Services
     //TODO: сделать сохранение текущей страницы, если роль позволяет на ней находиться
     public class NavigationService
     {
+        private const string DEFAULT_URL = "/ideas/list";
         private readonly NavigationManager _navigationManager;
         private readonly IAuthService _authService;
         private readonly IMarketService _marketService;
@@ -39,8 +40,6 @@ namespace HITSBlazor.Services
             _authService.OnActiveRoleChanged += OnActiveRoleChanged;
             _navigationManager.LocationChanged += OnLocationChanged;
         }
-
-        private const string DEFAULT_URL = "/ideas/list";
 
         public NavigationItem? CurrentModule { get; set; } = null;
         public NavigationSubItem? CurrentPage { get; set; } = null;

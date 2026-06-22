@@ -1,5 +1,6 @@
 ﻿using HITSBlazor.Models.Common.Entities;
 using HITSBlazor.Models.Common.Enums;
+using HITSBlazor.Models.Common.Requests;
 using HITSBlazor.Models.Common.Responses;
 
 namespace HITSBlazor.Services.Skills
@@ -7,7 +8,7 @@ namespace HITSBlazor.Services.Skills
     public interface ISkillService
     {
         event Action<Skill>? OnSkillHasCreated;
-        event Action<Skill>? OnSkillHasUpdated;
+        event Action<UpdateSkillRequest>? OnSkillHasUpdated;
         event Action<Skill>? OnSkillHasDeleted;
 
         Task<ListDataResponse<Skill>> GetSkillsAsync(
@@ -18,8 +19,7 @@ namespace HITSBlazor.Services.Skills
         );
 
         Task<Skill?> CreateNewSkillAsync(string name, SkillType type, bool isConfirmed);
-        Task<bool> ConfirmSkillAsync(Guid skillId);
-        Task<bool> UpdateSkillAsync(Guid skillId, string name, SkillType type);
+        Task<bool> UpdateSkillAsync(UpdateSkillRequest request);
         Task DeleteSkillAsync(Skill skill);
     }
 }

@@ -1,25 +1,22 @@
 ﻿using HITSBlazor.Models.Common.Entities;
 using HITSBlazor.Models.Common.Enums;
+using HITSBlazor.Models.Common.Requests;
 using HITSBlazor.Models.Common.Responses;
-using HITSBlazor.Services.Auth;
-using System.Xml.Linq;
 
 namespace HITSBlazor.Services.Skills
 {
     public class SkillService(
-        IAuthService authService, 
         SkillApi skillApi,
         ILogger<SkillService> logger,
         GlobalNotificationService globalNotificationService
     ) : ISkillService
     {
-        private readonly IAuthService _authService = authService;
         private readonly SkillApi _skillApi = skillApi;
         private readonly ILogger<SkillService> _logger = logger;
         private readonly GlobalNotificationService _globalNotificationService = globalNotificationService;
 
         public event Action<Skill>? OnSkillHasCreated;
-        public event Action<Skill>? OnSkillHasUpdated;
+        public event Action<UpdateSkillRequest>? OnSkillHasUpdated;
         public event Action<Skill>? OnSkillHasDeleted;
 
         public async Task<ListDataResponse<Skill>> GetSkillsAsync(
@@ -55,6 +52,7 @@ namespace HITSBlazor.Services.Skills
             if (result.IsSuccess && result.Response is not null)
             {
                 OnSkillHasCreated?.Invoke(result.Response);
+                _globalNotificationService.ShowSuccess("Компетенция успешно создана!");
             }
             else if (!string.IsNullOrWhiteSpace(result.Message))
             {
@@ -66,15 +64,22 @@ namespace HITSBlazor.Services.Skills
             return result.Response;
         }
 
-        public async Task<bool> ConfirmSkillAsync(Guid skillId)
+        public async Task<bool> UpdateSkillAsync(UpdateSkillRequest request)
         {
-            _globalNotificationService.ShowError("Метод ConfirmSkillAsync не реализован");
-            return false;
-        }
+            var result = await _skillApi.UpdateSkillAsync(request);
+            if (result.IsSuccess && result.Response is not null)
+            {
+                OnSkillHasUpdated?.Invoke(request);
+                _globalNotificationService.ShowSuccess(result.Response);
+                return true;
+            }
+            else if (!string.IsNullOrWhiteSpace(result.Message))
+            {
+                _globalNotificationService.ShowError(result.Message);
+                if (_logger.IsEnabled(LogLevel.Warning))
+                    _logger.LogWarning("Update skill failed: {Error}", result.Message);
+            }
 
-        public async Task<bool> UpdateSkillAsync(Guid skillId, string name, SkillType type)
-        {
-            _globalNotificationService.ShowError("Метод UpdateSkillAsync не реализован");
             return false;
         }
 
@@ -84,7 +89,7 @@ namespace HITSBlazor.Services.Skills
             if (result.IsSuccess && result.Response is not null)
             {
                 OnSkillHasDeleted?.Invoke(skill);
-                _globalNotificationService.ShowError(result.Response);
+                _globalNotificationService.ShowSuccess(result.Response);
             }
             else if (!string.IsNullOrWhiteSpace(result.Message))
             {
@@ -92,8 +97,6 @@ namespace HITSBlazor.Services.Skills
                 if (_logger.IsEnabled(LogLevel.Warning))
                     _logger.LogWarning("Delete skill failed: {Error}", result.Message);
             }
-
-            return;
         }
     }
 }

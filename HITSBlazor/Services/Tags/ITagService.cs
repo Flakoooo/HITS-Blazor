@@ -1,4 +1,5 @@
 ﻿using HITSBlazor.Models.Common.Entities;
+using HITSBlazor.Models.Common.Requests;
 using HITSBlazor.Models.Common.Responses;
 
 namespace HITSBlazor.Services.Tags
@@ -6,7 +7,7 @@ namespace HITSBlazor.Services.Tags
     public interface ITagService
     {
         event Action<Tag>? OnTagHasCreated;
-        event Action<Tag>? OnTagHasUpdated;
+        event Action<Guid, UpdateTagRequest?, bool?>? OnTagHasUpdated;
         event Action<Tag>? OnTagHasDeleted;
 
         Task<ListDataResponse<Tag>> GetTagsAsync(
@@ -15,7 +16,7 @@ namespace HITSBlazor.Services.Tags
 
         Task<Tag?> CreateNewTagAsync(string name, string color, bool isConfirmed);
         Task<bool> ConfirmTagAsync(Guid tagId);
-        Task<bool> UpdateTagAsync(Guid tagId, string name, string color);
+        Task<bool> UpdateTagAsync(Guid tagId, UpdateTagRequest request);
         Task DeleteTagAsync(Tag tag);
     }
 }

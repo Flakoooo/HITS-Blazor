@@ -33,7 +33,7 @@ namespace HITSBlazor.Services.Users
                     User? user = await response.Content.ReadFromJsonAsync<User>(Settings.UserJsonOptions);
                     if (user is null)
                     {
-                        LogFail(GET_USER_OPERATION, response.StatusCode, "Error when parse User model");
+                        LogFail(GET_USER_OPERATION, response.StatusCode, "Error when parse user model");
 
                         return ServiceResponse<User>.Failure("Не удалось получить пользователя", response.StatusCode);
                     }
