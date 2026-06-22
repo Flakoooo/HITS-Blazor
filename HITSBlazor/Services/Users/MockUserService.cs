@@ -10,7 +10,7 @@ namespace HITSBlazor.Services.Users
     {
         private readonly GlobalNotificationService _globalNotificationService = globalNotificationService;
 
-        public event Action<User>? OnUserHasUpdated;
+        public event Action<UpdateUserRequest>? OnUserHasUpdated;
         public event Action<User>? OnUserHasDeleted;
 
         public async Task<ListDataResponse<User>> GetUsersAsync(
@@ -42,7 +42,7 @@ namespace HITSBlazor.Services.Users
                 return false;
             }
 
-            OnUserHasUpdated?.Invoke(newUser);
+            OnUserHasUpdated?.Invoke(request);
             return true;
         }
 

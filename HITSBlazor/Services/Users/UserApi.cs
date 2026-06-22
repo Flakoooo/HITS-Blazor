@@ -33,11 +33,7 @@ namespace HITSBlazor.Services.Users
                     User? user = await response.Content.ReadFromJsonAsync<User>(Settings.UserJsonOptions);
                     if (user is null)
                     {
-                        if (_logger.IsEnabled(LogLevel.Warning))
-                            _logger.LogWarning(
-                                "{Operation} failed: {StatusCode} - {ErrorMessage}",
-                                GET_USER_OPERATION, response.StatusCode, "Error when parse User model"
-                            );
+                        LogFail(GET_USER_OPERATION, response.StatusCode, "Error when parse User model");
 
                         return ServiceResponse<User>.Failure("Не удалось получить пользователя", response.StatusCode);
                     }
@@ -95,11 +91,7 @@ namespace HITSBlazor.Services.Users
                     var users = await response.Content.ReadFromJsonAsync<ListDataResponse<User>>(Settings.UserJsonOptions);
                     if (users is null)
                     {
-                        if (_logger.IsEnabled(LogLevel.Warning))
-                            _logger.LogWarning(
-                                "{Operation} failed: {StatusCode} - {ErrorMessage}",
-                                GET_USERS_OPERATION, response.StatusCode, "Error when parse users"
-                            );
+                        LogFail(GET_USERS_OPERATION, response.StatusCode, "Error when parse users");
 
                         return ServiceResponse<ListDataResponse<User>>.Failure("Не удалось получить пользователей", response.StatusCode);
                     }
@@ -118,14 +110,10 @@ namespace HITSBlazor.Services.Users
                 apiCall: () => _httpClient.PutAsync(_userPath, content),
                 successHandler: async response =>
                 {
-                    var message = await response.Content.ReadFromJsonAsync<MessageResponse>(Settings.UserJsonOptions);                    
+                    var message = await response.Content.ReadFromJsonAsync<MessageResponse>(Settings.BaseJsonOptions);                    
                     if (message is null)
                     {
-                        if (_logger.IsEnabled(LogLevel.Warning))
-                            _logger.LogWarning(
-                                "{Operation} failed: {StatusCode} - {ErrorMessage}",
-                                UPDATE_USER_OPERATION, response.StatusCode, "Error when update user"
-                            );
+                        LogFail(UPDATE_USER_OPERATION, response.StatusCode, "Error when update user");
 
                         return ServiceResponse<string>.Failure("Не удалось обновить пользователя", response.StatusCode);
                     }
@@ -144,14 +132,10 @@ namespace HITSBlazor.Services.Users
                 apiCall: () => _httpClient.DeleteAsync(path),
                 successHandler: async response =>
                 {
-                    var message = await response.Content.ReadFromJsonAsync<MessageResponse>(Settings.UserJsonOptions);
+                    var message = await response.Content.ReadFromJsonAsync<MessageResponse>(Settings.BaseJsonOptions);
                     if (message is null)
                     {
-                        if (_logger.IsEnabled(LogLevel.Warning))
-                            _logger.LogWarning(
-                                "{Operation} failed: {StatusCode} - {ErrorMessage}",
-                                DELETE_USER_OPERATION, response.StatusCode, "Error when delete user"
-                            );
+                        LogFail(DELETE_USER_OPERATION, response.StatusCode, "Error when delete user");
 
                         return ServiceResponse<string>.Failure("Не удалось удалить пользователя", response.StatusCode);
                     }

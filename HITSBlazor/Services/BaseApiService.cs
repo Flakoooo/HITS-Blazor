@@ -1,4 +1,5 @@
-﻿using HITSBlazor.Utils;
+﻿using ApexCharts;
+using HITSBlazor.Utils;
 using System.Net;
 using System.Net.Mime;
 using System.Text.Json;
@@ -118,6 +119,15 @@ namespace HITSBlazor.Services
             }
 
             return query;
+        }
+
+        protected void LogFail(string operationName, HttpStatusCode statusCode, string errorMessage)
+        {
+            if (_logger.IsEnabled(LogLevel.Warning))
+                _logger.LogWarning(
+                    "{Operation} failed: {StatusCode} - {ErrorMessage}",
+                    operationName, statusCode, errorMessage
+                );
         }
 
         protected static StringContent SerializeData<T>(T value)

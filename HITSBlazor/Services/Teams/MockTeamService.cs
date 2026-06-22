@@ -63,12 +63,6 @@ namespace HITSBlazor.Services.Teams
         public async Task<Team?> GetTeamByIdAsync(Guid teamId) 
             => MockTeams.GetTeamById(teamId);
 
-        public async Task<ListDataResponse<TeamMember>> GetTeamMembersAsync(
-            int page,
-            Guid? teamId,
-            string? searchText
-        ) => MockTeams.GetTeamMembers(page, teamId: teamId, searchText: searchText);
-
         public async Task<bool> CreateTeamAsync(CreateTeamRequest request)
         {
             var result = MockTeams.CreateTeam(request);

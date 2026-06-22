@@ -3,9 +3,9 @@ using HITSBlazor.Components.Button;
 using HITSBlazor.Components.Modals.CenterModals.UpdateUserModal;
 using HITSBlazor.Components.Tables.TableComponent;
 using HITSBlazor.Components.Tables.TableHeader;
-using HITSBlazor.Models.Ideas.Entities;
 using HITSBlazor.Models.Users.Entities;
 using HITSBlazor.Models.Users.Enums;
+using HITSBlazor.Models.Users.Requests;
 using HITSBlazor.Services.Auth;
 using HITSBlazor.Services.Modal;
 using HITSBlazor.Services.Users;
@@ -185,11 +185,11 @@ namespace HITSBlazor.Pages.Admin.AllUsers
             }
         }
 
-        private void UserHasUpdated(User updatedUser)
+        private void UserHasUpdated(UpdateUserRequest updatedUser)
         {
             var user = _users.FirstOrDefault(c => c.Id == updatedUser.Id);
             if (user is null) return;
-
+            
             user.Email = updatedUser.Email;
             user.StudyGroup = updatedUser.StudyGroup;
             user.FirstName = updatedUser.FirstName;

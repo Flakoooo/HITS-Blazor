@@ -4,10 +4,9 @@
 @using HITSBlazor.Components.Tables.TableBodyRow
 @using HITSBlazor.Components.Tables.TableComponent
 @using HITSBlazor.Pages
-@inherits ListPageDataLoader
 
-<InputSearch Width="50" IsLoading="_isLoading" ValueChanged="@((value) => SearchData(value))" DebounceDelay="500" />
-<TableComponent IsLoading="_isLoading" HeaderItems="MembersTableHeader" TableActionMenuIsEnable="true" @ref="_tableComponent">
+<InputSearch Width="50" ValueChanged="@((value) => SearchData(value))" DebounceDelay="500" />
+<TableComponent HeaderItems="MembersTableHeader" TableActionMenuIsEnable="true">
     <TableContent>
         @foreach (var member in _teamMembers.OrderBy(tm => tm.UserId != CurrentTeam.Owner?.UserId || tm.Id != CurrentTeam.Leader?.UserId))
         {

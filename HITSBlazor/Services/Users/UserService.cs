@@ -15,7 +15,7 @@ namespace HITSBlazor.Services.Users
         private readonly ILogger<UserService> _logger = logger;
         private readonly GlobalNotificationService _globalNotificationService = globalNotificationService;
 
-        public event Action<User>? OnUserHasUpdated;
+        public event Action<UpdateUserRequest>? OnUserHasUpdated;
         public event Action<User>? OnUserHasDeleted;
 
         //TODOO: возможно добавить получение одного пользователя
@@ -47,7 +47,7 @@ namespace HITSBlazor.Services.Users
 
             if (!string.IsNullOrWhiteSpace(result.Message))
             {
-                _globalNotificationService.ShowError("Не удалось получить список пользователей");
+                _globalNotificationService.ShowError(result.Message);
                 if (_logger.IsEnabled(LogLevel.Warning))
                     _logger.LogWarning("Get users failed: {Error}", result.Message);
             }
@@ -61,13 +61,14 @@ namespace HITSBlazor.Services.Users
 
             if (result.IsSuccess && result.Response is not null)
             {
-                _globalNotificationService.ShowError(result.Response);
+                OnUserHasUpdated?.Invoke(request);
+                _globalNotificationService.ShowSuccess(result.Response);
                 return true;
             }
 
             if (!string.IsNullOrWhiteSpace(result.Message))
             {
-                _globalNotificationService.ShowError("Не удалось обновить пользователя");
+                _globalNotificationService.ShowError(result.Message);
                 if (_logger.IsEnabled(LogLevel.Warning))
                     _logger.LogWarning("Update user failed: {Error}", result.Message);
             }
@@ -81,7 +82,8 @@ namespace HITSBlazor.Services.Users
 
             if (result.IsSuccess && result.Response is not null)
             {
-                _globalNotificationService.ShowError(result.Response);
+                OnUserHasDeleted?.Invoke(user);
+                _globalNotificationService.ShowSuccess(result.Response);
                 return true;
             }
 
@@ -89,7 +91,7 @@ namespace HITSBlazor.Services.Users
             {
                 _globalNotificationService.ShowError(result.Message);
                 if (_logger.IsEnabled(LogLevel.Warning))
-                    _logger.LogWarning("Update user failed: {Error}", result.Message);
+                    _logger.LogWarning("Delete user failed: {Error}", result.Message);
             }
 
             return false;

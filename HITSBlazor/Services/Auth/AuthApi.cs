@@ -66,11 +66,7 @@ namespace HITSBlazor.Services.Auth
                 string? strGuid = JObject.Parse(content)["id"]?.ToString();
                 if (strGuid is null || !Guid.TryParse(strGuid, out Guid guid))
                 {
-                    if (_logger.IsEnabled(LogLevel.Warning))
-                        _logger.LogWarning(
-                            "{Operation} failed: {StatusCode} - {ErrorMessage}",
-                            PASSWORD_VERIFICATION_OPERATION, response.StatusCode, "Error when parse GUID"
-                        );
+                    LogFail(PASSWORD_VERIFICATION_OPERATION, response.StatusCode, "Error when parse GUID");
 
                     return ServiceResponse<Guid>.Failure("Не удалось подтвердить почту, попробуйте позже");
                 }

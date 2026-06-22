@@ -40,11 +40,6 @@ namespace HITSBlazor.Services.Teams
             bool? byDescending = null
         );
         Task<Team?> GetTeamByIdAsync(Guid teamId);
-        Task<ListDataResponse<TeamMember>> GetTeamMembersAsync(
-            int page,
-            Guid? teamId = null,
-            string? searchText = null
-        );
         Task<bool> CreateTeamAsync(CreateTeamRequest request);
         Task<bool> UpdateTeamAsync(UpdateTeamRequest request);
         Task<bool> UpdateTeamLeader(Team team, TeamMember? newLeader);

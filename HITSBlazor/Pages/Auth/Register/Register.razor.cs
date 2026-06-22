@@ -34,7 +34,7 @@ namespace HITSBlazor.Pages.Auth.Register
         [Inject]
         private GlobalNotificationService NotificationService { get; set; } = null!;
 
-        //TODO: Сделать так, чтобы выбрасывало из регистрации, если не найдено id приглашения
+        //TODOO: Сделать так, чтобы выбрасывало из регистрации, если не найдено id приглашения
 
         protected override async Task OnInitializedAsync()
         {

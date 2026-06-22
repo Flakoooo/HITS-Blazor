@@ -25,11 +25,8 @@ namespace HITSBlazor.Components.Tables.Teams.TeamMemberTable
         [Parameter]
         public required Team CurrentTeam { get; set; }
 
-        private bool _isLoading = true;
-        private TableComponent.TableComponent? _tableComponent;
-
         private string _searchText = string.Empty;
-        private readonly List<TeamMember> _teamMembers = [];
+        private List<TeamMember> _teamMembers = [];
 
         private static List<TableHeaderItem> MembersTableHeader { get; } =
         [
@@ -38,46 +35,26 @@ namespace HITSBlazor.Components.Tables.Teams.TeamMemberTable
             new() { Text = "Фамилия", ColumnClass = "col-3" }
         ];
 
-        protected override async Task OnInitializedAsync()
+        protected override void OnParametersSet()
         {
-            _isLoading = true;
-
-            TeamService.OnTeamMemberHasKicked += TeamMemberHasKicked;
-
-            await LoadTeamMembersAsync();
-
-            _isLoading = false;
-            MarkAsInitialized();
+            SearchData(_searchText);
         }
 
-        protected override async Task AdditionalAfterRenderMethod()
-        {
-            if (_tableComponent != null)
-                _tableContainer = _tableComponent.ScrollContainer;
-        }
-
-        protected override async Task OnLoadMoreItemsAsync() => await LoadTeamMembersAsync(true);
-
-        protected override int GetCurrentItemsCount() => _teamMembers.Count;
-
-        private async Task LoadTeamMembersAsync(bool append = false)
-        {
-            await LoadDataAsync(
-                _teamMembers,
-                () => TeamService.GetTeamMembersAsync(
-                    _currentPage,
-                    teamId: CurrentTeam.Id,
-                    searchText: _searchText
-                ),
-                append
-            );
-        }
-
-        private async Task SearchData(string value)
+        private async void SearchData(string value)
         {
             _searchText = value;
-            ResetPagination();
-            await LoadTeamMembersAsync();
+
+            if (string.IsNullOrWhiteSpace(_searchText))
+            {
+                _teamMembers = CurrentTeam.Members.ToList();
+            }
+            else
+            {
+                _teamMembers = CurrentTeam.Members
+                    .Where(m => m.FullName.Contains(_searchText, StringComparison.CurrentCultureIgnoreCase))
+                    .ToList();
+            }
+            StateHasChanged();
         }
 
         private (TextColor? TextColor, string DisplayText) GetRoleDisplayInfo(Guid memberId)
@@ -168,22 +145,6 @@ namespace HITSBlazor.Components.Tables.Teams.TeamMemberTable
                     );
                 }
             }
-        }
-
-        private void TeamMemberHasKicked(TeamMember kickedMember)
-        {
-            if (_teamMembers.Remove(kickedMember))
-            {
-                --_totalCount;
-                StateHasChanged();
-            }
-        }
-
-        protected override async ValueTask DisposeAsyncCore()
-        {
-            TeamService.OnTeamMemberHasKicked -= TeamMemberHasKicked;
-
-            await ValueTask.CompletedTask;
         }
     }
 }

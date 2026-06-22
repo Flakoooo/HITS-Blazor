@@ -71,6 +71,7 @@ namespace HITSBlazor.Components.Modals.RightSideModals.TeamModal
             _currentTeam = await TeamService.GetTeamByIdAsync(TeamId);
             if (_currentTeam is null) return;
 
+            TeamService.OnTeamMemberHasKicked += TeamMemberHasKicked;
             TeamService.OnTeamLeaderHasChanged += TeamLeaderHasChanged;
             TeamService.OnRequestToTeamStatusHasChanged += TeamRequestsStatusChanged;
             TeamService.OnTeamInvitationStatusHasChanged += TeamRequestsStatusChanged;
@@ -130,6 +131,14 @@ namespace HITSBlazor.Components.Modals.RightSideModals.TeamModal
             }
         }
 
+        private void TeamMemberHasKicked(TeamMember kickedMember)
+        {
+            if (_currentTeam is null) return;
+
+            if (_currentTeam.Members.Remove(kickedMember))
+                StateHasChanged();
+        }
+
         private void TeamRequestsStatusChanged(Guid id, TeamRequestStatus newStatus)
         {
             if (_currentTeam is not null && newStatus is TeamRequestStatus.Accepted)
@@ -173,6 +182,7 @@ namespace HITSBlazor.Components.Modals.RightSideModals.TeamModal
 
         public void Dispose()
         {
+            TeamService.OnTeamMemberHasKicked -= TeamMemberHasKicked;
             TeamService.OnTeamLeaderHasChanged -= TeamLeaderHasChanged;
             TeamService.OnRequestToTeamStatusHasChanged -= TeamRequestsStatusChanged;
             TeamService.OnTeamInvitationStatusHasChanged -= TeamRequestsStatusChanged;

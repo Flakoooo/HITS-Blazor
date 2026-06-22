@@ -7,7 +7,7 @@ namespace HITSBlazor.Services.Users
 {
     public interface IUserService
     {
-        event Action<User>? OnUserHasUpdated;
+        event Action<UpdateUserRequest>? OnUserHasUpdated;
         event Action<User>? OnUserHasDeleted;
 
         Task<ListDataResponse<User>> GetUsersAsync(

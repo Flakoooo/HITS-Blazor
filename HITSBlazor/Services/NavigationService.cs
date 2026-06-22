@@ -1,5 +1,4 @@
 ﻿using HITSBlazor.Components.LeftSideNavigation;
-using HITSBlazor.Models.Markets.Enums;
 using HITSBlazor.Models.Users.Enums;
 using HITSBlazor.Services.Auth;
 using HITSBlazor.Services.Markets;
