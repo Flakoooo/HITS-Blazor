@@ -46,7 +46,7 @@ namespace HITSBlazor.Services.Invitation
 
         public async Task<ServiceResponse<string>> SendInvitationsAsync(InviteUsersRequest request)
         {
-            var content = SerializeData(request);
+            var content = SerializeData(request, Settings.UserJsonOptions);
 
             return await ExecuteApiCallAsync(
                 apiCall: () => _httpClient.PostAsync(_invitationPath, content),

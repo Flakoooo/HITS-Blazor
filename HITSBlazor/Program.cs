@@ -125,7 +125,12 @@ namespace HITSBlazor
 #endif
 
             //UsersGroups
+#if DEBUG && !DEBUGAPI
             builder.Services.AddScoped<IUsersGroupsService, MockUsersGroupsService>();
+#else
+            builder.Services.AddScoped<UsersGroupApi>();
+            builder.Services.AddScoped<IUsersGroupsService, UsersGroupsService>();
+#endif
 
             //Ideas
             builder.Services.AddScoped<IIdeasService, MockIdeasService>();

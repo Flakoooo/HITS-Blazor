@@ -143,7 +143,7 @@ namespace HITSBlazor.Services.Companies
                     var company = await response.Content.ReadFromJsonAsync<Company>(Settings.UserJsonOptions);
                     if (company is null)
                     {
-                        LogFail(CREATE_COMPANY_OPERATION, response.StatusCode, "Error when update company");
+                        LogFail(UPDATE_COMPANY_OPERATION, response.StatusCode, "Error when update company");
 
                         return ServiceResponse<Company?>.Failure("Не удалось обновить компанию", response.StatusCode);
                     }

@@ -130,9 +130,9 @@ namespace HITSBlazor.Services
                 );
         }
 
-        protected static StringContent SerializeData<T>(T value)
+        protected static StringContent SerializeData<T>(T value, JsonSerializerOptions? options = null)
         {
-            var json = JsonSerializer.Serialize(value, Settings.UserJsonOptions);
+            var json = JsonSerializer.Serialize(value, options ?? Settings.BaseJsonOptions);
             var content = new StringContent(json, System.Text.Encoding.UTF8, MediaTypeNames.Application.Json);
 
             return content;

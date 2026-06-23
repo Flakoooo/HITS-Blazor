@@ -104,7 +104,7 @@ namespace HITSBlazor.Services.Users
 
         public async Task<ServiceResponse<string>> UpdateUserAsync(UpdateUserRequest request)
         {
-            var content = SerializeData(request);
+            var content = SerializeData(request, Settings.UserJsonOptions);
 
             return await ExecuteApiCallAsync(
                 apiCall: () => _httpClient.PutAsync(_userPath, content),
