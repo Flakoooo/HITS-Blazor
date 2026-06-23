@@ -130,12 +130,12 @@ namespace HITSBlazor.Pages.Ideas.IdeasCreate
                     };
 
                     //TODOO: НУЖНО ИЗМЕНИТЬ ЛОГИКУ КОМПАНИЙ
-                    SelectedCompany = await CompanyService.GetCompanyByNameAsync(idea.Customer);
+                    var companies = await CompanyService.GetCompaniesAsync(1, idea.Customer);
+                    SelectedCompany = companies.List.FirstOrDefault();
                     if (SelectedCompany != null)
                     {
-                        SelectedContactPerson = SelectedCompany.Members.FirstOrDefault(
-                            u => u.FullName.Equals(idea.ContactPerson)
-                        );
+                        var filteredMembers = await CompanyService.GetCompanyMembersAsync(SelectedCompany.Id, 1, idea.ContactPerson);
+                        SelectedContactPerson = filteredMembers.List.FirstOrDefault();
                     }
 
                     SuitabilityScore = idea.Suitability.ToString();

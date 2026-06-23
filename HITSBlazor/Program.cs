@@ -109,13 +109,20 @@ namespace HITSBlazor
 #endif
 
             //UserSkills
+#if DEBUG && !DEBUGAPI
             builder.Services.AddScoped<IUserSkillService, MockUserSkillService>();
-
+#else
             builder.Services.AddScoped<UserSkillsApi>();
             builder.Services.AddScoped<IUserSkillService, UserSkillService>();
+#endif
 
             //Companies
+#if DEBUG && !DEBUGAPI
             builder.Services.AddScoped<ICompanyService, MockCompanyService>();
+#else
+            builder.Services.AddScoped<CompanyApi>();
+            builder.Services.AddScoped<ICompanyService, CompanyService>();
+#endif
 
             //UsersGroups
             builder.Services.AddScoped<IUsersGroupsService, MockUsersGroupsService>();
@@ -147,7 +154,7 @@ namespace HITSBlazor
             //Profile
             builder.Services.AddScoped<IProfileService, MockProfileService>();
 
-            // Notification
+            //Notification
             builder.Services.AddScoped<INotificationService, MockNotificationService>();
 
             var host = builder.Build();

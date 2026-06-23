@@ -33,12 +33,6 @@ namespace HITSBlazor.Services.Companies
         public async Task<ListDataResponse<User>> GetCompanyMembersAsync(Guid companyId, int page, string? searchText)
             => MockCompanies.GetCompanyMembersByQueryParams(companyId, page, searchText: searchText);
 
-        //TODO: надо это как то изменить
-        public async Task<Company?> GetCompanyByNameAsync(string name)
-        {
-            return MockCompanies.GetCompanyByName(name);
-        }
-
         public async Task<bool> CreateCompanyAsync(string name, User owner, IEnumerable<User> members)
         {
             var company = MockCompanies.CreateCompany(name, owner.Id, members.Select(u => u.Id).ToList());
