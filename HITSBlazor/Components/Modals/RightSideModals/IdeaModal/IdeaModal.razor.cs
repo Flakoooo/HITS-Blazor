@@ -166,9 +166,6 @@ namespace HITSBlazor.Components.Modals.RightSideModals.IdeaModal
                 }
             }
 
-            if (CurrentIdea is not null && !CurrentIdea.IsChecked)
-                await IdeasService.UpdateCheckedIdeaAsync(CurrentIdea.Id);
-
             _isLoading = false;
         }
 

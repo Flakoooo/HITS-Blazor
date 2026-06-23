@@ -117,6 +117,7 @@ namespace HITSBlazor.Pages.Ideas.IdeasCreate
                 {
                     IdeasCreateModel = new()
                     {
+                        Id = idea.Id,
                         Name = idea.Name,
                         Problem = idea.Problem,
                         Description = idea.Description,
@@ -242,7 +243,7 @@ namespace HITSBlazor.Pages.Ideas.IdeasCreate
         {
             if (!Guid.TryParse(IdeaId, out Guid guid)) return;
 
-            if (await IdeasService.UpdateIdeaAsync(guid, IdeasCreateModel))
+            if (await IdeasService.UpdateIdeaAsync(IdeasCreateModel))
                 await Navigation.NavigateToAsync("ideas/list");
         }
     }

@@ -23,7 +23,7 @@ namespace HITSBlazor.Services.UserSkills
                 apiCall: () => _httpClient.GetAsync(path),
                 successHandler: async resposne =>
                 {
-                    var skills = await resposne.Content.ReadFromJsonAsync<List<Skill>>(Settings.SkillJsonOptions);
+                    var skills = await resposne.Content.ReadFromJsonAsync<List<Skill>>(Settings.BaseJsonOptions);
                     if (skills is null)
                     {
                         LogFail(GET_USER_SKILLS_OPERATION, resposne.StatusCode, "Error when parse user skills");

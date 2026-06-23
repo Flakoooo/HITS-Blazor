@@ -36,7 +36,7 @@ namespace HITSBlazor.Services.Companies
                 apiCall: () => _httpClient.GetAsync(path),
                 successHandler: async response =>
                 {
-                    var companies = await response.Content.ReadFromJsonAsync<ListDataResponse<Company>>(Settings.UserJsonOptions);
+                    var companies = await response.Content.ReadFromJsonAsync<ListDataResponse<Company>>(Settings.BaseJsonOptions);
                     if (companies is null)
                     {
                         LogFail(GET_COMPANIES_OPERATION, response.StatusCode, "Error when parse companies");
@@ -58,7 +58,7 @@ namespace HITSBlazor.Services.Companies
                 apiCall: () => _httpClient.GetAsync(path),
                 successHandler: async response =>
                 {
-                    var company = await response.Content.ReadFromJsonAsync<Company>(Settings.UserJsonOptions);
+                    var company = await response.Content.ReadFromJsonAsync<Company>(Settings.BaseJsonOptions);
                     if (company is null)
                     {
                         LogFail(GET_COMPANY_OPERATION, response.StatusCode, "Error when parse company");
@@ -88,7 +88,7 @@ namespace HITSBlazor.Services.Companies
                 apiCall: () => _httpClient.GetAsync(path),
                 successHandler: async response =>
                 {
-                    var members = await response.Content.ReadFromJsonAsync<ListDataResponse<User>>(Settings.UserJsonOptions);
+                    var members = await response.Content.ReadFromJsonAsync<ListDataResponse<User>>(Settings.BaseJsonOptions);
                     if (members is null)
                     {
                         LogFail(GET_COMPANY_MEMBERS_OPERATION, response.StatusCode, "Error when parse company members");
@@ -112,7 +112,7 @@ namespace HITSBlazor.Services.Companies
                 apiCall: () => _httpClient.PostAsync(_companyPath, content),
                 successHandler: async response =>
                 {
-                    var company = await response.Content.ReadFromJsonAsync<Company>(Settings.UserJsonOptions);
+                    var company = await response.Content.ReadFromJsonAsync<Company>(Settings.BaseJsonOptions);
                     if (company is null)
                     {
                         LogFail(CREATE_COMPANY_OPERATION, response.StatusCode, "Error when create company");
@@ -140,7 +140,7 @@ namespace HITSBlazor.Services.Companies
                 apiCall: () => _httpClient.PutAsync(_companyPath, content),
                 successHandler: async response =>
                 {
-                    var company = await response.Content.ReadFromJsonAsync<Company>(Settings.UserJsonOptions);
+                    var company = await response.Content.ReadFromJsonAsync<Company>(Settings.BaseJsonOptions);
                     if (company is null)
                     {
                         LogFail(UPDATE_COMPANY_OPERATION, response.StatusCode, "Error when update company");

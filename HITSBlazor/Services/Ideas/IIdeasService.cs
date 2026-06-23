@@ -1,5 +1,4 @@
-﻿using HITSBlazor.Components.Modals.RightSideModals.IdeaModal;
-using HITSBlazor.Models.Common.Entities;
+﻿using HITSBlazor.Models.Common.Entities;
 using HITSBlazor.Models.Common.Responses;
 using HITSBlazor.Models.Ideas.Entities;
 using HITSBlazor.Models.Ideas.Enums;
@@ -21,8 +20,7 @@ namespace HITSBlazor.Services.Ideas
         );
         Task<Idea?> GetIdeaByIdAsync(Guid id);
         Task<Idea?> CreateNewIdeaAsync(IdeasCreateModel ideasCreateModel);
-        Task<bool> UpdateCheckedIdeaAsync(Guid ideaId);
-        Task<bool> UpdateIdeaAsync(Guid ideaId, IdeasCreateModel ideasCreateModel);
+        Task<bool> UpdateIdeaAsync(IdeasCreateModel ideasCreateModel);
         Task<bool> UpdateIdeaStatusAsync(Guid ideaId, IdeaStatusType ideaStatus);
         Task<bool> DeleteIdeaAsync(Idea idea);
 

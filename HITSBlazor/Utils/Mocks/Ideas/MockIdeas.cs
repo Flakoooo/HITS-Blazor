@@ -395,9 +395,9 @@ namespace HITSBlazor.Utils.Mocks.Ideas
             return true;
         }
 
-        public static bool UpdateIdea(Guid ideaId, IdeasCreateModel model)
+        public static bool UpdateIdea(IdeasCreateModel model)
         {
-            var idea = _ideas.FirstOrDefault(i => i.Id == ideaId);
+            var idea = _ideas.FirstOrDefault(i => i.Id == model.Id);
             if (idea is null) return false;
 
             idea.Name = model.Name;

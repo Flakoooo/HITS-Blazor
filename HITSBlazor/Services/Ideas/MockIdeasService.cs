@@ -55,7 +55,12 @@ namespace HITSBlazor.Services.Ideas
                 );
         }
 
-        public async Task<Idea?> GetIdeaByIdAsync(Guid id) => MockIdeas.GetIdeaById(id);
+        public async Task<Idea?> GetIdeaByIdAsync(Guid id)
+        {
+            var idea = MockIdeas.GetIdeaById(id);
+            OnIdeaHasOpened?.Invoke(id, true);
+            return idea;
+        }
 
         public async Task<Idea?> CreateNewIdeaAsync(IdeasCreateModel ideasCreateModel)
         {
@@ -80,24 +85,22 @@ namespace HITSBlazor.Services.Ideas
             return newIdea;
         }
 
-        public async Task<bool> UpdateCheckedIdeaAsync(Guid ideaId)
+        public async Task<bool> UpdateIdeaAsync(IdeasCreateModel ideasCreateModel)
         {
-            if (!MockIdeas.CheckIdea(ideaId)) return false;
+            if (!ideasCreateModel.Id.HasValue)
+            {
+                _globalNotificationService.ShowError("Не удалось обновить идею");
+                return false;
+            }
 
-            OnIdeaHasOpened?.Invoke(ideaId, true);
-            return true;
-        }
-
-        public async Task<bool> UpdateIdeaAsync(Guid ideaId, IdeasCreateModel ideasCreateModel)
-        {
-            var idea = MockIdeas.GetIdeaById(ideaId);
+            var idea = MockIdeas.GetIdeaById(ideasCreateModel.Id.Value);
             if (idea is null)
             {
                 _globalNotificationService.ShowError("Редактируемая идея не найдена");
                 return false;
             }
 
-            if (!MockIdeas.UpdateIdea(ideaId, ideasCreateModel))
+            if (!MockIdeas.UpdateIdea(ideasCreateModel))
             {
                 _globalNotificationService.ShowError("Не удалось обновить идею");
                 return false;

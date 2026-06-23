@@ -13,16 +13,12 @@ namespace HITSBlazor.Utils
             PropertyNameCaseInsensitive = true,
             WriteIndented = false
         };
-        public static JsonSerializerOptions UserJsonOptions { get; }
-        public static JsonSerializerOptions SkillJsonOptions { get; }
 
         static Settings()
         {
-            UserJsonOptions = BaseJsonOptions;
-            SkillJsonOptions = BaseJsonOptions;
-
-            UserJsonOptions.Converters.Add(new RoleTypeJsonConverter());
-            SkillJsonOptions.Converters.Add(new SkillTypeJsonConverter());
+            BaseJsonOptions.Converters.Add(new RoleTypeJsonConverter());
+            BaseJsonOptions.Converters.Add(new SkillTypeJsonConverter());
+            BaseJsonOptions.Converters.Add(new IdeaStatusTypeJsonConverter());
         }
     }
 }

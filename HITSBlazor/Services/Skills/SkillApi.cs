@@ -36,13 +36,13 @@ namespace HITSBlazor.Services.Skills
                 path += AddQuery("confirmed", confirmed.Value);
 
             if (skillTypes is not null && skillTypes.Any())
-                path += AddQuery("skill_types", skillTypes);
+                path += AddQuery("skill_type", skillTypes);
 
             return await ExecuteApiCallAsync(
                 apiCall: () => _httpClient.GetAsync(path),
                 successHandler: async response => 
                 {
-                    var skills = await response.Content.ReadFromJsonAsync<ListDataResponse<Skill>>(Settings.SkillJsonOptions);
+                    var skills = await response.Content.ReadFromJsonAsync<ListDataResponse<Skill>>(Settings.BaseJsonOptions);
                     if (skills is null)
                     {
                         LogFail(GET_SKILLS_OPERATION, response.StatusCode, "Error when parse skills");
@@ -64,7 +64,7 @@ namespace HITSBlazor.Services.Skills
                 apiCall: () => _httpClient.PostAsync(_skillPath, content),
                 successHandler: async response =>
                 {
-                    var skill = await response.Content.ReadFromJsonAsync<Skill>(Settings.SkillJsonOptions);
+                    var skill = await response.Content.ReadFromJsonAsync<Skill>(Settings.BaseJsonOptions);
                     if (skill is null)
                     {
                         LogFail(CREATE_SKILL_OPERATION, response.StatusCode, "Error when create skill");

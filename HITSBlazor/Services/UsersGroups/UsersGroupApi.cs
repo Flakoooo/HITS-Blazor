@@ -34,13 +34,13 @@ namespace HITSBlazor.Services.UsersGroups
                 path += AddQuery("search_text", searchText);
 
             if (selectedRoles is not null && selectedRoles.Any())
-                path += AddQuery("selected_roles", selectedRoles);
+                path += AddQuery("selected_role", selectedRoles);
 
             return await ExecuteApiCallAsync(
                 apiCall: () => _httpClient.GetAsync(path),
                 successHandler: async response =>
                 {
-                    var groups = await response.Content.ReadFromJsonAsync<ListDataResponse<UsersGroup>>(Settings.UserJsonOptions);
+                    var groups = await response.Content.ReadFromJsonAsync<ListDataResponse<UsersGroup>>(Settings.BaseJsonOptions);
                     if (groups is null)
                     {
                         LogFail(GET_GROUPS_OPERATION, response.StatusCode, "Error when parse groups");
@@ -62,7 +62,7 @@ namespace HITSBlazor.Services.UsersGroups
                 apiCall: () => _httpClient.GetAsync(path),
                 successHandler: async response =>
                 {
-                    var group = await response.Content.ReadFromJsonAsync<UsersGroup>(Settings.UserJsonOptions);
+                    var group = await response.Content.ReadFromJsonAsync<UsersGroup>(Settings.BaseJsonOptions);
                     if (group is null)
                     {
                         LogFail(GET_GROUP_OPERATION, response.StatusCode, "Error when parse group");
@@ -92,7 +92,7 @@ namespace HITSBlazor.Services.UsersGroups
                 apiCall: () => _httpClient.GetAsync(path),
                 successHandler: async response =>
                 {
-                    var members = await response.Content.ReadFromJsonAsync<ListDataResponse<User>>(Settings.UserJsonOptions);
+                    var members = await response.Content.ReadFromJsonAsync<ListDataResponse<User>>(Settings.BaseJsonOptions);
                     if (members is null)
                     {
                         LogFail(GET_GROUP_MEMBERS_OPERATION, response.StatusCode, "Error when parse group members");
@@ -112,13 +112,13 @@ namespace HITSBlazor.Services.UsersGroups
             IEnumerable<User> members
         )
         {
-            var content = SerializeData(new { Name = name, Roles = roles, Members = members }, Settings.UserJsonOptions);
+            var content = SerializeData(new { Name = name, Roles = roles, Members = members });
 
             return await ExecuteApiCallAsync(
                 apiCall: () => _httpClient.PostAsync(_usersGroupPath, content),
                 successHandler: async response =>
                 {
-                    var group = await response.Content.ReadFromJsonAsync<UsersGroup>(Settings.UserJsonOptions);
+                    var group = await response.Content.ReadFromJsonAsync<UsersGroup>(Settings.BaseJsonOptions);
                     if (group is null)
                     {
                         LogFail(CREATE_GROUP_OPERATION, response.StatusCode, "Error when create group");
@@ -140,13 +140,13 @@ namespace HITSBlazor.Services.UsersGroups
             IEnumerable<Guid>? removeMembersIds = null
         )
         {
-            var content = SerializeData(new { Id = usersGroupId, Name = name, Roles = roles, NewMembersIds = newMembersIds, RemoveMembersIds = removeMembersIds }, Settings.UserJsonOptions);
+            var content = SerializeData(new { Id = usersGroupId, Name = name, Roles = roles, NewMembersIds = newMembersIds, RemoveMembersIds = removeMembersIds });
 
             return await ExecuteApiCallAsync(
                 apiCall: () => _httpClient.PutAsync(_usersGroupPath, content),
                 successHandler: async response =>
                 {
-                    var group = await response.Content.ReadFromJsonAsync<UsersGroup>(Settings.UserJsonOptions);
+                    var group = await response.Content.ReadFromJsonAsync<UsersGroup>(Settings.BaseJsonOptions);
                     if (group is null)
                     {
                         LogFail(UPDATE_GROUP_OPERATION, response.StatusCode, "Error when update group");

@@ -133,7 +133,12 @@ namespace HITSBlazor
 #endif
 
             //Ideas
+#if DEBUG && !DEBUGAPI
             builder.Services.AddScoped<IIdeasService, MockIdeasService>();
+#else
+            builder.Services.AddScoped<IdeaApi>();
+            builder.Services.AddScoped<IIdeasService, IdeasService>();
+#endif
 
             //Ratings
             builder.Services.AddScoped<IRatingService, MockRatingService>();

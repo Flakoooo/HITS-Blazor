@@ -30,7 +30,7 @@ namespace HITSBlazor.Services.Users
                 apiCall: () => _httpClient.GetAsync(path),
                 successHandler: async response =>
                 {
-                    User? user = await response.Content.ReadFromJsonAsync<User>(Settings.UserJsonOptions);
+                    User? user = await response.Content.ReadFromJsonAsync<User>(Settings.BaseJsonOptions);
                     if (user is null)
                     {
                         LogFail(GET_USER_OPERATION, response.StatusCode, "Error when parse user model");
@@ -79,7 +79,7 @@ namespace HITSBlazor.Services.Users
                 path += AddQuery("ignored_team", ignoredTeam.Value);
 
             if (selectedRoles is not null && selectedRoles.Any())
-                path += AddQuery("selected_roles", selectedRoles);
+                path += AddQuery("selected_role", selectedRoles);
 
             if (ignoredIds is not null && ignoredIds.Any())
                 path += AddQuery("ignored_id", ignoredIds);
@@ -88,7 +88,7 @@ namespace HITSBlazor.Services.Users
                 apiCall: () => _httpClient.GetAsync(path),
                 successHandler: async response =>
                 {
-                    var users = await response.Content.ReadFromJsonAsync<ListDataResponse<User>>(Settings.UserJsonOptions);
+                    var users = await response.Content.ReadFromJsonAsync<ListDataResponse<User>>(Settings.BaseJsonOptions);
                     if (users is null)
                     {
                         LogFail(GET_USERS_OPERATION, response.StatusCode, "Error when parse users");
@@ -104,7 +104,7 @@ namespace HITSBlazor.Services.Users
 
         public async Task<ServiceResponse<string>> UpdateUserAsync(UpdateUserRequest request)
         {
-            var content = SerializeData(request, Settings.UserJsonOptions);
+            var content = SerializeData(request);
 
             return await ExecuteApiCallAsync(
                 apiCall: () => _httpClient.PutAsync(_userPath, content),
