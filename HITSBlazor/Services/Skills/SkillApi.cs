@@ -12,7 +12,7 @@ namespace HITSBlazor.Services.Skills
         ILogger<SkillApi> logger
     ) : BaseApiService(httpClientFactory.CreateClient(Settings.HttpClientName), logger)
     {
-        private readonly string _skillPath = "api/skill";
+        private readonly string _skillPath = "/api/skill";
 
         private const string GET_SKILLS_OPERATION = "GetSkills";
         private const string CREATE_SKILL_OPERATION = "CreateSkill";

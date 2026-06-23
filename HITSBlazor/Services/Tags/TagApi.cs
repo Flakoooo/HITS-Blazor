@@ -11,7 +11,7 @@ namespace HITSBlazor.Services.Tags
         ILogger<TagApi> logger
     ) : BaseApiService(httpClientFactory.CreateClient(Settings.HttpClientName), logger)
     {
-        private readonly string _tagPath = "api/tag";
+        private readonly string _tagPath = "/api/tag";
 
         private const string GET_TAGS_OPERATION = "GetTags";
         private const string CREATE_TAG_OPERATION = "CreateTag";

@@ -111,6 +111,9 @@ namespace HITSBlazor
             //UserSkills
             builder.Services.AddScoped<IUserSkillService, MockUserSkillService>();
 
+            builder.Services.AddScoped<UserSkillsApi>();
+            builder.Services.AddScoped<IUserSkillService, UserSkillService>();
+
             //Companies
             builder.Services.AddScoped<ICompanyService, MockCompanyService>();
 
