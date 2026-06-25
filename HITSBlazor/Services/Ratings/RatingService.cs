@@ -8,16 +8,33 @@ using HITSBlazor.Utils.Mocks.Ideas;
 
 namespace HITSBlazor.Services.Ratings
 {
-    public class MockRatingService(
+    public class RatingService(
         IIdeasService ideasService,
+        RatingApi ratingApi,
+        ILogger<RatingService> logger,
         GlobalNotificationService globalNotificationService
     ) : IRatingService
     {
         private readonly IIdeasService _ideasService = ideasService;
+        private readonly RatingApi _ratingApi = ratingApi;
+        private readonly ILogger<RatingService> _logger = logger;
         private readonly GlobalNotificationService _globalNotificationService = globalNotificationService;
 
         public async Task<List<Rating>> GetIdeaRatingsAsync(Guid ideaId)
-            => MockRatings.GetIdeaRatingById(ideaId);
+        {
+            //var result
+            //if (result.IsSuccess && result.Response is not null)
+            //    return result.Response;
+
+            //if (!string.IsNullOrWhiteSpace(result.Message))
+            //{
+            //    _globalNotificationService.ShowError(result.Message);
+            //    if (_logger.IsEnabled(LogLevel.Warning))
+            //        _logger.LogWarning("Get users failed: {Error}", result.Message);
+            //}
+
+            return [];
+        }
 
         public async Task<bool> SendRatingAsync(RatingRequest request, bool isConfirmed, List<Rating>? ideasRatings)
         {

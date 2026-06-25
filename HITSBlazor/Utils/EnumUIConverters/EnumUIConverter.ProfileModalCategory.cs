@@ -10,7 +10,7 @@ namespace HITSBlazor.Utils.EnumUIConverters
             ProfileModalCategory.Skills => new EnumUIResult("Компетенции", string.Empty),
             ProfileModalCategory.Ideas => new EnumUIResult("Идеи", string.Empty),
             ProfileModalCategory.Teams => new EnumUIResult("Портфолио", string.Empty),
-            ProfileModalCategory.Tests => new EnumUIResult("Тесты", string.Empty),
+            //ProfileModalCategory.Tests => new EnumUIResult("Тесты", string.Empty),
             _ => new EnumUIResult(category.ToString(), string.Empty)
         };
     }

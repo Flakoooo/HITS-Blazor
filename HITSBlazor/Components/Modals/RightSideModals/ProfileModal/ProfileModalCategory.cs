@@ -14,9 +14,9 @@ namespace HITSBlazor.Components.Modals.RightSideModals.ProfileModal
         Ideas,
 
         [Description("Портфолио")]
-        Teams,
+        Teams
 
-        [Description("Тесты")]
-        Tests,
+        //[Description("Тесты")]
+        //Tests,
     }
 }

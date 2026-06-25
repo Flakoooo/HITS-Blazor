@@ -1,4 +1,5 @@
 ﻿using HITSBlazor.Models.Common.Entities;
+using HITSBlazor.Models.Common.Enums;
 using HITSBlazor.Services.Skills;
 using Microsoft.AspNetCore.Components;
 
@@ -11,6 +12,9 @@ namespace HITSBlazor.Components.InputDropdowns.SkillDropdown
 
         [Parameter]
         public bool IsLoading { get; set; } = false;
+
+        [Parameter]
+        public HashSet<SkillType> FilteredSkillTypes { get; set; } = [];
 
         [Parameter]
         public string Placeholder { get; set; } = string.Empty;

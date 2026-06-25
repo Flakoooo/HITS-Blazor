@@ -15,7 +15,7 @@
                       @bind-SelectedValues="SelectedSkills"
                       CreateValueAllowed="true"
                       ValueMustCreated="(value) => CreateNewSkill(value)"
-                      DataLoaderMethod="async (page, searchText) => await SkillService.GetSkillsAsync(page, searchText)"
+                      DataLoaderMethod="async (page, searchText) => await SkillService.GetSkillsAsync(page, searchText, skillTypes: FilteredSkillTypes)"
                       DebounceDelay="500" />
     @if (!IsLoading && SelectedSkills.Any())
     {

@@ -32,18 +32,22 @@
     }
     <div class="mt-2 w-100 stack-categories">
         <SkillDropdown IsLoading="IsLoading"
+                       FilteredSkillTypes="[SkillType.Language]"
                        Placeholder="@EnumUIConverter.GetInfo(SkillType.Language).DisplayText"
                        @bind-SelectedSkills="@SelectedLanguageSkills"
                        ValueMustCreated="(value) => CreateNewSkill(value, SkillType.Language)" />
         <SkillDropdown IsLoading="IsLoading"
+                       FilteredSkillTypes="[SkillType.Framework]"
                        Placeholder="@EnumUIConverter.GetInfo(SkillType.Framework).DisplayText"
                        @bind-SelectedSkills="@SelectedFrameworkSkills"
                        ValueMustCreated="(value) => CreateNewSkill(value, SkillType.Framework)" />
         <SkillDropdown IsLoading="IsLoading"
+                       FilteredSkillTypes="[SkillType.Database]"
                        Placeholder="@EnumUIConverter.GetInfo(SkillType.Database).DisplayText"
                        @bind-SelectedSkills="@SelectedDatabaseSkills"
                        ValueMustCreated="(value) => CreateNewSkill(value, SkillType.Database)" />
         <SkillDropdown IsLoading="IsLoading"
+                       FilteredSkillTypes="[SkillType.Devops]"
                        Placeholder="@EnumUIConverter.GetInfo(SkillType.Devops).DisplayText"
                        @bind-SelectedSkills="@SelectedDevopsSkills"
                        ValueMustCreated="(value) => CreateNewSkill(value, SkillType.Devops)" />
