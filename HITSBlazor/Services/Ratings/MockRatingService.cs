@@ -1,8 +1,6 @@
 ﻿using HITSBlazor.Components.Modals.RightSideModals.IdeaModal;
-using HITSBlazor.Models.Common.Responses;
 using HITSBlazor.Models.Ideas.Entities;
 using HITSBlazor.Models.Ideas.Enums;
-using HITSBlazor.Models.Users.Entities;
 using HITSBlazor.Services.Ideas;
 using HITSBlazor.Utils.Mocks.Ideas;
 
@@ -28,14 +26,15 @@ namespace HITSBlazor.Services.Ratings
             }
 
 
+            if (!MockRatings.UpdateOrConfirmRating(request, isConfirmed))
+            {
+                _globalNotificationService.ShowError($"Не удалось {(isConfirmed ? "подтвердить" : "сохранить")} рейтинг");
+                return false;
+            }
+
+
             if (isConfirmed)
             {
-                if (!MockRatings.UpdateOrConfirmRating(request, isConfirmed))
-                {
-                    _globalNotificationService.ShowError("Не удалось подтвердить рейтинг");
-                    return false;
-                }
-
                 var rating = ideasRatings!.FirstOrDefault(r => r.Id == request.Id);
                 if (rating is not null)
                 {
@@ -49,19 +48,9 @@ namespace HITSBlazor.Services.Ratings
                     if (ideasRatings!.Count == ideasRatings!.Count(r => r.IsConfirmed))
                         _ideasService.IdeasStatusHasUpdatedEvent(rating.IdeaId, IdeaStatusType.Confirmed);
                 }
-
-                _globalNotificationService.ShowSuccess("Рейтинг успешно подтвержден");
             }
-            else
-            {
-                if (!MockRatings.UpdateOrConfirmRating(request))
-                {
-                    _globalNotificationService.ShowError("Не удалось сохранить рейтинг");
-                    return false;
-                }
 
-                _globalNotificationService.ShowSuccess("Рейтинг успешно сохранен");
-            }
+            _globalNotificationService.ShowSuccess($"Рейтинг успешно {(isConfirmed ? "подтвержден" : "сохранен")}");
 
             return true;
         }

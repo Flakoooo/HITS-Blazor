@@ -141,7 +141,12 @@ namespace HITSBlazor
 #endif
 
             //Ratings
+#if DEBUG && !DEBUGAPI
             builder.Services.AddScoped<IRatingService, MockRatingService>();
+#else
+            builder.Services.AddScoped<RatingApi>();
+            builder.Services.AddScoped<IRatingService, RatingService>();
+#endif
 
             //Teams
             builder.Services.AddScoped<ITeamService, MockTeamService>();

@@ -1,8 +1,6 @@
 ﻿using HITSBlazor.Components.Modals.RightSideModals.IdeaModal;
-using HITSBlazor.Models.Common.Responses;
 using HITSBlazor.Models.Ideas.Entities;
 using HITSBlazor.Models.Ideas.Enums;
-using HITSBlazor.Models.Users.Entities;
 using HITSBlazor.Services.Ideas;
 using HITSBlazor.Utils.Mocks.Ideas;
 
@@ -22,16 +20,16 @@ namespace HITSBlazor.Services.Ratings
 
         public async Task<List<Rating>> GetIdeaRatingsAsync(Guid ideaId)
         {
-            //var result
-            //if (result.IsSuccess && result.Response is not null)
-            //    return result.Response;
+            var result = await _ratingApi.GetRatingsAsync(ideaId);
+            if (result.IsSuccess && result.Response is not null)
+                return result.Response;
 
-            //if (!string.IsNullOrWhiteSpace(result.Message))
-            //{
-            //    _globalNotificationService.ShowError(result.Message);
-            //    if (_logger.IsEnabled(LogLevel.Warning))
-            //        _logger.LogWarning("Get users failed: {Error}", result.Message);
-            //}
+            if (!string.IsNullOrWhiteSpace(result.Message))
+            {
+                _globalNotificationService.ShowError(result.Message);
+                if (_logger.IsEnabled(LogLevel.Warning))
+                    _logger.LogWarning("Get idea ratings failed: {Error}", result.Message);
+            }
 
             return [];
         }
@@ -44,40 +42,33 @@ namespace HITSBlazor.Services.Ratings
                 throw new ArgumentNullException(errorText);
             }
 
-
-            if (isConfirmed)
+            var result = await _ratingApi.SaveRatingsAsync(request);
+            if (result.IsSuccess && result.Response is not null)
             {
-                if (!MockRatings.UpdateOrConfirmRating(request, isConfirmed))
+                if (isConfirmed)
                 {
-                    _globalNotificationService.ShowError("Не удалось подтвердить рейтинг");
-                    return false;
+                    var rating = ideasRatings!.FirstOrDefault(r => r.Id == request.Id);
+                    if (rating is not null)
+                    {
+                        rating.MarketValue = request.MarketValue;
+                        rating.Originality = request.Originality;
+                        rating.TechnicalRealizability = request.TechnicalRealizability;
+                        rating.Suitability = request.Suitability;
+                        rating.Budget = request.Budget;
+                        rating.IsConfirmed = true;
+
+                        if (ideasRatings!.Count == ideasRatings!.Count(r => r.IsConfirmed))
+                            _ideasService.IdeasStatusHasUpdatedEvent(rating.IdeaId, IdeaStatusType.Confirmed);
+                    }
                 }
 
-                var rating = ideasRatings!.FirstOrDefault(r => r.Id == request.Id);
-                if (rating is not null)
-                {
-                    rating.MarketValue = request.MarketValue;
-                    rating.Originality = request.Originality;
-                    rating.TechnicalRealizability = request.TechnicalRealizability;
-                    rating.Suitability = request.Suitability;
-                    rating.Budget = request.Budget;
-                    rating.IsConfirmed = true;
-
-                    if (ideasRatings!.Count == ideasRatings!.Count(r => r.IsConfirmed))
-                        _ideasService.IdeasStatusHasUpdatedEvent(rating.IdeaId, IdeaStatusType.Confirmed);
-                }
-
-                _globalNotificationService.ShowSuccess("Рейтинг успешно подтвержден");
+                _globalNotificationService.ShowSuccess(result.Response);
             }
-            else
+            else if (!string.IsNullOrWhiteSpace(result.Message))
             {
-                if (!MockRatings.UpdateOrConfirmRating(request))
-                {
-                    _globalNotificationService.ShowError("Не удалось сохранить рейтинг");
-                    return false;
-                }
-
-                _globalNotificationService.ShowSuccess("Рейтинг успешно сохранен");
+                _globalNotificationService.ShowError(result.Message);
+                if (_logger.IsEnabled(LogLevel.Warning))
+                    _logger.LogWarning("Change idea rating failed: {Error}", result.Message);
             }
 
             return true;
