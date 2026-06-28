@@ -3,10 +3,8 @@ using HITSBlazor.Models.Markets.Entities;
 using HITSBlazor.Models.Projects.Entities;
 using HITSBlazor.Models.Projects.Enums;
 using HITSBlazor.Models.Projects.Requests;
-using HITSBlazor.Models.Quests.Entities;
 using HITSBlazor.Services.Auth;
 using HITSBlazor.Utils.Mocks.Projects;
-using System.Reflection.Metadata.Ecma335;
 using HITSTask = HITSBlazor.Models.Projects.Entities.Task;
 using HITSTaskStatus = HITSBlazor.Models.Projects.Enums.TaskStatus;
 
@@ -16,6 +14,7 @@ namespace HITSBlazor.Services.Projects
         IAuthService authService,
         ProjectApi projectApi,
         SprintApi sprintApi,
+        TaskApi taskApi,
         ILogger<ProjectService> logger,
         GlobalNotificationService globalNotificationService
     ) : IProjectService
@@ -23,6 +22,7 @@ namespace HITSBlazor.Services.Projects
         private readonly IAuthService _authService = authService;
         private readonly ProjectApi _projectApi = projectApi;
         private readonly SprintApi _sprintApi = sprintApi;
+        private readonly TaskApi _taskApi = taskApi;
         private readonly ILogger<ProjectService> _logger = logger;
         private readonly GlobalNotificationService _globalNotificationService = globalNotificationService;
 
@@ -383,38 +383,90 @@ namespace HITSBlazor.Services.Projects
             IEnumerable<HITSTaskStatus>? selectedStatuses,
             IEnumerable<Guid>? selectedTags,
             IEnumerable<Guid>? selectedExecutors
-        ) => MockSprints.GetTasksByQueryParams(
-            page,
-            projectId: projectId,
-            sprintId: sprintId,
-            searchText: searchText,
-            selectedStatuses: selectedStatuses?.ToHashSet(),
-            selectedTags: selectedTags?.ToHashSet(),
-            selectedExecutors: selectedExecutors?.ToHashSet()
-        );
+        )
+        {
+            var result = await _taskApi.GetTasksAsync(
+                page,
+                projectId: projectId,
+                sprintId: sprintId,
+                searchText: searchText,
+                selectedStatuses: selectedStatuses,
+                selectedTags: selectedTags,
+                selectedExecutors: selectedExecutors
+            );
+
+            if (result.IsSuccess && result.Response is not null)
+                return result.Response;
+
+            if (!string.IsNullOrWhiteSpace(result.Message))
+            {
+                _globalNotificationService.ShowError(result.Message);
+                if (_logger.IsEnabled(LogLevel.Warning))
+                    _logger.LogWarning("Get tasks failed: {Error}", result.Message);
+            }
+
+            return new ListDataResponse<HITSTask>(0, []);
+        }
 
         public async Task<ListDataResponse<TaskMovementLog>> GetTasksLogsAsync(
             Guid taskId,
             int page
-        ) => MockTaskMovementLogs.GetTasksLogsById(taskId, page);
+        )
+        {
+            var result = await _taskApi.GetTasksLogsAsync(taskId, page);
+            if (result.IsSuccess && result.Response is not null)
+                return result.Response;
 
-        public async Task<HITSTask?> GetTaskByIdAsync(Guid taskId) => MockSprints.GetTaskById(taskId);
+            if (!string.IsNullOrWhiteSpace(result.Message))
+            {
+                _globalNotificationService.ShowError(result.Message);
+                if (_logger.IsEnabled(LogLevel.Warning))
+                    _logger.LogWarning("Get task logs failed: {Error}", result.Message);
+            }
+
+            return new ListDataResponse<TaskMovementLog>(0, []);
+        }
+
+        public async Task<HITSTask?> GetTaskByIdAsync(Guid taskId)
+        {
+            var result = await _taskApi.GetTaskAsync(taskId);
+
+            if (!string.IsNullOrWhiteSpace(result.Message))
+            {
+                _globalNotificationService.ShowError(result.Message);
+                if (_logger.IsEnabled(LogLevel.Warning))
+                    _logger.LogWarning("Get task failed: {Error}", result.Message);
+            }
+
+            return result.Response;
+        }
 
         public async Task<bool> MemberHasTaskInProgressAsync(Guid? sprintId)
         {
             if (!sprintId.HasValue) return false;
             if (_authService.CurrentUser is null) return false;
 
-            return MockSprints.MemberHasTaskInProgress(sprintId.Value, _authService.CurrentUser.Id);
+            var result = await _taskApi.MemberHasActiveTaskAsync(sprintId.Value);
+            return result.IsSuccess;
         }
 
-        public async Task<bool> CreateNewTaskAsync(CreateTaskRequest request)
+        public async Task<bool> CreateNewTaskAsync(HITSTaskStatus taskStatus, CreateTaskRequest request)
         {
-            var newTask = MockSprints.CreateTask(request);
-            if (newTask is null) return false;
+            var result = await _taskApi.CreateTaskAsync(request);
+            if (result.IsSuccess && result.Response is not null)
+            {
+                OnTaskHasCreated?.Invoke(result.Response);
+                return true;
+            }
 
-            OnTaskHasCreated?.Invoke(newTask);
-            return true;
+            if (!string.IsNullOrWhiteSpace(result.Message))
+            {
+                _globalNotificationService.ShowError(result.Message);
+                if (_logger.IsEnabled(LogLevel.Warning))
+                    _logger.LogWarning("Create task failed: {Error}", result.Message);
+            }
+
+            return false;
         }
 
         public async Task<bool> UpdateTaskAsync(Guid taskId, UpdateTaskRequest request)

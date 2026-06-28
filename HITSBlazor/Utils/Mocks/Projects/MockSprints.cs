@@ -810,7 +810,7 @@ namespace HITSBlazor.Utils.Mocks.Projects
                 t.SprintId == sprintId && t.Executor?.Id == userId && t.Status is HITSTaskStatus.InProgress
             );
 
-        public static HITSTask? CreateTask(CreateTaskRequest request)
+        public static HITSTask? CreateTask(User initiator, HITSTaskStatus taskStatus, CreateTaskRequest request)
         {
             var newTask = new HITSTask
             {
@@ -819,18 +819,18 @@ namespace HITSBlazor.Utils.Mocks.Projects
                 ProjectId = request.ProjectId,
                 Name = request.Name,
                 Description = request.Description,
-                Initiator = request.Initiator,
+                Initiator = initiator,
                 WorkHour = request.WorkHour,
                 StartDate = request.StartDate,
                 Tags = request.Tags.ToList(),
-                Status = request.Status
+                Status = taskStatus
             };
 
             if (newTask.Status is HITSTaskStatus.InBackLog)
                 newTask.Position = _tasks.Count(t => t.ProjectId == request.ProjectId && t.Status is HITSTaskStatus.InBackLog) + 1;
 
             _tasks.Add(newTask);
-            MockTaskMovementLogs.CreateNewTaskLog(newTask, request.Initiator);
+            MockTaskMovementLogs.CreateNewTaskLog(newTask, initiator);
 
             return newTask;
         }

@@ -6,7 +6,7 @@ namespace HITSBlazor.Models.Projects.Requests
     {
         public string? Name { get; set; }
         public string? Description { get; set; }
-        public ICollection<Tag>? Tags { get; set; }
         public int? WorkHour { get; set; }
+        public ICollection<Tag>? Tags { get; set; }
     }
 }

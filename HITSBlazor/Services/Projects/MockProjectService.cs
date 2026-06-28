@@ -191,9 +191,12 @@ namespace HITSBlazor.Services.Projects
             return MockSprints.MemberHasTaskInProgress(sprintId.Value, _authService.CurrentUser.Id);
         }
 
-        public async Task<bool> CreateNewTaskAsync(CreateTaskRequest request)
+        public async Task<bool> CreateNewTaskAsync(HITSTaskStatus taskStatus, CreateTaskRequest request)
         {
-            var newTask = MockSprints.CreateTask(request);
+            var currentUser = _authService.CurrentUser;
+            if (currentUser is null) return false;
+
+            var newTask = MockSprints.CreateTask(currentUser, taskStatus, request);
             if (newTask is null) return false;
 
             OnTaskHasCreated?.Invoke(newTask);

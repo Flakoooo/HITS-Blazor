@@ -77,14 +77,12 @@ namespace HITSBlazor.Components.Modals.CenterModals.TaskModal
                 ProjectId = ProjectId,
                 Name = TaskName,
                 Description = TaskDescription,
-                Initiator = currentUser,
                 WorkHour = Hours!.Value,
                 StartDate = DateTime.UtcNow,
-                Tags = SelectedTags,
-                Status = SprintId.HasValue ? HITSTaskStatus.NewTask : HITSTaskStatus.InBackLog
+                Tags = SelectedTags
             };
 
-            var result = await ProjectService.CreateNewTaskAsync(request);
+            var result = await ProjectService.CreateNewTaskAsync(SprintId.HasValue ? HITSTaskStatus.NewTask : HITSTaskStatus.InBackLog, request);
             if (result)  await ModalService.Close(ModalType.Center);
         }
 
