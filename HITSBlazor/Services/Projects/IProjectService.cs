@@ -11,6 +11,7 @@ namespace HITSBlazor.Services.Projects
     public interface IProjectService
     {
         event Action<Project>? OnProjectStatusHasChanged;
+        event Action<ProjectMember>? OnMemberHasKicked;
 
         event Action<Sprint>? OnSprintHasCreated;
         event Action<Sprint>? OnSprintHasUpdated;
@@ -30,17 +31,10 @@ namespace HITSBlazor.Services.Projects
         );
         Task<List<Project>> GetAllActiveProjectsAsync();
         Task<Project?> GetProjectByIdAsync(Guid projectId);
-        Task<ListDataResponse<ProjectMember>> GetProjectMembersAsync(
-            Guid projectId,
-            int page,
-            string? searchText
-        );
-        Task<ProjectMember?> GetCurrentProjectMemberAsync(Guid projectId);
         Task<bool> CreateNewProjectAsync(IdeaMarket ideaMarket);
         //TODOO: найти применение
         Task<bool> AddMemberInProjectAsync(Guid projectId, Guid userId);
-        //TODOO: найти применение
-        Task<bool> KickMemberFromProjectAsync(Guid projectId, Guid userId);
+        Task<bool> KickMemberFromProjectAsync(Guid projectId, ProjectMember member);
         Task<bool> ActivateProjectAsync(Project project);
         Task<bool> PauseProjectAsync(Project project);
         Task<bool> FinishProjectAsync(Project project, string report);
@@ -56,7 +50,7 @@ namespace HITSBlazor.Services.Projects
             string? searchText = null
         );
         Task<Sprint?> GetActiveSprintByProjectIdAsync(Guid proectId);
-        Task<bool> CreateSprintAsync(Guid projectId, CreateSprintRequest request);
+        Task<bool> CreateSprintAsync(CreateSprintRequest request);
         Task<bool> UpdateSprintAsync(Guid sprintId, UpdateSprintRequest request);
         Task<bool> FinishSprintAsync(Guid sprintId, string report, IEnumerable<SprintMarkRequest> marks);
 

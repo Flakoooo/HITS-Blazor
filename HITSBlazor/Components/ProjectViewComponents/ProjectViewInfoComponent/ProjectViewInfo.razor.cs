@@ -2,25 +2,23 @@
 using HITSBlazor.Components.Button;
 using HITSBlazor.Components.Modals.CenterModals.FinishProjectModal;
 using HITSBlazor.Components.Modals.Components.RightSideModaCollapselInfo;
-using HITSBlazor.Components.Tables.TableComponent;
 using HITSBlazor.Components.Tables.TableHeader;
 using HITSBlazor.Components.Typography;
-using HITSBlazor.Models.Ideas.Entities;
-using HITSBlazor.Models.Markets.Entities;
-using HITSBlazor.Models.Markets.Enums;
 using HITSBlazor.Models.Projects.Entities;
 using HITSBlazor.Models.Projects.Enums;
-using HITSBlazor.Services.Markets;
+using HITSBlazor.Services.Auth;
 using HITSBlazor.Services.Modal;
 using HITSBlazor.Services.Projects;
 using Microsoft.AspNetCore.Components;
-using HITSTask = HITSBlazor.Models.Projects.Entities.Task;
 using SharpTask = System.Threading.Tasks.Task;
 
 namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewInfoComponent
 {
     public partial class ProjectViewInfo
     {
+        [Inject]
+        private IAuthService AuthService { get; set; } = null!;
+
         [Inject]
         private IProjectService ProjectService { get; set; } = null!;
 
@@ -38,15 +36,13 @@ namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewInfoComponent
 
         private bool _isLoading = true;
 
-        private TableComponent? _tableComponent;
-
         private string _searchtext = string.Empty;
 
-        private readonly List<ProjectMember> _projectMembers = [];
+        private List<ProjectMember> _projectMembers = [];
 
         private List<CollapseItem> _projectInfoData = [];
 
-        private static List<TableHeaderItem> _membersTableHeader =
+        private static readonly List<TableHeaderItem> _membersTableHeader =
         [
             new() { Text = "Почта",                     },
             new() { Text = "Имя",                       },
@@ -60,37 +56,14 @@ namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewInfoComponent
         {
             _isLoading = true;
 
-            await LoadProjectMembersAsync();
             _projectInfoData = GetProjectData();
 
             _isLoading = false;
-            MarkAsInitialized();
         }
 
-        protected override async SharpTask AdditionalAfterRenderMethod()
+        protected override void OnParametersSet()
         {
-            if (_tableComponent is not null)
-                _tableContainer = _tableComponent.ScrollContainer;
-        }
-
-        protected override int GetCurrentItemsCount() => _projectMembers.Count;
-
-        protected override async SharpTask OnLoadMoreItemsAsync()
-            => await LoadProjectMembersAsync(true);
-
-        private async SharpTask LoadProjectMembersAsync(bool append = false)
-        {
-            if (CurrentProject is null) return;
-
-            await LoadDataAsync(
-                _projectMembers,
-                () => ProjectService.GetProjectMembersAsync(
-                    CurrentProject.Id,
-                    _currentPage,
-                    searchText: _searchtext
-                ),
-                append
-            );
+            SeacrhMember(_searchtext);
         }
 
         private List<CollapseItem> GetProjectData() => [
@@ -105,19 +78,18 @@ namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewInfoComponent
             };
 
             if (CurrentProjectMember?.ProjectRole is ProjectMemberRole.Initiator or ProjectMemberRole.TeamLeader)
-            {
-                actions.Add(MenuAction.SetLeader, member);
                 actions.Add(MenuAction.RemoveTeamMember, member);
-            }
 
             return actions;
         }
 
-        private async SharpTask SeacrhMember(string value)
+        private void SeacrhMember(string value)
         {
             _searchtext = value;
-            ResetPagination();
-            await LoadProjectMembersAsync();
+            if (string.IsNullOrWhiteSpace(_searchtext))
+                _projectMembers = CurrentProject?.Members.ToList() ?? [];
+            else
+                _projectMembers = CurrentProject?.Members.Where(m => m.FullName.Contains(_searchtext, StringComparison.CurrentCultureIgnoreCase)).ToList() ?? [];
         }
 
         private void ShowProfileModal(Guid userId) => ModalService.ShowProfileModal(userId);
@@ -145,7 +117,7 @@ namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewInfoComponent
             {
                 ModalService.ShowConfirmModal(
                     "Вы действительно хотите запустить проект?",
-                    () => ProjectService.PauseProjectAsync(CurrentProject),
+                    () => ProjectService.ActivateProjectAsync(CurrentProject),
                     questionTextColor: TextColor.Danger,
                     confirmButtonVariant: ButtonVariant.Success,
                     confirmButtonText: "Запустить проект"
@@ -167,7 +139,7 @@ namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewInfoComponent
             {
                 ModalService.ShowConfirmModal(
                     "Вы действительно хотите удалить проект? Данное действие отменить нельзя.",
-                    () => ProjectService.PauseProjectAsync(CurrentProject),
+                    () => ProjectService.DeletedProjectAsync(CurrentProject),
                     questionTextColor: TextColor.Danger,
                     confirmButtonVariant: ButtonVariant.Danger,
                     confirmButtonText: "Удалить проект"
@@ -179,6 +151,16 @@ namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewInfoComponent
         {
             if (context.Action is MenuAction.ViewProfile && context.Item is Guid memberId)
                 ShowProfileModal(memberId);
+            else if (context.Item is ProjectMember member && context.Action is MenuAction.RemoveTeamMember && CurrentProject is not null)
+            {
+                ModalService.ShowConfirmModal(
+                    $"Вы действительно хотите исключить {member.FullName}? Данное действие отменить нельзя.",
+                    () => ProjectService.KickMemberFromProjectAsync(CurrentProject.Id, member),
+                    questionTextColor: TextColor.Danger,
+                    confirmButtonVariant: ButtonVariant.Danger,
+                    confirmButtonText: "Исключить пользователя"
+                );
+            }
         }
     }
 }

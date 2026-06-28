@@ -498,7 +498,7 @@ namespace HITSBlazor.Utils.Mocks.Projects
 
         private static List<Sprint> CreateSprints()
         {
-            var firstSprintDate = new DateTime(2023, 12, 26, 11, 2, 17, DateTimeKind.Utc);
+            var firstSprintDate = new DateOnly(2023, 12, 26);
 
             return
             [
@@ -594,24 +594,24 @@ namespace HITSBlazor.Utils.Mocks.Projects
         public static Sprint? GetActiveSprintByProjectId(Guid projectId)
             => _sprints.FirstOrDefault(s => s.ProjectId == projectId && s.Status is SprintStatus.Active);
 
-        public static Sprint? CreateSprint(Guid projectId, CreateSprintRequest request)
+        public static Sprint? CreateSprint(CreateSprintRequest request)
         {
             var newSprint = new Sprint
             {
                 Id = Guid.NewGuid(),
-                ProjectId = projectId,
+                ProjectId = request.ProjectId,
                 Name = request.Name,
                 Goal = request.Goal,
                 StartDate = request.StartDate,
                 FinishDate = request.FinishDate,
                 WorkingHours = request.WorkingHours,
                 Status = SprintStatus.Active,
-                Tasks = request.Tasks.ToList()
+                Tasks = _tasks.Where(t => request.Tasks.Contains(t.Id)).ToList()
             };
 
             _sprints.Add(newSprint);
 
-            foreach (var task in _tasks.Where(request.Tasks.Contains))
+            foreach (var task in _tasks.Where(t => request.Tasks.Contains(t.Id)))
             {
                 task.Status = HITSTaskStatus.NewTask;
                 task.SprintId = newSprint.Id;
@@ -633,14 +633,14 @@ namespace HITSBlazor.Utils.Mocks.Projects
 
             if (sprintForUpdate.Tasks.Count < request.Tasks?.Count)
             {
-                foreach (var task in request.Tasks?.Where(t => t.Status is HITSTaskStatus.InBackLog) ?? [])
+                foreach (var task in _tasks.Where(t => request.Tasks.Contains(t.Id) && t.Status is HITSTaskStatus.InBackLog))
                 {
                     task.Status = HITSTaskStatus.NewTask;
                     task.SprintId = sprintId;
                     UpdateTaskStatus(task.Id, HITSTaskStatus.NewTask, updateInitiator);
                 }
 
-                sprintForUpdate.Tasks = request.Tasks?.ToList() ?? sprintForUpdate.Tasks;
+                sprintForUpdate.Tasks = _tasks.Where(t => request.Tasks.Contains(t.Id)).ToList();
 
                 UpdateTaskBackLogPosition(sprintForUpdate.ProjectId);
             }

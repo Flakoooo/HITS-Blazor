@@ -1,6 +1,7 @@
 ﻿using HITSBlazor.Components.ProjectViewComponents.ProjectViewActiveSprintTasks;
 using HITSBlazor.Models.Projects.Entities;
 using HITSBlazor.Models.Projects.Enums;
+using HITSBlazor.Services.Auth;
 using HITSBlazor.Services.DragAndDrop;
 using HITSBlazor.Services.Projects;
 using Microsoft.AspNetCore.Authorization;
@@ -15,6 +16,9 @@ namespace HITSBlazor.Pages.Projects.ProjectView
     [Route("projects/{ProjectId}")]
     public partial class ProjectView : IDisposable
     {
+        [Inject]
+        private IAuthService AuthService { get; set; } = null!;
+
         [Inject]
         private IProjectService ProjectService { get; set; } = null!;
 
@@ -37,6 +41,7 @@ namespace HITSBlazor.Pages.Projects.ProjectView
             _isLoading = true;
 
             ProjectService.OnProjectStatusHasChanged += ProjectStatusHasChanged;
+            ProjectService.OnMemberHasKicked += MemberHaskicked;
 
             ProjectService.OnSprintHasCreated += SprintHasCreated;
             ProjectService.OnSprintHasFinished += SprintHasFinished;
@@ -54,7 +59,7 @@ namespace HITSBlazor.Pages.Projects.ProjectView
                 _currentProject = await ProjectService.GetProjectByIdAsync(guid);
                 if (_currentProject is null) return;
 
-                _currentMember = await ProjectService.GetCurrentProjectMemberAsync(guid);
+                _currentMember = _currentProject.Members.FirstOrDefault(m => m.UserId == AuthService.CurrentUser?.Id);
                 _activeSprint = await ProjectService.GetActiveSprintByProjectIdAsync(_currentProject.Id);
                 _activeCategory = ProjectViewCategory.Info;
             }
@@ -90,6 +95,12 @@ namespace HITSBlazor.Pages.Projects.ProjectView
             StateHasChanged();
         }
 
+        private void MemberHaskicked(ProjectMember kickedMember)
+        {
+            if (_currentProject is not null && _currentProject.Members.Remove(kickedMember))
+                StateHasChanged();
+        }
+
         private void SprintHasCreated(Sprint newSprint)
         {
             _activeSprint = newSprint;
@@ -106,6 +117,7 @@ namespace HITSBlazor.Pages.Projects.ProjectView
         public void Dispose()
         {
             ProjectService.OnProjectStatusHasChanged -= ProjectStatusHasChanged;
+            ProjectService.OnMemberHasKicked -= MemberHaskicked;
 
             ProjectService.OnSprintHasCreated -= SprintHasCreated;
             ProjectService.OnSprintHasFinished -= SprintHasFinished;

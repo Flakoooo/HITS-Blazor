@@ -166,10 +166,10 @@ namespace HITSBlazor
             builder.Services.AddScoped<IIdeaMarketService, MockIdeaMarketService>();
 
             //Tests
-            builder.Services.AddScoped<ITestService, MockTestService>();
+            //builder.Services.AddScoped<ITestService, MockTestService>();
 
             //TestResults
-            builder.Services.AddScoped<ITestResultService, MockTestResultService>();
+            //builder.Services.AddScoped<ITestResultService, MockTestResultService>();
 
             //Profile
             builder.Services.AddScoped<IProfileService, MockProfileService>();

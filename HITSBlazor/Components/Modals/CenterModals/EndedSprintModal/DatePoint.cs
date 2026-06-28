@@ -2,7 +2,7 @@
 {
     public class DatePoint
     {
-        public DateTime Date { get; set; } = DateTime.Now;
+        public DateOnly Date { get; set; } = DateOnly.FromDateTime(DateTime.Now);
         public decimal Value { get; set; } = 0;
     }
 }

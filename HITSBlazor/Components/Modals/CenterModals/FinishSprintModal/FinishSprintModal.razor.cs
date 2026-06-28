@@ -69,7 +69,6 @@ namespace HITSBlazor.Components.Modals.CenterModals.FinishSprintModal
             {
                 marks.Add(new SprintMarkRequest
                 {
-                    SprintId = SprintId,
                     UserId = pair.Key,
                     Mark = pair.Value ?? 0
                 });

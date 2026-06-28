@@ -2,6 +2,7 @@
 using HITSBlazor.Models.Projects.Requests;
 using HITSBlazor.Services.Modal;
 using HITSBlazor.Services.Projects;
+using HITSBlazor.Utils.Validation;
 using Microsoft.AspNetCore.Components;
 using Newtonsoft.Json.Bson;
 using System.Globalization;
@@ -87,43 +88,30 @@ namespace HITSBlazor.Components.Modals.CenterModals.SprintModal
             WorkingHours = _sprintTasks.Sum(t => t.WorkHour);
         }
 
-        private static DateTime? ConvertStringToDate(string date)
-        {
-            if (string.IsNullOrWhiteSpace(date)) return null;
-
-            return DateTimeOffset.Parse(
-                date, CultureInfo.InvariantCulture, DateTimeStyles.AssumeUniversal
-            ).UtcDateTime;
-        }
-
-        private bool CheckValidValues(out DateTime? startDate, out DateTime? finishDate)
-        {
-            startDate = ConvertStringToDate(StartDate);
-            finishDate = ConvertStringToDate(FinishDate);
-
-            if (string.IsNullOrWhiteSpace(Name)) return false;
-            if (!startDate.HasValue) return false;
-            if (!finishDate.HasValue) return false;
-
-            return true;
-        }
-
         private async SharpTask CreateSprint()
         {
-            if (CheckValidValues(out var startDate, out var finishDate))
-            {
-                var createRequest = new CreateSprintRequest
-                {
-                    Name = Name,
-                    Goal = Goal,
-                    StartDate = startDate!.Value,
-                    FinishDate = finishDate!.Value,
-                    WorkingHours = _sprintTasks.Sum(t => t.WorkHour),
-                    Tasks = _sprintTasks
-                };
+            var startDate = DateValidation.ConvertStringDate<DateOnly>(StartDate);
+            var finishDate = DateValidation.ConvertStringDate<DateOnly>(FinishDate);
+            if (!startDate.HasValue || !finishDate.HasValue) return;
 
-                if (await ProjectService.CreateSprintAsync(ProjectId, createRequest))  
-                    await ModalService.Close(ModalType.Center);
+            if (DateValidation.StartDateValidation(startDate.Value).IsValid)
+            {
+                if (DateValidation.FinishDateValidation(finishDate.Value, startDate.Value).IsValid)
+                {
+                    var createRequest = new CreateSprintRequest
+                    {
+                        ProjectId = ProjectId,
+                        Name = Name,
+                        Goal = Goal,
+                        StartDate = startDate.Value,
+                        FinishDate = finishDate.Value,
+                        WorkingHours = _sprintTasks.Sum(t => t.WorkHour),
+                        Tasks = _sprintTasks.Select(t => t.Id).ToList()
+                    };
+
+                    if (await ProjectService.CreateSprintAsync(createRequest))
+                        await ModalService.Close(ModalType.Center);
+                }
             }
         }
 
@@ -131,20 +119,27 @@ namespace HITSBlazor.Components.Modals.CenterModals.SprintModal
         {
             if (CurrentSprint is null) return;
 
-            if (CheckValidValues(out var startDate, out var finishDate))
-            {
-                var updateSprint = new UpdateSprintRequest
-                {
-                    Name = Name,
-                    Goal = Goal,
-                    StartDate = startDate!.Value,
-                    FinishDate = finishDate!.Value,
-                    WorkingHours = _sprintTasks.Sum(t => t.WorkHour),
-                    Tasks = _sprintTasks
-                };
+            var startDate = DateValidation.ConvertStringDate<DateOnly>(StartDate);
+            var finishDate = DateValidation.ConvertStringDate<DateOnly>(FinishDate);
+            if (!startDate.HasValue || !finishDate.HasValue) return;
 
-                if (await ProjectService.UpdateSprintAsync(CurrentSprint.Id, updateSprint))  
-                    await ModalService.Close(ModalType.Center);
+            if (DateValidation.StartDateValidation(startDate.Value).IsValid)
+            {
+                if (DateValidation.FinishDateValidation(finishDate.Value, startDate.Value).IsValid)
+                {
+                    var updateSprint = new UpdateSprintRequest
+                    {
+                        Name = Name,
+                        Goal = Goal,
+                        StartDate = startDate!.Value,
+                        FinishDate = finishDate!.Value,
+                        WorkingHours = _sprintTasks.Sum(t => t.WorkHour),
+                        Tasks = _sprintTasks.Select(t => t.Id).ToList()
+                    };
+
+                    if (await ProjectService.UpdateSprintAsync(CurrentSprint.Id, updateSprint))
+                        await ModalService.Close(ModalType.Center);
+                }
             }
         }
 

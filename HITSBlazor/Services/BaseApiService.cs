@@ -105,6 +105,9 @@ namespace HITSBlazor.Services
         protected static string AddQuery(string key, bool value, bool append = true)
             => $"{(append ? '&' : '?')}{key}={value.ToString().ToLower()}";
 
+        protected static string AddQuery(string key, Enum value, bool append = true)
+            => $"{(append ? '&' : '?')}{key}={value}";
+
         protected static string AddQuery(string key, Guid value, bool append = true)
             => $"{(append ? '&' : '?')}{key}={value}";
 

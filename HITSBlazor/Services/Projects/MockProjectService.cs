@@ -17,6 +17,7 @@ namespace HITSBlazor.Services.Projects
         private readonly IAuthService _authService = authService;
 
         public event Action<Project>? OnProjectStatusHasChanged;
+        public event Action<ProjectMember>? OnMemberHasKicked; 
 
         public event Action<Sprint>? OnSprintHasCreated;
         public event Action<Sprint>? OnSprintHasUpdated;
@@ -47,20 +48,6 @@ namespace HITSBlazor.Services.Projects
         public async Task<Project?> GetProjectByIdAsync(Guid projectId)
             => MockProjects.GetProjectById(projectId);
 
-        public async Task<ListDataResponse<ProjectMember>> GetProjectMembersAsync(
-            Guid projectId,
-            int page,
-            string? searchText
-        ) => MockProjects.GetProjectMembers(projectId, page, searchText: searchText);
-
-        public async Task<ProjectMember?> GetCurrentProjectMemberAsync(Guid projectId)
-        {
-            var currentUser = _authService.CurrentUser;
-            if (currentUser is null) return null;
-            
-            return MockProjects.GetCurrentProjectMember(projectId, currentUser.Id);
-        }
-
         public async Task<bool> CreateNewProjectAsync(IdeaMarket ideaMarket) => MockProjects.CreateNewProject(ideaMarket);
 
         //TODOO: реализовать, но как?
@@ -72,8 +59,16 @@ namespace HITSBlazor.Services.Projects
         public async Task<bool> AddMemberInProjectAsync(Guid projectId, Guid userId)
             => MockProjects.AddMemberInProject(projectId, userId);
 
-        public async Task<bool> KickMemberFromProjectAsync(Guid projectId, Guid userId)
-            => MockProjects.KickMemberFromProject(projectId, userId);
+        public async Task<bool> KickMemberFromProjectAsync(Guid projectId, ProjectMember member)
+        {
+            if (MockProjects.KickMemberFromProject(projectId, member.UserId))
+            {
+                OnMemberHasKicked?.Invoke(member);
+                return true;
+            }
+
+            return false;
+        }
 
         public async Task<bool> ActivateProjectAsync(Project project)
         {
@@ -127,9 +122,9 @@ namespace HITSBlazor.Services.Projects
         public async Task<Sprint?> GetActiveSprintByProjectIdAsync(Guid proectId)
             => MockSprints.GetActiveSprintByProjectId(proectId);
 
-        public async Task<bool> CreateSprintAsync(Guid projectId, CreateSprintRequest request)
+        public async Task<bool> CreateSprintAsync(CreateSprintRequest request)
         {
-            var newSprint = MockSprints.CreateSprint(projectId, request);
+            var newSprint = MockSprints.CreateSprint(request);
             if (newSprint is null) return false;
 
             OnSprintHasCreated?.Invoke(newSprint);

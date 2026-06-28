@@ -12,16 +12,16 @@
 @using HITSBlazor.Components.Typography
 @using HITSBlazor.Models.Projects.Entities
 @using HITSBlazor.Models.Projects.Enums
+@using HITSBlazor.Models.Users.Enums
 @using HITSBlazor.Pages
 @using HITSBlazor.Services.Modal
-@inherits ListPageDataLoader
 
 <div class="d-flex gap-3 mt-4">
     <div class="w-75">
         <RightSideModaCollapselInfo IsLoading="IsOnLoading" Data="_projectInfoData" />
         <div class="w-100 bg-white p-3">
             <InputSearch Width="50" IsLoading="IsOnLoading" ValueChanged="@((value) => SeacrhMember(value))" DebounceDelay="500" />
-            <TableComponent IsLoading="IsOnLoading" HeaderItems="_membersTableHeader" TableActionMenuIsEnable="true" @ref="_tableComponent">
+            <TableComponent IsLoading="IsOnLoading" HeaderItems="_membersTableHeader" TableActionMenuIsEnable="true">
                 <TableContent>
                     @foreach (var member in _projectMembers)
                     {
@@ -83,11 +83,12 @@
                 @{
                     var currentStatus = CurrentProject?.Status;
                     var currentMemberRole = CurrentProjectMember?.ProjectRole;
+                    var currentUser = AuthService.CurrentUser;
                     <Button IsLoading="IsOnLoading"
                             Text="Перейти в идею" 
                             Variant="ButtonVariant.Primary"
                             OnButtonClick="() => ShowIdeaModal(CurrentProject?.IdeaId)" />
-                    @if (currentStatus is not ProjectStatus.Deleted and ProjectStatus.Done && currentMemberRole is not ProjectMemberRole.Member)
+                    @if (currentMemberRole is not ProjectMemberRole.Member || currentUser?.Role is RoleType.Admin)
                     {
                         if (currentStatus is ProjectStatus.Paused)
                         {

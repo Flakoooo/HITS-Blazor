@@ -146,11 +146,11 @@ namespace HITSBlazor.Components.Modals.CenterModals.EndedSprintModal
             _activeStatCategory = category;
         }
 
-        private List<DateTime> GetSprintDays()
+        private List<DateOnly> GetSprintDays()
         {
-            var days = new List<DateTime>();
-            var currentDate = CurrentSprint.StartDate.Date;
-            var endDate = CurrentSprint.FinishDate.Date;
+            var days = new List<DateOnly>();
+            var currentDate = CurrentSprint.StartDate;
+            var endDate = CurrentSprint.FinishDate;
 
             while (currentDate <= endDate)
             {
@@ -160,10 +160,10 @@ namespace HITSBlazor.Components.Modals.CenterModals.EndedSprintModal
             return days;
         }
 
-        private List<DatePoint> GetCompletedTasksByDay(List<DateTime> sprintDays)
+        private List<DatePoint> GetCompletedTasksByDay(List<DateOnly> sprintDays)
         {
             var result = new List<DatePoint>();
-            var completedTasks = new Dictionary<DateTime, int>();
+            var completedTasks = new Dictionary<DateOnly, int>();
 
             var taskLogs = CurrentSprint.Tasks
                 .SelectMany(t => MockTaskMovementLogs.GetTaskMovementLogsByTaskId(t.Id))
@@ -171,7 +171,7 @@ namespace HITSBlazor.Components.Modals.CenterModals.EndedSprintModal
 
             foreach (var day in sprintDays)
             {
-                var completedOnDay = taskLogs.Count(log => log.StartDate.Date == day.Date);
+                var completedOnDay = taskLogs.Count(log => DateOnly.FromDateTime(log.StartDate) == day);
 
                 completedTasks[day] = completedOnDay;
             }
@@ -190,7 +190,7 @@ namespace HITSBlazor.Components.Modals.CenterModals.EndedSprintModal
             return result;
         }
 
-        private List<DatePoint> GetRemainingTasksByDay(List<DateTime> sprintDays)
+        private List<DatePoint> GetRemainingTasksByDay(List<DateOnly> sprintDays)
         {
             var result = new List<DatePoint>();
             var totalTasks = CurrentSprint.Tasks.Count;
@@ -213,21 +213,21 @@ namespace HITSBlazor.Components.Modals.CenterModals.EndedSprintModal
             return result;
         }
 
-        private Models.Projects.Enums.TaskStatus GetTaskStatusOnDate(Models.Projects.Entities.Task task, DateTime date)
+        private Models.Projects.Enums.TaskStatus GetTaskStatusOnDate(Models.Projects.Entities.Task task, DateOnly date)
         {
             var logs = MockTaskMovementLogs.GetTaskMovementLogsByTaskId(task.Id);
             if (logs.Count == 0) return task.Status;
 
             var activeLog = logs
-                .Where(log => log.StartDate.Date <= date.Date)
-                .Where(log => !log.EndDate.HasValue || log.EndDate.Value.Date >= date.Date)
+                .Where(log => DateOnly.FromDateTime(log.StartDate) <= date)
+                .Where(log => !log.EndDate.HasValue || DateOnly.FromDateTime(log.EndDate.Value) >= date)
                 .OrderByDescending(log => log.StartDate)
                 .FirstOrDefault();
 
             return activeLog?.Status ?? task.Status;
         }
 
-        private List<DatePoint> GetIdealBurndown(List<DateTime> sprintDays)
+        private List<DatePoint> GetIdealBurndown(List<DateOnly> sprintDays)
         {
             var totalTasks = CurrentSprint.Tasks.Count;
 
@@ -293,7 +293,7 @@ namespace HITSBlazor.Components.Modals.CenterModals.EndedSprintModal
                     .Where(day => day.DayOfWeek == DayOfWeek.Saturday || day.DayOfWeek == DayOfWeek.Sunday)
                     .Select(weekend => new AnnotationsXAxis
                     {
-                        X = weekend.ToOADate(),
+                        X = weekend.ToDateTime(TimeOnly.MinValue).ToOADate(),
                         BorderColor = "#ffeb3b",
                         Opacity = 0.1,
                         Label = new Label

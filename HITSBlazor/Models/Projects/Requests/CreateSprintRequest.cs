@@ -2,11 +2,12 @@
 {
     public class CreateSprintRequest
     {
+        public Guid ProjectId { get; set; }
         public string Name { get; set; } = string.Empty;
         public string Goal { get; set; } = string.Empty;
-        public DateTime StartDate { get; set; }
-        public DateTime FinishDate { get; set; }
         public int WorkingHours { get; set; }
-        public ICollection<Entities.Task> Tasks { get; set; } = [];
+        public DateOnly StartDate { get; set; }
+        public DateOnly FinishDate { get; set; }
+        public ICollection<Guid> Tasks { get; set; } = [];
     }
 }

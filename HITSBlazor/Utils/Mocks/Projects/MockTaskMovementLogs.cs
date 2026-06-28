@@ -24,11 +24,11 @@ namespace HITSBlazor.Utils.Mocks.Projects
 
                 var workablemembers = project.Members.Where(m => m.ProjectRole is not ProjectMemberRole.Initiator).Select(m => m.UserId).ToList();
 
-                var sprintDifference = sprint.FinishDate - sprint.StartDate;
+                var sprintDifference = sprint.FinishDate.ToDateTime(TimeOnly.MinValue) - sprint.StartDate.ToDateTime(TimeOnly.MinValue);
 
                 foreach (var task in sprint.Tasks)
                 {
-                    if (task.Status is HITSTaskStatus.InBackLog || task.StartDate < sprint.StartDate)
+                    if (task.Status is HITSTaskStatus.InBackLog || task.StartDate < sprint.StartDate.ToDateTime(TimeOnly.MinValue))
                     {
                         logs.Add(
                             CreateTaskLog(
@@ -126,8 +126,8 @@ namespace HITSBlazor.Utils.Mocks.Projects
 
             if (targetStatus is HITSTaskStatus.NewTask)
             {
-                startDate = sprint.StartDate;
-                lastLog?.EndDate = sprint.StartDate;
+                startDate = sprint.StartDate.ToDateTime(TimeOnly.MinValue);
+                lastLog?.EndDate = sprint.StartDate.ToDateTime(TimeOnly.MinValue);
             }
             else if (lastLog?.EndDate is not null)
             {
@@ -147,8 +147,8 @@ namespace HITSBlazor.Utils.Mocks.Projects
                 User = task.Initiator,
                 StartDate = startDate ?? task.StartDate,
                 EndDate = task.Status > targetStatus
-                    ? (startDate ?? task.StartDate).AddDays(_random.Next(0, (sprint.FinishDate - (lastLog?.EndDate is null
-                        ? sprint.StartDate
+                    ? (startDate ?? task.StartDate).AddDays(_random.Next(0, (sprint.FinishDate.ToDateTime(TimeOnly.MinValue) - (lastLog?.EndDate is null
+                        ? sprint.StartDate.ToDateTime(TimeOnly.MinValue)
                         : lastLog.EndDate.Value)).Days))
                     : null,
                 WastedTime = string.Empty,
