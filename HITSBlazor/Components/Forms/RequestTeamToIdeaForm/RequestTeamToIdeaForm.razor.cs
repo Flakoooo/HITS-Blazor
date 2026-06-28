@@ -139,6 +139,8 @@ namespace HITSBlazor.Components.Forms.RequestTeamToIdeaForm
             if (_errors.Count > 0) return;
 
             var newRequest = await TeamService.CreateRequestTeamToIdeaAsync(IdeaMarket, team, LetterText);
+            if (newRequest is null) return;
+
             _cachedRequests.Add(team.Id, newRequest);
             if (_queuedCollapseMethod is not null)
             {

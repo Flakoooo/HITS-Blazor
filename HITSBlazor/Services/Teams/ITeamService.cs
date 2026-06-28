@@ -44,6 +44,7 @@ namespace HITSBlazor.Services.Teams
         Task<bool> UpdateTeamAsync(UpdateTeamRequest request);
         Task<bool> UpdateTeamLeader(Team team, TeamMember? newLeader);
         Task KickMemberAsync(TeamMember member);
+        Task LeaveFromTeamAsync(TeamMember member);
         Task DeleteTeamAsync(Team team);
 
 
@@ -54,7 +55,7 @@ namespace HITSBlazor.Services.Teams
             string? searchText = null,
             IEnumerable<TeamRequestStatus>? selectedStatuses = null
         );
-        Task CreateNewTeamInvitationsAsync(Guid teamId, IEnumerable<Guid> inviteMemberIds);
+        Task CreateNewTeamInvitationsAsync(Guid teamId, IEnumerable<User> invitedMembers);
         Task UpdateTeamInvitationStatusAsync(Guid teamInvitationId, TeamRequestStatus newStatus);
 
         //заявки в команду участников
@@ -79,7 +80,7 @@ namespace HITSBlazor.Services.Teams
             Guid ideaMarketId,
             IEnumerable<Guid> currentTeamIds
         );
-        Task<RequestTeamToIdea> CreateRequestTeamToIdeaAsync(IdeaMarket ideaMarket, Team team, string letter);
+        Task<RequestTeamToIdea?> CreateRequestTeamToIdeaAsync(IdeaMarket ideaMarket, Team team, string letter);
 
         Task<bool> UpdateRequestTeamToIdeaStatusAsync(Guid requestId, TeamRequestStatus newStatus);
 

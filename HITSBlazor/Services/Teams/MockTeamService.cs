@@ -87,7 +87,7 @@ namespace HITSBlazor.Services.Teams
 
         public async Task<bool> UpdateTeamLeader(Team team, TeamMember? newLeader)
         {
-            if (!MockTeams.UpdateTeamLeader(team.Id, newLeader?.Id))
+            if (!MockTeams.UpdateTeamLeader(team.Id, newLeader?.UserId))
             {
                 _globalNotificationService.ShowError("Не удалось изменить Тим-лидера");
                 return false;
@@ -103,6 +103,17 @@ namespace HITSBlazor.Services.Teams
             if (!MockTeams.KickMember(member))
             {
                 _globalNotificationService.ShowError("Не удалось исключить участника");
+                return;
+            }
+
+            OnTeamMemberHasKicked?.Invoke(member);
+        }
+
+        public async Task LeaveFromTeamAsync(TeamMember member)
+        {
+            if (!MockTeams.KickMember(member))
+            {
+                _globalNotificationService.ShowError("Не удалось покинуть команду");
                 return;
             }
 
@@ -133,9 +144,9 @@ namespace HITSBlazor.Services.Teams
             selectedStatuses: selectedStatuses?.ToHashSet()
         );
 
-        public async Task CreateNewTeamInvitationsAsync(Guid teamId, IEnumerable<Guid> inviteMemberIds)
+        public async Task CreateNewTeamInvitationsAsync(Guid teamId, IEnumerable<User> invitedMembers)
         {
-            MockTeamInvitations.CreateNewInvitations(teamId, inviteMemberIds);
+            MockTeamInvitations.CreateNewInvitations(teamId, invitedMembers.Select(u => u.Id));
 
             _globalNotificationService.ShowSuccess("Приглашения отправлены!");
             OnNewTeamInvitationsHasCreated?.Invoke(false);
@@ -167,8 +178,6 @@ namespace HITSBlazor.Services.Teams
 
             _globalNotificationService.ShowSuccess(successText);
             OnTeamInvitationStatusHasChanged?.Invoke(teamInvitationId, newStatus);
-
-            return;
         }
 
         //заявки в команду участников
@@ -234,8 +243,6 @@ namespace HITSBlazor.Services.Teams
 
             _globalNotificationService.ShowSuccess(successText);
             OnRequestToTeamStatusHasChanged?.Invoke(requestToTeamId, newStatus);
-
-            return;
         }
 
         //заявки команды в идею
@@ -255,7 +262,7 @@ namespace HITSBlazor.Services.Teams
             ideaMarketId, currentTeamIds.ToHashSet()
         );
 
-        public async Task<RequestTeamToIdea> CreateRequestTeamToIdeaAsync(IdeaMarket ideaMarket, Team team, string letter)
+        public async Task<RequestTeamToIdea?> CreateRequestTeamToIdeaAsync(IdeaMarket ideaMarket, Team team, string letter)
         {
             var newRequest = MockRequestTeamToIdeas.CreateNewRequest(ideaMarket, team, letter);
 

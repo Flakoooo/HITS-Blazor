@@ -111,7 +111,7 @@ namespace HITSBlazor.Components.Modals.CenterModals.AddTeamMembersModal
         private async Task ConfirmUsers()
         {
             if (TeamId.HasValue)
-                await TeamService.CreateNewTeamInvitationsAsync(TeamId.Value, _selectedUsers.Select(u => u.Id));
+                await TeamService.CreateNewTeamInvitationsAsync(TeamId.Value, _selectedUsers);
             else
                 TeamService.InvokeInvitationEvent(_selectedUsers);
 

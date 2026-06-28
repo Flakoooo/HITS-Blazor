@@ -176,6 +176,13 @@
                                         Text="Подать заявку в команду"
                                         OnButtonClick="SendRequestInTeam" />
                             }
+                            @if (_currentUserMember is not null && _currentUserMember.Id == AuthService.CurrentUser?.Id)
+                            {
+                                <Button Variant="ButtonVariant.Danger"
+                                        IsLoading="_isLoading"
+                                        Text="Покинуть команду"
+                                        OnButtonClick="LeaveFromTeam" />
+                            }
                         </div>                        
                     }
                     @if (currentUser.Role is RoleType.Admin or RoleType.Initiator && !isOwner && !isLeader)

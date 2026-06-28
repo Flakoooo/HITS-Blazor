@@ -32,6 +32,7 @@ namespace HITSBlazor.Components.Modals.RightSideModals.TeamModal
 
         private Team? _currentTeam;
         private bool _sendRequestAllowed = false;
+        private TeamMember? _currentUserMember = null;
 
         private List<CollapseItem> _teamData = [];
 
@@ -76,6 +77,7 @@ namespace HITSBlazor.Components.Modals.RightSideModals.TeamModal
             TeamService.OnRequestToTeamStatusHasChanged += TeamRequestsStatusChanged;
             TeamService.OnTeamInvitationStatusHasChanged += TeamRequestsStatusChanged;
 
+            _currentUserMember = _currentTeam.Members.FirstOrDefault(m => m.UserId == AuthService.CurrentUser?.Id);
             _sendRequestAllowed = await TeamService.CurrentUserCanSendRequestInTeamAsync(_currentTeam.Id);
 
             _teamData = GetTeamData();
@@ -136,7 +138,12 @@ namespace HITSBlazor.Components.Modals.RightSideModals.TeamModal
             if (_currentTeam is null) return;
 
             if (_currentTeam.Members.Remove(kickedMember))
+            {
+                if (kickedMember.UserId == AuthService.CurrentUser?.Id)
+                    _currentUserMember = null;
+
                 StateHasChanged();
+            }
         }
 
         private void TeamRequestsStatusChanged(Guid id, TeamRequestStatus newStatus)
@@ -158,6 +165,18 @@ namespace HITSBlazor.Components.Modals.RightSideModals.TeamModal
                 () => TeamService.DeleteTeamAsync(_currentTeam),
                 confirmButtonVariant: ButtonVariant.Danger,
                 confirmButtonText: "Удалить"
+            );
+        }
+
+        private void LeaveFromTeam()
+        {
+            if (_currentTeam is null || _currentUserMember is null) return;
+
+            ModalService.ShowConfirmModal(
+                $"Вы действительно хотите покинуть {_currentTeam.Name}?",
+                () => TeamService.LeaveFromTeamAsync(_currentUserMember),
+                confirmButtonVariant: ButtonVariant.Danger,
+                confirmButtonText: "Покинуть"
             );
         }
 

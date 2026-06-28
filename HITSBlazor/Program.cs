@@ -149,7 +149,12 @@ namespace HITSBlazor
 #endif
 
             //Teams
+#if DEBUG && !DEBUGAPI
             builder.Services.AddScoped<ITeamService, MockTeamService>();
+#else
+            builder.Services.AddScoped<TeamApi>();
+            builder.Services.AddScoped<ITeamService, TeamService>();
+#endif
 
             //Projects
             builder.Services.AddScoped<IProjectService, MockProjectService>();
