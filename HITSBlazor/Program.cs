@@ -175,7 +175,12 @@ namespace HITSBlazor
 #endif
 
             //IdeaMarket
+#if DEBUG && !DEBUGAPI
             builder.Services.AddScoped<IIdeaMarketService, MockIdeaMarketService>();
+#else
+            builder.Services.AddScoped<IdeaMarketApi>();
+            builder.Services.AddScoped<IIdeaMarketService, IdeaMarketService>();
+#endif
 
             //Tests
             //builder.Services.AddScoped<ITestService, MockTestService>();

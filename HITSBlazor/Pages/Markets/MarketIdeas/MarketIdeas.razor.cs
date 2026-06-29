@@ -132,7 +132,7 @@ namespace HITSBlazor.Pages.Markets.MarketIdeas
 
             if (ideaMarket.IsFavorite)
             {
-                if (await IdeaMarketService.UnsetIdeaFromFavorite(AuthService.CurrentUser.Id, ideaMarket))
+                if (await IdeaMarketService.UnsetIdeaFromFavorite(ideaMarket))
                 {
                     ideaMarket.IsFavorite = false;
                     StateHasChanged();
@@ -140,7 +140,7 @@ namespace HITSBlazor.Pages.Markets.MarketIdeas
             }
             else
             {
-                if (await IdeaMarketService.SetIdeaFavorite(AuthService.CurrentUser.Id, ideaMarket))
+                if (await IdeaMarketService.SetIdeaFavorite(ideaMarket))
                 {
                     ideaMarket.IsFavorite = true;
                     StateHasChanged();

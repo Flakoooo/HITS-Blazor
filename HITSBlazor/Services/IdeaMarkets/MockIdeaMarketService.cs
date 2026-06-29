@@ -2,6 +2,7 @@
 using HITSBlazor.Models.Ideas.Entities;
 using HITSBlazor.Models.Markets.Entities;
 using HITSBlazor.Models.Markets.Enums;
+using HITSBlazor.Models.Users.Entities;
 using HITSBlazor.Models.Users.Enums;
 using HITSBlazor.Services.Auth;
 using HITSBlazor.Utils.Mocks.Markets;
@@ -41,10 +42,22 @@ namespace HITSBlazor.Services.IdeaMarkets
         public async Task<bool> SendIdeasOnMarket(ICollection<Idea> ideas, Market market)
             => MockIdeaMarkets.SendIdeasOnMarket(ideas, market) > 0;
 
-        public async Task<bool> SetIdeaFavorite(Guid userId, IdeaMarket ideaMarket)
-            => MockIdeaMarkets.SetIdeaFavorite(userId, ideaMarket.Id);
+        public async Task<bool> SetIdeaFavorite(IdeaMarket ideaMarket)
+        {
+            var currentUser = _authService.CurrentUser;
+            if (currentUser is null || currentUser.Role is null)
+                return false;
 
-        public async Task<bool> UnsetIdeaFromFavorite(Guid userId, IdeaMarket ideaMarket)
-            => MockIdeaMarkets.UnsetIdeaFromFavorite(userId, ideaMarket.Id);
+            return MockIdeaMarkets.SetIdeaFavorite(currentUser.Id, ideaMarket.Id);
+        }
+
+        public async Task<bool> UnsetIdeaFromFavorite(IdeaMarket ideaMarket)
+        {
+            var currentUser = _authService.CurrentUser;
+            if (currentUser is null || currentUser.Role is null)
+                return false;
+
+            return MockIdeaMarkets.UnsetIdeaFromFavorite(currentUser.Id, ideaMarket.Id);
+        }
     }
 }

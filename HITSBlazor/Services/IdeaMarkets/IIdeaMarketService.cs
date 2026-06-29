@@ -19,7 +19,7 @@ namespace HITSBlazor.Services.IdeaMarkets
 
         Task<bool> SendIdeasOnMarket(ICollection<Idea> ideas, Market market);
 
-        Task<bool> SetIdeaFavorite(Guid userId, IdeaMarket ideaMarket);
-        Task<bool> UnsetIdeaFromFavorite(Guid userId, IdeaMarket ideaMarket);
+        Task<bool> SetIdeaFavorite(IdeaMarket ideaMarket);
+        Task<bool> UnsetIdeaFromFavorite(IdeaMarket ideaMarket);
     }
 }
