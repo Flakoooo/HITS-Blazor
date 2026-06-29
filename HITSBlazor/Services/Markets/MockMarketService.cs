@@ -61,10 +61,10 @@ namespace HITSBlazor.Services.Markets
 
         
         public async Task<bool> UpdateMarketAsync(
-            Guid marketId, string name, DateOnly startDate, DateOnly finishDate, MarketStatus status
+            Guid marketId, string name, DateOnly startDate, DateOnly finishDate
         )
         {
-            var market = MockMarkets.UpdateMarket(marketId, name, startDate, finishDate, status);
+            var market = MockMarkets.UpdateMarket(marketId, name, startDate, finishDate);
             if (market is null)
             {
                 _globalNotificationService.ShowError("Не удалось обновить биржу");
@@ -108,7 +108,7 @@ namespace HITSBlazor.Services.Markets
         {
             if (!MockMarkets.DeleteMarket(market))
             {
-                _globalNotificationService.ShowError("Не удалось удалить команду");
+                _globalNotificationService.ShowError("Не удалось удалить биржу");
                 return;
             }
 

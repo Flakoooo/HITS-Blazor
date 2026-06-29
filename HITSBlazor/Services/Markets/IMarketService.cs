@@ -22,7 +22,7 @@ namespace HITSBlazor.Services.Markets
         Task<Market?> GetMarketByIdAsync(Guid marketId);
         Task<bool> CreateNewMarketAsync(string name, DateOnly startDate, DateOnly finishDate);
         Task<bool> UpdateMarketAsync(
-            Guid marketId, string name, DateOnly startDate, DateOnly finishDate, MarketStatus status
+            Guid marketId, string name, DateOnly startDate, DateOnly finishDate
         );
         Task UpdateMarketStatusAsync(Market market, MarketStatus status);
         Task DeleteMarketAsync(Market market);

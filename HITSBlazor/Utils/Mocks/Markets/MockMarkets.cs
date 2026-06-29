@@ -106,7 +106,7 @@ namespace HITSBlazor.Utils.Mocks.Markets
             return market;
         }
 
-        public static Market? UpdateMarket(Guid marketId, string name, DateOnly startDate, DateOnly finishDate, MarketStatus status)
+        public static Market? UpdateMarket(Guid marketId, string name, DateOnly startDate, DateOnly finishDate)
         {
             var marketForUpdate = _markets.FirstOrDefault(m => m.Id == marketId);
             if (marketForUpdate is null) return null;
@@ -114,7 +114,6 @@ namespace HITSBlazor.Utils.Mocks.Markets
             marketForUpdate.Name = name;
             marketForUpdate.StartDate = startDate;
             marketForUpdate.FinishDate = finishDate;
-            marketForUpdate.Status = status;
 
             return marketForUpdate;
         }

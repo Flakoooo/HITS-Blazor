@@ -84,8 +84,7 @@ namespace HITSBlazor.Components.Modals.CenterModals.MarketModal
                     MarketId.Value, 
                     MarketName, 
                     startDate.Value, 
-                    finishDate.Value,
-                    _currentMarketStatus.Value
+                    finishDate.Value
                 );
             }
             else

@@ -20,6 +20,7 @@ namespace HITSBlazor.Utils
             BaseJsonOptions.Converters.Add(new SkillTypeJsonConverter());
             BaseJsonOptions.Converters.Add(new IdeaStatusTypeJsonConverter());
             BaseJsonOptions.Converters.Add(new TeamRequestStatusJsonConverter());
+            BaseJsonOptions.Converters.Add(new MarketStatusJsonConverter());
             BaseJsonOptions.Converters.Add(new ProjectMemberRoleJsonConverter());
             BaseJsonOptions.Converters.Add(new TaskStatusJsonConverter());
             BaseJsonOptions.Converters.Add(new ProjectStatusJsonConverter());
