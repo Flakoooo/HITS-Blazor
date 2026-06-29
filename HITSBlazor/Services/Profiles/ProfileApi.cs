@@ -1,6 +1,7 @@
 ﻿using HITSBlazor.Models.Common.Responses;
 using HITSBlazor.Models.Users.Entities;
 using HITSBlazor.Utils;
+using System.Net.Http.Headers;
 using System.Net.Http.Json;
 
 namespace HITSBlazor.Services.Profiles
@@ -13,7 +14,9 @@ namespace HITSBlazor.Services.Profiles
         private readonly string _profilePath = "/api/profile";
 
         private const string GET_PROFILE_OPERATION = "GetProfile";
+        private const string GET_PROFILE_AVATAR_OPERATION = "GetProfileAvatar";
         private const string UPDATE_PROFILE_OPERATION = "UpdateProfile";
+        private const string UPDATE_PROFILE_AVATAR_OPERATION = "UpdateProfileAvatar";
         private const string REQUEST_TO_UPDATE_EMAIL_OPERATION = "RequestToUpdateEmail";
         private const string CONFIRM_UPDATE_EMAIL_OPERATION = "ConfirmUpdateEmail";
 
@@ -36,6 +39,24 @@ namespace HITSBlazor.Services.Profiles
                     return ServiceResponse<Profile?>.Success(users);
                 },
                 operationName: GET_PROFILE_OPERATION
+            );
+        }
+
+        public async Task<ServiceResponse<string?>> GetProfileAvatarAsync(Guid userId)
+        {
+            string path = $"/api/images/avatar/{userId}.webp";
+
+            return await ExecuteApiCallAsync(
+                apiCall: () => _httpClient.GetAsync(path),
+                successHandler: async response =>
+                {
+                    var bytes = await response.Content.ReadAsByteArrayAsync();
+                    var base64 = Convert.ToBase64String(bytes);
+                    string avatarDataUrl = $"data:image/webp;base64,{base64}";
+
+                    return ServiceResponse<string?>.Success(avatarDataUrl);
+                },
+                operationName: GET_PROFILE_AVATAR_OPERATION
             );
         }
 
@@ -64,6 +85,33 @@ namespace HITSBlazor.Services.Profiles
                     return ServiceResponse<string>.Success(message.Message);
                 },
                 operationName: UPDATE_PROFILE_OPERATION
+            );
+        }
+
+        public async Task<ServiceResponse<string>> UpdateProfileAvatarAsync(byte[] fileBytes, string fileName, string contentType)
+        {
+            string path = $"{_profilePath}/avatar";
+
+            var content = new MultipartFormDataContent();
+            var byteContent = new ByteArrayContent(fileBytes);
+            byteContent.Headers.ContentType = new MediaTypeHeaderValue(contentType);
+            content.Add(byteContent, "avatar", fileName);
+
+            return await ExecuteApiCallAsync(
+                apiCall: () => _httpClient.PostAsync(path, content),
+                successHandler: async response =>
+                {
+                    var message = await response.Content.ReadFromJsonAsync<MessageResponse>(Settings.BaseJsonOptions);
+                    if (message is null)
+                    {
+                        LogFail(UPDATE_PROFILE_AVATAR_OPERATION, response.StatusCode, "Error when update profile avatar");
+
+                        return ServiceResponse<string>.Failure("Не удалось обновить аватар профиля", response.StatusCode);
+                    }
+
+                    return ServiceResponse<string>.Success(message.Message);
+                },
+                operationName: UPDATE_PROFILE_AVATAR_OPERATION
             );
         }
 

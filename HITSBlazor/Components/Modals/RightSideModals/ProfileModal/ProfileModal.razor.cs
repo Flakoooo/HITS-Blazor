@@ -4,6 +4,7 @@ using HITSBlazor.Components.Modals.CenterModals.UpdateEmailModal;
 using HITSBlazor.Components.Tables.TableHeader;
 using HITSBlazor.Models.Common.Entities;
 using HITSBlazor.Models.Common.Enums;
+using HITSBlazor.Models.Common.Responses;
 using HITSBlazor.Models.Tests.Entities;
 using HITSBlazor.Models.Users.Entities;
 using HITSBlazor.Services.Auth;
@@ -12,6 +13,10 @@ using HITSBlazor.Services.Profiles;
 using HITSBlazor.Services.TestResults;
 using HITSBlazor.Services.UserSkills;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Forms;
+using System.Net.Http.Headers;
+using static System.Net.WebRequestMethods;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace HITSBlazor.Components.Modals.RightSideModals.ProfileModal
 {
@@ -29,9 +34,6 @@ namespace HITSBlazor.Components.Modals.RightSideModals.ProfileModal
         [Inject]
         private IUserSkillService UserSkillService { get; set; } = null!;
 
-        [Inject]
-        private ITestResultService TestResultService { get; set; } = null!;
-
         [Inject] 
         public IApexChartService ApexChartService { get; set; } = null!;
 
@@ -48,6 +50,7 @@ namespace HITSBlazor.Components.Modals.RightSideModals.ProfileModal
 
         private static ProfileModalCategory _activeCategory = ProfileModalCategory.General;
 
+        private string? _userAvatar = null;
         private Profile? Profile { get; set; }
         private UserDataForm? _userDataForm;
 
@@ -68,22 +71,15 @@ namespace HITSBlazor.Components.Modals.RightSideModals.ProfileModal
             new TableHeaderItem { Text = "Статус",          InCentered = true   },
         ];
 
-        private TestResult? BelbinTestResult { get; set; }
-        private TestResult? TemperTestResult { get; set; }
-        private TestResult? MindTestResult { get; set; }
-
         protected override async Task OnInitializedAsync()
         {
             _isLoading = true;
 
+            _userAvatar = await ProfileService.GetUserProifleAvatarAsync(UserId);
             Profile = await ProfileService.GetUserProifleAsync(UserId);
             if (Profile is null) return;
 
             _userDataForm = ResetUserForm(Profile);
-
-            BelbinTestResult = await TestResultService.GetTestResultAsync(UserId, TestResultService.BelbinTestName);
-            TemperTestResult = await TestResultService.GetTestResultAsync(UserId, TestResultService.TemperTestName);
-            MindTestResult = await TestResultService.GetTestResultAsync(UserId, TestResultService.MindTestName);
 
             if (UserId == AuthService.CurrentUser?.Id)
                 _isCurrentUser = true;
@@ -94,6 +90,22 @@ namespace HITSBlazor.Components.Modals.RightSideModals.ProfileModal
                 _skillRadarOptions.Add(skillType, GetRadarChartOptions());
 
             _isLoading = false;
+        }
+
+        private async Task OnFileSelected(InputFileChangeEventArgs e)
+        {
+            var file = e.File;
+            if (file is null) return;
+
+            if (await ProfileService.UpdateProfileAvatarAsync(file))
+            {
+                var currentUser = AuthService.CurrentUser;
+                if (currentUser is not null)
+                {
+                    _userAvatar = await ProfileService.GetUserProifleAvatarAsync(currentUser.Id);
+                    StateHasChanged();
+                }
+            }
         }
 
         private static async Task ChangeCategory(ProfileModalCategory category)

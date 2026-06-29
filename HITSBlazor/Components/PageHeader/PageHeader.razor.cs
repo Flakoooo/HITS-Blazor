@@ -3,6 +3,7 @@ using HITSBlazor.Models.Users.Entities;
 using HITSBlazor.Models.Users.Enums;
 using HITSBlazor.Services.Auth;
 using HITSBlazor.Services.Modal;
+using HITSBlazor.Services.Profiles;
 using Microsoft.AspNetCore.Components;
 
 namespace HITSBlazor.Components.PageHeader
@@ -13,23 +14,26 @@ namespace HITSBlazor.Components.PageHeader
         private IAuthService AuthService { get; set; } = null!;
 
         [Inject]
+        private IProfileService ProfileService { get; set; } = null!;
+
+        [Inject]
         private ModalService ModalService { get; set; } = null!;
 
+        private string? _userAvatar = null;
         private User? CurrentUser { get; set; } = null;
         private RoleType? CurrentRole { get; set; } = null;
 
         protected override async Task OnInitializedAsync()
         {
-            try
-            {
-                AuthService.OnAuthStateChanged += AuthStateChanged;
-                AuthService.OnActiveRoleChanged += RoleStateChanged;
-                CurrentUser = AuthService.CurrentUser;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Ошибка инициализации MainLayout: {ex.Message}");
-            }
+            AuthService.OnAuthStateChanged += AuthStateChanged;
+            AuthService.OnActiveRoleChanged += RoleStateChanged;
+
+            ProfileService.OnUserAvatarHasChanged += UserAvatarHasChanged;
+
+            CurrentUser = AuthService.CurrentUser;
+
+            if (CurrentUser is not null)
+                _userAvatar = await ProfileService.GetUserProifleAvatarAsync(CurrentUser.Id);
         }
 
         private void AuthStateChanged()
@@ -59,10 +63,18 @@ namespace HITSBlazor.Components.PageHeader
             ModalService.Show<NotificationsModal>(ModalType.RightSide);
         }
 
+        private void UserAvatarHasChanged(string? newAvatar)
+        {
+            _userAvatar = newAvatar;
+            StateHasChanged();
+        }
+
         public void Dispose()
         {
             AuthService.OnAuthStateChanged -= AuthStateChanged;
             AuthService.OnActiveRoleChanged -= RoleStateChanged;
+
+            ProfileService.OnUserAvatarHasChanged -= UserAvatarHasChanged;
         }
     }
 }

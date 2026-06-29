@@ -1,11 +1,8 @@
 ﻿using HITSBlazor.Components.Modals.RightSideModals.ProfileModal;
-using HITSBlazor.Models.Common.Responses;
-using HITSBlazor.Models.Teams.Entities;
 using HITSBlazor.Models.Users.Entities;
 using HITSBlazor.Services.Auth;
-using HITSBlazor.Services.Users;
-using HITSBlazor.Utils.Mocks.Users;
 using HITSBlazor.Utils.Validation;
+using Microsoft.AspNetCore.Components.Forms;
 
 namespace HITSBlazor.Services.Profiles
 {
@@ -21,8 +18,10 @@ namespace HITSBlazor.Services.Profiles
         private readonly ILogger<ProfileService> _logger = logger;
         private readonly GlobalNotificationService _globalNotificationService = globalNotificationService;
 
+        public event Action<string?>? OnUserAvatarHasChanged;
+
+        private string? _userAvatar = null;
         private Guid? _verificationGuid;
-        private string? _newEmail = string.Empty;
 
         public async Task<Profile?> GetUserProifleAsync(Guid userId)
         {
@@ -33,6 +32,28 @@ namespace HITSBlazor.Services.Profiles
                 _globalNotificationService.ShowError(result.Message);
                 if (_logger.IsEnabled(LogLevel.Warning))
                     _logger.LogWarning("Get profile failed: {Error}", result.Message);
+            }
+
+            return result.Response;
+        }
+
+        public async Task<string?> GetUserProifleAvatarAsync(Guid userId, bool refresh)
+        {
+            if (!string.IsNullOrWhiteSpace(_userAvatar) && !refresh) 
+                return _userAvatar;
+
+            var result = await _profileApi.GetProfileAvatarAsync(userId);
+            if (!string.IsNullOrWhiteSpace(result.Message))
+            {
+                _globalNotificationService.ShowError(result.Message);
+                if (_logger.IsEnabled(LogLevel.Warning))
+                    _logger.LogWarning("Get profile avatar failed: {Error}", result.Message);
+            }
+
+            if (userId == _authService.CurrentUser?.Id)
+            {
+                _userAvatar = result.Response;
+                OnUserAvatarHasChanged?.Invoke(_userAvatar);
             }
 
             return result.Response;
@@ -63,6 +84,42 @@ namespace HITSBlazor.Services.Profiles
             return false;
         }
 
+        public async Task<bool> UpdateProfileAvatarAsync(IBrowserFile avatar)
+        {
+            byte[] fileBytes = [];
+            try
+            {
+                using (var stream = avatar.OpenReadStream(maxAllowedSize: 5 * 1024 * 1024))
+                using (var memoryStream = new MemoryStream())
+                {
+                    await stream.CopyToAsync(memoryStream);
+                    fileBytes = memoryStream.ToArray();
+                }
+            }
+            catch (Exception)
+            {
+                _globalNotificationService.ShowError("Непредвиденная ошибка. Попробуйте другой файл или повторите попытку позже");
+            }
+
+            if (fileBytes.Length == 0) return false;
+
+            var result = await _profileApi.UpdateProfileAvatarAsync(fileBytes, avatar.Name, avatar.ContentType);
+            if (result.IsSuccess && result.Response is not null)
+            {
+                _globalNotificationService.ShowSuccess(result.Response);
+                return true;
+            }
+
+            if (!string.IsNullOrWhiteSpace(result.Message))
+            {
+                _globalNotificationService.ShowError(result.Message);
+                if (_logger.IsEnabled(LogLevel.Warning))
+                    _logger.LogWarning("Update profile avatar failed: {Error}", result.Message);
+            }
+
+            return false;
+        }
+
         public async Task<Guid> SendUpdateEmailRequestAsync(string newEmail)
         {
             var email = newEmail.Trim();
@@ -78,7 +135,6 @@ namespace HITSBlazor.Services.Profiles
             if (result.IsSuccess && result.Response.HasValue)
             {
                 _verificationGuid = result.Response.Value;
-                _newEmail = email;
                 _globalNotificationService.ShowSuccess("На указанную почту были отправлены инструкции");
                 return _verificationGuid.Value;
             }
@@ -111,7 +167,6 @@ namespace HITSBlazor.Services.Profiles
             if (result.IsSuccess && result.Response is not null)
             {
                 _verificationGuid = null;
-                _newEmail = null;
                 _globalNotificationService.ShowSuccess(result.Response);
                 return true;
             }

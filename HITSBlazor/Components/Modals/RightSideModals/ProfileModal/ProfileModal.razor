@@ -34,9 +34,11 @@
         <div class="d-flex flex-column gap-3 w-75">
             <div class="w-100 bg-white border p-3 rounded-3 d-flex flex-column gap-3" style="height: fit-content;">
                 <div class="d-flex justify-content-center w-100">
-                    <button class="position-relative p-0 rounded-circle">
-                        <img class="text-secondary" width="150" height="150" src="/images/defProfile.png" />
-                    </button>
+                    <label for="avatar" class="position-relative p-0 rounded-circle overflow-hidden" style="cursor: pointer;">
+                        <img class="text-secondary" width="150" height="150" src="@(!string.IsNullOrWhiteSpace(_userAvatar) ? _userAvatar : "/images/defProfile.png")" />
+                    </label>
+                    <InputFile id="avatar" accept="image/*" hidden
+                               OnChange="OnFileSelected" />
                 </div>
                 <div class="w-100 d-flex flex-wrap justify-content-center gap-1">
                     @foreach (var role in Profile?.Roles ?? [])
