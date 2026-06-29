@@ -228,23 +228,12 @@ namespace HITSBlazor.Services.Projects
 
             var oldStatus = task.Status;
 
-            var updatedTask = MockSprints.UpdateTaskStatus(task.Id, newStatus, currentUser, taskIndex);
+            var updatedTask = MockSprints.UpdateTaskStatus(task, newStatus, currentUser, taskIndex);
             if (updatedTask is null) return false;
 
             OnTaskHasMoved?.Invoke(updatedTask, oldStatus);
             return true;
         }
-
-        public async Task<bool> UpdateTaskPositionAsync(HITSTask task, int newIndex)
-        {
-            var taskHasUpdated = MockSprints.UpdateTaskPosition(task.Id, newIndex);
-            if (taskHasUpdated is null) return false;
-
-            return true;
-        }
-
-        public async Task<bool> UpdateTaskPositionsAsync(ICollection<HITSTask> tasks)
-            => MockSprints.UpdateTaskPositions(tasks);
 
         public async Task<bool> DeleteTaskAsync(HITSTask task)
         {

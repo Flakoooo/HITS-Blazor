@@ -77,8 +77,6 @@ namespace HITSBlazor.Services.Projects
         Task<bool> UpdateTaskAsync(Guid taskId, UpdateTaskRequest request);
         Task<bool> UpdateTaskCommentAsync(Guid taskId, string comment, ProjectMemberRole executorRole);
         Task<bool> UpdateTaskStatusAsync(HITSTask task, HITSTaskStatus newStatus, int taskIndex = -100);
-        Task<bool> UpdateTaskPositionAsync(HITSTask task, int newIndex);
-        Task<bool> UpdateTaskPositionsAsync(ICollection<HITSTask> tasks);
         Task<bool> DeleteTaskAsync(HITSTask task);
     }
 }

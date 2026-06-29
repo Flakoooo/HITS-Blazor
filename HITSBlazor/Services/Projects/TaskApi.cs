@@ -25,6 +25,8 @@ namespace HITSBlazor.Services.Projects
         private const string CREATE_TASK_OPERATION = "CreateTask";
         private const string UPDATE_TASK_OPERATION = "UpdateTask";
         private const string UPDATE_TASK_COMMENT_OPERATION = "UpdateTaskComment";
+        private const string UPDATE_TASK_POSITION_OPERATION = "UpdateTaskPosition";
+        private const string DELETE_TASK_OPERATION = "DeleteTask";
 
         private const string GET_TASK_LOGS_OPERATION = "GetTaskLogs";
         private const string CREATE_TASK_LOG_OPERATION = "CreateTaskLog";
@@ -190,6 +192,50 @@ namespace HITSBlazor.Services.Projects
                     return ServiceResponse<string>.Success(message.Message);
                 },
                 operationName: UPDATE_TASK_COMMENT_OPERATION
+            );
+        }
+
+        public async Task<ServiceResponse<string>> UpdateTaskPositionAsync(Guid taskId, int position)
+        {
+            string path = $"{_taskPath}/move/{taskId}/{position}";
+
+            return await ExecuteApiCallAsync(
+                apiCall: () => _httpClient.PutAsync(path, null),
+                successHandler: async response =>
+                {
+                    var message = await response.Content.ReadFromJsonAsync<MessageResponse>(Settings.BaseJsonOptions);
+                    if (message is null)
+                    {
+                        LogFail(UPDATE_TASK_POSITION_OPERATION, response.StatusCode, "Error when update task position");
+
+                        return ServiceResponse<string>.Failure("Не удалось изменить позицию задачи", response.StatusCode);
+                    }
+
+                    return ServiceResponse<string>.Success(message.Message);
+                },
+                operationName: UPDATE_TASK_POSITION_OPERATION
+            );
+        }
+
+        public async Task<ServiceResponse<string>> DeleteTaskAsync(Guid taskId)
+        {
+            string path = $"{_taskPath}/delete/{taskId}";
+
+            return await ExecuteApiCallAsync(
+                apiCall: () => _httpClient.DeleteAsync(path),
+                successHandler: async response =>
+                {
+                    var message = await response.Content.ReadFromJsonAsync<MessageResponse>(Settings.BaseJsonOptions);
+                    if (message is null)
+                    {
+                        LogFail(DELETE_TASK_OPERATION, response.StatusCode, "Error when delete task");
+
+                        return ServiceResponse<string>.Failure("Не удалось удалить задачу", response.StatusCode);
+                    }
+
+                    return ServiceResponse<string>.Success(message.Message);
+                },
+                operationName: DELETE_TASK_OPERATION
             );
         }
 

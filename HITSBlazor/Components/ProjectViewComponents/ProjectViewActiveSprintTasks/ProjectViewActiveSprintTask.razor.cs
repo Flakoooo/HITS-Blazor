@@ -293,11 +293,6 @@ namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewActiveSprintTas
                 if (dropIndex >= 0 && dropIndex != _sprintTasks.IndexOf(taskToMove))
                 {
                     MoveTaskToIndex(taskToMove, dropIndex);
-
-                    var tasksToUpdate = _sprintTasks.ToList();
-                    for (int i = 0; i < tasksToUpdate.Count; i++)
-                        tasksToUpdate[i].Position = i;
-                    await ProjectService.UpdateTaskPositionsAsync(tasksToUpdate);
                 }
                 await DragDrop.EndDrag();
                 return;
@@ -335,8 +330,6 @@ namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewActiveSprintTas
             { 
                 Console.WriteLine($"Error: {ex.Message}"); 
             }
-
-            await ProjectService.UpdateTaskPositionsAsync(_sprintTasks.ToList());
         }
 
         private void TaskHasCreated(HITSTask newTask)

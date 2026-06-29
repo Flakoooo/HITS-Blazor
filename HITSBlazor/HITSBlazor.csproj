@@ -25,6 +25,7 @@
 
   <ItemGroup>
     <Folder Include="Components\Inputs\Radio\" />
+    <Folder Include="Services\Projects\NewFolder\" />
   </ItemGroup>
 
 </Project>

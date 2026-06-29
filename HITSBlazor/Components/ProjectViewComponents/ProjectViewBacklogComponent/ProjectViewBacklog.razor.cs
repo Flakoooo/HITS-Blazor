@@ -271,11 +271,6 @@ namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewBacklogComponen
             if (dropIndex != _projectTasks.IndexOf(taskToMove))
             {
                 MoveTaskToIndex(taskToMove, dropIndex);
-
-                var tasksToUpdate = _projectTasks
-                    .Where(t => t.Status == HITSTaskStatus.InBackLog)
-                    .ToList();
-                await ProjectService.UpdateTaskPositionsAsync(tasksToUpdate);
             }
             await DragDrop.EndDrag();
         }

@@ -1,8 +1,10 @@
-﻿using HITSBlazor.Models.Common.Responses;
+﻿using HITSBlazor.Models.Common.Entities;
+using HITSBlazor.Models.Common.Responses;
 using HITSBlazor.Models.Markets.Entities;
 using HITSBlazor.Models.Projects.Entities;
 using HITSBlazor.Models.Projects.Enums;
 using HITSBlazor.Models.Projects.Requests;
+using HITSBlazor.Models.Quests.Entities;
 using HITSBlazor.Services.Auth;
 using HITSBlazor.Utils.Mocks.Projects;
 using HITSTask = HITSBlazor.Models.Projects.Entities.Task;
@@ -456,6 +458,7 @@ namespace HITSBlazor.Services.Projects
             if (result.IsSuccess && result.Response is not null)
             {
                 OnTaskHasCreated?.Invoke(result.Response);
+                _globalNotificationService.ShowSuccess("Задача успешно создана!");
                 return true;
             }
 
@@ -471,20 +474,49 @@ namespace HITSBlazor.Services.Projects
 
         public async Task<bool> UpdateTaskAsync(Guid taskId, UpdateTaskRequest request)
         {
-            var updatedTask = MockSprints.UpdateTask(taskId, request);
-            if (updatedTask is null) return false;
+            var result = await _taskApi.UpdateTaskAsync(taskId, request);
+            if (result.IsSuccess && result.Response is not null)
+            {
+                OnTaskHasUpdated?.Invoke(result.Response);
+                _globalNotificationService.ShowSuccess("Задача успешно изменена!");
+                return true;
+            }
 
-            OnTaskHasUpdated?.Invoke(updatedTask);
-            return true;
+            if (!string.IsNullOrWhiteSpace(result.Message))
+            {
+                _globalNotificationService.ShowError(result.Message);
+                if (_logger.IsEnabled(LogLevel.Warning))
+                    _logger.LogWarning("Update task failed: {Error}", result.Message);
+            }
+
+            return false;
         }
 
         public async Task<bool> UpdateTaskCommentAsync(Guid taskId, string comment, ProjectMemberRole executorRole)
         {
-            var taskHasUpdated = MockSprints.UpdateTaskComment(taskId, comment, executorRole);
-            if (!taskHasUpdated) return false;
+            var currentUser = _authService.CurrentUser;
+            if (currentUser is null)
+            {
+                _globalNotificationService.ShowError("Не удалось задать комментарий");
+                return false;
+            }
 
-            OnTaskCommentUpdated?.Invoke(taskId, comment, executorRole);
-            return true;
+            var result = await _taskApi.UpdateTaskCommentAsync(taskId, currentUser.Id, comment, executorRole);
+            if (result.IsSuccess && result.Response is not null)
+            {
+                OnTaskCommentUpdated?.Invoke(taskId, comment, executorRole);
+                _globalNotificationService.ShowSuccess("Комментарий задачи изменен");
+                return true;
+            }
+
+            if (!string.IsNullOrWhiteSpace(result.Message))
+            {
+                _globalNotificationService.ShowError(result.Message);
+                if (_logger.IsEnabled(LogLevel.Warning))
+                    _logger.LogWarning("Update task comment failed: {Error}", result.Message);
+            }
+
+            return false;
         }
 
         public async Task<bool> UpdateTaskStatusAsync(HITSTask task, HITSTaskStatus newStatus, int taskIndex)
@@ -494,33 +526,69 @@ namespace HITSBlazor.Services.Projects
 
             var oldStatus = task.Status;
 
-            var updatedTask = MockSprints.UpdateTaskStatus(task.Id, newStatus, currentUser, taskIndex);
-            if (updatedTask is null) return false;
+            var statusResult = await _taskApi.CreateTasksLogAsync(task.Id, currentUser.Id, task.Initiator.Id, newStatus);
+            if (statusResult.IsSuccess && statusResult.Response is not null)
+            {
+                await UpdateTaskPositionAsync(task, taskIndex);
 
-            OnTaskHasMoved?.Invoke(updatedTask, oldStatus);
-            return true;
+                task.Status = newStatus;
+                if (taskIndex >= 0)
+                    task.Position = taskIndex;
+
+                if (newStatus is not HITSTaskStatus.OnModification)
+                {
+                    if (newStatus > HITSTaskStatus.NewTask && task.Executor is null)
+                        task.Executor = currentUser;
+                    else if (newStatus <= HITSTaskStatus.NewTask)
+                        task.Executor = null;
+                }
+
+                OnTaskHasMoved?.Invoke(task, oldStatus);
+                return true;
+            }
+
+            if (!string.IsNullOrWhiteSpace(statusResult.Message))
+            {
+                _globalNotificationService.ShowError(statusResult.Message);
+                if (_logger.IsEnabled(LogLevel.Warning))
+                    _logger.LogWarning("Update task status failed: {Error}", statusResult.Message);
+            }
+
+            return false;
         }
 
-        public async Task<bool> UpdateTaskPositionAsync(HITSTask task, int newIndex)
+        private async Task<bool> UpdateTaskPositionAsync(HITSTask task, int newIndex)
         {
-            var taskHasUpdated = MockSprints.UpdateTaskPosition(task.Id, newIndex);
-            if (taskHasUpdated is null) return false;
+            var result = await _taskApi.UpdateTaskPositionAsync(task.Id, newIndex);
 
-            return true;
+            if (!string.IsNullOrWhiteSpace(result.Message))
+            {
+                _globalNotificationService.ShowError(result.Message);
+                if (_logger.IsEnabled(LogLevel.Warning))
+                    _logger.LogWarning("Update task position failed: {Error}", result.Message);
+            }
+
+            return result.IsSuccess;
         }
-
-        public async Task<bool> UpdateTaskPositionsAsync(ICollection<HITSTask> tasks)
-            => MockSprints.UpdateTaskPositions(tasks);
 
         public async Task<bool> DeleteTaskAsync(HITSTask task)
         {
-            if (!MockSprints.DeleteTask(task))
+            var result = await _taskApi.DeleteTaskAsync(task.Id);
+            if (result.IsSuccess && result.Response is not null)
             {
-                return false;
+                OnTaskHasDeleted?.Invoke(task);
+                _globalNotificationService.ShowSuccess(result.Response);
+                return true;
             }
 
-            OnTaskHasDeleted?.Invoke(task);
-            return true;
+            if (!string.IsNullOrWhiteSpace(result.Message))
+            {
+                _globalNotificationService.ShowError(result.Message);
+                if (_logger.IsEnabled(LogLevel.Warning))
+                    _logger.LogWarning("Delete task failed: {Error}", result.Message);
+            }
+
+            return false;
         }
     }
 }

@@ -637,7 +637,7 @@ namespace HITSBlazor.Utils.Mocks.Projects
                 {
                     task.Status = HITSTaskStatus.NewTask;
                     task.SprintId = sprintId;
-                    UpdateTaskStatus(task.Id, HITSTaskStatus.NewTask, updateInitiator);
+                    UpdateTaskStatus(task, HITSTaskStatus.NewTask, updateInitiator);
                 }
 
                 sprintForUpdate.Tasks = _tasks.Where(t => request.Tasks.Contains(t.Id)).ToList();
@@ -863,14 +863,45 @@ namespace HITSBlazor.Utils.Mocks.Projects
             return true;
         }
 
-        public static HITSTask? UpdateTaskStatus(Guid taskId, HITSTaskStatus newStatus, User executor, int taskIndex = -100)
+        public static HITSTask? UpdateTaskStatus(HITSTask task, HITSTaskStatus newStatus, User executor, int taskIndex = -100)
         {
-            var taskForUpdate = _tasks.FirstOrDefault(t => t.Id == taskId);
+            var taskForUpdate = _tasks.FirstOrDefault(t => t.Id == task.Id);
             if (taskForUpdate is null) return null;
 
+            var oldStatus = task.Status;
             taskForUpdate.Status = newStatus;
+
             if (taskIndex >= 0)
+            {
                 taskForUpdate.Position = taskIndex;
+                int count = 0;
+                foreach (var movedTask in _tasks.Where(t => t.Status == newStatus)
+                                                .OrderBy(t => t.Position)
+                                                .ThenBy(t => t.Id == taskForUpdate.Id ? 1 : 0)
+                )
+                {
+                    if (movedTask.Id == taskForUpdate.Id)
+                    {
+                        ++count;
+                        continue;
+                    }
+
+                    if (count == taskIndex) ++count;
+
+                    movedTask.Position = count;
+                    ++count;                    
+                }
+            }
+
+            if (oldStatus != newStatus)
+            {
+                int count = 0;
+                foreach (var movedTask in _tasks.Where(t => t.Status == oldStatus).OrderBy(t => t.Position))
+                {
+                    movedTask.Position = count;
+                    ++count;
+                }
+            }
 
             if (newStatus is not HITSTaskStatus.OnModification)
             {
@@ -881,27 +912,8 @@ namespace HITSBlazor.Utils.Mocks.Projects
             }
 
             MockTaskMovementLogs.CreateNewTaskLog(taskForUpdate, taskForUpdate.Initiator, executor);
-
+            
             return taskForUpdate;
-        }
-
-        public static HITSTask? UpdateTaskPosition(Guid taskId, int newIndex)
-        {
-            var taskForUpdate = _tasks.FirstOrDefault(t => t.Id == taskId);
-            if (taskForUpdate is null) return null;
-
-            taskForUpdate.Position = newIndex;
-
-            return taskForUpdate;
-        }
-
-        public static bool UpdateTaskPositions(ICollection<HITSTask> tasks)
-        {
-            foreach (var updatedTask in tasks)
-            {
-                _tasks.FirstOrDefault(t => t.Id == updatedTask.Id)?.Position = updatedTask.Position;
-            }
-            return true;
         }
 
         public static bool DeleteTask(HITSTask task)
