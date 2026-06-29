@@ -189,7 +189,12 @@ namespace HITSBlazor
             //builder.Services.AddScoped<ITestResultService, MockTestResultService>();
 
             //Profile
+#if DEBUG && !DEBUGAPI
             builder.Services.AddScoped<IProfileService, MockProfileService>();
+#else
+            builder.Services.AddScoped<ProfileApi>();
+            builder.Services.AddScoped<IProfileService, ProfileService>();
+#endif
 
             //Notification
             builder.Services.AddScoped<INotificationService, MockNotificationService>();
