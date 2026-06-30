@@ -2,6 +2,7 @@
 @using Microsoft.AspNetCore.Components.Authorization
 @inject NavigationManager Navigation
 @inject IAuthService AuthService
+@inject IApexChartService ApexChartService
 
 <CascadingAuthenticationState>
     @if (_isInitialized)
@@ -87,6 +88,14 @@
         {
             Console.WriteLine($"Ошибка инициализации: {ex.Message}");
             _isInitialized = true;
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await ApexChartService.InitalizeChartAsync();
         }
     }
 }

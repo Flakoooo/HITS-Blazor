@@ -4,19 +4,13 @@ using HITSBlazor.Components.Modals.CenterModals.UpdateEmailModal;
 using HITSBlazor.Components.Tables.TableHeader;
 using HITSBlazor.Models.Common.Entities;
 using HITSBlazor.Models.Common.Enums;
-using HITSBlazor.Models.Common.Responses;
-using HITSBlazor.Models.Tests.Entities;
 using HITSBlazor.Models.Users.Entities;
 using HITSBlazor.Services.Auth;
 using HITSBlazor.Services.Modal;
 using HITSBlazor.Services.Profiles;
-using HITSBlazor.Services.TestResults;
 using HITSBlazor.Services.UserSkills;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
-using System.Net.Http.Headers;
-using static System.Net.WebRequestMethods;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace HITSBlazor.Components.Modals.RightSideModals.ProfileModal
 {

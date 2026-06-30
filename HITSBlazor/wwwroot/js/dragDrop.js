@@ -2,14 +2,39 @@
     helpers: {},
     isDragging: false,
     sourceCategory: null,
+    _pendingMoveEvent: null,
+    _animationFrameScheduled: false,
 
     initializeGlobalMouseEvents: function (dotNetHelper, category) {
         this.helpers[category] = dotNetHelper;
         if (!this._eventsInitialized) {
             this._eventsInitialized = true;
-            document.addEventListener('mousemove', this.globalMouseMoveHandler);
+
+            const self = this;
+
+            this._mouseMoveProxy = function (e) {
+
+                self._pendingMoveEvent = e;
+
+                if (!self._animationFrameScheduled) {
+
+                    self._animationFrameScheduled = true;
+
+                    requestAnimationFrame(() => {
+
+                        self._animationFrameScheduled = false;
+
+                        if (self._pendingMoveEvent)
+                            self.globalMouseMoveHandler(self._pendingMoveEvent);
+
+                    });
+
+                }
+            };
+
+            document.addEventListener("mousemove", this._mouseMoveProxy);
+            window.addEventListener("mousemove", this._mouseMoveProxy);
             document.addEventListener('mouseup', this.globalMouseUpHandler);
-            window.addEventListener('mousemove', this.globalMouseMoveHandler);
             window.addEventListener('mouseup', this.globalMouseUpHandler);
         }
     },
@@ -92,12 +117,25 @@
 
         var sourceHelper = window.dragDrop.helpers[window.dragDrop.sourceCategory];
         if (sourceHelper) {
-            sourceHelper.invokeMethodAsync('OnGlobalMouseMove', e.clientX, e.clientY, category, dropIndex);
+            sourceHelper.invokeMethodAsync(
+                "OnGlobalMouseMove",
+                e.clientX,
+                e.clientY,
+                category,
+                dropIndex
+            );
         }
         if (category && category !== window.dragDrop.sourceCategory) {
             var targetHelper = window.dragDrop.helpers[category];
+
             if (targetHelper) {
-                targetHelper.invokeMethodAsync('OnGlobalMouseMove', e.clientX, e.clientY, category, dropIndex);
+                targetHelper.invokeMethodAsync(
+                    "OnGlobalMouseMove",
+                    e.clientX,
+                    e.clientY,
+                    category,
+                    dropIndex
+                );
             }
         }
     },
@@ -136,12 +174,25 @@
 
         var sourceHelper = window.dragDrop.helpers[window.dragDrop.sourceCategory];
         if (sourceHelper) {
-            sourceHelper.invokeMethodAsync('OnGlobalMouseUp', e.clientX, e.clientY, category, dropIndex);
+            sourceHelper.invokeMethodAsync(
+                "OnGlobalMouseUp",
+                e.clientX,
+                e.clientY,
+                category,
+                dropIndex
+            );
         }
         if (category && category !== window.dragDrop.sourceCategory) {
             var targetHelper = window.dragDrop.helpers[category];
+
             if (targetHelper) {
-                targetHelper.invokeMethodAsync('OnGlobalMouseUp', e.clientX, e.clientY, category, dropIndex);
+                targetHelper.invokeMethodAsync(
+                    "OnGlobalMouseUp",
+                    e.clientX,
+                    e.clientY,
+                    category,
+                    dropIndex
+                );
             }
         }
 
@@ -156,9 +207,9 @@
         document.body.style.userSelect = '';
     },
     removeGlobalMouseEvents: function () {
-        document.removeEventListener('mousemove', this.globalMouseMoveHandler);
+        document.removeEventListener("mousemove", this._mouseMoveProxy);
+        window.removeEventListener("mousemove", this._mouseMoveProxy);
         document.removeEventListener('mouseup', this.globalMouseUpHandler);
-        window.removeEventListener('mousemove', this.globalMouseMoveHandler);
         window.removeEventListener('mouseup', this.globalMouseUpHandler);
         this._eventsInitialized = false;
     },

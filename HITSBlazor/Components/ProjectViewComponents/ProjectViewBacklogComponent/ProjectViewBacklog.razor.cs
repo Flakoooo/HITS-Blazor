@@ -234,14 +234,21 @@ namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewBacklogComponen
 
         private void MoveTaskToIndex(HITSTask task, int newIndex)
         {
-            if (newIndex < 0) newIndex = 0;
-            if (newIndex > _inBackLogCount) newIndex = _inBackLogCount;
+            if (newIndex < 0) 
+                newIndex = 0;
+
+            if (newIndex > _inBackLogCount) 
+                newIndex = _inBackLogCount;
 
             var currentIndex = _projectTasks.IndexOf(task);
-            if (currentIndex < 0 || currentIndex == newIndex) return;
+            if (currentIndex < 0 || currentIndex == newIndex) 
+                return;
 
             _projectTasks.RemoveAt(currentIndex);
-            if (currentIndex < newIndex) newIndex--;
+
+            if (currentIndex < newIndex) 
+                newIndex--;
+
             _projectTasks.Insert(newIndex, task);
 
             int pos = 1;
@@ -250,8 +257,6 @@ namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewBacklogComponen
                 if (t.Status is HITSTaskStatus.InBackLog)
                     t.Position = pos++;
             }
-
-            StateHasChanged();
         }
 
         private async void HandleDrop()

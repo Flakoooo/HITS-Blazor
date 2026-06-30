@@ -27,6 +27,8 @@ namespace HITSBlazor.Services.DragAndDrop
         public event Action? OnOverlayNeedsUpdate;
         private DateTime _lastOverlayUpdate = DateTime.MinValue;
 
+        private long _lastRenderTicks;
+
         public void SetJSRuntime(IJSRuntime jsRuntime) => _jsRuntime = jsRuntime;
 
         public void UpdateMouseMove(double clientX, double clientY, string? targetCategory, int dropIndex)
@@ -79,7 +81,17 @@ namespace HITSBlazor.Services.DragAndDrop
             ) removeTask();
         }
 
-        public void NotifyStateChanged() => OnDragStateChanged?.Invoke();
+        public void NotifyStateChanged()
+        {
+            var now = Environment.TickCount64;
+
+            if (now - _lastRenderTicks < 16)
+                return;
+
+            _lastRenderTicks = now;
+
+            OnDragStateChanged?.Invoke();
+        }
 
         public void NotifyCleanUp() => OnCleanupTempTask?.Invoke();
     }

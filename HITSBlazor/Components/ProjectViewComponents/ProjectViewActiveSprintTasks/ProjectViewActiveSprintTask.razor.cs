@@ -263,16 +263,20 @@ namespace HITSBlazor.Components.ProjectViewComponents.ProjectViewActiveSprintTas
 
         private void MoveTaskToIndex(HITSTask task, int newIndex)
         {
-            if (newIndex < 0 || newIndex > _sprintTasks.Count) return;
+            if (newIndex < 0 || newIndex > _sprintTasks.Count)
+                return;
 
             var currentIndex = _sprintTasks.IndexOf(task);
-            if (currentIndex < 0 || currentIndex == newIndex) return;
 
-            
+            if (currentIndex < 0 || currentIndex == newIndex)
+                return;
+
             _sprintTasks.RemoveAt(currentIndex);
-            if (currentIndex < newIndex) newIndex--;
+
+            if (currentIndex < newIndex)
+                newIndex--;
+
             _sprintTasks.Insert(newIndex, task);
-            StateHasChanged();
         }
 
         private async void HandleDrop()

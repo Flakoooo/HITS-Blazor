@@ -57,9 +57,10 @@
         }
         else
         {
-            @foreach (var task in _sprintTasks)
+            @for (int i = 0; i < _sprintTasks.Count; i++)
             {
-                var order = _sprintTasks.IndexOf(task);
+                var task = _sprintTasks[i];
+                var order = i;
                 @if (CanDragTask(task))
                 {
                     <div class="d-flex my-1 task-item task-item-draggable @(DragDrop.DraggedTask?.Id == task.Id ? "task-item-dragging" : "")"
